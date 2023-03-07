@@ -88,6 +88,11 @@ def main(cwd, argv):
     default_cache_dir = os.path.expanduser("~/.isopy")
     default_env = "default"
 
+    def add_subcommand(subparsers, *args, func, **kwargs):
+        parser = subparsers.add_parser(*args, **kwargs)
+        parser.set_defaults(func=func)
+        return parser
+
     def add_common_args(parser):
         parser.add_argument(
             "--cache-dir",
@@ -102,12 +107,17 @@ def main(cwd, argv):
             default=default_env,
             help=f"cache directory (default: {default_env})")
 
-    parser = argparse.ArgumentParser(description="isopy")
+    parser = argparse.ArgumentParser(
+        prog="isopy",
+        description="Isolated Python Tool")
 
     subparsers = parser.add_subparsers(required=True)
 
-    p = subparsers.add_parser("install")
-    p.set_defaults(
+    p = add_subcommand(
+        subparsers,
+        "install",
+        help="install Python interpreter",
+        description="Install Python interpreter",
         func=lambda logger, args: do_install(
             logger=logger,
             cache_dir=args.cache_dir,
@@ -116,8 +126,11 @@ def main(cwd, argv):
             env=args.env))
     add_common_args(p)
 
-    p = subparsers.add_parser("shell")
-    p.set_defaults(
+    p = add_subcommand(
+        subparsers,
+        "shell",
+        help="open shell in Python environment",
+        description="Open shell in Python environment",
         func=lambda logger, args: do_shell(
             logger=logger,
             cache_dir=args.cache_dir,
@@ -125,6 +138,7 @@ def main(cwd, argv):
     add_common_args(p)
 
     args = parser.parse_args(argv)
+
     logging.basicConfig(
         format="%(asctime)s %(levelname)s %(message)s")
     logger = logging.getLogger(__name__)
