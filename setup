@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+this_dir=$(cd $(dirname $0); pwd -P)
+python3 -m pip install -r $this_dir/requirements.txt
