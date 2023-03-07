@@ -187,11 +187,12 @@ def do_shell(logger, cache_dir, env):
     python_bin_dir = make_dir_path(python_dir, "bin")
 
     print(f"Python shell for environment {env}; Python is at {python_bin_dir}")
+    print(f"Type \"exit\" to return to parent shell")
     existing_path = os.getenv("PATH")
     os.environ["PATH"] = python_bin_dir \
         if existing_path is None \
         else python_bin_dir + ":" + existing_path
-    pty.spawn("/bin/bash")
+    pty.spawn(os.getenv("SHELL"))
     print("You are back in the parent shell")
 
 
