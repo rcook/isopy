@@ -1,4 +1,5 @@
 from collections import namedtuple
+from enum import Enum, auto, unique
 from tempfile import TemporaryDirectory
 import argparse
 import json
@@ -18,6 +19,29 @@ SUBARCHES = set(["apple", "pc", "unknown"])
 OSES = set(["darwin", "linux"])
 FLAVOURS = set(["debug", "gnu", "musl"])
 SUBFLAVOURS = set(["install_only"])
+
+
+from enum import Enum, auto, unique
+import platform
+
+
+@unique
+class Platform(Enum):
+    LINUX = auto()
+    MACOS = auto()
+    WINDOWS = auto()
+
+    @classmethod
+    def current(cls):
+        os = platform.system().lower()
+        if os == "linux":
+            return cls.LINUX
+        elif os == "darwin":
+            return cls.MACOS
+        elif os == "windows":
+            return cls.WINDOWS
+        else:
+            raise NotImplementedError(f"Unsupported OS \"{os}\"")
 
 
 ReleaseInfo = namedtuple("ReleaseInfo", [
@@ -178,6 +202,9 @@ def do_install(logger, cache_dir, tag_name, python_version, env):
 
 
 def do_shell(logger, cache_dir, env):
+    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
+        raise NotImplementedError(f"Not supported for this platform yet")
+
     with open(make_env_manifest_path(cache_dir=cache_dir, env=env), "rt") as f:
         manifest = json.load(f)
 
