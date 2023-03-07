@@ -11,7 +11,6 @@ import shutil
 import sys
 
 
-PYTHON_FILE_NAME_FORMAT = "cpython-{python_version}+{tag_name}-x86_64-unknown-linux-gnu-install_only.tar.gz"
 PYTHON_URL_FORMAT = "https://github.com/indygreg/python-build-standalone/releases/download/{tag_name}/{file_name}"
 EXTS = set([".tar.gz"])
 ARCHES = set(["aarch64", "x86_64", "x86_64_v2", "x86_64_v3", "x86_64_v4"])
@@ -186,74 +185,7 @@ def make_env_manifest_path(cache_dir, env):
     return make_file_path(make_env_dir(cache_dir, env), "env.json")
 
 
-def do_install(logger, cache_dir, tag_name, python_version, env):
-    python_file_name = PYTHON_FILE_NAME_FORMAT.format(
-        tag_name=tag_name,
-        python_version=python_version)
-    python_path = make_file_path(cache_dir, python_file_name)
-    if os.path.isfile(python_path):
-        logger.info(f"Using {python_path}")
-    else:
-        python_url = PYTHON_URL_FORMAT.format(
-            tag_name=tag_name,
-            python_version=python_version,
-            file_name=python_file_name)
-
-        logger.info(f"Downloading {python_url} to {python_path}")
-
-        download_file(
-            url=python_url,
-            local_path=python_path)
-
-    env_dir = make_env_dir(cache_dir=cache_dir, env=env)
-
-    python_dir = make_dir_path(
-        env_dir,
-        f"cpython-{python_version}+{tag_name}")
-    if os.path.isdir(python_dir):
-        logger.info(f"Python already exists at {python_dir}")
-    else:
-        logger.info(f"Unpacking {python_path} to {python_dir}")
-        with TemporaryDirectory() as d:
-            shutil.unpack_archive(python_path, d)
-            temp_python_dir = make_dir_path(d, "python")
-            shutil.move(temp_python_dir, python_dir)
-
-    env_manifest_path = make_env_manifest_path(cache_dir=cache_dir, env=env)
-    if os.path.isfile(env_manifest_path):
-        logger.info(f"Environment manifest {env_manifest_path} already exists")
-    else:
-        with open(env_manifest_path, "wt") as f:
-            f.write(json.dumps({
-                "tag_name": tag_name,
-                "python_version": python_version,
-                "python_dir": os.path.relpath(python_dir, env_dir)
-            }, indent=2))
-
-
-def do_shell(logger, cache_dir, env):
-    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
-        raise NotImplementedError(f"Not supported for this platform yet")
-
-    with open(make_env_manifest_path(cache_dir=cache_dir, env=env), "rt") as f:
-        manifest = json.load(f)
-
-    python_dir = make_dir_path(
-        make_env_dir(cache_dir=cache_dir, env=env),
-        manifest["python_dir"])
-    python_bin_dir = make_dir_path(python_dir, "bin")
-
-    print(f"Python shell for environment {env}; Python is at {python_bin_dir}")
-    print(f"Type \"exit\" to return to parent shell")
-    existing_path = os.getenv("PATH")
-    os.environ["PATH"] = python_bin_dir \
-        if existing_path is None \
-        else python_bin_dir + ":" + existing_path
-    pty.spawn(os.getenv("SHELL"))
-    print("You are back in the parent shell")
-
-
-def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
+def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
     def filter_releases(releases, tag_name):
         def predicate(x):
             if tag_name is not None:
@@ -310,16 +242,112 @@ def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None,
     else:
         raise NotImplementedError(f"Unsupported platform {platform}")
 
-    for release in filter_releases(
-            releases=releases,
-            tag_name=tag_name):
+    return [
+        asset
+        for release in filter_releases(releases=releases, tag_name=tag_name)
         for asset in filter_assets(
-                assets=release.assets,
-                python_version=python_version,
-                os_=os_,
-                arch="x86_64",
-                flavour=flavour):
-            print(f"{asset.os} {asset.arch} {asset.tag_name} {asset.python_version}")
+            assets=release.assets,
+            python_version=python_version,
+            os_=os_,
+            arch="x86_64",
+            flavour=flavour)
+    ]
+
+
+def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
+    assets = get_versions(
+        logger=logger,
+        cache_dir=cache_dir,
+        tag_name=tag_name,
+        python_version=python_version,
+        os_=os_,
+        arch=arch,
+        flavour=flavour)
+
+    if len(assets) != 1:
+        raise NotImplementedError()
+
+    asset = assets[0]
+
+    env_dir = make_env_dir(cache_dir=cache_dir, env=env)
+
+    if force and os.path.isdir(env_dir):
+        shutil.rmtree(env_dir)
+
+    python_path = make_file_path(cache_dir, asset.name)
+    if os.path.isfile(python_path):
+        logger.info(f"Using {python_path}")
+    else:
+        python_url = PYTHON_URL_FORMAT.format(
+            tag_name=tag_name,
+            python_version=python_version,
+            file_name=asset.name)
+
+        logger.info(f"Downloading {python_url} to {python_path}")
+
+        download_file(
+            url=python_url,
+            local_path=python_path)
+
+    python_dir = make_dir_path(
+        env_dir,
+        f"cpython-{python_version}+{tag_name}")
+    if os.path.isdir(python_dir):
+        logger.info(f"Python already exists at {python_dir}")
+    else:
+        logger.info(f"Unpacking {python_path} to {python_dir}")
+        with TemporaryDirectory() as d:
+            shutil.unpack_archive(python_path, d)
+            temp_python_dir = make_dir_path(d, "python")
+            shutil.move(temp_python_dir, python_dir)
+
+    env_manifest_path = make_env_manifest_path(cache_dir=cache_dir, env=env)
+    if os.path.isfile(env_manifest_path):
+        logger.info(f"Environment manifest {env_manifest_path} already exists")
+    else:
+        with open(env_manifest_path, "wt") as f:
+            f.write(json.dumps({
+                "tag_name": tag_name,
+                "python_version": python_version,
+                "python_dir": os.path.relpath(python_dir, env_dir)
+            }, indent=2))
+
+
+def do_shell(logger, cache_dir, env):
+    raise NotImplementedError()
+    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
+        raise NotImplementedError(f"Not supported for this platform yet")
+
+    with open(make_env_manifest_path(cache_dir=cache_dir, env=env), "rt") as f:
+        manifest = json.load(f)
+
+    python_dir = make_dir_path(
+        make_env_dir(cache_dir=cache_dir, env=env),
+        manifest["python_dir"])
+    python_bin_dir = make_dir_path(python_dir, "bin")
+
+    print(f"Python shell for environment {env}; Python is at {python_bin_dir}")
+    print(f"Type \"exit\" to return to parent shell")
+    existing_path = os.getenv("PATH")
+    os.environ["PATH"] = python_bin_dir \
+        if existing_path is None \
+        else python_bin_dir + ":" + existing_path
+    pty.spawn(os.getenv("SHELL"))
+    print("You are back in the parent shell")
+
+
+def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
+    assets = get_versions(
+        logger=logger,
+        cache_dir=cache_dir,
+        tag_name=tag_name,
+        python_version=python_version,
+        os_=os_,
+        arch=arch,
+        flavour=flavour)
+
+    for asset in assets:
+        print(f"{asset.os} {asset.arch} {asset.tag_name} {asset.python_version}")
 
 
 def main(cwd, argv):
@@ -365,9 +393,10 @@ def main(cwd, argv):
         func=lambda logger, args: do_install(
             logger=logger,
             cache_dir=args.cache_dir,
+            env=args.env,
+            force=args.force,
             tag_name=args.tag_name,
-            python_version=args.python_version,
-            env=args.env))
+            python_version=args.python_version))
     add_common_args(p)
     p.add_argument(
         "tag_name",
@@ -379,6 +408,12 @@ def main(cwd, argv):
         metavar="PYTHON_VERSION",
         type=str,
         help="Python version")
+    p.add_argument(
+        "--force",
+        "-f",
+        metavar="FORCE",
+        action=argparse.BooleanOptionalAction,
+        help="force overwrite of environment")
 
     p = add_subcommand(
         subparsers,
