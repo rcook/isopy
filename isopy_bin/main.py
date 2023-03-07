@@ -289,10 +289,20 @@ def main(cwd, argv):
         func=lambda logger, args: do_install(
             logger=logger,
             cache_dir=args.cache_dir,
-            tag_name="20230116",
-            python_version="3.11.1",
+            tag_name=args.tag_name,
+            python_version=args.python_version,
             env=args.env))
     add_common_args(p)
+    p.add_argument(
+        "tag_name",
+        metavar="TAG_NAME",
+        type=str,
+        help="tag name")
+    p.add_argument(
+        "python_version",
+        metavar="PYTHON_VERSION",
+        type=str,
+        help="Python version")
 
     p = add_subcommand(
         subparsers,
