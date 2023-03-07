@@ -11,6 +11,32 @@ import sys
 
 PYTHON_FILE_NAME_FORMAT = "cpython-{python_version}+{tag_name}-x86_64-unknown-linux-gnu-install_only.tar.gz"
 PYTHON_URL_FORMAT = "https://github.com/indygreg/python-build-standalone/releases/download/{tag_name}/{file_name}"
+EXTS = set([".tar.gz"])
+ARCHES = set(["aarch64", "x86_64", "x86_64_v2", "x86_64_v3", "x86_64_v4"])
+SUBARCHES = set(["apple", "pc", "unknown"])
+OSES = set(["darwin", "linux"])
+FLAVOURS = set(["debug", "gnu", "musl"])
+SUBFLAVOURS = set(["install_only"])
+
+
+ReleaseInfo = namedtuple("ReleaseInfo", [
+    "tag_name",
+    "assets"
+])
+
+
+AssetInfo = namedtuple("AssetInfo", [
+    "browser_download_url",
+    "name",
+    "ext",
+    "python_version",
+    "tag_name",
+    "arch",
+    "subarch",
+    "os",
+    "flavour",
+    "subflavour"
+])
 
 
 def make_dir_path(*args):
@@ -19,6 +45,74 @@ def make_dir_path(*args):
 
 def make_file_path(*args):
     return os.path.abspath(os.path.join(*args))
+
+
+def split_at_ext(s):
+    for ext in EXTS:
+        if s.endswith(ext):
+            s_len = len(s)
+            ext_len = len(ext)
+            temp = s_len - ext_len
+            return s[0:temp], s[temp:]
+    raise ValueError(f"Name {s} has unknown extension")
+
+
+def parse_python_version_and_tag_name(s):
+    parts = s.split("+")
+    if len(parts) != 2:
+        raise ValueError(f"Invalid Python version and tag name {s}")
+
+    return parts
+
+
+def make_release_info(obj):
+    assets = []
+    for asset_obj in obj["assets"]:
+        try:
+            assets.append(make_asset_info(asset_obj))
+        except ValueError:
+            pass
+
+    return ReleaseInfo(tag_name=obj["tag_name"], assets=assets)
+
+
+def make_asset_info(obj):
+    base, ext = split_at_ext(obj["name"])
+
+    prog, temp, arch, subarch, os_, flavour, subflavour = \
+        base.split("-", 7)
+
+    if prog != "cpython":
+        raise ValueError(f"Invalid program name {prog}")
+
+    python_version, tag_name = parse_python_version_and_tag_name(temp)
+
+    if arch not in ARCHES:
+        raise ValueError(f"Unsupported architecture {arch}")
+
+    if subarch not in SUBARCHES:
+        raise ValueError(f"Unsupported subarchitecture {subarch}")
+
+    if os_ not in OSES:
+        raise ValueError(f"Unsupported OS {os_}")
+
+    if flavour not in FLAVOURS:
+        raise ValueError(f"Unsupported flavour {flavour}")
+
+    if subflavour not in SUBFLAVOURS:
+        raise ValueError(f"Unsupported subflavour {subflavour}")
+
+    return AssetInfo(
+        browser_download_url=obj["browser_download_url"],
+        name=obj["name"],
+        ext=ext,
+        python_version=python_version,
+        tag_name=tag_name,
+        arch=arch,
+        subarch=subarch,
+        os=os_,
+        flavour=flavour,
+        subflavour=subflavour)
 
 
 def download_file(url, local_path):
@@ -61,8 +155,6 @@ def do_install(logger, cache_dir, tag_name, python_version, env):
     python_dir = make_dir_path(
         env_dir,
         f"cpython-{python_version}+{tag_name}")
-    print(python_dir)
-    exit(1)
     if os.path.isdir(python_dir):
         logger.info(f"Python already exists at {python_dir}")
     else:
@@ -78,9 +170,9 @@ def do_install(logger, cache_dir, tag_name, python_version, env):
     else:
         with open(env_manifest_path, "wt") as f:
             f.write(json.dumps({
-                "tagName": tag_name,
-                "pythonVersion": python_version,
-                "pythonDir": os.path.relpath(python_dir, env_dir)
+                "tag_name": tag_name,
+                "python_version": python_version,
+                "python_dir": os.path.relpath(python_dir, env_dir)
             }, indent=2))
 
 
@@ -90,12 +182,39 @@ def do_shell(logger, cache_dir, env):
 
     python_dir = make_dir_path(
         make_env_dir(cache_dir=cache_dir, env=env),
-        manifest["pythonDir"])
+        manifest["python_dir"])
     python_bin_dir = make_dir_path(python_dir, "bin")
     print(f"export PATH={python_bin_dir}:$PATH")
 
 
-def do_versions(logger, cache_dir):
+def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
+    def filter_releases(releases, tag_name):
+        def predicate(x):
+            if tag_name is not None:
+                if x.tag_name != tag_name:
+                    return False
+            return True
+
+        return filter(predicate, releases)
+
+    def filter_assets(assets, python_version, os_, arch, flavour):
+        def predicate(x):
+            if python_version is not None:
+                if x.python_version != python_version:
+                    return False
+            if os_ is not None:
+                if x.os != os_:
+                    return False
+            if arch is not None:
+                if x.arch != arch:
+                    return False
+            if flavour is not None:
+                if x.flavour != flavour:
+                    return False
+            return True
+
+        return filter(predicate, assets)
+
     cached_releases_json_path = make_file_path(
         cache_dir,
         "cached-releases.json")
@@ -112,25 +231,19 @@ def do_versions(logger, cache_dir):
     with open(cached_releases_json_path, "rt") as f:
         releases_obj = json.load(f)
 
-    ReleaseInfo = namedtuple("ReleaseInfo", [
-        "tag_name",
-        "prerelease",
-        "assets"
-    ])
-
-    def make_release_info(obj):
-        return ReleaseInfo(
-            tag_name=obj["tag_name"],
-            prerelease=obj["prerelease"],
-            assets=obj["assets"])
-
     temp = map(make_release_info, releases_obj)
     releases = sorted(temp, key=lambda x: x.tag_name, reverse=True)
 
-    release = releases[0]
-    for a in release.assets[0:1]:
-        print(json.dumps(a, indent=2))
-    exit(1)
+    for release in filter_releases(
+            releases=releases,
+            tag_name=tag_name):
+        for asset in filter_assets(
+                assets=release.assets,
+                python_version=python_version,
+                os_="linux",
+                arch="x86_64",
+                flavour="gnu"):
+            print(asset)
 
 
 def main(cwd, argv):
@@ -199,8 +312,24 @@ def main(cwd, argv):
         description="List available Python versions",
         func=lambda logger, args: do_versions(
             logger=logger,
-            cache_dir=args.cache_dir))
+            cache_dir=args.cache_dir,
+            tag_name=args.tag_name,
+            python_version=args.python_version))
     add_cache_dir_arg(p)
+    p.add_argument(
+        "--tag-name",
+        "-t",
+        metavar="TAG_NAME",
+        type=str,
+        required=False,
+        help="tag name")
+    p.add_argument(
+        "--python-version",
+        "-v",
+        metavar="PYTHON_VERSION",
+        type=str,
+        required=False,
+        help="Python version")
 
     args = parser.parse_args(argv)
 
