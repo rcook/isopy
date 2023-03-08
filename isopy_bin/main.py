@@ -1,4 +1,5 @@
 from isopy_lib.env import make_env_dir, make_env_manifest_path, make_env_root_dir
+from isopy_lib.errors import ReportableError
 from isopy_lib.fs import make_dir_path, make_file_path
 from isopy_lib.manifest import EnvManifest
 from isopy_lib.platform import Platform
@@ -28,8 +29,8 @@ def do_envs(logger, cache_dir):
         print("There are no environments yet!")
 
 
-def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
-    assets = get_all_assets(
+def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+    assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
         tag_name=tag_name,
@@ -38,9 +39,10 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
         arch=arch,
         flavour=flavour)
 
-    if len(assets) != 1:
-        print(assets)
-        raise NotImplementedError()
+    asset_count = len(assets)
+    if asset_count == 0:
+        raise ReportableError(
+            f"There are no Python distributions matching version {python_version}")
 
     asset = assets[0]
 
@@ -54,8 +56,8 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
         logger.info(f"Using {python_path}")
     else:
         python_url = PYTHON_URL_FORMAT.format(
-            tag_name=tag_name,
-            python_version=python_version,
+            python_version=asset.python_version,
+            tag_name=asset.tag_name,
             file_name=asset.name)
 
         logger.info(f"Downloading {python_url} to {python_path}")
@@ -66,7 +68,7 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
 
     python_dir = make_dir_path(
         env_dir,
-        f"cpython-{python_version}+{tag_name}")
+        f"cpython-{asset.python_version}+{asset.tag_name}")
     if os.path.isdir(python_dir):
         logger.info(f"Python already exists at {python_dir}")
     else:
@@ -81,8 +83,8 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
         logger.info(f"Environment manifest {env_manifest_path} already exists")
     else:
         EnvManifest(
-            tag_name=tag_name,
-            python_version=python_version,
+            python_version=asset.python_version,
+            tag_name=asset.tag_name,
             python_dir=os.path.relpath(python_dir, env_dir)).save(env_manifest_path)
 
 
@@ -111,7 +113,7 @@ def do_shell(logger, cache_dir, env):
     os.execle(shell, shell, e)
 
 
-def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
+def do_available(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
     assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
@@ -150,6 +152,15 @@ def main(cwd, argv):
             default=default_env,
             help=f"cache directory (default: {default_env})")
 
+    def add_tag_name_arg(parser):
+        parser.add_argument(
+            "--tag-name",
+            "-t",
+            metavar="TAG_NAME",
+            type=str,
+            required=False,
+            help="tag name")
+
     def add_common_args(parser):
         add_cache_dir_arg(parser)
         add_env_dir_arg(parser)
@@ -172,27 +183,23 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
-        "install",
-        help="install Python interpreter",
-        description="Install Python interpreter",
-        func=lambda logger, args: do_install(
+        "new",
+        help="create new isolated Python environment",
+        description="Create new isolated Python environment",
+        func=lambda logger, args: do_new(
             logger=logger,
             cache_dir=args.cache_dir,
             env=args.env,
             force=args.force,
-            tag_name=args.tag_name,
-            python_version=args.python_version))
+            python_version=args.python_version,
+            tag_name=args.tag_name))
     add_common_args(p)
-    p.add_argument(
-        "tag_name",
-        metavar="TAG_NAME",
-        type=str,
-        help="tag name")
     p.add_argument(
         "python_version",
         metavar="PYTHON_VERSION",
         type=Version.parse,
         help="Python version")
+    add_tag_name_arg(p)
     p.add_argument(
         "--force",
         "-f",
@@ -213,22 +220,16 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
-        "versions",
+        "available",
         help="list available Python versions",
         description="List available Python versions",
-        func=lambda logger, args: do_versions(
+        func=lambda logger, args: do_available(
             logger=logger,
             cache_dir=args.cache_dir,
             tag_name=args.tag_name,
             python_version=args.python_version))
     add_cache_dir_arg(p)
-    p.add_argument(
-        "--tag-name",
-        "-t",
-        metavar="TAG_NAME",
-        type=str,
-        required=False,
-        help="tag name")
+    add_tag_name_arg(p)
     p.add_argument(
         "--python-version",
         "-v",
@@ -243,7 +244,12 @@ def main(cwd, argv):
         format="%(asctime)s %(levelname)s %(message)s")
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
-    args.func(logger=logger, args=args)
+
+    try:
+        args.func(logger=logger, args=args)
+    except ReportableError as e:
+        print(str(e), file=sys.stderr)
+        exit(1)
 
 
 if __name__ == "__main__":

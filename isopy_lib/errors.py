@@ -1,0 +1,2 @@
+class ReportableError(RuntimeError):
+    pass
