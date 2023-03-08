@@ -1,7 +1,6 @@
-import platform
 from collections import namedtuple
-from enum import Enum, auto, unique
 from isopy_lib.manifest import EnvManifest
+from isopy_lib.platform import Platform
 from isopy_lib.version import Version
 from tempfile import TemporaryDirectory
 import argparse
@@ -21,25 +20,6 @@ SUBARCHES = set(["apple", "pc", "unknown"])
 OSES = set(["darwin", "linux"])
 FLAVOURS = set(["debug", "gnu", "musl"])
 SUBFLAVOURS = set(["install_only"])
-
-
-@unique
-class Platform(Enum):
-    LINUX = auto()
-    MACOS = auto()
-    WINDOWS = auto()
-
-    @classmethod
-    def current(cls):
-        os = platform.system().lower()
-        if os == "linux":
-            return cls.LINUX
-        elif os == "darwin":
-            return cls.MACOS
-        elif os == "windows":
-            return cls.WINDOWS
-        else:
-            raise NotImplementedError(f"Unsupported OS \"{os}\"")
 
 
 ReleaseInfo = namedtuple("ReleaseInfo", [
