@@ -1,4 +1,5 @@
 #!/bin/bash
 set -euo pipefail
 this_dir=$(cd $(dirname $0); pwd -P)
-python3 $this_dir/isopy_bin/main.py "$@"
+PYTHONPATH=$this_dir \
+  python3 $this_dir/isopy_bin/main.py "$@"

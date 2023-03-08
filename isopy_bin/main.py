@@ -1,5 +1,7 @@
+import platform
 from collections import namedtuple
 from enum import Enum, auto, unique
+from isopy_lib.version import Version
 from tempfile import TemporaryDirectory
 import argparse
 import json
@@ -18,10 +20,6 @@ SUBARCHES = set(["apple", "pc", "unknown"])
 OSES = set(["darwin", "linux"])
 FLAVOURS = set(["debug", "gnu", "musl"])
 SUBFLAVOURS = set(["install_only"])
-
-
-from enum import Enum, auto, unique
-import platform
 
 
 @unique
@@ -86,7 +84,8 @@ def parse_python_version_and_tag_name(s):
     if len(parts) != 2:
         raise ValueError(f"Invalid Python version and tag name {s}")
 
-    return parts
+    python_version_str, tag_name = parts
+    return Version.parse(python_version_str), tag_name
 
 
 def make_release_info(obj):
@@ -226,12 +225,6 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
         with open(cached_releases_json_path, "wt") as f:
             f.write(json.dumps(response.json(), indent=2))
 
-    with open(cached_releases_json_path, "rt") as f:
-        releases_obj = json.load(f)
-
-    temp = map(make_release_info, releases_obj)
-    releases = sorted(temp, key=lambda x: x.tag_name, reverse=True)
-
     platform = Platform.current()
     if platform == Platform.LINUX:
         os_ = "linux"
@@ -242,7 +235,12 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
     else:
         raise NotImplementedError(f"Unsupported platform {platform}")
 
-    return [
+    with open(cached_releases_json_path, "rt") as f:
+        releases_obj = json.load(f)
+
+    releases = map(make_release_info, releases_obj)
+
+    return sorted([
         asset
         for release in filter_releases(releases=releases, tag_name=tag_name)
         for asset in filter_assets(
@@ -251,7 +249,7 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
             os_=os_,
             arch="x86_64",
             flavour=flavour)
-    ]
+    ], key=lambda x: (x.tag_name, x.python_version), reverse=True)
 
 
 def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
