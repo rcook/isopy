@@ -6,6 +6,9 @@ from functools import total_ordering
 class Version(namedtuple("Version", ["major", "minor", "build"])):
     @staticmethod
     def parse(s):
+        if not isinstance(s, str):
+            raise TypeError(f"{s} is not a string")
+
         major, minor, build = [int(x) for x in s.split(".", 3)]
         return Version(major=major, minor=minor, build=build)
 

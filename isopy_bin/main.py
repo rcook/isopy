@@ -1,6 +1,7 @@
 import platform
 from collections import namedtuple
 from enum import Enum, auto, unique
+from isopy_lib.manifest import EnvManifest
 from isopy_lib.version import Version
 from tempfile import TemporaryDirectory
 import argparse
@@ -255,10 +256,8 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
 def do_envs(logger, cache_dir):
     for d in sorted(os.listdir(os.path.join(cache_dir, "env"))):
         p = make_env_manifest_path(cache_dir=cache_dir, env=d)
-        with open(p, "rt") as f:
-            manifest_obj = json.load(f)
-        print(
-            f"{d}: {manifest_obj['tag_name']}, {manifest_obj['python_version']}")
+        env_manifest = EnvManifest.load(p)
+        print(f"{d}: {env_manifest.tag_name}, {env_manifest.python_version}")
 
 
 def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
@@ -313,12 +312,10 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
     if os.path.isfile(env_manifest_path):
         logger.info(f"Environment manifest {env_manifest_path} already exists")
     else:
-        with open(env_manifest_path, "wt") as f:
-            f.write(json.dumps({
-                "tag_name": tag_name,
-                "python_version": python_version,
-                "python_dir": os.path.relpath(python_dir, env_dir)
-            }, indent=2))
+        EnvManifest(
+            tag_name=tag_name,
+            python_version=python_version,
+            python_dir=os.path.relpath(python_dir, env_dir)).save(env_manifest_path)
 
 
 def do_shell(logger, cache_dir, env):
