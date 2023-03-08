@@ -1,7 +1,8 @@
 from isopy_lib.fs import make_file_path
 from isopy_lib.platform import Platform
+from isopy_lib.web import download_file
 import json
-import requests
+import os
 
 
 def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
@@ -39,11 +40,9 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
         logger.info(
             f"Found cached releases data at {cached_releases_json_path}")
     else:
-        response = requests.get(
-            "https://api.github.com/repos/indygreg/python-build-standalone/releases")
-        response.raise_for_status()
-        with open(cached_releases_json_path, "wt") as f:
-            f.write(json.dumps(response.json(), indent=2))
+        download_file(
+            url="https://api.github.com/repos/indygreg/python-build-standalone/releases",
+            local_path=cached_releases_json_path)
 
     platform = Platform.current()
     if platform == Platform.LINUX:
