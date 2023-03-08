@@ -1,5 +1,7 @@
 from collections import namedtuple
+from isopy_lib.fs import split_at_ext
 from isopy_lib.utils import parse_python_version_and_tag_name
+import json
 
 
 EXTS = set([".tar.gz"])
@@ -108,3 +110,10 @@ def make_asset_info(obj):
             subflavour=subflavour)
     else:
         raise NotImplementedError(f"Unsupported OS {os_}")
+
+
+def load_releases(json_path):
+    with open(json_path, "rt") as f:
+        releases_obj = json.load(f)
+
+    return map(make_release_info, releases_obj)

@@ -1,11 +1,11 @@
+from isopy_lib.asset import load_releases
 from isopy_lib.fs import make_file_path
 from isopy_lib.platform import Platform
 from isopy_lib.web import download_file
-import json
 import os
 
 
-def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
+def get_assets(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
     def filter_releases(releases, tag_name):
         def predicate(x):
             if tag_name is not None:
@@ -54,10 +54,7 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
     else:
         raise NotImplementedError(f"Unsupported platform {platform}")
 
-    with open(cached_releases_json_path, "rt") as f:
-        releases_obj = json.load(f)
-
-    releases = map(make_release_info, releases_obj)
+    releases = load_releases(cached_releases_json_path)
 
     return sorted([
         asset

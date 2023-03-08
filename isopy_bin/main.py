@@ -1,9 +1,9 @@
-from isopy_lib.asset import AssetInfo, ReleaseInfo
 from isopy_lib.env import make_env_dir, make_env_manifest_path
-from isopy_lib.fs import make_dir_path, make_file_path, split_at_ext
+from isopy_lib.fs import make_dir_path, make_file_path
 from isopy_lib.manifest import EnvManifest
 from isopy_lib.platform import Platform
 from isopy_lib.version import Version
+from isopy_lib.assets import get_assets
 from isopy_lib.web import download_file
 from tempfile import TemporaryDirectory
 import argparse
@@ -26,7 +26,7 @@ def do_envs(logger, cache_dir):
 
 
 def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
-    assets = get_versions(
+    assets = get_all_assets(
         logger=logger,
         cache_dir=cache_dir,
         tag_name=tag_name,
@@ -109,7 +109,7 @@ def do_shell(logger, cache_dir, env):
 
 
 def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
-    assets = get_versions(
+    assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
         tag_name=tag_name,
