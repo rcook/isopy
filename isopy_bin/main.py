@@ -313,7 +313,6 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
 
 
 def do_shell(logger, cache_dir, env):
-    raise NotImplementedError()
     if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
         raise NotImplementedError(f"Not supported for this platform yet")
 
@@ -327,12 +326,15 @@ def do_shell(logger, cache_dir, env):
 
     print(f"Python shell for environment {env}; Python is at {python_bin_dir}")
     print(f"Type \"exit\" to return to parent shell")
-    existing_path = os.getenv("PATH")
-    os.environ["PATH"] = python_bin_dir \
-        if existing_path is None \
-        else python_bin_dir + ":" + existing_path
-    pty.spawn(os.getenv("SHELL"))
-    print("You are back in the parent shell")
+
+    e = dict(os.environ)
+    temp = e.get("PATH")
+    paths = [] if temp is None else temp.split(":")
+    if python_bin_dir not in paths:
+        e["PATH"] = ":".join([python_bin_dir] + paths)
+
+    shell = os.getenv("SHELL")
+    os.execle(shell, shell, e)
 
 
 def do_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
