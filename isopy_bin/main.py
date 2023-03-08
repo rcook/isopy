@@ -18,7 +18,7 @@ import sys
 PYTHON_URL_FORMAT = "https://github.com/indygreg/python-build-standalone/releases/download/{tag_name}/{file_name}"
 
 
-def do_envs(logger, cache_dir):
+def do_list(logger, cache_dir):
     env_root_dir = make_env_root_dir(cache_dir=cache_dir)
     if os.path.exists(env_root_dir):
         for d in sorted(os.listdir(env_root_dir)):
@@ -173,10 +173,10 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
-        "envs",
+        "list",
         help="list environments",
         description="List environments",
-        func=lambda logger, args: do_envs(
+        func=lambda logger, args: do_list(
             logger=logger,
             cache_dir=args.cache_dir))
     add_cache_dir_arg(p)
