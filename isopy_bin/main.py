@@ -1,4 +1,4 @@
-from isopy_lib.env import make_env_dir, make_env_manifest_path
+from isopy_lib.env import make_env_dir, make_env_manifest_path, make_env_root_dir
 from isopy_lib.fs import make_dir_path, make_file_path
 from isopy_lib.manifest import EnvManifest
 from isopy_lib.platform import Platform
@@ -18,10 +18,14 @@ PYTHON_URL_FORMAT = "https://github.com/indygreg/python-build-standalone/release
 
 
 def do_envs(logger, cache_dir):
-    for d in sorted(os.listdir(os.path.join(cache_dir, "env"))):
-        p = make_env_manifest_path(cache_dir=cache_dir, env=d)
-        env_manifest = EnvManifest.load(p)
-        print(f"{d}: {env_manifest.tag_name}, {env_manifest.python_version}")
+    env_root_dir = make_env_root_dir(cache_dir=cache_dir)
+    if os.path.exists(env_root_dir):
+        for d in sorted(os.listdir(env_root_dir)):
+            p = make_env_manifest_path(cache_dir=cache_dir, env=d)
+            env_manifest = EnvManifest.load(p)
+            print(f"{d}: {env_manifest.tag_name}, {env_manifest.python_version}")
+    else:
+        print("There are no environments yet!")
 
 
 def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
