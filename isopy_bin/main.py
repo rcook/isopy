@@ -252,6 +252,15 @@ def get_versions(logger, cache_dir, tag_name=None, python_version=None, os_=None
     ], key=lambda x: (x.tag_name, x.python_version), reverse=True)
 
 
+def do_envs(logger, cache_dir):
+    for d in sorted(os.listdir(os.path.join(cache_dir, "env"))):
+        p = make_env_manifest_path(cache_dir=cache_dir, env=d)
+        with open(p, "rt") as f:
+            manifest_obj = json.load(f)
+        print(
+            f"{d}: {manifest_obj['tag_name']}, {manifest_obj['python_version']}")
+
+
 def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None, arch=None, flavour=None):
     assets = get_versions(
         logger=logger,
@@ -385,6 +394,16 @@ def main(cwd, argv):
         description="Isolated Python Tool")
 
     subparsers = parser.add_subparsers(required=True)
+
+    p = add_subcommand(
+        subparsers,
+        "envs",
+        help="list environments",
+        description="List environments",
+        func=lambda logger, args: do_envs(
+            logger=logger,
+            cache_dir=args.cache_dir))
+    add_cache_dir_arg(p)
 
     p = add_subcommand(
         subparsers,
