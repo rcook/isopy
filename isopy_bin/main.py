@@ -263,6 +263,7 @@ def do_install(logger, cache_dir, env, force, tag_name, python_version, os_=None
         flavour=flavour)
 
     if len(assets) != 1:
+        print(assets)
         raise NotImplementedError()
 
     asset = assets[0]
@@ -404,7 +405,7 @@ def main(cwd, argv):
     p.add_argument(
         "python_version",
         metavar="PYTHON_VERSION",
-        type=str,
+        type=Version.parse,
         help="Python version")
     p.add_argument(
         "--force",
@@ -446,7 +447,7 @@ def main(cwd, argv):
         "--python-version",
         "-v",
         metavar="PYTHON_VERSION",
-        type=str,
+        type=Version.parse,
         required=False,
         help="Python version")
 
