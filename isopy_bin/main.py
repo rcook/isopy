@@ -1,3 +1,4 @@
+from isopy_lib.checksum import verify_checksum
 from isopy_lib.env import make_env_dir, make_env_manifest_path, make_env_root_dir
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import make_dir_path, make_file_path
@@ -16,6 +17,12 @@ import sys
 
 
 PYTHON_URL_FORMAT = "https://github.com/indygreg/python-build-standalone/releases/download/{tag_name}/{file_name}"
+CHECKSUM_FILE_PATH = make_file_path(
+    __file__,
+    "..",
+    "..",
+    "sha256sums",
+    "20230116.sha256sums")
 
 
 def do_list(logger, cache_dir):
@@ -65,6 +72,13 @@ def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=Non
         download_file(
             url=python_url,
             local_path=python_path)
+
+        if not verify_checksum(
+                file_path=python_path,
+                checksum_file_path=CHECKSUM_FILE_PATH):
+            os.remove(python_path)
+            raise ReportableError(
+                f"Checksum verification on downloaded file {python_path} failed")
 
     python_dir = make_dir_path(
         env_dir,
