@@ -17,12 +17,6 @@ import sys
 
 
 PYTHON_URL_FORMAT = "https://github.com/indygreg/python-build-standalone/releases/download/{tag_name}/{file_name}"
-CHECKSUM_FILE_PATH = make_file_path(
-    __file__,
-    "..",
-    "..",
-    "sha256sums",
-    "20230116.sha256sums")
 
 
 def do_list(logger, cache_dir):
@@ -37,6 +31,14 @@ def do_list(logger, cache_dir):
 
 
 def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+    def make_checksum_file_path(tag_name):
+        return make_file_path(
+            __file__,
+            "..",
+            "..",
+            "sha256sums",
+            f"{tag_name}.sha256sums")
+
     assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
@@ -75,7 +77,7 @@ def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=Non
 
         if not verify_checksum(
                 file_path=python_path,
-                checksum_file_path=CHECKSUM_FILE_PATH):
+                checksum_file_path=make_checksum_file_path(tag_name=asset.tag_name)):
             os.remove(python_path)
             raise ReportableError(
                 f"Checksum verification on downloaded file {python_path} failed")
