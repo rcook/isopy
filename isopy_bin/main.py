@@ -5,7 +5,7 @@ from isopy_lib.fs import make_dir_path, make_file_path
 from isopy_lib.manifest import EnvManifest
 from isopy_lib.platform import Platform
 from isopy_lib.version import Version
-from isopy_lib.assets import get_assets
+from isopy_lib.assets import AssetFilter, get_assets
 from isopy_lib.web import download_file
 from tempfile import TemporaryDirectory
 import argparse
@@ -30,26 +30,22 @@ def do_list(logger, cache_dir):
         print("There are no environments yet!")
 
 
-def get_asset(logger, cache_dir, env, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+def get_asset(logger, cache_dir, env, asset_filter):
     assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
-        tag_name=tag_name,
-        python_version=python_version,
-        os_=os_,
-        arch=arch,
-        flavour=flavour)
+        asset_filter=asset_filter)
 
     asset_count = len(assets)
-    if asset_count == 0:
+    if asset_count == 0 or True:
         raise ReportableError(
-            f"There are no Python distributions matching version {python_version}")
+            f"There are no Python distributions matching filter {asset_filter}")
 
     asset = assets[0]
     return asset
 
 
-def do_download(logger, cache_dir, env, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+def do_download(logger, cache_dir, env, asset_filter):
     def make_checksum_file_path(tag_name):
         return make_file_path(
             __file__,
@@ -62,11 +58,7 @@ def do_download(logger, cache_dir, env, python_version, tag_name=None, os_=None,
         logger=logger,
         cache_dir=cache_dir,
         env=env,
-        python_version=python_version,
-        tag_name=tag_name,
-        os_=os_,
-        arch=arch,
-        flavour=flavour)
+        asset_filter=asset_filter)
 
     python_path = make_file_path(cache_dir, "assets", asset.name)
     if os.path.isfile(python_path):
@@ -91,16 +83,12 @@ def do_download(logger, cache_dir, env, python_version, tag_name=None, os_=None,
                 f"Checksum verification on downloaded file {python_path} failed")
 
 
-def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+def do_new(logger, cache_dir, env, force, asset_filter):
     asset = get_asset(
         logger=logger,
         cache_dir=cache_dir,
         env=env,
-        python_version=python_version,
-        tag_name=tag_name,
-        os_=os_,
-        arch=arch,
-        flavour=flavour)
+        asset_filter=asset_filter)
 
     python_path = make_file_path(cache_dir, "assets", asset.name)
 
@@ -153,15 +141,11 @@ def do_shell(logger, cache_dir, env):
     os.execle(shell, shell, e)
 
 
-def do_available(logger, cache_dir, tag_name=None, python_version=None, os_=None, arch=None, flavour=None):
+def do_available(logger, cache_dir, asset_filter):
     assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
-        tag_name=tag_name,
-        python_version=python_version,
-        os_=os_,
-        arch=arch,
-        flavour=flavour)
+        asset_filter=asset_filter)
 
     for asset in assets:
         print(f"{asset.os} {asset.arch} {asset.tag_name} {asset.python_version}")
@@ -230,8 +214,9 @@ def main(cwd, argv):
             logger=logger,
             cache_dir=args.cache_dir,
             env=args.env,
-            python_version=args.python_version,
-            tag_name=args.tag_name))
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version)))
     add_common_args(p)
     p.add_argument(
         "python_version",
@@ -285,8 +270,9 @@ def main(cwd, argv):
         func=lambda logger, args: do_available(
             logger=logger,
             cache_dir=args.cache_dir,
-            tag_name=args.tag_name,
-            python_version=args.python_version))
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version)))
     add_cache_dir_arg(p)
     add_tag_name_arg(p)
     p.add_argument(
