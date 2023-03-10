@@ -37,7 +37,7 @@ def get_asset(logger, cache_dir, env, asset_filter):
         asset_filter=asset_filter)
 
     asset_count = len(assets)
-    if asset_count == 0 or True:
+    if asset_count == 0:
         raise ReportableError(
             f"There are no Python distributions matching filter {asset_filter}")
 
