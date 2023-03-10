@@ -60,7 +60,7 @@ def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=Non
     if force and os.path.isdir(env_dir):
         shutil.rmtree(env_dir)
 
-    python_path = make_file_path(cache_dir, asset.name)
+    python_path = make_file_path(cache_dir, "assets", asset.name)
     if os.path.isfile(python_path):
         logger.info(f"Using {python_path}")
     else:

@@ -33,16 +33,17 @@ def get_assets(logger, cache_dir, tag_name=None, python_version=None, os_=None, 
 
         return filter(predicate, assets)
 
-    cached_releases_json_path = make_file_path(
+    index_path = make_file_path(
         cache_dir,
-        "cached-releases.json")
-    if os.path.isfile(cached_releases_json_path):
+        "assets",
+        "index.json")
+    if os.path.isfile(index_path):
         logger.info(
-            f"Found cached releases data at {cached_releases_json_path}")
+            f"Found cached releases data at {index_path}")
     else:
         download_file(
             url="https://api.github.com/repos/indygreg/python-build-standalone/releases",
-            local_path=cached_releases_json_path)
+            local_path=index_path)
 
     platform = Platform.current()
     if platform == Platform.LINUX:
@@ -54,7 +55,7 @@ def get_assets(logger, cache_dir, tag_name=None, python_version=None, os_=None, 
     else:
         raise NotImplementedError(f"Unsupported platform {platform}")
 
-    releases = load_releases(cached_releases_json_path)
+    releases = load_releases(index_path)
 
     return sorted([
         asset
