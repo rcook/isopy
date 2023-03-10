@@ -30,15 +30,7 @@ def do_list(logger, cache_dir):
         print("There are no environments yet!")
 
 
-def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=None, arch=None, flavour=None):
-    def make_checksum_file_path(tag_name):
-        return make_file_path(
-            __file__,
-            "..",
-            "..",
-            "sha256sums",
-            f"{tag_name}.sha256sums")
-
+def get_asset(logger, cache_dir, env, python_version, tag_name=None, os_=None, arch=None, flavour=None):
     assets = get_assets(
         logger=logger,
         cache_dir=cache_dir,
@@ -54,15 +46,31 @@ def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=Non
             f"There are no Python distributions matching version {python_version}")
 
     asset = assets[0]
+    return asset
 
-    env_dir = make_env_dir(cache_dir=cache_dir, env=env)
 
-    if force and os.path.isdir(env_dir):
-        shutil.rmtree(env_dir)
+def do_download(logger, cache_dir, env, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+    def make_checksum_file_path(tag_name):
+        return make_file_path(
+            __file__,
+            "..",
+            "..",
+            "sha256sums",
+            f"{tag_name}.sha256sums")
+
+    asset = get_asset(
+        logger=logger,
+        cache_dir=cache_dir,
+        env=env,
+        python_version=python_version,
+        tag_name=tag_name,
+        os_=os_,
+        arch=arch,
+        flavour=flavour)
 
     python_path = make_file_path(cache_dir, "assets", asset.name)
     if os.path.isfile(python_path):
-        logger.info(f"Using {python_path}")
+        logger.info(f"Package {python_path} is already available locally")
     else:
         python_url = PYTHON_URL_FORMAT.format(
             python_version=asset.python_version,
@@ -81,6 +89,22 @@ def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=Non
             os.remove(python_path)
             raise ReportableError(
                 f"Checksum verification on downloaded file {python_path} failed")
+
+
+def do_new(logger, cache_dir, env, force, python_version, tag_name=None, os_=None, arch=None, flavour=None):
+    asset = get_asset(
+        logger=logger,
+        cache_dir=cache_dir,
+        env=env,
+        python_version=python_version,
+        tag_name=tag_name,
+        os_=os_,
+        arch=arch,
+        flavour=flavour)
+
+    python_path = make_file_path(cache_dir, "assets", asset.name)
+
+    env_dir = make_env_dir(cache_dir=cache_dir, env=env)
 
     python_dir = make_dir_path(
         env_dir,
@@ -196,6 +220,25 @@ def main(cwd, argv):
             logger=logger,
             cache_dir=args.cache_dir))
     add_cache_dir_arg(p)
+
+    p = add_subcommand(
+        subparsers,
+        "download",
+        help="download Python package",
+        description="Download Python package",
+        func=lambda logger, args: do_download(
+            logger=logger,
+            cache_dir=args.cache_dir,
+            env=args.env,
+            python_version=args.python_version,
+            tag_name=args.tag_name))
+    add_common_args(p)
+    p.add_argument(
+        "python_version",
+        metavar="PYTHON_VERSION",
+        type=Version.parse,
+        help="Python version")
+    add_tag_name_arg(p)
 
     p = add_subcommand(
         subparsers,
