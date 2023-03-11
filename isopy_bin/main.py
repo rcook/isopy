@@ -21,6 +21,7 @@ import argparse
 import colorama
 import logging
 import os
+import shutil
 import sys
 
 
@@ -31,9 +32,11 @@ def main(cwd, argv):
         add_log_level_arg(parser=parser)
         add_cache_dir_arg(parser=parser, default=default_cache_dir)
 
+    extra_info = f"Using Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({shutil.which('python3')})"
     parser = argparse.ArgumentParser(
         prog="isopy",
-        description="Isolated Python Tool")
+        description="Isolated Python Tool",
+        epilog=extra_info)
 
     subparsers = parser.add_subparsers(required=True)
 
