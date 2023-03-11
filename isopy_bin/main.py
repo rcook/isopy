@@ -90,17 +90,9 @@ def main(cwd, argv):
         subparsers,
         "init",
         **auto_description("initialize isopy environment"),
-        func=lambda ctx, args: do_init(
-            ctx=ctx,
-            env=args.env,
-            asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
-                python_version=args.python_version),
-            force=args.force))
+        func=lambda ctx, args: do_init(ctx=ctx, env=args.env, force=args.force))
     add_common_args(parser=p)
     add_env_positional_arg(parser=p)
-    add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
     add_force_arg(parser=p)
 
     p = add_subcommand(

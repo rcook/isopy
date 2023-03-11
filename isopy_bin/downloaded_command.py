@@ -1,4 +1,4 @@
-from isopy_lib.asset import assets_dir as __assets_dir
+from isopy_lib.asset import assets_dir as assets_dir__
 from isopy_lib.fs import file_path
 from isopy_lib.version import Version
 from isopy_lib.xprint import xprint
@@ -12,7 +12,7 @@ CPYTHON_PREFIX_LEN = len(CPYTHON_PREFIX)
 
 
 def do_downloaded(ctx):
-    assets_dir = __assets_dir(ctx.cache_dir)
+    assets_dir = assets_dir__(ctx.cache_dir)
     if os.path.isdir(assets_dir):
         items = []
         for f in os.listdir(assets_dir):

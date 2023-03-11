@@ -45,8 +45,13 @@ def exec_environment(ctx, env):
 
 
 def read_yaml(path):
-    with open(path, "rt") as f:
-        return yaml.load(f, Loader=yaml.SafeLoader)
+    try:
+        with open(path, "rt") as f:
+            return yaml.load(f, Loader=yaml.SafeLoader)
+    except FileNotFoundError as e:
+        raise ReportableError(
+            f"File not found at {path}") \
+            from e
 
 
 def write_yaml(path, obj, force):
@@ -60,24 +65,30 @@ def write_yaml(path, obj, force):
             from e
 
 
-class EnvManifest(namedtuple("EnvManifest", ["tag_name", "python_version", "python_dir"])):
+class EnvManifest(namedtuple("EnvManifest", ["env", "tag_name", "python_version", "python_dir"])):
     @staticmethod
     def load(path):
         obj = read_yaml(path)
+        env = obj["env"]
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         python_dir = obj["python_dir"]
         return EnvManifest(
+            env=env,
             tag_name=tag_name,
             python_version=python_version,
             python_dir=python_dir)
 
-    def save(self, path):
-        write_yaml(path, {
-            "tag_name": self.tag_name,
-            "python_version": str(self.python_version),
-            "python_dir": self.python_dir
-        })
+    def save_to_cache(self, ctx, force):
+        write_yaml(
+            env_manifest_path(cache_dir=ctx.cache_dir, env=self.env),
+            {
+                "env": self.env,
+                "tag_name": self.tag_name,
+                "python_version": str(self.python_version),
+                "python_dir": self.python_dir
+            },
+            force=force)
 
 
 class ProjectManifest(namedtuple("ProjectManifest", ["tag_name", "python_version"])):
@@ -138,9 +149,9 @@ class EnvInfo(namedtuple("EnvInfo", ["env", "tag_name", "python_version", "dir"]
         if not os.path.isfile(p):
             return None
 
-        env_manifest = EnvManifest.load(p)
+        manifest = EnvManifest.load(p)
         return EnvInfo(
-            env=env,
-            tag_name=env_manifest.tag_name,
-            python_version=env_manifest.python_version,
+            env=manifest.env,
+            tag_name=manifest.tag_name,
+            python_version=manifest.python_version,
             dir=p)
