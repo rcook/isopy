@@ -48,3 +48,7 @@ python_dir: $python_dir_name
 python_version: $python_version
 tag_name: '$tag_name'
 EOF
+
+cat > $this_dir/.isopy.local.yaml <<EOF
+env: isopy
+EOF
