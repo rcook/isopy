@@ -2,7 +2,6 @@ from contextlib import contextmanager
 from isopy_lib.fs import dir_path, file_path
 from isopy_lib.manifest import EnvManifest
 from isopy_lib.platform import Platform
-import json
 import os
 
 

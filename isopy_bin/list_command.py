@@ -1,44 +1,36 @@
 from collections import namedtuple
 from isopy_lib.env import env_manifest_path, env_root_dir as __env_root_dir
-from isopy_lib.fs import dir_path
 from isopy_lib.manifest import EnvManifest
-from isopy_lib.pretty import show_item_table
+from isopy_lib.pretty import show_table
 import os
 
 
-Env = namedtuple("Env", [
-    "env",
-    "tag_name",
-    "python_version",
-    "dir"
-])
+class EnvInfo(namedtuple("EnvInfo", ["env", "tag_name", "python_version", "dir"])):
+    @staticmethod
+    def load(cache_dir, env):
+        p = env_manifest_path(cache_dir=cache_dir, env=env)
+        if not os.path.isfile(p):
+            return None
 
-
-def do_list(ctx):
-    def make_env(env, env_manifest, dir):
-        return Env(
+        env_manifest = EnvManifest.load(p)
+        return EnvInfo(
             env=env,
             tag_name=env_manifest.tag_name,
             python_version=env_manifest.python_version,
-            dir=dir)
+            dir=p)
 
+
+def do_list(ctx):
     env_root_dir = __env_root_dir(cache_dir=ctx.cache_dir)
-    if os.path.exists(env_root_dir):
-        envs = [
-            make_env(
-                env=d,
-                env_manifest=EnvManifest.load(
-                    env_manifest_path(
-                        cache_dir=ctx.cache_dir,
-                        env=d)),
-                dir=dir_path(env_root_dir, d))
+    envs = [
+        x for x in [
+            EnvInfo.load(cache_dir=ctx.cache_dir, env=d)
             for d in sorted(os.listdir(env_root_dir))
         ]
-        show_item_table(attrs=[
-            "env",
-            "tag_name",
-            "python_version",
-            "dir"
-        ], items=envs)
+        if x is not None
+    ]
+
+    if len(envs) > 0:
+        show_table(items=envs)
     else:
         print("There are no environments yet!")
