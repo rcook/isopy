@@ -49,9 +49,15 @@ def read_yaml(path):
         return yaml.load(f, Loader=yaml.SafeLoader)
 
 
-def write_yaml(path, obj):
-    with open(path, "wt") as f:
-        yaml.dump(obj, f)
+def write_yaml(path, obj, force):
+    try:
+        with open(path, "wt" if force else "xt") as f:
+            yaml.dump(obj, f)
+    except FileExistsError as e:
+        raise ReportableError(
+            f"File already exists at {path}; "
+            "pass --force to overwrite") \
+            from e
 
 
 class EnvManifest(namedtuple("EnvManifest", ["tag_name", "python_version", "python_dir"])):
@@ -88,15 +94,13 @@ class ProjectManifest(namedtuple("ProjectManifest", ["tag_name", "python_version
             python_version=python_version)
 
     def save_to_dir(self, dir, force):
-        p = file_path(dir, ProjectManifest.FILE_NAME)
-        if not force and os.path.exists(p):
-            raise ReportableError(
-                f"Project manifest already found at {p}; pass --force to overwrite")
-
-        write_yaml(p, {
-            "tag_name": self.tag_name,
-            "python_version": str(self.python_version)
-        })
+        write_yaml(
+            file_path(dir, ProjectManifest.FILE_NAME),
+            {
+                "tag_name": self.tag_name,
+                "python_version": str(self.python_version)
+            },
+            force=force)
 
 
 class LocalProjectManifest(namedtuple("LocalProjectManifest", ["env"])):
@@ -110,12 +114,10 @@ class LocalProjectManifest(namedtuple("LocalProjectManifest", ["env"])):
         return LocalProjectManifest(env=env)
 
     def save_to_dir(self, dir, force):
-        p = file_path(dir, LocalProjectManifest.FILE_NAME)
-        if not force and os.path.exists(p):
-            raise ReportableError(
-                f"Local project manifest already found at {p}; pass --force to overwrite")
-
-        write_yaml(p, {"env": self.env})
+        write_yaml(
+            file_path(dir, LocalProjectManifest.FILE_NAME),
+            {"env": self.env},
+            force=force)
 
 
 class EnvInfo(namedtuple("EnvInfo", ["env", "tag_name", "python_version", "dir"])):
