@@ -60,17 +60,22 @@ def add_python_version_positional_arg(parser):
 def add_log_level_arg(parser):
     m = logging.getLevelNamesMapping()
     m.pop("NOTSET")
-    temp0 = list(sorted(m.items(), key=itemgetter(0)))
-    temp1 = list(sorted(temp0, key=itemgetter(1), reverse=True))
-    choices = list(map(lambda x: x[0].lower(), temp1))
+    temp0 = list(sorted(
+        sorted(m.items(), key=itemgetter(0)),
+        key=itemgetter(1), reverse=True))
+    temp1 = {v: k.lower() for k, v in temp0}
+
+    choices = list(map(lambda x: x[0].lower(), temp0))
+    default = temp1[logging.INFO]
+
     parser.add_argument(
         "--log-level",
         "-l",
         metavar="LOG_LEVEL",
         choices=choices,
         type=str,
-        default="info",
-        help=f"logging level (one of {', '.join(choices)})")
+        default=default,
+        help=f"logging level (one of {', '.join(choices)}) (default: {default})")
 
 
 def add_cache_dir_arg(parser, default):
