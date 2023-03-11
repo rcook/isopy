@@ -1,5 +1,14 @@
 from isopy_lib.version import Version
-import logging
+
+
+def auto_description(help):
+    if len(help) > 0:
+        return {
+            "help": help,
+            "description": help[0].upper() + help[1:]
+        }
+    else:
+        return {}
 
 
 def add_env_positional_arg(parser):

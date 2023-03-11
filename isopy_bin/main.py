@@ -2,7 +2,7 @@ from isopy_bin.available_command import do_available
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_lib.asset import AssetFilter
-from isopy_lib.cli import add_env_positional_arg, add_log_level_arg, add_python_version_positional_arg
+from isopy_lib.cli import add_env_positional_arg, add_log_level_arg, add_python_version_positional_arg, auto_description
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
@@ -54,16 +54,14 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "list",
-        help="list environments",
-        description="List environments",
+        **auto_description("list environments"),
         func=lambda ctx, args: do_list(ctx=ctx))
     add_common_args(parser=p)
 
     p = add_subcommand(
         subparsers,
         "download",
-        help="download Python package",
-        description="Download Python package",
+        **auto_description("download Python package"),
         func=lambda logger, args: do_download(
             logger=logger,
             cache_dir=args.cache_dir,
@@ -78,8 +76,7 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "new",
-        help="create new isolated Python environment",
-        description="Create new isolated Python environment",
+        **auto_description("create new isolated Python environment"),
         func=lambda ctx, args: do_new(
             ctx=ctx,
             env=args.env,
@@ -94,8 +91,7 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "shell",
-        help="open shell in Python environment",
-        description="Open shell in Python environment",
+        **auto_description("open shell in Python environment"),
         func=lambda logger, args: do_shell(
             logger=logger,
             cache_dir=args.cache_dir,
@@ -105,8 +101,7 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "available",
-        help="list available Python versions",
-        description="List available Python versions",
+        **auto_description("list available Python versions"),
         func=lambda ctx, args: do_available(
             ctx=ctx,
             asset_filter=AssetFilter.default(
