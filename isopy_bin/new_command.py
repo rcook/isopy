@@ -1,5 +1,6 @@
 from isopy_lib.asset import assets_dir, get_asset
-from isopy_lib.env import EnvManifest, env_dir as __env_dir, env_manifest_path as __env_manifest_path
+from isopy_lib.env import EnvInfo, EnvManifest, env_dir as __env_dir, env_manifest_path as __env_manifest_path
+from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
 from tempfile import TemporaryDirectory
 import shutil
@@ -7,6 +8,11 @@ import os
 
 
 def do_new(ctx, env, asset_filter):
+    env_infos = EnvInfo.load_all(cache_dir=ctx.cache_dir)
+    for e in env_infos:
+        if e.env == env:
+            raise ReportableError(f"Environment {env} already exists")
+
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
 
     python_path = file_path(assets_dir(ctx.cache_dir), asset.name)
