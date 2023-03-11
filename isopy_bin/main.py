@@ -7,12 +7,10 @@ from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import add_env_positional_arg, add_log_level_arg, add_python_version_positional_arg, auto_description
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
-from isopy_lib.fs import dir_path
 from isopy_lib.version import Version
 from isopy_lib.xprint import xprint
 import argparse
 import colorama
-import json
 import logging
 import os
 import sys
@@ -42,6 +40,15 @@ def main(cwd, argv):
             type=str,
             required=False,
             help="tag name")
+
+    def add_python_version_arg(parser):
+        parser.add_argument(
+            "--python-version",
+            "-v",
+            metavar="PYTHON_VERSION",
+            type=Version.parse,
+            required=False,
+            help="Python version")
 
     def add_common_args(parser):
         add_log_level_arg(parser=parser)
@@ -107,13 +114,7 @@ def main(cwd, argv):
                 python_version=args.python_version)))
     add_common_args(parser=p)
     add_tag_name_arg(parser=p)
-    p.add_argument(
-        "--python-version",
-        "-v",
-        metavar="PYTHON_VERSION",
-        type=Version.parse,
-        required=False,
-        help="Python version")
+    add_python_version_arg(parser=p)
 
     args = parser.parse_args(argv)
 
