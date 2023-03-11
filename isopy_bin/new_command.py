@@ -1,4 +1,4 @@
-from isopy_lib.asset import get_asset
+from isopy_lib.asset import assets_dir, get_asset
 from isopy_lib.env import env_dir as __env_dir, env_manifest_path as __env_manifest_path
 from isopy_lib.fs import dir_path, file_path
 from isopy_lib.manifest import EnvManifest
@@ -10,7 +10,7 @@ import os
 def do_new(ctx, env, asset_filter):
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
 
-    python_path = file_path(ctx.cache_dir, "assets", asset.name)
+    python_path = file_path(assets_dir(ctx.cache_dir), asset.name)
     env_dir = __env_dir(cache_dir=ctx.cache_dir, env=env)
     python_dir = dir_path(
         env_dir,

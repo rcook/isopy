@@ -1,7 +1,7 @@
 from collections import namedtuple
 from isopy_lib.checksum import make_checksum_file_path, verify_checksum
 from isopy_lib.errors import ReportableError
-from isopy_lib.fs import file_path, move_file, named_temporary_file, split_at_ext
+from isopy_lib.fs import dir_path, file_path, move_file, named_temporary_file, split_at_ext
 from isopy_lib.platform import Platform
 from isopy_lib.utils import parse_python_version_and_tag_name
 from isopy_lib.web import download_file
@@ -154,6 +154,10 @@ class AssetFilter(namedtuple("AssetFilter", ["tag_name", "python_version", "os_"
             if v is not None)
 
 
+def assets_dir(cache_dir):
+    return dir_path(cache_dir, "assets")
+
+
 def release_predicate(asset_filter):
     def predicate(x):
         if asset_filter.tag_name is not None:
@@ -188,10 +192,7 @@ def get_assets(ctx, asset_filter):
     def filter_assets(assets):
         return filter(asset_predicate(asset_filter=asset_filter), assets)
 
-    index_path = file_path(
-        ctx.cache_dir,
-        "assets",
-        "index.json")
+    index_path = file_path(assets_dir(ctx.cache_dir), "index.json")
     if os.path.isfile(index_path):
         ctx.logger.debug(
             f"Found Python version index at {index_path}")

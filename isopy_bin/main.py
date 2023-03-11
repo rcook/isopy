@@ -1,5 +1,6 @@
 from isopy_bin.available_command import do_available
 from isopy_bin.download_command import do_download
+from isopy_bin.downloaded_command import do_downloaded
 from isopy_bin.exec_command import do_exec
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
@@ -59,6 +60,13 @@ def main(cwd, argv):
     add_common_args(parser=p)
     add_python_version_positional_arg(parser=p)
     add_tag_name_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "downloaded",
+        **auto_description("show download Python packages"),
+        func=lambda ctx, args: do_downloaded(ctx))
+    add_common_args(parser=p)
 
     p = add_subcommand(
         subparsers,
