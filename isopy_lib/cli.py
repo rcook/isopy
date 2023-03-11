@@ -5,7 +5,7 @@ import logging
 import re
 
 
-ENV_RE = re.compile("^([A-Za-z0-9-_]+)(/[A-Za-z0-9-_]+)*$")
+ENV_RE = re.compile("^([A-Za-z0-9-_]+)$")
 
 
 def env_type(s):
