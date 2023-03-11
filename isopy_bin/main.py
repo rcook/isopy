@@ -1,5 +1,6 @@
 from isopy_bin.available_command import do_available
 from isopy_bin.download_command import do_download
+from isopy_bin.exec_command import do_exec
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_bin.shell_command import do_shell
@@ -102,6 +103,19 @@ def main(cwd, argv):
         func=lambda ctx, args: do_shell(ctx=ctx, env=args.env))
     add_common_args(parser=p)
     add_env_positional_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "exec",
+        **auto_description("run command in Python environment"),
+        func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command))
+    add_common_args(parser=p)
+    add_env_positional_arg(parser=p)
+    p.add_argument(
+        "command",
+        nargs=argparse.REMAINDER,
+        metavar="COMMAND",
+        help="command to run and its arguments")
 
     p = add_subcommand(
         subparsers,
