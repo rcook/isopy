@@ -1,11 +1,10 @@
 from collections import namedtuple
 from isopy_lib.checksum import make_checksum_file_path, verify_checksum
 from isopy_lib.errors import ReportableError
-from isopy_lib.fs import file_path, move_file, split_at_ext
+from isopy_lib.fs import file_path, move_file, named_temporary_file, split_at_ext
 from isopy_lib.platform import Platform
 from isopy_lib.utils import parse_python_version_and_tag_name
 from isopy_lib.web import download_file
-from tempfile import NamedTemporaryFile
 import os
 import json
 
@@ -110,8 +109,7 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
             raise NotImplementedError(f"Unsupported OS {os_}")
 
     def download(self, path):
-        with NamedTemporaryFile() as f:
-            print(f.name)
+        with named_temporary_file() as f:
             download_file(
                 url=self.browser_download_url,
                 local_path=f.name)
@@ -123,12 +121,10 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
                     checksum_file_path=checksum_file_path,
                     file_name_key=self.name):
                 os.remove(f.name)
-                f.delete = False
                 raise ReportableError(
                     f"Checksum verification on downloaded file {f.name} failed; file deleted")
 
             move_file(f.name, path)
-            f.delete = False
 
 
 class AssetFilter(namedtuple("AssetFilter", ["tag_name", "python_version", "os_", "arch", "flavour"])):

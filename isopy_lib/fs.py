@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+from tempfile import NamedTemporaryFile
 import os
 
 
@@ -23,3 +25,17 @@ def move_file(source, target):
     target_dir = os.path.dirname(target)
     os.makedirs(target_dir, exist_ok=True)
     os.rename(source, target)
+
+
+@contextmanager
+def named_temporary_file(*args, **kwargs):
+    t = None
+    try:
+        t = NamedTemporaryFile(*args, **kwargs)
+        yield t
+    finally:
+        if t is not None:
+            try:
+                t.close()
+            except FileNotFoundError:
+                pass

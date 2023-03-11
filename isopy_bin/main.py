@@ -1,4 +1,5 @@
 from isopy_bin.available_command import do_available
+from isopy_bin.download_command import do_download
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_bin.shell_command import do_shell
@@ -63,10 +64,8 @@ def main(cwd, argv):
         subparsers,
         "download",
         **auto_description("download Python package"),
-        func=lambda logger, args: do_download(
-            logger=logger,
-            cache_dir=args.cache_dir,
-            env=args.env,
+        func=lambda ctx, args: do_download(
+            ctx=ctx,
             asset_filter=AssetFilter.default(
                 tag_name=args.tag_name,
                 python_version=args.python_version)))
