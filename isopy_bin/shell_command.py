@@ -8,4 +8,4 @@ def do_shell(ctx, env):
             f"Python shell for environment {env}; Python is at {python_bin_dir}")
         print(f"Type \"exit\" to return to parent shell")
         shell = os.getenv("SHELL")
-        os.execle(shell, shell, e)
+        os.execlpe(shell, shell, e)
