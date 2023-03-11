@@ -6,6 +6,7 @@ from isopy_bin.init_command import do_init
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_bin.shell_command import do_shell
+from isopy_bin.wrap_command import do_wrap
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
@@ -20,6 +21,7 @@ from isopy_lib.cli import \
     auto_description
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
+from isopy_lib.fs import dir_path, file_path
 from isopy_lib.xprint import xprint
 import argparse
 import colorama
@@ -30,6 +32,12 @@ import sys
 
 
 def main(cwd, argv):
+    def dir_path_type(s):
+        return dir_path(cwd, s)
+
+    def file_path_type(s):
+        return file_path(cwd, s)
+
     default_cache_dir = os.path.expanduser("~/.isopy")
 
     def add_common_args(parser):
@@ -128,6 +136,34 @@ def main(cwd, argv):
     add_common_args(parser=p)
     add_tag_name_arg(parser=p)
     add_python_version_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "wrap",
+        **auto_description("generate shell wrapper for Python script"),
+        func=lambda ctx, args: do_wrap(
+            ctx=ctx,
+            env=args.env,
+            wrapper_path=args.wrapper_path,
+            script_path=args.script_path,
+            base_dir=args.base_dir))
+    add_common_args(parser=p)
+    add_env_positional_arg(parser=p)
+    p.add_argument(
+        "wrapper_path",
+        metavar="WRAPPER_PATH",
+        type=file_path_type,
+        help="path to output wrapper script")
+    p.add_argument(
+        "script_path",
+        metavar="SCRIPT_PATH",
+        type=file_path_type,
+        help="path to Python script")
+    p.add_argument(
+        "base_dir",
+        metavar="BASE_DIR",
+        type=dir_path_type,
+        help="path to base directory")
 
     args = parser.parse_args(argv)
 
