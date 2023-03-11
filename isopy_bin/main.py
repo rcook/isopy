@@ -5,10 +5,16 @@ from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_bin.shell_command import do_shell
 from isopy_lib.asset import AssetFilter
-from isopy_lib.cli import add_env_positional_arg, add_log_level_arg, add_python_version_positional_arg, auto_description
+from isopy_lib.cli import \
+    add_cache_dir_arg, \
+    add_env_positional_arg, \
+    add_log_level_arg, \
+    add_python_version_arg, \
+    add_python_version_positional_arg, \
+    add_tag_name_arg, \
+    auto_description
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
-from isopy_lib.version import Version
 from isopy_lib.xprint import xprint
 import argparse
 import colorama
@@ -25,35 +31,9 @@ def main(cwd, argv):
         parser.set_defaults(func=func)
         return parser
 
-    def add_cache_dir_arg(parser):
-        parser.add_argument(
-            "--cache-dir",
-            "-c",
-            metavar="CACHE_DIR",
-            default=default_cache_dir,
-            help=f"cache directory (default: {default_cache_dir})")
-
-    def add_tag_name_arg(parser):
-        parser.add_argument(
-            "--tag-name",
-            "-t",
-            metavar="TAG_NAME",
-            type=str,
-            required=False,
-            help="tag name")
-
-    def add_python_version_arg(parser):
-        parser.add_argument(
-            "--python-version",
-            "-v",
-            metavar="PYTHON_VERSION",
-            type=Version.parse,
-            required=False,
-            help="Python version")
-
     def add_common_args(parser):
         add_log_level_arg(parser=parser)
-        add_cache_dir_arg(parser=parser)
+        add_cache_dir_arg(parser=parser, default=default_cache_dir)
 
     parser = argparse.ArgumentParser(
         prog="isopy",

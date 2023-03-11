@@ -50,3 +50,32 @@ def add_log_level_arg(parser):
         type=str,
         default="info",
         help=f"logging level (one of {', '.join(choices)})")
+
+
+def add_cache_dir_arg(parser, default):
+    parser.add_argument(
+        "--cache-dir",
+        "-c",
+        metavar="CACHE_DIR",
+        default=default,
+        help=f"cache directory (default: {default})")
+
+
+def add_tag_name_arg(parser):
+    parser.add_argument(
+        "--tag-name",
+        "-t",
+        metavar="TAG_NAME",
+        type=str,
+        required=False,
+        help="tag name")
+
+
+def add_python_version_arg(parser):
+    parser.add_argument(
+        "--python-version",
+        "-v",
+        metavar="PYTHON_VERSION",
+        type=Version.parse,
+        required=False,
+        help="Python version")
