@@ -19,11 +19,11 @@ def do_new(ctx, env, asset_filter):
         ctx.logger.info(f"Python already exists at {python_dir}")
     else:
         if not os.path.exists(python_path):
-            ctx.logger.info(
+            ctx.logger.debug(
                 f"Downloading {asset.browser_download_url} to {python_path}")
             asset.download(python_path)
 
-        ctx.logger.info(f"Unpacking {python_path} to {python_dir}")
+        ctx.logger.debug(f"Unpacking {python_path} to {python_dir}")
         with TemporaryDirectory() as d:
             shutil.unpack_archive(python_path, d)
             temp_python_dir = dir_path(d, "python")
@@ -31,7 +31,7 @@ def do_new(ctx, env, asset_filter):
 
     env_manifest_path = __env_manifest_path(cache_dir=ctx.cache_dir, env=env)
     if os.path.isfile(env_manifest_path):
-        ctx.logger.info(
+        ctx.logger.debug(
             f"Environment manifest {env_manifest_path} already exists")
     else:
         EnvManifest(

@@ -193,7 +193,7 @@ def get_assets(ctx, asset_filter):
         "assets",
         "index.json")
     if os.path.isfile(index_path):
-        ctx.logger.info(
+        ctx.logger.debug(
             f"Found Python version index at {index_path}")
     else:
         download_file(
