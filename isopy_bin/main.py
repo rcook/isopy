@@ -2,6 +2,7 @@ from isopy_bin.available_command import do_available
 from isopy_bin.download_command import do_download
 from isopy_bin.downloaded_command import do_downloaded
 from isopy_bin.exec_command import do_exec
+from isopy_bin.init_command import do_init
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_bin.shell_command import do_shell
@@ -9,6 +10,7 @@ from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
     add_env_positional_arg, \
+    add_force_arg, \
     add_log_level_arg, \
     add_python_version_arg, \
     add_python_version_positional_arg, \
@@ -70,6 +72,23 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
+        "init",
+        **auto_description("create new isolated Python environment associated with a project"),
+        func=lambda ctx, args: do_init(
+            ctx=ctx,
+            env=args.env,
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version),
+            force=args.force))
+    add_common_args(parser=p)
+    add_env_positional_arg(parser=p)
+    add_python_version_positional_arg(parser=p)
+    add_tag_name_arg(parser=p)
+    add_force_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
         "new",
         **auto_description("create new isolated Python environment"),
         func=lambda ctx, args: do_new(
@@ -123,7 +142,12 @@ def main(cwd, argv):
         format="%(asctime)s %(levelname)s %(message)s")
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.getLevelNamesMapping()[args.log_level.upper()])
-    args.func(ctx=Context(logger=logger, cache_dir=args.cache_dir), args=args)
+    args.func(
+        ctx=Context(
+            cwd=cwd,
+            logger=logger,
+            cache_dir=args.cache_dir),
+        args=args)
 
 
 if __name__ == "__main__":

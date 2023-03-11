@@ -1,5 +1,6 @@
 from isopy_lib.version import Version
 from operator import itemgetter
+import argparse
 import logging
 
 
@@ -85,3 +86,12 @@ def add_python_version_arg(parser):
         type=Version.parse,
         required=False,
         help="Python version")
+
+
+def add_force_arg(parser):
+    parser.add_argument(
+        "--force",
+        "-f",
+        metavar="FORCE",
+        action=argparse.BooleanOptionalAction,
+        help="force overwrite of output files")
