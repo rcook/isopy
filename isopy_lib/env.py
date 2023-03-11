@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from isopy_lib.fs import dir_path, file_path
+from isopy_lib.manifest import EnvManifest
 from isopy_lib.platform import Platform
 import json
 import os
@@ -22,12 +23,14 @@ def exec_environment(ctx, env):
     if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
         raise NotImplementedError(f"Not supported for this platform yet")
 
-    with open(env_manifest_path(cache_dir=ctx.cache_dir, env=env), "rt") as f:
-        manifest = json.load(f)
+    manifest = EnvManifest.load(
+        env_manifest_path(
+            cache_dir=ctx.cache_dir,
+            env=env))
 
     python_dir = dir_path(
         env_dir(cache_dir=ctx.cache_dir, env=env),
-        manifest["python_dir"])
+        manifest.python_dir)
     python_bin_dir = dir_path(python_dir, "bin")
 
     e = dict(os.environ)

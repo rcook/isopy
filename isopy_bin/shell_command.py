@@ -7,8 +7,7 @@ import os
 
 def do_shell(ctx, env):
     if env is None:
-        m = LocalProjectManifest.load_from_dir(ctx.cwd)
-        env = m.env
+        env = LocalProjectManifest.load_from_dir(ctx.cwd).env
 
     with exec_environment(ctx=ctx, env=env) as (python_bin_dir, e):
         xprint(

@@ -19,7 +19,7 @@ def write_yaml(path, obj):
 class EnvManifest(namedtuple("EnvManifest", ["tag_name", "python_version", "python_dir"])):
     @staticmethod
     def load(path):
-        obj = read_yaml.load(path)
+        obj = read_yaml(path)
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         python_dir = obj["python_dir"]
@@ -42,7 +42,7 @@ class ProjectManifest(namedtuple("ProjectManifest", ["tag_name", "python_version
     @staticmethod
     def load_from_dir(dir):
         p = file_path(dir, ProjectManifest.FILE_NAME)
-        obj = read_yaml.load(p)
+        obj = read_yaml(p)
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         return ProjectManifest(
