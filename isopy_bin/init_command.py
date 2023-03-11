@@ -1,5 +1,6 @@
 from isopy_bin.new_command import do_new
-from isopy_lib.manifest import LocalProjectManifest, ProjectManifest
+from isopy_lib.env import EnvInfo, LocalProjectManifest, ProjectManifest
+from isopy_lib.errors import ReportableError
 
 
 def write_project_manifests(ctx, tag_name, python_version, env, force):
@@ -16,6 +17,11 @@ def write_project_manifests(ctx, tag_name, python_version, env, force):
 
 
 def do_init(ctx, env, asset_filter, force):
+    env_infos = EnvInfo.load_all(cache_dir=ctx.cache_dir)
+    for e in env_infos:
+        if e.env == env:
+            raise ReportableError(f"Environment {env} already exists")
+
     write_project_manifests(
         ctx=ctx,
         tag_name=asset_filter.tag_name,

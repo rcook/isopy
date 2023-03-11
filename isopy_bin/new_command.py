@@ -1,7 +1,6 @@
 from isopy_lib.asset import assets_dir, get_asset
-from isopy_lib.env import env_dir as __env_dir, env_manifest_path as __env_manifest_path
+from isopy_lib.env import EnvManifest, env_dir as __env_dir, env_manifest_path as __env_manifest_path
 from isopy_lib.fs import dir_path, file_path
-from isopy_lib.manifest import EnvManifest
 from tempfile import TemporaryDirectory
 import shutil
 import os

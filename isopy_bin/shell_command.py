@@ -1,5 +1,4 @@
-from isopy_lib.env import exec_environment
-from isopy_lib.manifest import LocalProjectManifest
+from isopy_lib.env import LocalProjectManifest, exec_environment
 from isopy_lib.xprint import xprint
 import colorama
 import os
