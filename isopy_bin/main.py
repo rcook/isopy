@@ -146,7 +146,8 @@ def main(cwd, argv):
             env=args.env,
             wrapper_path=args.wrapper_path,
             script_path=args.script_path,
-            base_dir=args.base_dir))
+            base_dir=args.base_dir,
+            force=args.force))
     add_common_args(parser=p)
     add_env_positional_arg(parser=p)
     p.add_argument(
@@ -164,6 +165,7 @@ def main(cwd, argv):
         metavar="BASE_DIR",
         type=dir_path_type,
         help="path to base directory")
+    add_force_arg(parser=p)
 
     args = parser.parse_args(argv)
 
