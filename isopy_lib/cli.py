@@ -2,6 +2,18 @@ from isopy_lib.version import Version
 from operator import itemgetter
 import argparse
 import logging
+import re
+
+
+ENV_RE = re.compile("^([A-Za-z0-9-_]+)(/[A-Za-z0-9-_]+)*$")
+
+
+def env_type(s):
+    m = ENV_RE.match(s)
+    if m is None:
+        raise argparse.ArgumentTypeError(f"invalid environment name {s}")
+
+    return s
 
 
 def add_subcommand(subparsers, *args, func, **kwargs):
@@ -24,6 +36,7 @@ def add_env_positional_arg(parser):
     parser.add_argument(
         "env",
         metavar="ENV",
+        type=env_type,
         help="environment")
 
 
@@ -32,6 +45,7 @@ def add_env_arg(parser):
         "--env",
         "-e",
         metavar="ENV",
+        type=env_type,
         help="environment")
 
 
