@@ -108,9 +108,12 @@ def add_python_version_arg(parser):
 
 
 def add_force_arg(parser):
+    default = False
+
     parser.add_argument(
         "--force",
         "-f",
         metavar="FORCE",
         action=argparse.BooleanOptionalAction,
-        help="force overwrite of output files")
+        default=default,
+        help=f"force overwrite of output files (default: {default})")
