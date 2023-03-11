@@ -3,6 +3,12 @@ from operator import itemgetter
 import logging
 
 
+def add_subcommand(subparsers, *args, func, **kwargs):
+    parser = subparsers.add_parser(*args, **kwargs)
+    parser.set_defaults(func=func)
+    return parser
+
+
 def auto_description(help):
     if len(help) > 0:
         return {

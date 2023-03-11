@@ -11,6 +11,7 @@ from isopy_lib.cli import \
     add_log_level_arg, \
     add_python_version_arg, \
     add_python_version_positional_arg, \
+    add_subcommand, \
     add_tag_name_arg, \
     auto_description
 from isopy_lib.context import Context
@@ -25,11 +26,6 @@ import sys
 
 def main(cwd, argv):
     default_cache_dir = os.path.expanduser("~/.isopy")
-
-    def add_subcommand(subparsers, *args, func, **kwargs):
-        parser = subparsers.add_parser(*args, **kwargs)
-        parser.set_defaults(func=func)
-        return parser
 
     def add_common_args(parser):
         add_log_level_arg(parser=parser)
