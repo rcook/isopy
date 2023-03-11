@@ -1,11 +1,11 @@
 import os
 
 
-def make_dir_path(*args):
+def dir_path(*args):
     return os.path.abspath(os.path.join(*args))
 
 
-def make_file_path(*args):
+def file_path(*args):
     return os.path.abspath(os.path.join(*args))
 
 
@@ -17,3 +17,9 @@ def split_at_ext(s, exts):
             temp = s_len - ext_len
             return s[0:temp], s[temp:]
     raise ValueError(f"Name {s} has unknown extension")
+
+
+def move_file(source, target):
+    target_dir = os.path.dirname(target)
+    os.makedirs(target_dir, exist_ok=True)
+    os.rename(source, target)

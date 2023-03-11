@@ -1,13 +1,13 @@
-from isopy_lib.fs import make_dir_path, make_file_path
+from isopy_lib.fs import dir_path, file_path
 
 
-def make_env_root_dir(cache_dir):
-    return make_dir_path(cache_dir, "env")
+def env_root_dir(cache_dir):
+    return dir_path(cache_dir, "env")
 
 
-def make_env_dir(cache_dir, env):
-    return make_dir_path(make_env_root_dir(cache_dir=cache_dir), env)
+def env_dir(cache_dir, env):
+    return dir_path(env_root_dir(cache_dir=cache_dir), env)
 
 
-def make_env_manifest_path(cache_dir, env):
-    return make_file_path(make_env_dir(cache_dir, env), "env.json")
+def env_manifest_path(cache_dir, env):
+    return file_path(env_dir(cache_dir, env), "env.json")
