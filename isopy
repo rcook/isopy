@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+isopy_dir=$HOME/src/isopy
+PATH=$HOME/.isopy/env/isopy/cpython-3.11.1+20230116/bin:$PATH \
+  PYTHONPATH=$isopy_dir \
+  python3 $isopy_dir/isopy_bin/main.py "$@"
