@@ -1,5 +1,8 @@
 from collections import namedtuple
+from isopy_lib.errors import ReportableError
+from isopy_lib.fs import file_path
 from isopy_lib.version import Version
+import os
 import yaml
 
 
@@ -34,28 +37,44 @@ class EnvManifest(namedtuple("EnvManifest", ["tag_name", "python_version", "pyth
 
 
 class ProjectManifest(namedtuple("ProjectManifest", ["tag_name", "python_version"])):
+    FILE_NAME = ".isopy.yaml"
+
     @staticmethod
-    def load(path):
-        obj = read_yaml.load(path)
+    def load_from_dir(dir):
+        p = file_path(dir, ProjectManifest.FILE_NAME)
+        obj = read_yaml.load(p)
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         return ProjectManifest(
             tag_name=tag_name,
             python_version=python_version)
 
-    def save(self, path):
-        write_yaml(path, {
+    def save_to_dir(self, dir, force):
+        p = file_path(dir, ProjectManifest.FILE_NAME)
+        if not force and os.path.exists(p):
+            raise ReportableError(
+                f"Project manifest already found at {p}; pass --force to overwrite")
+
+        write_yaml(p, {
             "tag_name": self.tag_name,
             "python_version": str(self.python_version)
         })
 
 
 class LocalProjectManifest(namedtuple("LocalProjectManifest", ["env"])):
+    FILE_NAME = ".isopy.local.yaml"
+
     @staticmethod
-    def load(path):
-        obj = read_yaml(path)
+    def load_from_dir(dir):
+        p = file_path(dir, LocalProjectManifest.FILE_NAME)
+        obj = read_yaml(p)
         env = obj["env"]
         return LocalProjectManifest(env=env)
 
-    def save(self, path):
-        write_yaml(path, {"env": self.env})
+    def save_to_dir(self, dir, force):
+        p = file_path(dir, LocalProjectManifest.FILE_NAME)
+        if not force and os.path.exists(p):
+            raise ReportableError(
+                f"Local project manifest already found at {p}; pass --force to overwrite")
+
+        write_yaml(p, {"env": self.env})

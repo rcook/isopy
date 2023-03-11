@@ -10,26 +10,16 @@ import os
 
 
 def write_project_manifests(ctx, tag_name, python_version, env, force):
-    project_manifest_path = file_path(ctx.cwd, ".isopy.yaml")
-    if not force and os.path.exists(project_manifest_path):
-        raise ReportableError(
-            f"Project manifest already found at {project_manifest_path}; pass --force to overwrite")
-
-    local_project_manifest_path = file_path(ctx.cwd, ".isopy.local.yaml")
-    if not force and os.path.exists(local_project_manifest_path):
-        raise ReportableError(
-            f"Local project manifest already found at {local_project_manifest_path}; pass --force to overwrite")
-
     m0 = ProjectManifest(
         tag_name=tag_name,
         python_version=python_version)
-    ctx.logger.info(f"Creating project manifest {project_manifest_path}")
-    m0.save(project_manifest_path)
+    ctx.logger.info(f"Creating project manifest at {ctx.cwd}")
+    m0.save_to_dir(ctx.cwd, force=force)
 
     m1 = LocalProjectManifest(env=env)
     ctx.logger.info(
-        f"Creating local project manifest {local_project_manifest_path}")
-    m1.save(local_project_manifest_path)
+        f"Creating local project manifest at {ctx.cwd}")
+    m1.save_to_dir(ctx.cwd, force=force)
 
 
 def do_init(ctx, env, asset_filter, force):

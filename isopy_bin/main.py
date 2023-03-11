@@ -9,6 +9,7 @@ from isopy_bin.shell_command import do_shell
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
+    add_env_arg, \
     add_env_positional_arg, \
     add_force_arg, \
     add_log_level_arg, \
@@ -108,7 +109,7 @@ def main(cwd, argv):
         **auto_description("open shell in Python environment"),
         func=lambda ctx, args: do_shell(ctx=ctx, env=args.env))
     add_common_args(parser=p)
-    add_env_positional_arg(parser=p)
+    add_env_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
