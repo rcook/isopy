@@ -1,5 +1,5 @@
+from isopy_lib.env import env_dir as __env_dir, env_manifest_path
 from isopy_lib.fs import dir_path
-from isopy_lib.manifest import env_dir as __env_dir, env_manifest_path
 from isopy_lib.platform import Platform
 import json
 import os

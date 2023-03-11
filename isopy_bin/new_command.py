@@ -1,5 +1,5 @@
 from isopy_lib.asset import get_asset
-from isopy_lib.env import env_dir as __env_dir
+from isopy_lib.env import env_dir as __env_dir, env_manifest_path as __env_manifest_path
 from isopy_lib.fs import dir_path, file_path
 from isopy_lib.manifest import EnvManifest
 from tempfile import TemporaryDirectory
@@ -21,10 +21,7 @@ def do_new(ctx, env, asset_filter):
         if not os.path.exists(python_path):
             ctx.logger.info(
                 f"Downloading {asset.browser_download_url} to {python_path}")
-
             asset.download(python_path)
-
-        raise NotImplementedError()
 
         ctx.logger.info(f"Unpacking {python_path} to {python_dir}")
         with TemporaryDirectory() as d:
@@ -32,9 +29,7 @@ def do_new(ctx, env, asset_filter):
             temp_python_dir = dir_path(d, "python")
             shutil.move(temp_python_dir, python_dir)
 
-    raise NotImplementedError()
-
-    env_manifest_path = env_manifest_path(cache_dir=ctx.cache_dir, env=env)
+    env_manifest_path = __env_manifest_path(cache_dir=ctx.cache_dir, env=env)
     if os.path.isfile(env_manifest_path):
         ctx.logger.info(
             f"Environment manifest {env_manifest_path} already exists")
