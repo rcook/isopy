@@ -48,4 +48,5 @@ def add_log_level_arg(parser):
         metavar="LOG_LEVEL",
         choices=choices,
         type=str,
+        default="info",
         help=f"logging level (one of {', '.join(choices)})")
