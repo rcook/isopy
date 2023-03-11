@@ -4,9 +4,11 @@ this_dir=$(cd $(dirname $0); pwd -P)
 cache_dir=$HOME/.isopy
 assets_dir=$cache_dir/assets
 isopy_env_dir=$cache_dir/env/isopy
-python_dir_name=cpython-3.11.1+20230116
+python_version=3.11.1
+tag_name=20230116
+python_dir_name=cpython-$python_version+$tag_name
 isopy_python_dir=$isopy_env_dir/$python_dir_name
-python_url=https://github.com/indygreg/python-build-standalone/releases/download/20230116/$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
+python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag_name/$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
 python_file_name=$(basename $python_url)
 python_path=$assets_dir/$python_file_name
 
@@ -39,3 +41,10 @@ if [ ! -e $isopy_python_dir/bin ]; then
     PATH=$isopy_env_dir/$python_dir_name/bin:$PATH \
         python3 -m pip install -r $this_dir/requirements.txt
 fi
+
+cat > $isopy_env_dir/env.json <<EOF
+env: isopy
+python_dir: $python_dir_name
+python_version: $python_version
+tag_name: '$tag_name'
+EOF
