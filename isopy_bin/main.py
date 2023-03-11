@@ -127,6 +127,7 @@ def main(cwd, argv):
         format="%(asctime)s %(levelname)s %(message)s")
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.getLevelNamesMapping()[args.log_level.upper()])
+
     args.func(
         ctx=Context(
             cwd=cwd,
