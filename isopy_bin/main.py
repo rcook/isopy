@@ -4,7 +4,6 @@ from isopy_bin.downloaded_command import do_downloaded
 from isopy_bin.exec_command import do_exec
 from isopy_bin.init_command import do_init
 from isopy_bin.list_command import do_list
-from isopy_bin.new_command import do_new
 from isopy_bin.shell_command import do_shell
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
@@ -74,7 +73,7 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "init",
-        **auto_description("create new isolated Python environment associated with a project"),
+        **auto_description("create new isolated Python environment optionally associated with a project"),
         func=lambda ctx, args: do_init(
             ctx=ctx,
             env=args.env,
@@ -87,21 +86,6 @@ def main(cwd, argv):
     add_python_version_positional_arg(parser=p)
     add_tag_name_arg(parser=p)
     add_force_arg(parser=p)
-
-    p = add_subcommand(
-        subparsers,
-        "new",
-        **auto_description("create new isolated Python environment"),
-        func=lambda ctx, args: do_new(
-            ctx=ctx,
-            env=args.env,
-            asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
-                python_version=args.python_version)))
-    add_common_args(parser=p)
-    add_env_positional_arg(parser=p)
-    add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
