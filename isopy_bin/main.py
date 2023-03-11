@@ -1,12 +1,11 @@
 from isopy_bin.available_command import do_available
+from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
 from isopy_lib.asset import AssetFilter
-from isopy_lib.cli import add_env_positional_arg, add_python_version_positional_arg
+from isopy_lib.cli import add_env_positional_arg, add_log_level_arg, add_python_version_positional_arg
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
-from isopy_lib.manifest import EnvManifest
-from isopy_lib.platform import Platform
 from isopy_lib.version import Version
 from isopy_lib.xprint import xprint
 import argparse
@@ -15,42 +14,6 @@ import json
 import logging
 import os
 import sys
-
-
-def do_list(logger, cache_dir):
-    env_root_dir = env_root_dir(cache_dir=cache_dir)
-    if os.path.exists(env_root_dir):
-        for d in sorted(os.listdir(env_root_dir)):
-            p = env_manifest_path(cache_dir=cache_dir, env=d)
-            env_manifest = EnvManifest.load(p)
-            print(f"{d}: {env_manifest.tag_name}, {env_manifest.python_version}")
-    else:
-        print("There are no environments yet!")
-
-
-def do_shell(logger, cache_dir, env):
-    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
-        raise NotImplementedError(f"Not supported for this platform yet")
-
-    with open(env_manifest_path(cache_dir=cache_dir, env=env), "rt") as f:
-        manifest = json.load(f)
-
-    python_dir = dir_path(
-        env_dir(cache_dir=cache_dir, env=env),
-        manifest["python_dir"])
-    python_bin_dir = dir_path(python_dir, "bin")
-
-    print(f"Python shell for environment {env}; Python is at {python_bin_dir}")
-    print(f"Type \"exit\" to return to parent shell")
-
-    e = dict(os.environ)
-    temp = e.get("PATH")
-    paths = [] if temp is None else temp.split(":")
-    if python_bin_dir not in paths:
-        e["PATH"] = ":".join([python_bin_dir] + paths)
-
-    shell = os.getenv("SHELL")
-    os.execle(shell, shell, e)
 
 
 def main(cwd, argv):
@@ -79,7 +42,8 @@ def main(cwd, argv):
             help="tag name")
 
     def add_common_args(parser):
-        add_cache_dir_arg(parser)
+        add_log_level_arg(parser=parser)
+        add_cache_dir_arg(parser=parser)
 
     parser = argparse.ArgumentParser(
         prog="isopy",
@@ -92,10 +56,8 @@ def main(cwd, argv):
         "list",
         help="list environments",
         description="List environments",
-        func=lambda logger, args: do_list(
-            logger=logger,
-            cache_dir=args.cache_dir))
-    add_cache_dir_arg(p)
+        func=lambda ctx, args: do_list(ctx=ctx))
+    add_common_args(parser=p)
 
     p = add_subcommand(
         subparsers,
@@ -124,7 +86,7 @@ def main(cwd, argv):
             asset_filter=AssetFilter.default(
                 tag_name=args.tag_name,
                 python_version=args.python_version)))
-    add_cache_dir_arg(parser=p)
+    add_common_args(parser=p)
     add_env_positional_arg(parser=p)
     add_python_version_positional_arg(parser=p)
     add_tag_name_arg(parser=p)
@@ -150,7 +112,7 @@ def main(cwd, argv):
             asset_filter=AssetFilter.default(
                 tag_name=args.tag_name,
                 python_version=args.python_version)))
-    add_cache_dir_arg(p)
+    add_common_args(p)
     add_tag_name_arg(p)
     p.add_argument(
         "--python-version",

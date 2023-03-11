@@ -1,5 +1,5 @@
 from isopy_lib.asset import get_asset
-from isopy_lib.env import env_dir as ENV_DIR
+from isopy_lib.env import env_dir as __env_dir
 from isopy_lib.fs import dir_path, file_path
 from isopy_lib.manifest import EnvManifest
 from tempfile import TemporaryDirectory
@@ -11,7 +11,7 @@ def do_new(ctx, env, asset_filter):
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
 
     python_path = file_path(ctx.cache_dir, "assets", asset.name)
-    env_dir = ENV_DIR(cache_dir=ctx.cache_dir, env=env)
+    env_dir = __env_dir(cache_dir=ctx.cache_dir, env=env)
     python_dir = dir_path(
         env_dir,
         f"cpython-{asset.python_version}+{asset.tag_name}")
