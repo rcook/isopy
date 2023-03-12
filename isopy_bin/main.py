@@ -142,21 +142,16 @@ def main(cwd, argv):
         metavar="COMMAND",
         help="command to run and its arguments")
 
-    # BELOW NOT REFACTORED YET
-
     p = add_subcommand(
         subparsers,
         "wrap",
         **auto_description("generate shell wrapper for Python script"),
         func=lambda ctx, args: do_wrap(
             ctx=ctx,
-            env=args.env,
             wrapper_path=args.wrapper_path,
             script_path=args.script_path,
-            base_dir=args.base_dir,
-            force=args.force))
+            base_dir=args.base_dir))
     add_common_args(parser=p)
-    add_env_positional_arg(parser=p)
     p.add_argument(
         "wrapper_path",
         metavar="WRAPPER_PATH",
@@ -172,7 +167,6 @@ def main(cwd, argv):
         metavar="BASE_DIR",
         type=dir_path_type,
         help="path to base directory")
-    add_force_arg(parser=p)
 
     args = parser.parse_args(argv)
 

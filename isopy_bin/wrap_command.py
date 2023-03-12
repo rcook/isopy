@@ -1,22 +1,27 @@
+from isopy_lib.env import get_current_env_config
 from isopy_lib.errors import ReportableError
+from isopy_lib.fs import dir_path
 import os
 
 
 WRAPPER_TEMPLATE = """#!/bin/bash
 set -euo pipefail
-PATH=$HOME/.isopy/env/{env}/cpython-3.11.1+20230116/bin:$PATH \\
+PATH={bin_dir}:$PATH \\
   PYTHONPATH={base_dir} \\
   exec python3 {script_path} "$@"
 """
 
 
-def do_wrap(ctx, env, wrapper_path, script_path, base_dir, force):
+def do_wrap(ctx, wrapper_path, script_path, base_dir):
+    env_config = get_current_env_config(ctx=ctx)
+    bin_dir = dir_path(env_config.path, "..", env_config.python_dir, "bin")
     wrapper = WRAPPER_TEMPLATE.format(
-        env=env,
-        script_path=script_path,
-        base_dir=base_dir)
+        bin_dir=bin_dir,
+        base_dir=base_dir,
+        script_path=script_path)
+
     try:
-        with open(wrapper_path, "wt" if force else "xt") as f:
+        with open(wrapper_path, "xt") as f:
             f.write(wrapper)
     except FileExistsError as e:
         raise ReportableError(
