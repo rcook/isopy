@@ -130,9 +130,9 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
 
         e = dict(os.environ)
         temp = e.get("PATH")
-        paths = [] if temp is None else temp.split(":")
+        paths = [] if temp is None else temp.split(os.pathsep)
         if bin_dir not in paths:
-            e["PATH"] = ":".join([bin_dir] + paths)
+            e["PATH"] = os.pathsep.join([bin_dir] + paths)
 
         return e
 

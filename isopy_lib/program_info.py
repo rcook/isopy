@@ -18,7 +18,7 @@ class ProgramInfo(namedtuple("ProgramInfo", ["paths", "python_paths", "cwd", "ca
             app_path = os.path.abspath(os.path.join(__file__, "..", ".."))
 
         return ProgramInfo(
-            paths=os.getenv("PATH").split(":"),
+            paths=os.getenv("PATH").split(os.pathsep),
             python_paths=sys.path,
             cwd=cwd,
             cache_dir=cache_dir,
