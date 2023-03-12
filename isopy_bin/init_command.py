@@ -20,7 +20,8 @@ def do_init(ctx):
         tag_name=dir_config.tag_name,
         python_version=dir_config.python_version)
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
-    EnvConfig.create(
+    c = EnvConfig.create(
         ctx=ctx,
         dir_config=dir_config,
         asset=asset)
+    ctx.logger.info(f"Initialized environment at {c.path}")

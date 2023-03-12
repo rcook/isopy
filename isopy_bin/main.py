@@ -66,6 +66,19 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
+        "new",
+        **auto_description("create project configuration"),
+        func=lambda ctx, args: do_new(
+            ctx=ctx,
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version)))
+    add_common_args(parser=p)
+    add_python_version_positional_arg(parser=p)
+    add_tag_name_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
         "init",
         **auto_description("initialize environment"),
         func=lambda ctx, args: do_init(ctx=ctx))
@@ -74,7 +87,7 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "shell",
-        **auto_description("open shell in Python environment"),
+        **auto_description("open shell"),
         func=lambda ctx, args: do_shell(ctx=ctx))
     add_common_args(parser=p)
 
@@ -106,21 +119,6 @@ def main(cwd, argv):
         **auto_description("show download Python packages"),
         func=lambda ctx, args: do_downloaded(ctx))
     add_common_args(parser=p)
-
-    p = add_subcommand(
-        subparsers,
-        "new",
-        **auto_description("create new isopy project"),
-        func=lambda ctx, args: do_new(
-            ctx=ctx,
-            asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
-                python_version=args.python_version),
-            force=args.force))
-    add_common_args(parser=p)
-    add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
-    add_force_arg(parser=p)
 
     p = add_subcommand(
         subparsers,

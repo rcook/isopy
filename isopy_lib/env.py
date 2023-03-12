@@ -13,7 +13,7 @@ ENV_CONFIG_FILE = "env.json"
 class DirConfig(namedtuple("DirConfig", ["path", "tag_name", "python_version"])):
     @staticmethod
     def find(ctx):
-        def find_config_path(dir, limit=3):
+        def find_dir_config_path(dir, limit=3):
             if limit == 0:
                 return None
 
@@ -25,16 +25,29 @@ class DirConfig(namedtuple("DirConfig", ["path", "tag_name", "python_version"]))
             if parent_dir == dir:
                 return None
 
-            return find_config_path(d=parent_dir, limit=limit - 1)
+            return find_dir_config_path(dir=parent_dir, limit=limit - 1)
 
-        p = find_config_path(dir=ctx.cwd)
+        p = find_dir_config_path(dir=ctx.cwd)
         if p is None:
             return None
 
-        return DirConfig.from_obj(path=p, obj=read_yaml(p))
+        return DirConfig._from_obj(path=p, obj=read_yaml(p))
 
     @staticmethod
-    def from_obj(path, obj):
+    def create(ctx, tag_name, python_version):
+        p = file_path(ctx.cwd, DIR_CONFIG_FILE_NAME)
+        c = DirConfig(
+            path=p,
+            tag_name=tag_name,
+            python_version=python_version)
+        write_yaml(p, {
+            "tag_name": str(c.tag_name),
+            "python_version": str(c.python_version)
+        })
+        return c
+
+    @staticmethod
+    def _from_obj(path, obj):
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         return DirConfig(
@@ -61,16 +74,39 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "dir_config_path", "tag_name", 
 
     @staticmethod
     def create(ctx, dir_config, asset):
-        env_dir = EnvConfig._dir(ctx=ctx, dir_config=dir_config)
+        env_dir = EnvConfig._dir(ctx=ctx, dir_config_path=dir_config.path)
         env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
         output_dir = asset.extract(ctx=ctx, dir=env_dir)
         python_dir = os.path.relpath(output_dir, env_dir)
+        c = EnvConfig(
+            path=env_config_path,
+            dir_config_path=dir_config.path,
+            tag_name=dir_config.tag_name,
+            python_version=dir_config.python_version,
+            python_dir=python_dir)
         write_yaml(env_config_path, {
-            "dir_config_path": dir_config.path,
-            "tag_name": dir_config.tag_name,
+            "dir_config_path": c.path,
+            "tag_name": str(c.tag_name),
             "python_version": str(dir_config.python_version),
             "python_dir": python_dir
         })
+        return c
+
+    def get_environment(self, ctx):
+        bin_dir = dir_path(
+            EnvConfig._dir(
+                ctx=ctx,
+                dir_config_path=self.dir_config_path),
+            self.python_dir,
+            "bin")
+
+        e = dict(os.environ)
+        temp = e.get("PATH")
+        paths = [] if temp is None else temp.split(":")
+        if bin_dir not in paths:
+            e["PATH"] = ":".join([bin_dir] + paths)
+
+        return e
 
     @staticmethod
     def _dir(ctx, dir_config_path):
@@ -89,19 +125,3 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "dir_config_path", "tag_name", 
             tag_name=tag_name,
             python_version=python_version,
             python_dir=python_dir)
-
-    def get_environment(self, ctx):
-        bin_dir = dir_path(
-            EnvConfig._dir(
-                ctx=ctx,
-                dir_config_path=self.dir_config_path),
-            self.python_dir,
-            "bin")
-
-        e = dict(os.environ)
-        temp = e.get("PATH")
-        paths = [] if temp is None else temp.split(":")
-        if bin_dir not in paths:
-            e["PATH"] = ":".join([bin_dir] + paths)
-
-        return e
