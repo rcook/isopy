@@ -78,6 +78,19 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
+        "download",
+        **auto_description("download Python package"),
+        func=lambda ctx, args: do_download(
+            ctx=ctx,
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version)))
+    add_common_args(parser=p)
+    add_python_version_positional_arg(parser=p)
+    add_tag_name_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
         "downloaded",
         **auto_description("show download Python packages"),
         func=lambda ctx, args: do_downloaded(ctx))
@@ -130,19 +143,6 @@ def main(cwd, argv):
         help="command to run and its arguments")
 
     # BELOW NOT REFACTORED YET
-
-    p = add_subcommand(
-        subparsers,
-        "download",
-        **auto_description("download Python package"),
-        func=lambda ctx, args: do_download(
-            ctx=ctx,
-            asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
-                python_version=args.python_version)))
-    add_common_args(parser=p)
-    add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
