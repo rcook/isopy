@@ -3,6 +3,7 @@ from isopy_lib.asset import assets_dir as assets_dir__
 from isopy_lib.fs import file_path
 from isopy_lib.version import Version
 from isopy_lib.pretty import show_table
+from operator import attrgetter
 import os
 
 
@@ -30,7 +31,7 @@ def get_downloads(ctx):
                     file_name=f,
                     python_version=python_version,
                     size=os.path.getsize(p)))
-    return items
+    return sorted(items, key=attrgetter("python_version"), reverse=True)
 
 
 def do_downloaded(ctx):
