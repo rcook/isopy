@@ -1,4 +1,5 @@
 from isopy_bin.available_command import do_available
+from isopy_bin.debug_command import do_debug
 from isopy_bin.download_command import do_download
 from isopy_bin.downloaded_command import do_downloaded
 from isopy_bin.exec_command import do_exec
@@ -51,6 +52,13 @@ def main(cwd, argv):
         epilog=extra_info)
 
     subparsers = parser.add_subparsers(required=True)
+
+    p = add_subcommand(
+        subparsers,
+        "debug",
+        **auto_description("show debugging information"),
+        func=lambda ctx, args: do_debug(ctx=ctx))
+    add_common_args(parser=p)
 
     p = add_subcommand(
         subparsers,

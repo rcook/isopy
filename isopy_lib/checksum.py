@@ -1,15 +1,16 @@
-from isopy_lib.fs import file_path
+from isopy_lib.fs import dir_path, file_path
 import hashlib
-import os
+
+
+CHECKSUM_DIR = dir_path(
+    __file__,
+    "..",
+    "..",
+    "sha256sums")
 
 
 def make_checksum_file_path(tag_name):
-    return file_path(
-        __file__,
-        "..",
-        "..",
-        "sha256sums",
-        f"{tag_name}.sha256sums")
+    return file_path(CHECKSUM_DIR, f"{tag_name}.sha256sums")
 
 
 def verify_checksum(file_path, checksum_file_path, file_name_key):
