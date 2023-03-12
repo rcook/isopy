@@ -19,7 +19,12 @@ def do_debug(ctx):
 
     debug_print(f"cwd={ctx.cwd}")
     debug_print(f"cache_dir={ctx.cache_dir}")
+
     debug_print(f"checksum_dir={CHECKSUM_DIR}")
+    debug_print(f"checksums:")
+    for f in os.listdir(CHECKSUM_DIR):
+        if f.endswith(".sha256sums"):
+            debug_print(f"  {f}")
 
     frozen = getattr(sys, "frozen", False)
     debug_print(f"frozen={frozen}")
