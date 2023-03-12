@@ -43,12 +43,8 @@ if [ ! -e $isopy_python_dir/bin ]; then
 fi
 
 cat > $isopy_env_dir/env.json <<EOF
-env: isopy
+name: isopy
 python_dir: $python_dir_name
 python_version: $python_version
 tag_name: '$tag_name'
-EOF
-
-cat > $this_dir/.isopy.local.yaml <<EOF
-env: isopy
 EOF

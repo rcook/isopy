@@ -11,8 +11,7 @@ from isopy_bin.wrap_command import do_wrap
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
-    add_env_positional_arg, \
-    add_force_arg, \
+    add_env_arg, \
     add_log_level_arg, \
     add_python_version_arg, \
     add_python_version_positional_arg, \
@@ -134,8 +133,9 @@ def main(cwd, argv):
         subparsers,
         "exec",
         **auto_description("run command in shell"),
-        func=lambda ctx, args: do_exec(ctx=ctx, command=args.command))
+        func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command))
     add_common_args(parser=p)
+    add_env_arg(parser=p)
     p.add_argument(
         "command",
         nargs=argparse.REMAINDER,
