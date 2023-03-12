@@ -1,11 +1,11 @@
-# -*- mode: python ; coding: utf-8 -*-
+import glob
 
 
 block_cipher = None
 
 
 a = Analysis(
-    ['isopy_bin/main.py'],
+    ["isopy_bin/main.py"],
     pathex=[],
     binaries=[],
     datas=[],
@@ -17,31 +17,18 @@ a = Analysis(
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
-    noarchive=False,
-)
+    noarchive=False)
 
 
-def extra_datas(mydir):
-    def rec_glob(p, files):
-        import os
-        import glob
-        for d in glob.glob(p):
-            if os.path.isfile(d):
-                files.append(d)
-            rec_glob("%s/*" % d, files)
-    files = []
-    rec_glob("%s/*" % mydir, files)
-    extra_datas = []
-    for f in files:
-        extra_datas.append((f, f, 'DATA'))
+def get_data_files(pattern):
+    data_files = []
+    for f in glob.glob(pattern):
+        data_files.append((f, f, "DATA"))
 
-    return extra_datas
-###########################################
+    return data_files
 
 
-# append the 'data' dir
-a.datas += extra_datas("sha256sums")
-
+a.datas += get_data_files("sha256sums/*.sha256sums")
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
@@ -52,7 +39,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='isopy',
+    name="isopy",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -64,5 +51,4 @@ exe = EXE(
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
-    entitlements_file=None,
-)
+    entitlements_file=None)
