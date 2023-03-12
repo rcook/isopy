@@ -98,7 +98,7 @@ def main(cwd, argv):
         func=lambda ctx, args: do_shell(ctx=ctx))
     add_common_args(parser=p)
 
-    # BELOW NOT IMPLEMENTED YET
+    # BELOW NOT REFACTORED YET
 
     p = add_subcommand(
         subparsers,
