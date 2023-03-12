@@ -7,7 +7,7 @@ import sys
 
 class ProgramInfo(namedtuple("ProgramInfo", ["paths", "python_paths", "cwd", "cache_dir", "checksum_dir", "checksum_paths", "frozen", "app_path"])):
     @staticmethod
-    def get(ctx):
+    def get(cwd, cache_dir):
         frozen = getattr(sys, "frozen", False)
         if frozen:
             # If the application is run as a bundle, the PyInstaller bootloader
@@ -20,8 +20,8 @@ class ProgramInfo(namedtuple("ProgramInfo", ["paths", "python_paths", "cwd", "ca
         return ProgramInfo(
             paths=os.getenv("PATH").split(":"),
             python_paths=sys.path,
-            cwd=ctx.cwd,
-            cache_dir=ctx.cache_dir,
+            cwd=cwd,
+            cache_dir=cache_dir,
             checksum_dir=CHECKSUM_DIR,
             checksum_paths=glob.glob(f"{CHECKSUM_DIR}/*.sha256sums"),
             frozen=frozen,

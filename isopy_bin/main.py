@@ -23,6 +23,7 @@ from isopy_lib.cli import \
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
+from isopy_lib.program_info import ProgramInfo
 from isopy_lib.xprint import xprint
 import argparse
 import colorama
@@ -45,7 +46,10 @@ def main(cwd, argv):
         add_log_level_arg(parser=parser)
         add_cache_dir_arg(parser=parser, default=default_cache_dir)
 
-    extra_info = f"Using Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} ({shutil.which('python3')})"
+    extra_info = f"Using Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    if not ProgramInfo.get(cwd=cwd, cache_dir=default_cache_dir).frozen:
+        extra_info += f" ({shutil.which('python3')})"
+
     parser = argparse.ArgumentParser(
         prog="isopy",
         description="Isolated Python Tool",

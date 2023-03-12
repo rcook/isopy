@@ -8,7 +8,7 @@ def do_debug(ctx):
     def debug_print(*args, **kwargs):
         xprint(colorama.Fore.YELLOW, *args, **kwargs)
 
-    program_info = ProgramInfo.get(ctx=ctx)
+    program_info = ProgramInfo.get(cwd=ctx.cwd, cache_dir=ctx.cache_dir)
 
     debug_print("System search paths:")
     for p in program_info.paths:
