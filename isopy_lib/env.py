@@ -70,17 +70,19 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
 
     @staticmethod
     def load_all(ctx):
-        hashed_dir = dir_path(ctx.cache_dir, "hashed")
-        items = []
-        for d in os.listdir(hashed_dir):
-            env_config_path = file_path(hashed_dir, d, ENV_CONFIG_FILE)
-            if os.path.isfile(env_config_path):
-                items.append(
-                    EnvConfig._from_obj(
-                        ctx=ctx,
-                        path=env_config_path,
-                        obj=read_yaml(env_config_path)))
-        return items
+        def get_env_configs(dir_name):
+            dir = dir_path(ctx.cache_dir, dir_name)
+            fs = [
+                file_path(dir, d, ENV_CONFIG_FILE)
+                for d in os.listdir(dir)
+            ]
+            return [
+                EnvConfig._from_obj(ctx=ctx, path=f, obj=read_yaml(f))
+                for f in fs
+                if os.path.isfile(f)
+            ]
+
+        return get_env_configs("envs") + get_env_configs("hashed")
 
     @staticmethod
     def find(ctx, dir_config_path):
