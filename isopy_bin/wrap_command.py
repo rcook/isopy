@@ -1,4 +1,4 @@
-from isopy_lib.env import get_current_env_config
+from isopy_lib.env import get_env_config
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
 import os
@@ -12,8 +12,8 @@ PATH={bin_dir}:$PATH \\
 """
 
 
-def do_wrap(ctx, wrapper_path, script_path, base_dir):
-    env_config = get_current_env_config(ctx=ctx)
+def do_wrap(ctx, env, wrapper_path, script_path, base_dir):
+    env_config = get_env_config(ctx=ctx, env=env)
     bin_dir = dir_path(env_config.path, "..", env_config.python_dir, "bin")
     wrapper = WRAPPER_TEMPLATE.format(
         bin_dir=bin_dir,

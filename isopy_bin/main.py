@@ -126,8 +126,9 @@ def main(cwd, argv):
         subparsers,
         "shell",
         **auto_description("open shell"),
-        func=lambda ctx, args: do_shell(ctx=ctx))
+        func=lambda ctx, args: do_shell(ctx=ctx, env=args.env))
     add_common_args(parser=p)
+    add_env_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
@@ -148,10 +149,12 @@ def main(cwd, argv):
         **auto_description("generate shell wrapper for Python script"),
         func=lambda ctx, args: do_wrap(
             ctx=ctx,
+            env=args.env,
             wrapper_path=args.wrapper_path,
             script_path=args.script_path,
             base_dir=args.base_dir))
     add_common_args(parser=p)
+    add_env_arg(parser=p)
     p.add_argument(
         "wrapper_path",
         metavar="WRAPPER_PATH",

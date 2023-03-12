@@ -160,24 +160,6 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
             python_dir=python_dir)
 
 
-def get_current_env_config(ctx):
-    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
-        raise NotImplementedError(f"Not supported for this platform yet")
-
-    dir_config = DirConfig.find(ctx=ctx)
-    if dir_config is None:
-        raise ReportableError(
-            f"No isopy configuration found for directory {ctx.cwd}; "
-            "consider creating one with \"isopy new\"")
-
-    env_config = EnvConfig.find(ctx=ctx, dir_config_path=dir_config.path)
-    if env_config is None:
-        raise ReportableError(
-            f"No environment initialized for {dir_config.path}")
-
-    return env_config
-
-
 def get_env_config(ctx, env):
     if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
         raise NotImplementedError(f"Not supported for this platform yet")
