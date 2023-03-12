@@ -1,21 +1,13 @@
-from collections import namedtuple
 from isopy_lib.asset import assets_dir as assets_dir__
 from isopy_lib.fs import file_path
 from isopy_lib.version import Version
 from isopy_lib.pretty import show_table
-from operator import attrgetter
+from operator import itemgetter
 import os
 
 
 CPYTHON_PREFIX = "cpython-"
 CPYTHON_PREFIX_LEN = len(CPYTHON_PREFIX)
-
-
-DownloadInfo = namedtuple("DownloadInfo", [
-    "file_name",
-    "python_version",
-    "size"
-])
 
 
 def get_downloads(ctx):
@@ -27,11 +19,12 @@ def get_downloads(ctx):
                 idx = f.index("+", CPYTHON_PREFIX_LEN)
                 python_version = Version.parse(f[CPYTHON_PREFIX_LEN:idx])
                 p = file_path(assets_dir, f)
-                items.append(DownloadInfo(
-                    file_name=f,
-                    python_version=python_version,
-                    size=os.path.getsize(p)))
-    return sorted(items, key=attrgetter("python_version"), reverse=True)
+                items.append({
+                    "file": f,
+                    "ver": python_version,
+                    "size": os.path.getsize(p)
+                })
+    return sorted(items, key=itemgetter("ver"), reverse=True)
 
 
 def do_downloaded(ctx):
