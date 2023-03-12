@@ -17,7 +17,7 @@ class ProgramInfo(namedtuple("ProgramInfo", ["paths", "python_paths", "cwd", "ca
             # path into variable _MEIPASS.
             app_path = sys._MEIPASS
         else:
-            app_path = os.path.dirname(os.path.abspath(__file__))
+            app_path = os.path.abspath(os.path.join(__file__, "..", ".."))
 
         return ProgramInfo(
             paths=os.getenv("PATH").split(":"),
