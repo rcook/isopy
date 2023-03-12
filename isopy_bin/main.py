@@ -117,6 +117,18 @@ def main(cwd, argv):
         func=lambda ctx, args: do_shell(ctx=ctx))
     add_common_args(parser=p)
 
+    p = add_subcommand(
+        subparsers,
+        "exec",
+        **auto_description("run command in shell"),
+        func=lambda ctx, args: do_exec(ctx=ctx, command=args.command))
+    add_common_args(parser=p)
+    p.add_argument(
+        "command",
+        nargs=argparse.REMAINDER,
+        metavar="COMMAND",
+        help="command to run and its arguments")
+
     # BELOW NOT REFACTORED YET
 
     p = add_subcommand(
@@ -131,19 +143,6 @@ def main(cwd, argv):
     add_common_args(parser=p)
     add_python_version_positional_arg(parser=p)
     add_tag_name_arg(parser=p)
-
-    p = add_subcommand(
-        subparsers,
-        "exec",
-        **auto_description("run command in Python environment"),
-        func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command))
-    add_common_args(parser=p)
-    add_env_positional_arg(parser=p)
-    p.add_argument(
-        "command",
-        nargs=argparse.REMAINDER,
-        metavar="COMMAND",
-        help="command to run and its arguments")
 
     p = add_subcommand(
         subparsers,
