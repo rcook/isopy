@@ -1,12 +1,12 @@
 from isopy_lib.asset import AssetFilter, get_asset
-from isopy_lib.env import EnvInfo, LocalProjectManifest, ProjectManifest
+from isopy_lib.env import EnvManifest, LocalProjectManifest, ProjectManifest
 from isopy_lib.errors import ReportableError
 
 
 def do_init(ctx, env, force):
-    env_infos = EnvInfo.load_all(cache_dir=ctx.cache_dir)
-    for e in env_infos:
-        if e.env == env:
+    manifests = EnvManifest.load_all_from_cache(ctx=ctx)
+    for m in manifests:
+        if m.env == env:
             raise ReportableError(f"Environment {env} already exists")
 
     project_manifest = ProjectManifest.load_from_dir(dir=ctx.cwd)

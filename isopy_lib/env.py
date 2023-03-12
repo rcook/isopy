@@ -25,10 +25,7 @@ def exec_environment(ctx, env):
     if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
         raise NotImplementedError(f"Not supported for this platform yet")
 
-    manifest = EnvManifest.load(
-        env_manifest_path(
-            cache_dir=ctx.cache_dir,
-            env=env))
+    manifest = EnvManifest.load_from_cache(ctx=ctx, env=env)
 
     python_dir = dir_path(
         env_dir(cache_dir=ctx.cache_dir, env=env),
@@ -65,16 +62,29 @@ def write_yaml(path, obj, force):
             from e
 
 
-class EnvManifest(namedtuple("EnvManifest", ["env", "tag_name", "python_version", "python_dir"])):
+class EnvManifest(namedtuple("EnvManifest", ["env", "path", "tag_name", "python_version", "python_dir"])):
     @staticmethod
-    def load(path):
-        obj = read_yaml(path)
+    def load_all_from_cache(ctx):
+        dir = env_root_dir(cache_dir=ctx.cache_dir)
+        return [
+            x for x in [
+                EnvManifest.load_from_cache(ctx=ctx, env=d)
+                for d in sorted(os.listdir(dir))
+            ]
+            if x is not None
+        ]
+
+    @staticmethod
+    def load_from_cache(ctx, env):
+        p = env_manifest_path(cache_dir=ctx.cache_dir, env=env)
+        obj = read_yaml(p)
         env = obj["env"]
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         python_dir = obj["python_dir"]
         return EnvManifest(
             env=env,
+            path=p,
             tag_name=tag_name,
             python_version=python_version,
             python_dir=python_dir)
@@ -129,29 +139,3 @@ class LocalProjectManifest(namedtuple("LocalProjectManifest", ["env"])):
             file_path(dir, LocalProjectManifest.FILE_NAME),
             {"env": self.env},
             force=force)
-
-
-class EnvInfo(namedtuple("EnvInfo", ["env", "tag_name", "python_version", "dir"])):
-    @staticmethod
-    def load_all(cache_dir):
-        dir = env_root_dir(cache_dir=cache_dir)
-        return [
-            x for x in [
-                EnvInfo.load(cache_dir=cache_dir, env=d)
-                for d in sorted(os.listdir(dir))
-            ]
-            if x is not None
-        ]
-
-    @staticmethod
-    def load(cache_dir, env):
-        p = env_manifest_path(cache_dir=cache_dir, env=env)
-        if not os.path.isfile(p):
-            return None
-
-        manifest = EnvManifest.load(p)
-        return EnvInfo(
-            env=manifest.env,
-            tag_name=manifest.tag_name,
-            python_version=manifest.python_version,
-            dir=p)
