@@ -107,6 +107,7 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
         python_dir = os.path.relpath(output_dir, env_dir)
         c = EnvConfig(
             path=env_config_path,
+            name=None,
             dir_config_path=dir_config.path,
             tag_name=dir_config.tag_name,
             python_version=dir_config.python_version,

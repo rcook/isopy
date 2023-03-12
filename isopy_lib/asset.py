@@ -143,7 +143,7 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
             f"cpython-{self.python_version}+{self.tag_name}")
         if os.path.isdir(output_dir):
             ctx.logger.info(f"Asset already extracted at {output_dir}")
-            return
+            return output_dir
 
         p = self._path(ctx=ctx)
         ctx.logger.debug(f"Unpacking {p} to {output_dir}")
