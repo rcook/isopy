@@ -3,6 +3,7 @@ from isopy_bin.debug_command import do_debug
 from isopy_bin.download_command import do_download
 from isopy_bin.downloaded_command import do_downloaded
 from isopy_bin.exec_command import do_exec
+from isopy_bin.info_command import do_info
 from isopy_bin.init_command import do_init
 from isopy_bin.list_command import do_list
 from isopy_bin.new_command import do_new
@@ -121,6 +122,14 @@ def main(cwd, argv):
         **auto_description("initialize environment"),
         func=lambda ctx, args: do_init(ctx=ctx))
     add_common_args(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "info",
+        **auto_description("information about current environment"),
+        func=lambda ctx, args: do_info(ctx=ctx, env=args.env))
+    add_common_args(parser=p)
+    add_env_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
