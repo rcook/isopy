@@ -1,10 +1,10 @@
-from isopy_lib.env import DirConfig
+from isopy_lib.env import EnvConfig
 from isopy_lib.pretty import show_table
 
 
 def do_list(ctx):
-    manifests = EnvManifest.load_all_from_cache(ctx=ctx)
-    if len(manifests) > 0:
-        show_table(items=manifests)
+    env_configs = EnvConfig.load_all(ctx=ctx)
+    if len(env_configs) > 0:
+        show_table(items=env_configs)
     else:
-        print("There are no environments yet!")
+        print("There are no environments yet")

@@ -3,7 +3,7 @@ import colorama
 
 
 def get_widths(fields, items):
-    widths = [0] * len(fields)
+    widths = [len(x) for x in fields]
     for item in items:
         for i in range(0, len(fields)):
             temp = len(str(getattr(item, fields[i])))
@@ -21,6 +21,13 @@ def show_table(items, fields=None):
         fields = items[0]._fields
 
     widths = get_widths(fields=fields, items=items)
+    xprint(colorama.Fore.LIGHTWHITE_EX, end="")
+    for i in range(0, len(fields)):
+        if i > 0:
+            print("  ", end="")
+        print(str(fields[i].upper()).ljust(widths[i]), end="")
+    xprint()
+
     for item in items:
         xprint(colorama.Fore.YELLOW, end="")
         for i in range(0, len(fields)):

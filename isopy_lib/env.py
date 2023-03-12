@@ -58,6 +58,20 @@ class DirConfig(namedtuple("DirConfig", ["path", "tag_name", "python_version"]))
 
 class EnvConfig(namedtuple("EnvConfig", ["path", "dir_config_path", "tag_name", "python_version", "python_dir"])):
     @staticmethod
+    def load_all(ctx):
+        hashed_dir = dir_path(ctx.cache_dir, "hashed")
+        items = []
+        for d in os.listdir(hashed_dir):
+            env_config_path = file_path(hashed_dir, d, ENV_CONFIG_FILE)
+            if os.path.isfile(env_config_path):
+                items.append(
+                    EnvConfig._from_obj(
+                        ctx=ctx,
+                        path=env_config_path,
+                        obj=read_yaml(env_config_path)))
+        return items
+
+    @staticmethod
     def find(ctx, dir_config_path):
         env_dir = EnvConfig._dir(ctx=ctx, dir_config_path=dir_config_path)
         env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
@@ -85,7 +99,7 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "dir_config_path", "tag_name", 
             python_version=dir_config.python_version,
             python_dir=python_dir)
         write_yaml(env_config_path, {
-            "dir_config_path": c.path,
+            "dir_config_path": dir_config.path,
             "tag_name": str(c.tag_name),
             "python_version": str(dir_config.python_version),
             "python_dir": python_dir

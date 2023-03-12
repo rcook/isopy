@@ -66,6 +66,13 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
+        "list",
+        **auto_description("list environments"),
+        func=lambda ctx, args: do_list(ctx=ctx))
+    add_common_args(parser=p)
+
+    p = add_subcommand(
+        subparsers,
         "new",
         **auto_description("create project configuration"),
         func=lambda ctx, args: do_new(
@@ -92,13 +99,6 @@ def main(cwd, argv):
     add_common_args(parser=p)
 
     # BELOW NOT IMPLEMENTED YET
-
-    p = add_subcommand(
-        subparsers,
-        "list",
-        **auto_description("list environments"),
-        func=lambda ctx, args: do_list(ctx=ctx))
-    add_common_args(parser=p)
 
     p = add_subcommand(
         subparsers,
