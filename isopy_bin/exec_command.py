@@ -1,4 +1,3 @@
-from isopy_lib.env import exec_environment
 import os
 
 

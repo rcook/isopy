@@ -1,4 +1,3 @@
-from isopy_lib.env import ProjectManifest
 
 
 def do_new(ctx, asset_filter, force):

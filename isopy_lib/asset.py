@@ -1,6 +1,5 @@
 from collections import namedtuple
 from isopy_lib.checksum import make_checksum_file_path, verify_checksum
-from isopy_lib.env import EnvManifest, env_dir as env_dir__
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path, move_file, named_temporary_file, split_at_ext
 from isopy_lib.platform import Platform
@@ -112,10 +111,9 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
             raise NotImplementedError(f"Unsupported OS {os_}")
 
     def download(self, ctx):
-        python_path = file_path(assets_dir(ctx.cache_dir), self.name)
-        if os.path.exists(python_path):
-            ctx.logger.info(
-                f"Python is already downloaded at {python_path}")
+        p = self._path(ctx=ctx)
+        if os.path.exists(p):
+            ctx.logger.info(f"Asset is already downloaded at {p}")
             return
 
         with named_temporary_file() as f:
@@ -131,34 +129,32 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
                     file_name_key=self.name):
                 os.remove(f.name)
                 raise ReportableError(
-                    f"Checksum verification on downloaded file {f.name} failed; "
+                    f"Checksum verification on downloaded asset {f.name} failed; "
                     "file deleted")
 
-            move_file(f.name, python_path)
-            ctx.logger.info(f"Python downloaded to {python_path}")
+            move_file(f.name, p)
+            ctx.logger.info(f"Asset downloaded to {p}")
 
-    def unpack(self, ctx, env):
-        env_dir = env_dir__(cache_dir=ctx.cache_dir, env=env)
-        python_dir = dir_path(
-            env_dir,
+    def extract(self, ctx, dir):
+        self.download(ctx=ctx)
+
+        output_dir = dir_path(
+            dir,
             f"cpython-{self.python_version}+{self.tag_name}")
-        if os.path.isdir(python_dir):
-            ctx.logger.info(f"Python already unpacked at {python_dir}")
+        if os.path.isdir(output_dir):
+            ctx.logger.info(f"Asset already extracted at {output_dir}")
             return
 
-        python_path = file_path(assets_dir(ctx.cache_dir), self.name)
-        ctx.logger.debug(f"Unpacking {python_path} to {python_dir}")
+        p = self._path(ctx=ctx)
+        ctx.logger.debug(f"Unpacking {p} to {output_dir}")
         with TemporaryDirectory() as d:
-            shutil.unpack_archive(python_path, d)
-            shutil.move(dir_path(d, "python"), python_dir)
+            shutil.unpack_archive(p, d)
+            shutil.move(dir_path(d, "python"), output_dir)
 
-        EnvManifest(
-            env=env,
-            python_version=self.python_version,
-            tag_name=self.tag_name,
-            python_dir=os.path.relpath(python_dir, env_dir)).save_to_cache(
-            ctx=ctx,
-            force=False)
+        return output_dir
+
+    def _path(self, ctx):
+        return file_path(assets_dir(ctx.cache_dir), self.name)
 
 
 class AssetFilter(namedtuple("AssetFilter", ["tag_name", "python_version", "os_", "arch", "flavour"])):

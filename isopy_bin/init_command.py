@@ -1,23 +1,26 @@
+from hashlib import md5
 from isopy_lib.asset import AssetFilter, get_asset
-from isopy_lib.env import EnvManifest, LocalProjectManifest, ProjectManifest
+from isopy_lib.env import DirConfig, EnvConfig
 from isopy_lib.errors import ReportableError
 
 
-def do_init(ctx, env, force):
-    manifests = EnvManifest.load_all_from_cache(ctx=ctx)
-    for m in manifests:
-        if m.env == env:
-            raise ReportableError(f"Environment {env} already exists")
+def do_init(ctx):
+    dir_config = DirConfig.find(ctx=ctx)
+    if dir_config is None:
+        raise ReportableError(
+            f"No isopy configuration found for directory {ctx.cwd}; "
+            "consider creating one with \"isopy new\"")
 
-    project_manifest = ProjectManifest.load_from_dir(dir=ctx.cwd)
+    env_config = EnvConfig.find(ctx=ctx, dir_config_path=dir_config.path)
+    if env_config is not None:
+        raise ReportableError(
+            f"Environment already exists for {dir_config.path}")
 
     asset_filter = AssetFilter.default(
-        tag_name=project_manifest.tag_name,
-        python_version=project_manifest.python_version)
-
+        tag_name=dir_config.tag_name,
+        python_version=dir_config.python_version)
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
-    asset.download(ctx=ctx)
-    asset.unpack(ctx=ctx, env=env)
-    local_project_manifest = LocalProjectManifest(env=env)
-    ctx.logger.info(f"Creating local project manifest in directory {ctx.cwd}")
-    local_project_manifest.save_to_dir(dir=ctx.cwd, force=force)
+    EnvConfig.create(
+        ctx=ctx,
+        dir_config=dir_config,
+        asset=asset)

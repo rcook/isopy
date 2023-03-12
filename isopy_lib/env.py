@@ -1,141 +1,107 @@
 from collections import namedtuple
-from contextlib import contextmanager
-from isopy_lib.errors import ReportableError
+from hashlib import md5
 from isopy_lib.fs import dir_path, file_path
-from isopy_lib.platform import Platform
 from isopy_lib.version import Version
+from isopy_lib.yaml_utils import read_yaml, write_yaml
 import os
-import yaml
 
 
-def env_root_dir(cache_dir):
-    return dir_path(cache_dir, "env")
+DIR_CONFIG_FILE_NAME = ".isopy.yaml"
+ENV_CONFIG_FILE = "env.json"
 
 
-def env_dir(cache_dir, env):
-    return dir_path(env_root_dir(cache_dir=cache_dir), env)
-
-
-def env_manifest_path(cache_dir, env):
-    return file_path(env_dir(cache_dir, env), "env.json")
-
-
-@contextmanager
-def exec_environment(ctx, env):
-    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
-        raise NotImplementedError(f"Not supported for this platform yet")
-
-    manifest = EnvManifest.load_from_cache(ctx=ctx, env=env)
-
-    python_dir = dir_path(
-        env_dir(cache_dir=ctx.cache_dir, env=env),
-        manifest.python_dir)
-    python_bin_dir = dir_path(python_dir, "bin")
-
-    e = dict(os.environ)
-    temp = e.get("PATH")
-    paths = [] if temp is None else temp.split(":")
-    if python_bin_dir not in paths:
-        e["PATH"] = ":".join([python_bin_dir] + paths)
-
-    yield python_bin_dir, e
-
-
-def read_yaml(path):
-    try:
-        with open(path, "rt") as f:
-            return yaml.load(f, Loader=yaml.SafeLoader)
-    except FileNotFoundError as e:
-        raise ReportableError(
-            f"File not found at {path}") \
-            from e
-
-
-def write_yaml(path, obj, force):
-    try:
-        with open(path, "wt" if force else "xt") as f:
-            yaml.dump(obj, f)
-    except FileExistsError as e:
-        raise ReportableError(
-            f"File already exists at {path}; "
-            "pass --force to overwrite") \
-            from e
-
-
-class EnvManifest(namedtuple("EnvManifest", ["env", "path", "tag_name", "python_version", "python_dir"])):
+class DirConfig(namedtuple("DirConfig", ["path", "tag_name", "python_version"])):
     @staticmethod
-    def load_all_from_cache(ctx):
-        dir = env_root_dir(cache_dir=ctx.cache_dir)
-        return [
-            x for x in [
-                EnvManifest.load_from_cache(ctx=ctx, env=d)
-                for d in sorted(os.listdir(dir))
-            ]
-            if x is not None
-        ]
+    def find(ctx):
+        def find_config_path(dir, limit=3):
+            if limit == 0:
+                return None
+
+            p = file_path(dir, DIR_CONFIG_FILE_NAME)
+            if os.path.isfile(p):
+                return p
+
+            parent_dir = os.path.dirname(dir)
+            if parent_dir == dir:
+                return None
+
+            return find_config_path(d=parent_dir, limit=limit - 1)
+
+        p = find_config_path(dir=ctx.cwd)
+        if p is None:
+            return None
+
+        return DirConfig.from_obj(path=p, obj=read_yaml(p))
 
     @staticmethod
-    def load_from_cache(ctx, env):
-        p = env_manifest_path(cache_dir=ctx.cache_dir, env=env)
-        obj = read_yaml(p)
-        env = obj["env"]
+    def from_obj(path, obj):
+        tag_name = obj["tag_name"]
+        python_version = Version.parse(obj["python_version"])
+        return DirConfig(
+            path=path,
+            tag_name=tag_name,
+            python_version=python_version)
+
+
+class EnvConfig(namedtuple("EnvConfig", ["path", "dir_config_path", "tag_name", "python_version", "python_dir"])):
+    @staticmethod
+    def find(ctx, dir_config_path):
+        env_dir = EnvConfig._dir(ctx=ctx, dir_config_path=dir_config_path)
+        env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
+
+        try:
+            obj = read_yaml(env_config_path)
+        except FileNotFoundError:
+            return None
+
+        return EnvConfig._from_obj(
+            ctx=ctx,
+            path=env_config_path,
+            obj=obj)
+
+    @staticmethod
+    def create(ctx, dir_config, asset):
+        env_dir = EnvConfig._dir(ctx=ctx, dir_config=dir_config)
+        env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
+        output_dir = asset.extract(ctx=ctx, dir=env_dir)
+        python_dir = os.path.relpath(output_dir, env_dir)
+        write_yaml(env_config_path, {
+            "dir_config_path": dir_config.path,
+            "tag_name": dir_config.tag_name,
+            "python_version": str(dir_config.python_version),
+            "python_dir": python_dir
+        })
+
+    @staticmethod
+    def _dir(ctx, dir_config_path):
+        hash = md5(dir_config_path.encode("utf-8")).hexdigest()
+        return file_path(ctx.cache_dir, "hashed", hash)
+
+    @staticmethod
+    def _from_obj(ctx, path, obj):
+        dir_config_path = obj["dir_config_path"]
         tag_name = obj["tag_name"]
         python_version = Version.parse(obj["python_version"])
         python_dir = obj["python_dir"]
-        return EnvManifest(
-            env=env,
-            path=p,
+        return EnvConfig(
+            path=path,
+            dir_config_path=dir_config_path,
             tag_name=tag_name,
             python_version=python_version,
             python_dir=python_dir)
 
-    def save_to_cache(self, ctx, force):
-        write_yaml(
-            env_manifest_path(cache_dir=ctx.cache_dir, env=self.env),
-            {
-                "env": self.env,
-                "tag_name": self.tag_name,
-                "python_version": str(self.python_version),
-                "python_dir": self.python_dir
-            },
-            force=force)
+    def get_environment(self, ctx):
+        bin_dir = dir_path(
+            EnvConfig._dir(
+                ctx=ctx,
+                dir_config_path=self.dir_config_path),
+            self.python_dir,
+            "bin")
 
+        e = dict(os.environ)
+        temp = e.get("PATH")
+        paths = [] if temp is None else temp.split(":")
+        if bin_dir not in paths:
+            e["PATH"] = ":".join([bin_dir] + paths)
 
-class ProjectManifest(namedtuple("ProjectManifest", ["tag_name", "python_version"])):
-    FILE_NAME = ".isopy.yaml"
-
-    @staticmethod
-    def load_from_dir(dir):
-        p = file_path(dir, ProjectManifest.FILE_NAME)
-        obj = read_yaml(p)
-        tag_name = obj["tag_name"]
-        python_version = Version.parse(obj["python_version"])
-        return ProjectManifest(
-            tag_name=tag_name,
-            python_version=python_version)
-
-    def save_to_dir(self, dir, force):
-        write_yaml(
-            file_path(dir, ProjectManifest.FILE_NAME),
-            {
-                "tag_name": self.tag_name,
-                "python_version": str(self.python_version)
-            },
-            force=force)
-
-
-class LocalProjectManifest(namedtuple("LocalProjectManifest", ["env"])):
-    FILE_NAME = ".isopy.local.yaml"
-
-    @staticmethod
-    def load_from_dir(dir):
-        p = file_path(dir, LocalProjectManifest.FILE_NAME)
-        obj = read_yaml(p)
-        env = obj["env"]
-        return LocalProjectManifest(env=env)
-
-    def save_to_dir(self, dir, force):
-        write_yaml(
-            file_path(dir, LocalProjectManifest.FILE_NAME),
-            {"env": self.env},
-            force=force)
+        return e

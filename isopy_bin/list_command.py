@@ -1,4 +1,4 @@
-from isopy_lib.env import EnvManifest
+from isopy_lib.env import DirConfig
 from isopy_lib.pretty import show_table
 
 

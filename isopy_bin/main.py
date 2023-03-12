@@ -62,6 +62,22 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
+        "init",
+        **auto_description("initialize environment"),
+        func=lambda ctx, args: do_init(ctx=ctx))
+    add_common_args(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "shell",
+        **auto_description("open shell in Python environment"),
+        func=lambda ctx, args: do_shell(ctx=ctx))
+    add_common_args(parser=p)
+
+    # BELOW NOT IMPLEMENTED YET
+
+    p = add_subcommand(
+        subparsers,
         "list",
         **auto_description("list environments"),
         func=lambda ctx, args: do_list(ctx=ctx))
@@ -101,23 +117,6 @@ def main(cwd, argv):
     add_python_version_positional_arg(parser=p)
     add_tag_name_arg(parser=p)
     add_force_arg(parser=p)
-
-    p = add_subcommand(
-        subparsers,
-        "init",
-        **auto_description("initialize isopy environment"),
-        func=lambda ctx, args: do_init(ctx=ctx, env=args.env, force=args.force))
-    add_common_args(parser=p)
-    add_env_positional_arg(parser=p)
-    add_force_arg(parser=p)
-
-    p = add_subcommand(
-        subparsers,
-        "shell",
-        **auto_description("open shell in Python environment"),
-        func=lambda ctx, args: do_shell(ctx=ctx, env=args.env))
-    add_common_args(parser=p)
-    add_env_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
