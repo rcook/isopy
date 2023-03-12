@@ -11,7 +11,6 @@ from isopy_bin.wrap_command import do_wrap
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
-    add_env_arg, \
     add_env_positional_arg, \
     add_force_arg, \
     add_log_level_arg, \
@@ -66,6 +65,26 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
+        "available",
+        **auto_description("list available Python versions"),
+        func=lambda ctx, args: do_available(
+            ctx=ctx,
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version)))
+    add_common_args(parser=p)
+    add_tag_name_arg(parser=p)
+    add_python_version_arg(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "downloaded",
+        **auto_description("show download Python packages"),
+        func=lambda ctx, args: do_downloaded(ctx))
+    add_common_args(parser=p)
+
+    p = add_subcommand(
+        subparsers,
         "list",
         **auto_description("list environments"),
         func=lambda ctx, args: do_list(ctx=ctx))
@@ -115,13 +134,6 @@ def main(cwd, argv):
 
     p = add_subcommand(
         subparsers,
-        "downloaded",
-        **auto_description("show download Python packages"),
-        func=lambda ctx, args: do_downloaded(ctx))
-    add_common_args(parser=p)
-
-    p = add_subcommand(
-        subparsers,
         "exec",
         **auto_description("run command in Python environment"),
         func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command))
@@ -132,19 +144,6 @@ def main(cwd, argv):
         nargs=argparse.REMAINDER,
         metavar="COMMAND",
         help="command to run and its arguments")
-
-    p = add_subcommand(
-        subparsers,
-        "available",
-        **auto_description("list available Python versions"),
-        func=lambda ctx, args: do_available(
-            ctx=ctx,
-            asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
-                python_version=args.python_version)))
-    add_common_args(parser=p)
-    add_tag_name_arg(parser=p)
-    add_python_version_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
