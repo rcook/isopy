@@ -1,3 +1,7 @@
+from PyInstaller.building.build_main import \
+    Analysis, \
+    EXE, \
+    PYZ
 import glob
 
 
