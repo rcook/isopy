@@ -21,6 +21,6 @@ def do_init(ctx):
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
     c = EnvConfig.create(
         ctx=ctx,
-        dir_config=dir_config,
+        dir_config_path=dir_config.path,
         asset=asset)
     ctx.logger.info(f"Initialized environment at {c.path}")
