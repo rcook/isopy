@@ -132,7 +132,7 @@ isopy exec -e isopy pyinstaller isopy.spec
 
 ### `debug` subcommand
 
-Dumps out useful runtime troubleshooting information
+Dumps out useful runtime troubleshooting information.
 
 ### `available` subcommand
 
@@ -144,15 +144,17 @@ of the index.
 
 ### `download` subcommand
 
-TBD
+Downloads a Python distribution from
+[python-build-standalone][python-build-standalone] optionally filtered
+by Python version and/or tag without extracting it to an environment.
 
 ### `downloaded` subcommand
 
-TBD
+Lists locally downloaded Python distributions.
 
 ### `list` subcommand
 
-TBD
+Lists environments.
 
 ### `new` subcommand
 
