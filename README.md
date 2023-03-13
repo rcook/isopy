@@ -36,12 +36,15 @@ cd /path/to/workspace/isopy
 
 ### `debug` subcommand
 
-Dump out useful runtime troubleshooting informatino
+Dumps out useful runtime troubleshooting information
 
 ### `available` subcommand
 
-List versions of Python available for download from
-[python-build-standalone][python-build-standalone].
+Lists versions of Python available for download from
+[python-build-standalone][python-build-standalone] optionally filtered
+by Python version and/or tag. The release index is cached locally since
+this is fairly expensive to download. Use `--refresh` to force download
+of the index.
 
 ### `download` subcommand
 
