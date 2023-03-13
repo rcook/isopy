@@ -13,7 +13,7 @@ TBD: Install prebuilt binaries
 cd /path/to/workspace
 git clone git@github.com:rcook/isopy.git
 cd isopy
-./isopy-bootstrap
+./bootstrap
 ```
 
 ## Open development shell
