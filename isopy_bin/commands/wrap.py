@@ -1,7 +1,7 @@
 from isopy_lib.env import get_env_config
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
-from isopy_lib.os import get_python_executable_name
+from isopy_lib.platform import Platform
 import os
 
 
@@ -19,7 +19,7 @@ def do_wrap(ctx, env, wrapper_path, script_path, base_dir):
     wrapper = WRAPPER_TEMPLATE.format(
         bin_dir=bin_dir,
         base_dir=base_dir,
-        python_executable_name=get_python_executable_name(),
+        python_executable_name=Platform.current().python_executable_name,
         script_path=script_path)
 
     try:
