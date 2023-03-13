@@ -1,17 +1,15 @@
 from isopy_lib.env import EnvConfig
-from isopy_lib.platform import Platform
+from isopy_lib.platform import PLATFORM
 from isopy_lib.pretty import show_table
 import os
 
 
 def transform(x):
-    c = Platform.current()
-
     def truncate_path(s):
-        if s == c.home_dir:
-            return c.home_dir_meta
-        if s.startswith(c.home_dir + os.sep):
-            return c.home_dir_meta + s[len(c.home_dir):]
+        if s == PLATFORM.home_dir:
+            return PLATFORM.home_dir_meta
+        if s.startswith(PLATFORM.home_dir + os.sep):
+            return PLATFORM.home_dir_meta + s[len(PLATFORM.home_dir):]
         return s
 
     return {
