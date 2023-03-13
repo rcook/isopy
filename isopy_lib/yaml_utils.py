@@ -11,8 +11,8 @@ def read_yaml(path):
         return yaml.load(f, Loader=yaml.SafeLoader)
 
 
-def write_yaml(path, obj):
+def write_yaml(path, obj, force=False):
     dir = os.path.dirname(path)
     os.makedirs(dir, exist_ok=True)
-    with open(path, "xt") as f:
+    with open(path, "wt" if force else "xt") as f:
         yaml.dump(obj, f)

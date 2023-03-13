@@ -213,11 +213,11 @@ class UseInfo(namedtuple("UseInfo", ["dir", "env"])):
         return UseInfo(dir=obj["dir"], env=obj["env"])
 
     @staticmethod
-    def create(ctx, env):
+    def create(ctx, env, force):
         use_info = UseInfo(dir=ctx.cwd, env=env)
         hash = hash_path(use_info.dir)
         use_config_path = file_path(ctx.cache_dir, "uses", hash, "use.yaml")
         write_yaml(use_config_path, {
             "dir": use_info.dir,
             "env": use_info.env
-        })
+        }, force=force)

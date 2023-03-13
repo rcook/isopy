@@ -16,6 +16,7 @@ from isopy_lib.cli import \
     add_cache_dir_arg, \
     add_env_arg, \
     add_env_positional_arg, \
+    add_force_arg, \
     add_log_level_arg, \
     add_python_version_arg, \
     add_python_version_positional_arg, \
@@ -134,9 +135,10 @@ def main(cwd, argv):
         subparsers,
         "use",
         **auto_description("specify which environment use in current directory"),
-        func=lambda ctx, args: do_use(ctx=ctx, env=args.env))
+        func=lambda ctx, args: do_use(ctx=ctx, env=args.env, force=args.force))
     add_common_args(parser=p)
     add_env_positional_arg(parser=p)
+    add_force_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
