@@ -128,3 +128,14 @@ def add_refresh_arg(parser):
         action=argparse.BooleanOptionalAction,
         default=default,
         help=f"force download a new assets list (default: {default})")
+
+
+def add_detailed_arg(parser):
+    default = True
+
+    parser.add_argument(
+        "--detailed",
+        metavar="DETAILED",
+        action=argparse.BooleanOptionalAction,
+        default=default,
+        help=f"show detailed output (default: {default})")

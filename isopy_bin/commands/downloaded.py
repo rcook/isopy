@@ -10,7 +10,7 @@ CPYTHON_PREFIX = "cpython-"
 CPYTHON_PREFIX_LEN = len(CPYTHON_PREFIX)
 
 
-def get_downloads(ctx):
+def get_downloads(ctx, detailed):
     items = []
     assets_dir = assets_dir__(ctx.cache_dir)
     if os.path.isdir(assets_dir):
@@ -21,17 +21,26 @@ def get_downloads(ctx):
                 continue
 
             p = file_path(assets_dir, f)
-            items.append({
-                "file": f,
-                "ver": asset_name_info.python_version,
-                "size": os.path.getsize(p),
-                "create_command": f"\"isopy create MY_NAMED_ENVIRONMENT {asset_name_info.python_version} --tag {asset_name_info.tag}\""
-            })
+            if detailed:
+                item = {
+                    "file": f,
+                    "ver": asset_name_info.python_version,
+                    "size": os.path.getsize(p),
+                    "create_command": f"\"isopy create MY_NAMED_ENVIRONMENT {asset_name_info.python_version} --tag {asset_name_info.tag}\""
+                }
+            else:
+                item = {
+                    "file": f,
+                    "ver": asset_name_info.python_version,
+                    "size": os.path.getsize(p)
+                }
+
+            items.append(item)
     return sorted(items, key=itemgetter("ver"), reverse=True)
 
 
-def do_downloaded(ctx):
-    downloads = get_downloads(ctx=ctx)
+def do_downloaded(ctx, detailed):
+    downloads = get_downloads(ctx=ctx, detailed=detailed)
     if len(downloads) > 0:
         show_table(items=downloads)
     else:

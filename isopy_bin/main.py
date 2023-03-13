@@ -14,6 +14,7 @@ from isopy_bin.commands.wrap import do_wrap
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
+    add_detailed_arg, \
     add_env_arg, \
     add_env_positional_arg, \
     add_force_arg, \
@@ -101,15 +102,17 @@ def main(cwd, argv):
         subparsers,
         "downloaded",
         **auto_description("show download Python packages"),
-        func=lambda ctx, args: do_downloaded(ctx))
+        func=lambda ctx, args: do_downloaded(ctx=ctx, detailed=args.detailed))
     add_common_args(parser=p)
+    add_detailed_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
         "list",
         **auto_description("list environments"),
-        func=lambda ctx, args: do_list(ctx=ctx))
+        func=lambda ctx, args: do_list(ctx=ctx, detailed=args.detailed))
     add_common_args(parser=p)
+    add_detailed_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
