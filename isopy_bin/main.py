@@ -18,6 +18,7 @@ from isopy_lib.cli import \
     add_log_level_arg, \
     add_python_version_arg, \
     add_python_version_positional_arg, \
+    add_refresh_arg, \
     add_subcommand, \
     add_tag_name_arg, \
     auto_description
@@ -74,10 +75,12 @@ def main(cwd, argv):
             ctx=ctx,
             asset_filter=AssetFilter.default(
                 tag_name=args.tag_name,
-                python_version=args.python_version)))
+                python_version=args.python_version),
+            refresh=args.refresh))
     add_common_args(parser=p)
     add_tag_name_arg(parser=p)
     add_python_version_arg(parser=p)
+    add_refresh_arg(parser=p)
 
     p = add_subcommand(
         subparsers,

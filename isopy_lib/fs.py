@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from isopy_lib.platform import LINUX, MACOS, PLATFORM, WINDOWS
 from tempfile import NamedTemporaryFile
 import os
 
@@ -21,10 +22,23 @@ def split_at_ext(s, exts):
     raise ValueError(f"Name {s} has unknown extension")
 
 
-def move_file(source, target):
+def move_file(source, target, overwrite=False):
     target_dir = os.path.dirname(target)
     os.makedirs(target_dir, exist_ok=True)
-    os.rename(source, target)
+
+    if PLATFORM == LINUX or PLATFORM == MACOS:
+        if overwrite:
+            os.rename(source, target)
+        else:
+            os.link(source, target)
+            os.unlink(source)
+    elif PLATFORM == WINDOWS:
+        if overwrite:
+            os.replace(source, target)
+        else:
+            os.rename(source, target)
+    else:
+        raise NotImplementedError(f"Unsupported platform {PLATFORM}")
 
 
 @contextmanager

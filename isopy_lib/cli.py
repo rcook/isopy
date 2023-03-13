@@ -117,3 +117,14 @@ def add_force_arg(parser):
         action=argparse.BooleanOptionalAction,
         default=default,
         help=f"force overwrite of output files (default: {default})")
+
+
+def add_refresh_arg(parser):
+    default = False
+
+    parser.add_argument(
+        "--refresh",
+        metavar="REFRESH",
+        action=argparse.BooleanOptionalAction,
+        default=default,
+        help=f"force download a new assets list (default: {default})")

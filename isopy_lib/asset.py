@@ -230,7 +230,7 @@ def asset_predicate(asset_filter):
     return predicate
 
 
-def get_assets(ctx, asset_filter):
+def get_assets(ctx, asset_filter, refresh):
     def filter_releases(releases):
         return filter(release_predicate(asset_filter=asset_filter), releases)
 
@@ -239,12 +239,23 @@ def get_assets(ctx, asset_filter):
 
     index_path = file_path(assets_dir(ctx.cache_dir), "index.json")
     if os.path.isfile(index_path):
-        ctx.logger.debug(
-            f"Found Python version index at {index_path}")
+        if refresh:
+            with named_temporary_file() as f:
+                download_file(
+                    url=PYTHON_INDEX_URL,
+                    local_path=f.name)
+                move_file(f.name, index_path, overwrite=True)
+            ctx.logger.debug(
+                f"Updated Python version index at {index_path}")
+        else:
+            ctx.logger.debug(
+                f"Found Python version index at {index_path}")
     else:
         download_file(
             url=PYTHON_INDEX_URL,
             local_path=index_path)
+        ctx.logger.debug(
+            f"Downloaded Python version index to {index_path}")
 
     releases = ReleaseInfo.load_all(index_path)
 
