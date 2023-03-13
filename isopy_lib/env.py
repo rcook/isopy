@@ -3,7 +3,7 @@ from hashlib import md5
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
 from isopy_lib.version import Version
-from isopy_lib.yaml_utils import read_yaml, write_yaml
+from isopy_lib.yaml_utils import nullable_str, read_yaml, write_yaml
 import os
 
 
@@ -42,7 +42,7 @@ class DirConfig(namedtuple("DirConfig", ["path", "tag_name", "python_version"]))
             tag_name=tag_name,
             python_version=python_version)
         write_yaml(p, {
-            "tag_name": str(c.tag_name),
+            "tag_name": nullable_str(c.tag_name),
             "python_version": str(c.python_version)
         })
         return c
@@ -120,14 +120,14 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
         if name is None:
             write_yaml(env_config_path, {
                 "dir_config_path": dir_config_path,
-                "tag_name": str(c.tag_name),
+                "tag_name": nullable_str(c.tag_name),
                 "python_version": str(asset.python_version),
                 "python_dir": python_dir
             })
         else:
             write_yaml(env_config_path, {
                 "name": name,
-                "tag_name": str(c.tag_name),
+                "tag_name": nullable_str(c.tag_name),
                 "python_version": str(asset.python_version),
                 "python_dir": python_dir
             })

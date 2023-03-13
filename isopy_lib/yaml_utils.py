@@ -2,6 +2,10 @@ import os
 import yaml
 
 
+def nullable_str(obj):
+    return None if obj is None else str(obj)
+
+
 def read_yaml(path):
     with open(path, "rt") as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
