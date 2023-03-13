@@ -54,6 +54,15 @@ environment globally (e.g. from your `.bashrc` add a line to modify your
 export PATH=$HOME/.isopy/envs/isopy/cpython-3.11.1+20230116/bin:$PATH
 ```
 
+You may, instead, be able to call out to the `shell` command instead at
+the end of your `.bashrc` file:
+
+```bash
+isopy shell -e isopy
+```
+
+_Note that this has not been tested!_
+
 ### What does this all do?
 
 * Intended to minimally impact your system
