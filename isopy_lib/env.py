@@ -11,6 +11,10 @@ DIR_CONFIG_FILE_NAME = ".isopy.yaml"
 ENV_CONFIG_FILE = "env.yaml"
 
 
+def hash_path(p):
+    return md5(p.encode("utf-8")).hexdigest()
+
+
 class DirConfig(namedtuple("DirConfig", ["path", "tag", "python_version"])):
     @staticmethod
     def find(ctx):
@@ -139,7 +143,7 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
             name is not None and dir_config_path is None
 
         if name is None:
-            hash = md5(dir_config_path.encode("utf-8")).hexdigest()
+            hash = hash_path(dir_config_path)
             return file_path(ctx.cache_dir, "hashed", hash)
         else:
             return file_path(ctx.cache_dir, "envs", name)
@@ -193,3 +197,27 @@ def get_env_config(ctx, env):
             "or use \"isopy new\" to create an environment for it")
 
     return env_config
+
+
+class UseInfo(namedtuple("UseInfo", ["dir", "env"])):
+    @staticmethod
+    def find(ctx):
+        hash = hash_path(ctx.cwd)
+        use_config_path = file_path(ctx.cache_dir, "uses", hash, "use.yaml")
+
+        try:
+            obj = read_yaml(use_config_path)
+        except FileNotFoundError:
+            return None
+
+        return UseInfo(dir=obj["dir"], env=obj["env"])
+
+    @staticmethod
+    def create(ctx, env):
+        use_info = UseInfo(dir=ctx.cwd, env=env)
+        hash = hash_path(use_info.dir)
+        use_config_path = file_path(ctx.cache_dir, "uses", hash, "use.yaml")
+        write_yaml(use_config_path, {
+            "dir": use_info.dir,
+            "env": use_info.env
+        })
