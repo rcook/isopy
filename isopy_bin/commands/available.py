@@ -7,7 +7,8 @@ def transform(x):
         "os": x.os,
         "arch": x.arch,
         "tag": x.tag,
-        "ver": x.python_version
+        "ver": x.python_version,
+        "download_command": f"\"isopy download {x.python_version} --tag {x.tag}\""
     }
 
 
