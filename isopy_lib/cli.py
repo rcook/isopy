@@ -87,14 +87,14 @@ def add_cache_dir_arg(parser, default):
         help=f"cache directory (default: {default})")
 
 
-def add_tag_name_arg(parser):
+def add_tag_arg(parser):
     parser.add_argument(
-        "--tag-name",
+        "--tag",
         "-t",
-        metavar="TAG_NAME",
+        metavar="TAG",
         type=str,
         required=False,
-        help="tag name")
+        help="python-build-standalone build tag")
 
 
 def add_python_version_arg(parser):

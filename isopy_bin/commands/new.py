@@ -6,7 +6,7 @@ def do_new(ctx, asset_filter):
     try:
         c = DirConfig.create(
             ctx=ctx,
-            tag_name=asset_filter.tag_name,
+            tag=asset_filter.tag,
             python_version=asset_filter.python_version)
     except FileExistsError as e:
         raise ReportableError(

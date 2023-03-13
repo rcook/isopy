@@ -20,7 +20,7 @@ from isopy_lib.cli import \
     add_python_version_positional_arg, \
     add_refresh_arg, \
     add_subcommand, \
-    add_tag_name_arg, \
+    add_tag_arg, \
     auto_description
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
@@ -74,11 +74,11 @@ def main(cwd, argv):
         func=lambda ctx, args: do_available(
             ctx=ctx,
             asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
+                tag=args.tag,
                 python_version=args.python_version),
             refresh=args.refresh))
     add_common_args(parser=p)
-    add_tag_name_arg(parser=p)
+    add_tag_arg(parser=p)
     add_python_version_arg(parser=p)
     add_refresh_arg(parser=p)
 
@@ -89,11 +89,11 @@ def main(cwd, argv):
         func=lambda ctx, args: do_download(
             ctx=ctx,
             asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
+                tag=args.tag,
                 python_version=args.python_version)))
     add_common_args(parser=p)
     add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
+    add_tag_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
@@ -116,11 +116,11 @@ def main(cwd, argv):
         func=lambda ctx, args: do_new(
             ctx=ctx,
             asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
+                tag=args.tag,
                 python_version=args.python_version)))
     add_common_args(parser=p)
     add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
+    add_tag_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
@@ -137,12 +137,12 @@ def main(cwd, argv):
             ctx=ctx,
             env=args.env,
             asset_filter=AssetFilter.default(
-                tag_name=args.tag_name,
+                tag=args.tag,
                 python_version=args.python_version)))
     add_common_args(parser=p)
     add_env_positional_arg(parser=p)
     add_python_version_positional_arg(parser=p)
-    add_tag_name_arg(parser=p)
+    add_tag_arg(parser=p)
 
     p = add_subcommand(
         subparsers,

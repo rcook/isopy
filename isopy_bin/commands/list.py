@@ -15,7 +15,7 @@ def transform(x):
     return {
         "path": truncate_path(x.path),
         "name_or_dir": truncate_path(x.dir_config_path) if x.name is None else x.name,
-        "tag": x.tag_name,
+        "tag": x.tag,
         "ver": x.python_version
     }
 

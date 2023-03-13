@@ -9,8 +9,8 @@ CHECKSUM_DIR = dir_path(
     "sha256sums")
 
 
-def make_checksum_file_path(tag_name):
-    return file_path(CHECKSUM_DIR, f"{tag_name}.sha256sums")
+def make_checksum_file_path(tag):
+    return file_path(CHECKSUM_DIR, f"{tag}.sha256sums")
 
 
 def verify_checksum(file_path, checksum_file_path, file_name_key):

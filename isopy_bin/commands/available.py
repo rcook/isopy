@@ -6,7 +6,7 @@ def transform(x):
     return {
         "os": x.os,
         "arch": x.arch,
-        "tag": x.tag_name,
+        "tag": x.tag,
         "ver": x.python_version
     }
 

@@ -5,10 +5,10 @@ cache_dir=$HOME/.isopy
 assets_dir=$cache_dir/assets
 isopy_env_dir=$cache_dir/env/isopy
 python_version=3.11.1
-tag_name=20230116
-python_dir_name=cpython-$python_version+$tag_name
+tag=20230116
+python_dir_name=cpython-$python_version+$tag
 isopy_python_dir=$isopy_env_dir/$python_dir_name
-python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag_name/$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
+python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag/$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
 python_file_name=$(basename $python_url)
 python_path=$assets_dir/$python_file_name
 
@@ -46,5 +46,5 @@ cat > $isopy_env_dir/env.json <<EOF
 name: isopy
 python_dir: $python_dir_name
 python_version: $python_version
-tag_name: '$tag_name'
+tag: '$tag'
 EOF

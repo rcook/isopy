@@ -16,7 +16,7 @@ def do_init(ctx):
             f"Environment already exists for {dir_config.path}")
 
     asset_filter = AssetFilter.default(
-        tag_name=dir_config.tag_name,
+        tag=dir_config.tag,
         python_version=dir_config.python_version)
     asset = get_asset(ctx=ctx, asset_filter=asset_filter)
     c = EnvConfig.create(

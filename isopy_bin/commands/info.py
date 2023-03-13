@@ -25,6 +25,6 @@ def do_info(ctx, env):
         show_value("dir_config_path", env_config.dir_config_path)
 
     show_value("path", env_config.path)
-    show_value("tag_name", env_config.tag_name)
+    show_value("tag", env_config.tag)
     show_value("python_version", env_config.python_version)
     show_value("python_dir", env_config.python_dir)
