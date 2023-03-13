@@ -31,12 +31,12 @@ class Platform(Enum):
 
     @classmethod
     def current(cls):
-        os = platform.system().lower()
-        if os == "linux":
+        p = platform.system().lower()
+        if p == "linux":
             return cls.LINUX
-        elif os == "darwin":
+        elif p == "darwin":
             return cls.MACOS
-        elif os == "windows":
+        elif p == "windows":
             return cls.WINDOWS
         else:
-            raise NotImplementedError(f"Unsupported OS \"{os}\"")
+            raise NotImplementedError(f"Unsupported platform {p}")
