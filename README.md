@@ -61,7 +61,8 @@ the end of your `.bashrc` file:
 isopy shell -e isopy
 ```
 
-_Note that this has not been tested!_
+_Note that this has not been tested and may or may not work propertly
+since the wrapper scripts use [`exec`][man-exec]._
 
 ### What does this all do?
 
@@ -175,5 +176,6 @@ TBD
 
 TBD
 
+[man-exec]: https://linux.die.net/man/1/exec
 [pyinstaller]: https://pyinstaller.org/
 [python-build-standalone]: https://github.com/indygreg/python-build-standalone/releases
