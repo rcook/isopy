@@ -1,4 +1,4 @@
-from isopy_lib.asset import assets_dir as assets_dir__
+from isopy_lib.asset import AssetNameInfo, assets_dir as assets_dir__
 from isopy_lib.fs import file_path
 from isopy_lib.version import Version
 from isopy_lib.pretty import show_table
@@ -15,21 +15,18 @@ def get_downloads(ctx):
     assets_dir = assets_dir__(ctx.cache_dir)
     if os.path.isdir(assets_dir):
         for f in os.listdir(assets_dir):
-            if f.startswith(CPYTHON_PREFIX):
-                # Don't do this!
-                # Use the functions in asset.py instead since these
-                # parse these strings properly!
-                idx0 = f.index("+", CPYTHON_PREFIX_LEN)
-                python_version = Version.parse(f[CPYTHON_PREFIX_LEN:idx0])
-                idx1 = f.index("-", idx0)
-                tag = f[idx0 + 1:idx1]
-                p = file_path(assets_dir, f)
-                items.append({
-                    "file": f,
-                    "ver": python_version,
-                    "size": os.path.getsize(p),
-                    "create_command": f"\"isopy create MY_NAMED_ENVIRONMENT {python_version} --tag {tag}\""
-                })
+            try:
+                asset_name_info = AssetNameInfo.parse(f)
+            except ValueError:
+                continue
+
+            p = file_path(assets_dir, f)
+            items.append({
+                "file": f,
+                "ver": asset_name_info.python_version,
+                "size": os.path.getsize(p),
+                "create_command": f"\"isopy create MY_NAMED_ENVIRONMENT {asset_name_info.python_version} --tag {asset_name_info.tag}\""
+            })
     return sorted(items, key=itemgetter("ver"), reverse=True)
 
 

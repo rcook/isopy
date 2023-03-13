@@ -43,10 +43,9 @@ class ReleaseInfo(namedtuple("ReleaseInfo", ["tag", "assets"])):
         return ReleaseInfo(tag=obj["tag_name"], assets=assets)
 
 
-class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", "python_version", "tag", "arch", "subarch", "os", "flavour", "subflavour"])):
+class AssetNameInfo(namedtuple("AssetNameInfo", ["ext", "python_version", "tag", "tail"])):
     @staticmethod
-    def read(obj):
-        asset_name = obj["name"]
+    def parse(asset_name):
         base, ext = split_at_ext(asset_name, EXTS)
         tail = base.split("-")
 
@@ -56,6 +55,23 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
 
         temp, *tail = tail
         python_version, tag = parse_python_version_and_tag(temp)
+        return AssetNameInfo(
+            ext=ext,
+            python_version=python_version,
+            tag=tag,
+            tail=tail)
+
+
+class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", "python_version", "tag", "arch", "subarch", "os", "flavour", "subflavour"])):
+    @staticmethod
+    def read(obj):
+        asset_name = obj["name"]
+
+        asset_name_info = AssetNameInfo.parse(asset_name=asset_name)
+        ext = asset_name_info.ext
+        python_version = asset_name_info.python_version
+        tag = asset_name_info.tag
+        tail = asset_name_info.tail
 
         arch, *tail = tail
         if arch not in ARCHES:
