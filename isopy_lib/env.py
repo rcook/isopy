@@ -188,8 +188,8 @@ def get_env_config(ctx, env):
         dir_config_path=dir_config_path)
     if env_config is None:
         raise ReportableError(
-            f"No environment initialized for {label}; "
-            "use \"isopy new\" to create an environment or "
-            "specify a named environment using --env")
+            f"No environment specified for {label}; "
+            "specify which environment to use using \"isopy use\" "
+            "or use \"isopy new\" to create an environment for it")
 
     return env_config
