@@ -1,6 +1,21 @@
 from contextlib import contextmanager
+from isopy_lib.platform import Platform
 from tempfile import NamedTemporaryFile
 import os
+
+
+def get_home_dir_meta():
+    c = Platform.current()
+    if c == Platform.LINUX:
+        return "$HOME"
+    elif c == Platform.WINDOWS:
+        return "%USERPROFILE"
+    else:
+        raise NotImplementedError()
+
+
+def get_home_dir():
+    return os.path.expanduser("~")
 
 
 def dir_path(*args):
@@ -28,14 +43,18 @@ def move_file(source, target):
 
 
 @contextmanager
-def named_temporary_file(*args, **kwargs):
-    t = None
+def named_temporary_file():
+    p = None
     try:
-        t = NamedTemporaryFile(*args, **kwargs)
-        yield t
+        with NamedTemporaryFile(delete=False) as t:
+            p = t.name
+            assert os.path.isfile(p)
+            t.close()
+            assert os.path.isfile(p)
+            yield t
     finally:
-        if t is not None:
+        if p is not None:
             try:
-                t.close()
+                os.unlink(p)
             except FileNotFoundError:
                 pass

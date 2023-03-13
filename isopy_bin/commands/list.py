@@ -1,17 +1,18 @@
 from isopy_lib.env import EnvConfig
+from isopy_lib.fs import get_home_dir, get_home_dir_meta
 from isopy_lib.pretty import show_table
 import os
 
 
 def transform(x):
-    HOME_DIR_VAR = "$HOME"
-    home_dir = os.path.expanduser("~")
+    home_dir_meta = get_home_dir_meta()
+    home_dir = get_home_dir()
 
     def truncate_path(s):
         if s == home_dir:
-            return HOME_DIR_VAR
+            return home_dir_meta
         if s.startswith(home_dir + os.sep):
-            return HOME_DIR_VAR + s[len(home_dir):]
+            return home_dir_meta + s[len(home_dir):]
         return s
 
     return {

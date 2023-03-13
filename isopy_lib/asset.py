@@ -17,9 +17,10 @@ PYTHON_INDEX_URL = "https://api.github.com/repos/indygreg/python-build-standalon
 EXTS = set([".tar.gz"])
 ARCHES = set(["aarch64", "x86_64", "x86_64_v2", "x86_64_v3", "x86_64_v4"])
 SUBARCHES = set(["apple", "pc", "unknown"])
-OSES = set(["darwin", "linux"])
-FLAVOURS = set(["debug", "gnu", "musl"])
+OSES = set(["darwin", "linux", "windows"])
+FLAVOURS = set(["debug", "gnu", "msvc", "musl"])
 SUBFLAVOURS = set(["install_only"])
+LINKAGES = set(["shared", "static"])
 
 
 class ReleaseInfo(namedtuple("ReleaseInfo", ["tag_name", "assets"])):
@@ -107,6 +108,30 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
                 os=os_,
                 flavour=flavour,
                 subflavour=subflavour)
+        elif os_ == "windows":
+            flavour, *tail = tail
+            if flavour not in FLAVOURS:
+                raise ValueError(f"Unsupported flavour {flavour}")
+
+            linkage, *tail = tail
+            if linkage not in LINKAGES:
+                raise ValueError(f"Unsupported linkage {linkage}")
+
+            subflavour, *tail = tail
+            if subflavour not in SUBFLAVOURS:
+                raise ValueError(f"Unsupported subflavour {subflavour}")
+
+            return AssetInfo(
+                browser_download_url=obj["browser_download_url"],
+                name=obj["name"],
+                ext=ext,
+                python_version=python_version,
+                tag_name=tag_name,
+                arch=arch,
+                subarch=subarch,
+                os=os_,
+                flavour=flavour,
+                subflavour=subflavour)
         else:
             raise NotImplementedError(f"Unsupported OS {os_}")
 
@@ -167,6 +192,9 @@ class AssetFilter(namedtuple("AssetFilter", ["tag_name", "python_version", "os_"
         elif platform == Platform.MACOS:
             os_ = "darwin"
             flavour = None
+        elif platform == Platform.WINDOWS:
+            os_ = "windows"
+            flavour = "msvc"
         else:
             raise NotImplementedError(f"Unsupported platform {platform}")
 

@@ -2,6 +2,7 @@ from collections import namedtuple
 from hashlib import md5
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
+from isopy_lib.os import make_paths_str
 from isopy_lib.platform import Platform
 from isopy_lib.version import Version
 from isopy_lib.yaml_utils import read_yaml, write_yaml
@@ -72,15 +73,18 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
     def load_all(ctx):
         def get_env_configs(dir_name):
             dir = dir_path(ctx.cache_dir, dir_name)
-            fs = [
-                file_path(dir, d, ENV_CONFIG_FILE)
-                for d in os.listdir(dir)
-            ]
-            return [
-                EnvConfig._from_obj(ctx=ctx, path=f, obj=read_yaml(f))
-                for f in fs
-                if os.path.isfile(f)
-            ]
+            if os.path.isdir(dir):
+                fs = [
+                    file_path(dir, d, ENV_CONFIG_FILE)
+                    for d in os.listdir(dir)
+                ]
+                return [
+                    EnvConfig._from_obj(ctx=ctx, path=f, obj=read_yaml(f))
+                    for f in fs
+                    if os.path.isfile(f)
+                ]
+            else:
+                return []
 
         return get_env_configs("envs") + get_env_configs("hashed")
 
@@ -149,28 +153,16 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
             python_version=python_version,
             python_dir=python_dir)
 
-    def _get_environment(self, ctx):
-        bin_dir = dir_path(
+    def make_python_dir(self, ctx):
+        return dir_path(
             EnvConfig._dir(
                 ctx=ctx,
                 name=self.name,
                 dir_config_path=self.dir_config_path),
-            self.python_dir,
-            "bin")
-
-        e = dict(os.environ)
-        temp = e.get("PATH")
-        paths = [] if temp is None else temp.split(os.pathsep)
-        if bin_dir not in paths:
-            e["PATH"] = os.pathsep.join([bin_dir] + paths)
-
-        return e
+            self.python_dir)
 
 
 def get_env_config(ctx, env):
-    if Platform.current() not in [Platform.LINUX, Platform.MACOS]:
-        raise NotImplementedError(f"Not supported for this platform yet")
-
     if env is None:
         dir_config = DirConfig.find(ctx=ctx)
         if dir_config is None:
