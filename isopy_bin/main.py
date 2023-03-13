@@ -35,7 +35,12 @@ def main(cwd, argv):
 
     h = _ArgHelper()
 
-    extra_info = f"Using Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    python_version_str = ".".join([str(s) for s in [
+        sys.version_info.major,
+        sys.version_info.minor,
+        sys.version_info.micro
+    ]])
+    extra_info = f"Using Python {python_version_str}"
     if not ProgramInfo.get(cwd=cwd, cache_dir=default_cache_dir).frozen:
         extra_info += f" ({shutil.which(PLATFORM.python_executable_name)})"
 
