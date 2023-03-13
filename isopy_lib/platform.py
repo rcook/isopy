@@ -6,6 +6,7 @@ import shlex
 
 
 Platform = namedtuple("Platform", [
+    "name",
     "home_dir_meta",
     "home_dir",
     "python_executable_name",
@@ -61,6 +62,7 @@ def exec_windows(command=None, path_dirs=[], extra_env={}):
 
 
 LINUX = Platform(
+    name="Linux",
     home_dir_meta="$HOME",
     home_dir=os.path.expanduser("~"),
     python_executable_name="python3",
@@ -69,6 +71,7 @@ LINUX = Platform(
     asset_os="linux",
     asset_flavour="gnu")
 MACOS = Platform(
+    name="macOS",
     home_dir_meta="$HOME",
     home_dir=os.path.expanduser("~"),
     python_executable_name="python3",
@@ -77,6 +80,7 @@ MACOS = Platform(
     asset_os="darwin",
     asset_flavour=None)
 WINDOWS = Platform(
+    name="Windows",
     home_dir_meta="%USERPROFILE%",
     home_dir=os.path.expanduser("~"),
     python_executable_name="python",

@@ -1,7 +1,9 @@
+from isopy_lib.platform import PLATFORM
 from isopy_lib.program_info import ProgramInfo
 from isopy_lib.xprint import xprint
 import colorama
 import os
+import yaml
 
 
 def do_debug(ctx):
@@ -17,6 +19,15 @@ def do_debug(ctx):
             colorama.Fore.LIGHTWHITE_EX, value)
 
     program_info = ProgramInfo.get(cwd=ctx.cwd, cache_dir=ctx.cache_dir)
+
+    show("Platform information:")
+    d = {
+        k: v
+        for k, v in PLATFORM._asdict().items()
+        if k != "exec" and v is not None
+    }
+    for line in yaml.dump(d, sort_keys=True).splitlines():
+        show(f"  {line}")
 
     show("System search paths:")
     for p in program_info.paths:
