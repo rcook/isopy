@@ -37,8 +37,11 @@ cat -n ~/.local/bin/isopy
 # Now you should have an "isopy" script available on PATH
 isopy --help
 
+# Configure this project to use the named environment "isopy"
+isopy use isopy
+
 # Run a local isopy shell
-isopy shell -e isopy
+isopy shell
 
 # In isopy shell, report version of isopy-installed Python interpreter
 $ python3 --version
@@ -156,6 +159,10 @@ TBD
 TBD
 
 ### `init` subcommand
+
+TBD
+
+### `use` subcommand
 
 TBD
 
