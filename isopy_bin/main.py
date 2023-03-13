@@ -1,4 +1,5 @@
 from isopy_bin.commands.available import do_available
+from isopy_bin.commands.create import do_create
 from isopy_bin.commands.debug import do_debug
 from isopy_bin.commands.download import do_download
 from isopy_bin.commands.downloaded import do_downloaded
@@ -13,6 +14,7 @@ from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
     add_cache_dir_arg, \
     add_env_arg, \
+    add_env_positional_arg, \
     add_log_level_arg, \
     add_python_version_arg, \
     add_python_version_positional_arg, \
@@ -120,9 +122,24 @@ def main(cwd, argv):
     p = add_subcommand(
         subparsers,
         "init",
-        **auto_description("initialize environment"),
+        **auto_description("initialize environment corresponding to current project"),
         func=lambda ctx, args: do_init(ctx=ctx))
     add_common_args(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "create",
+        **auto_description("initialize named environment"),
+        func=lambda ctx, args: do_create(
+            ctx=ctx,
+            env=args.env,
+            asset_filter=AssetFilter.default(
+                tag_name=args.tag_name,
+                python_version=args.python_version)))
+    add_common_args(parser=p)
+    add_env_positional_arg(parser=p)
+    add_python_version_positional_arg(parser=p)
+    add_tag_name_arg(parser=p)
 
     p = add_subcommand(
         subparsers,

@@ -2,7 +2,7 @@ from collections import namedtuple
 from isopy_lib.checksum import make_checksum_file_path, verify_checksum
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path, move_file, named_temporary_file, split_at_ext
-from isopy_lib.platform import Platform
+from isopy_lib.platform import PLATFORM
 from isopy_lib.utils import parse_python_version_and_tag_name
 from isopy_lib.web import download_file
 from tempfile import TemporaryDirectory
@@ -185,25 +185,12 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
 class AssetFilter(namedtuple("AssetFilter", ["tag_name", "python_version", "os_", "arch", "flavour"])):
     @staticmethod
     def default(tag_name, python_version):
-        platform = Platform.current()
-        if platform == Platform.LINUX:
-            os_ = "linux"
-            flavour = "gnu"
-        elif platform == Platform.MACOS:
-            os_ = "darwin"
-            flavour = None
-        elif platform == Platform.WINDOWS:
-            os_ = "windows"
-            flavour = "msvc"
-        else:
-            raise NotImplementedError(f"Unsupported platform {platform}")
-
         return AssetFilter(
             tag_name=tag_name,
             python_version=python_version,
-            os_=os_,
+            os_=PLATFORM.asset_os,
             arch="x86_64",
-            flavour=flavour)
+            flavour=PLATFORM.asset_flavour)
 
     def __str__(self):
         return ", ".join(

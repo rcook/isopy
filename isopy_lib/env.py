@@ -59,13 +59,25 @@ class DirConfig(namedtuple("DirConfig", ["path", "tag_name", "python_version"]))
 
 class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag_name", "python_version", "python_dir"])):
     @staticmethod
-    def load_by_name(ctx, env):
-        envs_dir = dir_path(ctx.cache_dir, "envs")
-        env_config_path = file_path(envs_dir, env, ENV_CONFIG_FILE)
+    def find(ctx, name=None, dir_config_path=None):
+        assert name is None and dir_config_path is not None or \
+            name is not None and dir_config_path is None
+
+        env_dir = EnvConfig._dir(
+            ctx=ctx,
+            name=name,
+            dir_config_path=dir_config_path)
+        env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
+
+        try:
+            obj = read_yaml(env_config_path)
+        except FileNotFoundError:
+            return None
+
         return EnvConfig._from_obj(
             ctx=ctx,
             path=env_config_path,
-            obj=read_yaml(env_config_path))
+            obj=obj)
 
     @staticmethod
     def load_all(ctx):
@@ -87,45 +99,45 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
         return get_env_configs("envs") + get_env_configs("hashed")
 
     @staticmethod
-    def find(ctx, dir_config_path):
-        env_dir = EnvConfig._dir(ctx=ctx, dir_config_path=dir_config_path)
-        env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
+    def create(ctx, asset, name=None, dir_config_path=None):
+        assert name is None and dir_config_path is not None or \
+            name is not None and dir_config_path is None
 
-        try:
-            obj = read_yaml(env_config_path)
-        except FileNotFoundError:
-            return None
-
-        return EnvConfig._from_obj(
+        env_dir = EnvConfig._dir(
             ctx=ctx,
-            path=env_config_path,
-            obj=obj)
-
-    @staticmethod
-    def create(ctx, dir_config, asset):
-        env_dir = EnvConfig._dir(ctx=ctx, dir_config_path=dir_config.path)
+            name=name,
+            dir_config_path=dir_config_path)
         env_config_path = file_path(env_dir, ENV_CONFIG_FILE)
         output_dir = asset.extract(ctx=ctx, dir=env_dir)
         python_dir = os.path.relpath(output_dir, env_dir)
         c = EnvConfig(
             path=env_config_path,
-            name=None,
-            dir_config_path=dir_config.path,
-            tag_name=dir_config.tag_name,
-            python_version=dir_config.python_version,
+            name=name,
+            dir_config_path=dir_config_path,
+            tag_name=asset.tag_name,
+            python_version=asset.python_version,
             python_dir=python_dir)
-        write_yaml(env_config_path, {
-            "dir_config_path": dir_config.path,
-            "tag_name": str(c.tag_name),
-            "python_version": str(dir_config.python_version),
-            "python_dir": python_dir
-        })
+        if name is None:
+            write_yaml(env_config_path, {
+                "dir_config_path": dir_config_path,
+                "tag_name": str(c.tag_name),
+                "python_version": str(asset.python_version),
+                "python_dir": python_dir
+            })
+        else:
+            write_yaml(env_config_path, {
+                "name": name,
+                "tag_name": str(c.tag_name),
+                "python_version": str(asset.python_version),
+                "python_dir": python_dir
+            })
         return c
 
     @staticmethod
     def _dir(ctx, name=None, dir_config_path=None):
         assert name is None and dir_config_path is not None or \
             name is not None and dir_config_path is None
+
         if name is None:
             hash = md5(dir_config_path.encode("utf-8")).hexdigest()
             return file_path(ctx.cache_dir, "hashed", hash)

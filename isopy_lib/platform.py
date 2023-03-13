@@ -10,7 +10,9 @@ Platform = namedtuple("Platform", [
     "home_dir",
     "python_executable_name",
     "python_bin_dirs",
-    "exec"
+    "exec",
+    "asset_os",
+    "asset_flavour"
 ])
 
 
@@ -63,19 +65,25 @@ LINUX = Platform(
     home_dir=os.path.expanduser("~"),
     python_executable_name="python3",
     python_bin_dirs=["bin"],
-    exec=exec_unix)
+    exec=exec_unix,
+    asset_os="linux",
+    asset_flavour="gnu")
 MACOS = Platform(
     home_dir_meta="$HOME",
     home_dir=os.path.expanduser("~"),
     python_executable_name="python3",
     python_bin_dirs=["bin"],
-    exec=exec_unix)
+    exec=exec_unix,
+    asset_os="darwin",
+    asset_flavour=None)
 WINDOWS = Platform(
     home_dir_meta="%USERPROFILE%",
     home_dir=os.path.expanduser("~"),
     python_executable_name="python",
     python_bin_dirs=[".", "Scripts"],
-    exec=exec_windows)
+    exec=exec_windows,
+    asset_os="windows",
+    asset_flavour="msvc")
 
 
 def get_current_platform():
