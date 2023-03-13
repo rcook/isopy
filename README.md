@@ -1,13 +1,16 @@
 # isopy
 
 Isolated Python environment tool to download and manage Python builds
-downloaded from [Python Standalone Builds][python-build-standalone].
+downloaded from [Python Standalone Builds][python-build-standalone]
 
-## Install
+## Installation
 
-TBD: Install prebuilt binaries
+TBD: Install prebuilt binaries: eventually we'll build self-contained
+downloads using [PyInstaller][pyinstaller] or similar. For now, these
+instructions will assume that you're a developer, so please follow the
+bootstrapping instructions below.
 
-## Bootstrap development environment
+## Bootstrapping development environment
 
 ```bash
 # Report version of system-wide Python interpreter
@@ -38,6 +41,8 @@ isopy shell -e isopy
 $ python3 --version
 ```
 
+`$` indicates that the command is being run in the child shell.
+
 ### Making an isopy environment available on shell startup
 
 Note that the `PATH=$HOME/.isopy/envs/isopy/cpython-3.11.1+20230116/bin:$PATH`
@@ -67,11 +72,37 @@ outside the project directory.
 
 ## Open development shell
 
+This makes use of the `shell` subcommand and tells isopy to open a
+child shell (Bash or similar or Linux or macOS, PowerShell on Windows)
+using the environment named `isopy`:
+
 ```bash
 cd /path/to/workspace/isopy
 isopy shell -e isopy
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+$ python3 -m pip install --upgrade pip
+$ python3 -m pip install -r requirements.txt
+```
+
+If you would like a dedicated environment for your Python project, do
+the following:
+
+```bash
+cd /path/to/workspace
+git init my-python-project
+cd my-python-project
+isopy new 3.11.1
+isopy init
+isopy shell
+$ python3 -m pip install --upgrade pip
+$ python3 -m pip install -r requirements.txt
+```
+
+From now on, you'll just need to run `isopy shell` to run in the
+appropriate environment:
+
+```bash
+cd /path/to/workspace/my-python-project
+$ isopy shell
 ```
 
 ## Build self-contained executable
@@ -135,4 +166,5 @@ TBD
 
 TBD
 
+[pyinstaller]: https://pyinstaller.org/
 [python-build-standalone]: https://github.com/indygreg/python-build-standalone/releases
