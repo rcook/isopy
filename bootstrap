@@ -1,15 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 this_dir=$(cd $(dirname $0); pwd -P)
-cache_dir=$HOME/.isopy
-assets_dir=$cache_dir/assets
-isopy_env_dir=$cache_dir/env/isopy
+
+cache_dir=$HOME/.isopy2
 python_version=3.11.1
 tag=20230116
+
+assets_dir=$cache_dir/assets
+isopy_env_dir=$cache_dir/envs/isopy
+isopy_env_path=$isopy_env_dir/env.json
 python_dir_name=cpython-$python_version+$tag
 isopy_python_dir=$isopy_env_dir/$python_dir_name
-python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag/$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
-python_file_name=$(basename $python_url)
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    python_file_name=$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    python_file_name=$python_dir_name-x86_64-apple-darwin-install_only.tar.gz
+else
+    echo "Unsupported OS $OSTYPE"
+fi
+
+python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag/$python_file_name
 python_path=$assets_dir/$python_file_name
 
 mkdir -p $assets_dir
@@ -17,7 +28,7 @@ mkdir -p $isopy_python_dir
 
 if [ ! -e $python_path ]; then
     mkdir -p $assets_dir
-    curl -L -v $python_url --output $python_path
+    curl -L $python_url --output $python_path
     set +e
     echo "$(cat $this_dir/sha256sums/$python_file_name.sha256)  $python_path" | \
         sha256sum --check --quiet -
@@ -42,7 +53,7 @@ if [ ! -e $isopy_python_dir/bin ]; then
         python3 -m pip install -r $this_dir/requirements.txt
 fi
 
-cat > $isopy_env_dir/env.json <<EOF
+cat > $isopy_env_path <<EOF
 name: isopy
 python_dir: $python_dir_name
 python_version: $python_version
