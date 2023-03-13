@@ -1,4 +1,4 @@
-from isopy_lib.env import get_env_config
+from isopy_lib.env import UseInfo, get_env_config
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
 from isopy_lib.platform import PLATFORM
@@ -14,6 +14,10 @@ def do_shell(ctx, env):
     if os.getenv(ISOPY_ENV_VAR_NAME) is not None:
         raise ReportableError(
             "You are already in an active isopy shell")
+
+    use_info = UseInfo.find(ctx=ctx)
+    if use_info is not None:
+        env = use_info.env
 
     env_config = get_env_config(ctx=ctx, env=env)
 
