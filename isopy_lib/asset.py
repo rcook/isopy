@@ -1,6 +1,7 @@
 from collections import namedtuple
 from isopy_lib.checksum import make_checksum_file_path, verify_checksum
 from isopy_lib.errors import ReportableError
+from isopy_lib.features import INCLUDE_VERSION_IN_PYTHON_DIR
 from isopy_lib.fs import dir_path, file_path, move_file, named_temporary_file, split_at_ext
 from isopy_lib.platform import PLATFORM
 from isopy_lib.utils import parse_python_version_and_tag
@@ -178,9 +179,13 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
     def extract(self, ctx, dir):
         self.download(ctx=ctx)
 
-        output_dir = dir_path(
-            dir,
-            f"cpython-{self.python_version}+{self.tag}")
+        if INCLUDE_VERSION_IN_PYTHON_DIR:
+            output_dir = dir_path(
+                dir,
+                f"cpython-{self.python_version}+{self.tag}")
+        else:
+            output_dir = dir_path(dir, "python")
+
         if os.path.isdir(output_dir):
             ctx.logger.info(f"Asset already extracted at {output_dir}")
             return output_dir
