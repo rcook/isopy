@@ -67,14 +67,21 @@ def get_windows_shell():
         raise NotImplementedError(f"Unsupported shell {c[0]}")
 
 
-def shell_execute(path_dirs, extra_env={}):
+def exec(command=None, path_dirs=[], extra_env={}):
     c = Platform.current()
     if c in [Platform.LINUX, Platform.MACOS]:
-        shell = os.getenv("SHELL")
         e = dict(os.environ)
         e["PATH"] = make_paths_str(e["PATH"], path_dirs)
         e.update(extra_env)
-        os.execlpe(shell, shell, e)
+
+        if command is None:
+            prog = os.getenv("SHELL")
+            args = [prog]
+        else:
+            prog = command[0]
+            args = command
+
+        os.execlpe(prog, *args, e)
     elif c == Platform.WINDOWS:
         shell = get_windows_shell()
         os.environ["PATH"] = make_paths_str(os.getenv("PATH"), path_dirs)

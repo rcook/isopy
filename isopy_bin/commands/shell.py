@@ -1,7 +1,7 @@
 from isopy_lib.env import get_env_config
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
-from isopy_lib.platform import Platform, shell_execute
+from isopy_lib.platform import Platform, exec
 from isopy_lib.xprint import xprint
 import colorama
 import os
@@ -32,4 +32,4 @@ def do_shell(ctx, env):
         for d in c.bin_dirs
     ]
     extra_env = {ISOPY_ENV_VAR_NAME: label}
-    shell_execute(path_dirs=path_dirs, extra_env=extra_env)
+    exec(path_dirs=path_dirs, extra_env=extra_env)
