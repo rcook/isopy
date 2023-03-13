@@ -7,13 +7,26 @@ downloaded from [Python Standalone Builds][python-build-standalone].
 
 TBD: Install prebuilt binaries
 
-## Set up development environment
+## Bootstrap development environment
 
 ```bash
+# Report version of system-wide Python interpreter
+python3 --version
+
+# Clone source code and bootstrap
 cd /path/to/workspace
 git clone git@github.com:rcook/isopy.git
 cd isopy
 ./bootstrap
+
+# Now you should have an "isopy" script available on PATH
+isopy --help
+
+# Run a local isopy shell
+isopy shell -e isopy
+
+# In isopy shell, report version of isopy-installed Python interpreter
+$ python3 --version
 ```
 
 ## Open development shell
