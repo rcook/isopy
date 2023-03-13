@@ -2,7 +2,6 @@ from collections import namedtuple
 from hashlib import md5
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
-from isopy_lib.platform import Platform
 from isopy_lib.version import Version
 from isopy_lib.yaml_utils import read_yaml, write_yaml
 import os

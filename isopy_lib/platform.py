@@ -1,5 +1,4 @@
 from collections import namedtuple
-from enum import Enum, unique
 from psutil import Process
 import os
 import platform

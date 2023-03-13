@@ -1,5 +1,4 @@
 from contextlib import contextmanager
-from isopy_lib.platform import Platform
 from tempfile import NamedTemporaryFile
 import os
 
