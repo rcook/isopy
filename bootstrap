@@ -9,14 +9,14 @@ tag=20230116
 assets_dir=$cache_dir/assets
 isopy_env_dir=$cache_dir/envs/isopy
 isopy_env_path=$isopy_env_dir/env.yaml
-python_dir_name=cpython-$python_version+$tag
-isopy_python_dir=$isopy_env_dir/$python_dir_name
+python_base_name=cpython-$python_version+$tag
+isopy_python_dir=$isopy_env_dir/python
 bin_dir=$HOME/.local/bin
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    python_file_name=$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
+    python_file_name=$python_base_name-x86_64-unknown-linux-gnu-install_only.tar.gz
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    python_file_name=$python_dir_name-x86_64-apple-darwin-install_only.tar.gz
+    python_file_name=$python_base_name-x86_64-apple-darwin-install_only.tar.gz
 else
     echo "Unsupported OS $OSTYPE"
 fi
@@ -48,9 +48,9 @@ if [ ! -e $isopy_python_dir/bin ]; then
     mkdir -p $isopy_python_dir
     mv $T/python/* $isopy_python_dir
     rm -rf $T
-    PATH=$isopy_env_dir/$python_dir_name/bin:$PATH \
+    PATH=$isopy_python_dir/bin:$PATH \
         python3 -m pip install --upgrade pip
-    PATH=$isopy_env_dir/$python_dir_name/bin:$PATH \
+    PATH=$isopy_python_dir/bin:$PATH \
         python3 -m pip install -r $this_dir/requirements.txt
 fi
 
@@ -71,7 +71,7 @@ fi
 
 cat > $isopy_env_path <<EOF
 name: isopy
-python_dir: $python_dir_name
+python_dir: python
 python_version: $python_version
 tag: '$tag'
 EOF
