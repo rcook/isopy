@@ -9,6 +9,7 @@ from isopy_bin.commands.init import do_init
 from isopy_bin.commands.list import do_list
 from isopy_bin.commands.new import do_new
 from isopy_bin.commands.shell import do_shell
+from isopy_bin.commands.use import do_use
 from isopy_bin.commands.wrap import do_wrap
 from isopy_lib.asset import AssetFilter
 from isopy_lib.cli import \
@@ -128,6 +129,14 @@ def main(cwd, argv):
         **auto_description("initialize environment corresponding to current project"),
         func=lambda ctx, args: do_init(ctx=ctx))
     add_common_args(parser=p)
+
+    p = add_subcommand(
+        subparsers,
+        "use",
+        **auto_description("specify which environment use in current directory"),
+        func=lambda ctx, args: do_use(ctx=ctx, env=args.env))
+    add_common_args(parser=p)
+    add_env_positional_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
