@@ -3,4 +3,4 @@ set -euo pipefail
 this_dir=$(cd $(dirname $0); pwd -P)
 PATH=$HOME/.isopy/envs/isopy/cpython-3.11.1+20230116/bin:$PATH \
   PYTHONPATH=$this_dir \
-  python3 $this_dir/isopy_bin/main.py "$@"
+  exec python3 $this_dir/isopy_bin/main.py "$@"

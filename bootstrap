@@ -61,7 +61,7 @@ set -euo pipefail
 isopy_dir=$(cd $(dirname $0); pwd -P)
 PATH=$isopy_python_dir/bin:\$PATH \
   PYTHONPATH=\$isopy_dir \
-  python3 \$isopy_dir/isopy_bin/main.py "\$@"
+  exec python3 \$isopy_dir/isopy_bin/main.py "\$@"
 EOF
     chmod +x $bin_dir/isopy
     echo "Wrapper script created at $bin_dir/isopy; please make sure this path is on PATH"
