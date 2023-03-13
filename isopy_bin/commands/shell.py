@@ -15,9 +15,10 @@ def do_shell(ctx, env):
         raise ReportableError(
             "You are already in an active isopy shell")
 
-    use_info = UseInfo.find(ctx=ctx)
-    if use_info is not None:
-        env = use_info.env
+    if env is None:
+        use_info = UseInfo.find(ctx=ctx)
+        if use_info is not None:
+            env = use_info.env
 
     env_config = get_env_config(ctx=ctx, env=env)
 
