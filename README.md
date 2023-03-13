@@ -3,6 +3,8 @@
 Isolated Python environment tool to download and manage Python builds
 downloaded from [Python Standalone Builds][python-build-standalone]
 
+Released under [MIT License](LICENSE)
+
 ## Installation
 
 TBD: Install prebuilt binaries: eventually we'll build self-contained
