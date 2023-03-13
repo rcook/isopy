@@ -266,7 +266,7 @@ def get_assets(ctx, asset_filter, refresh):
 
 
 def get_asset(ctx, asset_filter):
-    assets = get_assets(ctx=ctx, asset_filter=asset_filter)
+    assets = get_assets(ctx=ctx, asset_filter=asset_filter, refresh=False)
 
     asset_count = len(assets)
     if asset_count == 0:
