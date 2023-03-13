@@ -3,7 +3,16 @@ from isopy_lib.program_info import ProgramInfo
 from isopy_lib.xprint import xprint
 import colorama
 import os
+import shutil
 import yaml
+
+
+PYTHON_PROGRAMS = [
+    "python3",
+    "python",
+    "pip3",
+    "pip"
+]
 
 
 def do_debug(ctx):
@@ -48,3 +57,16 @@ def do_debug(ctx):
     show_value("frozen", program_info.frozen)
     show_value("app_path", program_info.app_path)
     os.system(f"tree {program_info.app_path}")
+
+    for python_program in PYTHON_PROGRAMS:
+        matches = [
+            x
+            for x in [
+                shutil.which(python_program, path=p)
+                for p in program_info.paths
+            ]
+            if x is not None]
+        if len(matches) > 0:
+            xprint(colorama.Fore.GREEN, python_program)
+            for m in matches:
+                show(f"  {m}")
