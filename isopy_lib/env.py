@@ -120,22 +120,9 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
         })
         return c
 
-    def get_environment(self, ctx):
-        bin_dir = dir_path(
-            EnvConfig._dir(
-                ctx=ctx,
-                name=self.name,
-                dir_config_path=self.dir_config_path),
-            self.python_dir,
-            "bin")
-
-        e = dict(os.environ)
-        temp = e.get("PATH")
-        paths = [] if temp is None else temp.split(os.pathsep)
-        if bin_dir not in paths:
-            e["PATH"] = os.pathsep.join([bin_dir] + paths)
-
-        return e
+    def execlpe(self, *args, ctx):
+        e = self._get_environment(ctx=ctx)
+        os.execlpe(args[0], *args, e)
 
     @staticmethod
     def _dir(ctx, name=None, dir_config_path=None):
@@ -161,6 +148,23 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
             tag_name=tag_name,
             python_version=python_version,
             python_dir=python_dir)
+
+    def _get_environment(self, ctx):
+        bin_dir = dir_path(
+            EnvConfig._dir(
+                ctx=ctx,
+                name=self.name,
+                dir_config_path=self.dir_config_path),
+            self.python_dir,
+            "bin")
+
+        e = dict(os.environ)
+        temp = e.get("PATH")
+        paths = [] if temp is None else temp.split(os.pathsep)
+        if bin_dir not in paths:
+            e["PATH"] = os.pathsep.join([bin_dir] + paths)
+
+        return e
 
 
 def get_env_config(ctx, env):

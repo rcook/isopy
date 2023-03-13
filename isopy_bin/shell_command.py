@@ -13,5 +13,4 @@ def do_shell(ctx, env):
         colorama.Fore.YELLOW,
         "Type \"exit\" to return to parent shell")
 
-    shell = os.getenv("SHELL")
-    os.execlpe(shell, shell, env_config.get_environment(ctx=ctx))
+    env_config.execlpe(os.getenv("SHELL"), ctx=ctx)
