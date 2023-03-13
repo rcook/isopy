@@ -16,13 +16,19 @@ def get_downloads(ctx):
     if os.path.isdir(assets_dir):
         for f in os.listdir(assets_dir):
             if f.startswith(CPYTHON_PREFIX):
-                idx = f.index("+", CPYTHON_PREFIX_LEN)
-                python_version = Version.parse(f[CPYTHON_PREFIX_LEN:idx])
+                # Don't do this!
+                # Use the functions in asset.py instead since these
+                # parse these strings properly!
+                idx0 = f.index("+", CPYTHON_PREFIX_LEN)
+                python_version = Version.parse(f[CPYTHON_PREFIX_LEN:idx0])
+                idx1 = f.index("-", idx0)
+                tag = f[idx0 + 1:idx1]
                 p = file_path(assets_dir, f)
                 items.append({
                     "file": f,
                     "ver": python_version,
-                    "size": os.path.getsize(p)
+                    "size": os.path.getsize(p),
+                    "create_command": f"\"isopy create MY_NAMED_ENVIRONMENT {python_version} --tag {tag}\""
                 })
     return sorted(items, key=itemgetter("ver"), reverse=True)
 
