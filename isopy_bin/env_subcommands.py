@@ -19,7 +19,7 @@ def add_env_subcommands(helper, subparsers):
     p = add_subcommand(
         subparsers,
         "list",
-        **auto_description("list environments"),
+        **auto_description("show environments"),
         func=lambda ctx, args: do_list(ctx=ctx, detailed=args.detailed))
     helper.add_common_args(parser=p)
     add_detailed_arg(parser=p)
@@ -27,14 +27,14 @@ def add_env_subcommands(helper, subparsers):
     p = add_subcommand(
         subparsers,
         "init",
-        **auto_description("initialize environment corresponding to current project"),
+        **auto_description("initialize environment for current project"),
         func=lambda ctx, args: do_init(ctx=ctx))
     helper.add_common_args(parser=p)
 
     p = add_subcommand(
         subparsers,
         "use",
-        **auto_description("specify which environment use in current directory"),
+        **auto_description("specify environment to use for current directory"),
         func=lambda ctx, args: do_use(ctx=ctx, env=args.env, force=args.force))
     helper.add_common_args(parser=p)
     add_env_positional_arg(parser=p)
@@ -43,7 +43,7 @@ def add_env_subcommands(helper, subparsers):
     p = add_subcommand(
         subparsers,
         "create",
-        **auto_description("initialize named environment"),
+        **auto_description("create named environment"),
         func=lambda ctx, args: do_create(
             ctx=ctx,
             env=args.env,

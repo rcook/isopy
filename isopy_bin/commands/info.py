@@ -1,13 +1,9 @@
-from isopy_lib.env import get_env_config
+from isopy_lib.env import UseInfo, get_env_config
 from isopy_lib.xprint import xprint
 import colorama
-import os
 
 
 def do_info(ctx, env):
-    def show(*args, **kwargs):
-        xprint(colorama.Fore.YELLOW, *args, **kwargs)
-
     def show_value(key, value):
         xprint(
             colorama.Fore.YELLOW,
@@ -15,6 +11,11 @@ def do_info(ctx, env):
             colorama.Fore.WHITE,
             ": ",
             colorama.Fore.LIGHTWHITE_EX, value)
+
+    if env is None:
+        use_info = UseInfo.find(ctx=ctx)
+        if use_info is not None:
+            env = use_info.env
 
     env_config = get_env_config(ctx=ctx, env=env)
 
