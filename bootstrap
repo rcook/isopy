@@ -8,7 +8,7 @@ tag=20230116
 
 assets_dir=$cache_dir/assets
 isopy_env_dir=$cache_dir/envs/isopy
-isopy_env_path=$isopy_env_dir/env.json
+isopy_env_path=$isopy_env_dir/env.yaml
 python_dir_name=cpython-$python_version+$tag
 isopy_python_dir=$isopy_env_dir/$python_dir_name
 bin_dir=$HOME/.local/bin

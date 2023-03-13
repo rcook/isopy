@@ -8,7 +8,7 @@ import os
 
 
 DIR_CONFIG_FILE_NAME = ".isopy.yaml"
-ENV_CONFIG_FILE = "env.json"
+ENV_CONFIG_FILE = "env.yaml"
 
 
 class DirConfig(namedtuple("DirConfig", ["path", "tag", "python_version"])):
