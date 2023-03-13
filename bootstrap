@@ -2,7 +2,7 @@
 set -euo pipefail
 this_dir=$(cd $(dirname $0); pwd -P)
 
-cache_dir=$HOME/.isopy2
+cache_dir=$HOME/.isopy
 python_version=3.11.1
 tag=20230116
 
