@@ -176,6 +176,6 @@ TBD
 
 TBD
 
-[man-exec]: https://linux.die.net/man/1/exec
+[man-exec]: https://linuxcommand.org/lc3_man_pages/exech.html
 [pyinstaller]: https://pyinstaller.org/
 [python-build-standalone]: https://github.com/indygreg/python-build-standalone/releases
