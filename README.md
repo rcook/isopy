@@ -33,7 +33,7 @@ $ python3 --version
 
 ```bash
 cd /path/to/workspace/isopy
-./isopy shell
+isopy shell -e isopy
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
@@ -42,7 +42,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 cd /path/to/workspace/isopy
-./isopy exec pyinstaller isopy.spec
+isopy exec -e isopy pyinstaller isopy.spec
 ```
 
 ## Usage
