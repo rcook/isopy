@@ -22,7 +22,7 @@ from isopy_lib.cli import \
 from isopy_lib.context import Context
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
-from isopy_lib.platform import Platform
+from isopy_lib.platform import PLATFORM
 from isopy_lib.program_info import ProgramInfo, get_default_cache_dir
 from isopy_lib.xprint import xprint
 import argparse
@@ -48,8 +48,7 @@ def main(cwd, argv):
 
     extra_info = f"Using Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     if not ProgramInfo.get(cwd=cwd, cache_dir=default_cache_dir).frozen:
-        python_executable_name = Platform.current().python_executable_name
-        extra_info += f" ({shutil.which(python_executable_name)})"
+        extra_info += f" ({shutil.which(PLATFORM.python_executable_name)})"
 
     parser = argparse.ArgumentParser(
         prog="isopy",

@@ -1,51 +1,17 @@
+from collections import namedtuple
 from enum import Enum, unique
 from psutil import Process
 import os
 import platform
 
 
-@unique
-class Platform(Enum):
-    LINUX = "$HOME", os.path.expanduser("~"), "python3", ["bin"]
-    MACOS = "$HOME", os.path.expanduser("~"), "python3", ["bin"]
-    WINDOWS = "%USERPROFILE%", os.path.expanduser("~"), "python", [
-        ".", "Scripts"]
-
-    def __new__(cls, *args, **kwargs):
-        value = len(cls.__members__) + 1
-        obj = object.__new__(cls)
-        obj._value_ = value
-        return obj
-
-    def __init__(self, home_dir_meta, home_dir, python_executable_name, bin_dirs):
-        self.__home_dir_meta = home_dir_meta
-        self.__home_dir = home_dir
-        self.__python_executable_name = python_executable_name
-        self.__bin_dirs = bin_dirs
-
-    @property
-    def home_dir_meta(self): return self.__home_dir_meta
-
-    @property
-    def home_dir(self): return self.__home_dir
-
-    @property
-    def python_executable_name(self): return self.__python_executable_name
-
-    @property
-    def bin_dirs(self): return self.__bin_dirs
-
-    @classmethod
-    def current(cls):
-        p = platform.system().lower()
-        if p == "linux":
-            return cls.LINUX
-        elif p == "darwin":
-            return cls.MACOS
-        elif p == "windows":
-            return cls.WINDOWS
-        else:
-            raise NotImplementedError(f"Unsupported platform {p}")
+Platform = namedtuple("Platform", [
+    "home_dir_meta",
+    "home_dir",
+    "python_executable_name",
+    "python_bin_dirs",
+    "exec"
+])
 
 
 def make_paths_str(paths_str, dirs):
@@ -58,34 +24,71 @@ def make_paths_str(paths_str, dirs):
     return os.pathsep.join(dirs + paths)
 
 
-def get_windows_shell():
-    parent_process = Process(os.getppid())
-    c = parent_process.cmdline()
-    if len(c) == 1 and c[0].endswith("powershell.exe"):
-        return c[0]
+def exec_unix(command=None, path_dirs=[], extra_env={}):
+    e = dict(os.environ)
+    e["PATH"] = make_paths_str(e["PATH"], path_dirs)
+    e.update(extra_env)
+
+    if command is None:
+        prog = os.getenv("SHELL")
+        args = [prog]
     else:
-        raise NotImplementedError(f"Unsupported shell {c[0]}")
+        prog = command[0]
+        args = command
+
+    os.execlpe(prog, *args, e)
 
 
-def exec(command=None, path_dirs=[], extra_env={}):
-    c = Platform.current()
-    if c in [Platform.LINUX, Platform.MACOS]:
-        e = dict(os.environ)
-        e["PATH"] = make_paths_str(e["PATH"], path_dirs)
-        e.update(extra_env)
-
-        if command is None:
-            prog = os.getenv("SHELL")
-            args = [prog]
+def exec_windows(command=None, path_dirs=[], extra_env={}):
+    def get_shell():
+        parent_process = Process(os.getppid())
+        c = parent_process.cmdline()
+        if len(c) == 1 and c[0].endswith("powershell.exe"):
+            return c[0]
         else:
-            prog = command[0]
-            args = command
+            raise NotImplementedError(f"Unsupported shell {c[0]}")
 
-        os.execlpe(prog, *args, e)
-    elif c == Platform.WINDOWS:
-        shell = get_windows_shell()
-        os.environ["PATH"] = make_paths_str(os.getenv("PATH"), path_dirs)
-        os.environ.update(extra_env)
-        os.system(f"\"{shell}\" -NoExit -NoProfile")
+    if command is None:
+        pass
     else:
-        raise NotImplementedError(f"Unsupported platform {c}")
+        raise NotImplementedError()
+
+    shell = get_shell()
+    os.environ["PATH"] = make_paths_str(os.getenv("PATH"), path_dirs)
+    os.environ.update(extra_env)
+    os.system(f"\"{shell}\" -NoExit -NoProfile")
+
+
+LINUX = Platform(
+    home_dir_meta="$HOME",
+    home_dir=os.path.expanduser("~"),
+    python_executable_name="python3",
+    python_bin_dirs=["bin"],
+    exec=exec_unix)
+MACOS = Platform(
+    home_dir_meta="$HOME",
+    home_dir=os.path.expanduser("~"),
+    python_executable_name="python3",
+    python_bin_dirs=["bin"],
+    exec=exec_unix)
+WINDOWS = Platform(
+    home_dir_meta="%USERPROFILE%",
+    home_dir=os.path.expanduser("~"),
+    python_executable_name="python",
+    python_bin_dirs=[".", "Scripts"],
+    exec=exec_windows)
+
+
+def get_current_platform():
+    p = platform.system().lower()
+    if p == "linux":
+        return LINUX
+    elif p == "darwin":
+        return MACOS
+    elif p == "windows":
+        return WINDOWS
+    else:
+        raise NotImplementedError(f"Unsupported platform {p}")
+
+
+PLATFORM = get_current_platform()

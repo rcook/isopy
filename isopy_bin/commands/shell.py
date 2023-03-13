@@ -1,7 +1,7 @@
 from isopy_lib.env import get_env_config
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path
-from isopy_lib.platform import Platform, exec
+from isopy_lib.platform import PLATFORM
 from isopy_lib.xprint import xprint
 import colorama
 import os
@@ -26,10 +26,9 @@ def do_shell(ctx, env):
         "Type \"exit\" to return to parent shell")
 
     python_dir = env_config.make_python_dir(ctx=ctx)
-    c = Platform.current()
     path_dirs = [
         dir_path(python_dir, d)
-        for d in c.bin_dirs
+        for d in PLATFORM.python_bin_dirs
     ]
     extra_env = {ISOPY_ENV_VAR_NAME: label}
-    exec(path_dirs=path_dirs, extra_env=extra_env)
+    PLATFORM.exec(path_dirs=path_dirs, extra_env=extra_env)
