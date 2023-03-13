@@ -12,7 +12,7 @@ def add_shell_subcommands(helper, subparsers):
     p = add_subcommand(
         subparsers,
         "shell",
-        **auto_description("open shell"),
+        **auto_description("open shell in environment"),
         func=lambda ctx, args: do_shell(ctx=ctx, env=args.env))
     helper.add_common_args(parser=p)
     add_env_arg(parser=p)
@@ -20,7 +20,7 @@ def add_shell_subcommands(helper, subparsers):
     p = add_subcommand(
         subparsers,
         "exec",
-        **auto_description("run command in shell"),
+        **auto_description("run command in shell in environment"),
         func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command))
     helper.add_common_args(parser=p)
     add_env_arg(parser=p)
