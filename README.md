@@ -25,6 +25,7 @@ cd isopy
 ./bootstrap
 
 # Examine the contents of the isopy wrapper script
+which isopy
 cat -n ~/.local/bin/isopy
      1	#!/bin/bash
      2	set -euo pipefail
