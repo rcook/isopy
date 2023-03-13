@@ -1,13 +1,14 @@
 from collections import namedtuple
 from isopy_lib.checksum import CHECKSUM_DIR
-from isopy_lib.fs import dir_path, get_home_dir
+from isopy_lib.fs import dir_path
+from isopy_lib.platform import Platform
 import glob
 import os
 import sys
 
 
 def get_default_cache_dir():
-    return dir_path(get_home_dir(), ".isopy")
+    return dir_path(Platform.current().home_dir, ".isopy")
 
 
 class ProgramInfo(namedtuple("ProgramInfo", ["paths", "python_paths", "cwd", "cache_dir", "checksum_dir", "checksum_paths", "frozen", "app_path"])):

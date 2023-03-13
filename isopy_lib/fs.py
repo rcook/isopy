@@ -4,20 +4,6 @@ from tempfile import NamedTemporaryFile
 import os
 
 
-def get_home_dir_meta():
-    c = Platform.current()
-    if c == Platform.LINUX:
-        return "$HOME"
-    elif c == Platform.WINDOWS:
-        return "%USERPROFILE"
-    else:
-        raise NotImplementedError()
-
-
-def get_home_dir():
-    return os.path.expanduser("~")
-
-
 def dir_path(*args):
     return os.path.abspath(os.path.join(*args))
 

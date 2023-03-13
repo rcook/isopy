@@ -7,16 +7,6 @@ import os
 ISOPY_ENV_VAR_NAME = "ISOPY_ENV"
 
 
-def get_python_executable_name():
-    c = Platform.current()
-    if c in [Platform.LINUX, Platform.MACOS]:
-        return "python3"
-    elif c == Platform.WINDOWS:
-        return "python"
-    else:
-        raise NotImplementedError(f"Unsupported platform {c}")
-
-
 def get_windows_shell():
     parent_process = Process(os.getppid())
     c = parent_process.cmdline()
