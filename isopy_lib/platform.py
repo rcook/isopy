@@ -2,6 +2,7 @@ from collections import namedtuple
 from psutil import Process
 import os
 import platform
+import shlex
 
 
 Platform = namedtuple("Platform", [
@@ -47,15 +48,14 @@ def exec_windows(command=None, path_dirs=[], extra_env={}):
         else:
             raise NotImplementedError(f"Unsupported shell {c[0]}")
 
-    if command is None:
-        pass
-    else:
-        raise NotImplementedError()
-
     shell = get_shell()
     os.environ["PATH"] = make_paths_str(os.getenv("PATH"), path_dirs)
     os.environ.update(extra_env)
-    os.system(f"\"{shell}\" -NoExit -NoProfile")
+
+    if command is None:
+        os.system(f"\"{shell}\" -NoExit -NoProfile")
+    else:
+        os.system(f"\"{shell}\" -NoProfile -Command {shlex.join(command)}")
 
 
 LINUX = Platform(
