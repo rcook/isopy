@@ -175,12 +175,21 @@ def get_env_config(ctx, env):
             raise ReportableError(
                 f"No isopy configuration found for directory {ctx.cwd}; "
                 "consider creating one with \"isopy new\"")
-
-        env_config = EnvConfig.find(ctx=ctx, dir_config_path=dir_config.path)
-        if env_config is None:
-            raise ReportableError(
-                f"No environment initialized for {dir_config.path}")
-
-        return env_config
+        name = None
+        dir_config_path = dir_config.path
     else:
-        return EnvConfig.load_by_name(ctx=ctx, env=env)
+        name = env
+        dir_config_path = None
+
+    label = name or dir_config_path
+    env_config = EnvConfig.find(
+        ctx=ctx,
+        name=env,
+        dir_config_path=dir_config_path)
+    if env_config is None:
+        raise ReportableError(
+            f"No environment initialized for {label}; "
+            "use \"isopy new\" to create an environment or "
+            "specify a named environment using --env")
+
+    return env_config
