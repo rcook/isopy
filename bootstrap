@@ -11,6 +11,7 @@ isopy_env_dir=$cache_dir/envs/isopy
 isopy_env_path=$isopy_env_dir/env.json
 python_dir_name=cpython-$python_version+$tag
 isopy_python_dir=$isopy_env_dir/$python_dir_name
+bin_dir=$HOME/.local/bin
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     python_file_name=$python_dir_name-x86_64-unknown-linux-gnu-install_only.tar.gz
@@ -51,6 +52,21 @@ if [ ! -e $isopy_python_dir/bin ]; then
         python3 -m pip install --upgrade pip
     PATH=$isopy_env_dir/$python_dir_name/bin:$PATH \
         python3 -m pip install -r $this_dir/requirements.txt
+fi
+
+if [ -d $bin_dir ] && [ ! -e $bin_dir/isopy ]; then
+    cat > $bin_dir/isopy <<EOF
+#!/bin/bash
+set -euo pipefail
+isopy_dir=$(cd $(dirname $0); pwd -P)
+PATH=$isopy_python_dir/bin:\$PATH \
+  PYTHONPATH=\$isopy_dir \
+  python3 \$isopy_dir/isopy_bin/main.py "\$@"
+EOF
+    chmod +x $bin_dir/isopy
+    echo "Wrapper script created at $bin_dir/isopy; please make sure this path is on PATH"
+else
+    echo "Did not create bin wrapper script; create directory $bin_dir, add it to PATH and re-run bootstrap script"
 fi
 
 cat > $isopy_env_path <<EOF
