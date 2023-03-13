@@ -2,7 +2,6 @@ from collections import namedtuple
 from hashlib import md5
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
-from isopy_lib.os import make_paths_str
 from isopy_lib.platform import Platform
 from isopy_lib.version import Version
 from isopy_lib.yaml_utils import read_yaml, write_yaml
@@ -123,10 +122,6 @@ class EnvConfig(namedtuple("EnvConfig", ["path", "name", "dir_config_path", "tag
             "python_dir": python_dir
         })
         return c
-
-    def execlpe(self, *args, ctx):
-        e = self._get_environment(ctx=ctx)
-        os.execlpe(args[0], *args, e)
 
     @staticmethod
     def _dir(ctx, name=None, dir_config_path=None):

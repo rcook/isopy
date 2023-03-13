@@ -1,12 +1,17 @@
 from isopy_lib.env import get_env_config
 from isopy_lib.errors import ReportableError
-from isopy_lib.os import in_isopy_shell, start_isopy_shell
+from isopy_lib.fs import dir_path
+from isopy_lib.platform import Platform, shell_execute
 from isopy_lib.xprint import xprint
 import colorama
+import os
+
+
+ISOPY_ENV_VAR_NAME = "ISOPY_ENV"
 
 
 def do_shell(ctx, env):
-    if in_isopy_shell(ctx=ctx):
+    if os.getenv(ISOPY_ENV_VAR_NAME) is not None:
         raise ReportableError(
             "You are already in an active isopy shell")
 
@@ -20,4 +25,11 @@ def do_shell(ctx, env):
         colorama.Fore.YELLOW,
         "Type \"exit\" to return to parent shell")
 
-    start_isopy_shell(ctx=ctx, env_config=env_config)
+    python_dir = env_config.make_python_dir(ctx=ctx)
+    c = Platform.current()
+    path_dirs = [
+        dir_path(python_dir, d)
+        for d in c.bin_dirs
+    ]
+    extra_env = {ISOPY_ENV_VAR_NAME: label}
+    shell_execute(path_dirs=path_dirs, extra_env=extra_env)
