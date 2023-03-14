@@ -85,12 +85,14 @@ temp_dir=$(mktemp -d -t isopy-bootstrap-XXXXXX)
 trap 'rm -rf -- "$temp_dir"' EXIT
 
 if [ ! -e $isopy_branch_dir ]; then
-    temp_zip_path=$temp_dir/isopy-$isopy_branch.zip
+    temp_zip_dir=$temp_dir/isopy-$isopy_branch
+    temp_zip_path=$temp_zip_dir.zip
     curl -L $isopy_url --output $temp_zip_path
     unzip -q $temp_zip_path -d $temp_dir
     mkdir -p $isopy_branch_dir
-    mv $temp_dir/isopy-$isopy_branch $temp_dir/$isopy_branch
-    mv $temp_dir/$isopy_branch $isopy_src_dir
+    temp=$temp_dir/$isopy_branch
+    mv $temp_zip_dir $temp
+    mv $temp $isopy_src_dir
 fi
 
 python_version=$(cat $isopy_branch_dir/.isopy.yaml | sed -En "s/^python_version: ['\"]?([^'\"]+)['\"]?$/\1/p")
