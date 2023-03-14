@@ -15,6 +15,7 @@ def do_info(ctx, env):
     if env is None:
         use_info = UseInfo.find(ctx=ctx)
         if use_info is not None:
+            show_value("dir", use_info.dir)
             env = use_info.env
 
     env_config = get_env_config(ctx=ctx, env=env)
