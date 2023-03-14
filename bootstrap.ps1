@@ -1,6 +1,9 @@
 #Requires -Version 5
 [CmdletBinding()]
-param()
+param(
+    [Parameter(Mandatory = $false, Position = 0, ValueFromRemainingArguments = $true)]
+    [object[]] $Arguments
+)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
