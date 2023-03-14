@@ -10,7 +10,7 @@ import os
 ISOPY_ENV_VAR_NAME = "ISOPY_ENV"
 
 
-def do_shell(ctx, env, prune_paths):
+def do_shell(ctx, env, prune_paths, quiet):
     if os.getenv(ISOPY_ENV_VAR_NAME) is not None:
         raise ReportableError(
             "You are already in an active isopy shell")
@@ -23,12 +23,14 @@ def do_shell(ctx, env, prune_paths):
     env_config = get_env_config(ctx=ctx, env=env)
 
     label = env_config.name or env_config.dir_config_path
-    xprint(
-        colorama.Fore.LIGHTYELLOW_EX,
-        f"Python shell for environment {label}")
-    xprint(
-        colorama.Fore.YELLOW,
-        "Type \"exit\" to return to parent shell")
+
+    if not quiet:
+        xprint(
+            colorama.Fore.LIGHTYELLOW_EX,
+            f"Python shell for environment {label}")
+        xprint(
+            colorama.Fore.YELLOW,
+            "Type \"exit\" to return to parent shell")
 
     python_dir = env_config.make_python_dir(ctx=ctx)
     path_dirs = [

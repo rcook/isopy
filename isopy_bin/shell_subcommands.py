@@ -5,6 +5,7 @@ from isopy_lib.cli import \
     add_env_arg, \
     add_force_arg, \
     add_prune_paths_arg, \
+    add_quiet_arg, \
     add_subcommand, \
     auto_description
 import argparse
@@ -15,10 +16,15 @@ def add_shell_subcommands(helper, subparsers):
         subparsers,
         "shell",
         **auto_description("open shell in environment"),
-        func=lambda ctx, args: do_shell(ctx=ctx, env=args.env, prune_paths=args.prune_paths))
+        func=lambda ctx, args: do_shell(
+            ctx=ctx,
+            env=args.env,
+            prune_paths=args.prune_paths,
+            quiet=args.quiet))
     helper.add_common_args(parser=p)
     add_env_arg(parser=p)
     add_prune_paths_arg(parser=p)
+    add_quiet_arg(parser=p)
 
     p = add_subcommand(
         subparsers,

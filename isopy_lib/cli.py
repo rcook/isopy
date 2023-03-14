@@ -152,3 +152,16 @@ def add_prune_paths_arg(parser):
         action=argparse.BooleanOptionalAction,
         default=default,
         help=f"aggressively prune system PATH directories containing other Pythons (default: {default})")
+
+
+def add_quiet_arg(parser):
+    default = False
+
+    parser.add_argument(
+        "--quiet",
+        "-q",
+        dest="quiet",
+        metavar="QUIET",
+        action=argparse.BooleanOptionalAction,
+        default=default,
+        help=f"quiet output of command (default: {default})")
