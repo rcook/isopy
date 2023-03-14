@@ -11,8 +11,6 @@ usage() {
 }
 
 if [ $# -eq 0 ]; then
-    echo 'Invalid command line'
-    echo ''
     usage
     exit 1
 fi
@@ -65,18 +63,31 @@ if [ "$force" == '' ] && [ -e "$script_path" ]; then
     exit 1
 fi
 
-this_dir=$(cd $(dirname $0); pwd -P)
-cache_dir=$HOME/.isopy
-python_version=3.11.1
-tag=20230116
-
-assets_dir=$cache_dir/assets
-isopy_env_dir=$cache_dir/envs/isopy
+isopy_branch=main
+isopy_url=https://github.com/rcook/isopy/archive/refs/heads/$isopy_branch.zip
+isopy_dir=$HOME/.isopy
+isopy_src_dir=$isopy_dir/src
+isopy_assets_dir=$isopy_dir/assets
+isopy_branch_dir=$isopy_src_dir/$isopy_branch
+isopy_env_dir=$isopy_dir/envs/isopy
 isopy_env_path=$isopy_env_dir/env.yaml
-python_base_name=cpython-$python_version+$tag
-isopy_python_dir=$isopy_env_dir/python
-bin_dir=$HOME/.local/bin
+isopy_env_python_dir=$isopy_env_dir/python
 
+temp_dir=$(mktemp -d -t isopy-bootstrap-XXXXXX)
+trap 'rm -rf -- "$temp_dir"' EXIT
+
+if [ ! -e $isopy_branch_dir ]; then
+    #curl -L $isopy_url --output $temp_dir/isopy-$isopy_branch.zip
+    cp $HOME/Downloads/isopy.zip $temp_dir/isopy-$isopy_branch.zip
+    unzip -q $temp_dir/isopy-$isopy_branch.zip -d $temp_dir
+    mkdir -p $isopy_dir/src/$isopy_branch
+    mv $temp_dir/isopy-$isopy_branch $temp_dir/$isopy_branch
+    mv $temp_dir/$isopy_branch $isopy_src_dir
+fi
+
+python_version=$(cat $isopy_branch_dir/.isopy.yaml | sed -En "s/^python_version: ['\"]?([^'\"]+)['\"]?$/\1/p")
+tag=$(cat $isopy_branch_dir/.isopy.yaml | sed -En "s/^tag: ['\"]?([^'\"]+)['\"]?$/\1/p")
+python_base_name=cpython-$python_version+$tag
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     python_file_name=$python_base_name-x86_64-unknown-linux-gnu-install_only.tar.gz
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -86,15 +97,15 @@ else
 fi
 
 python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag/$python_file_name
-python_path=$assets_dir/$python_file_name
+python_path=$isopy_assets_dir/$python_file_name
 
-mkdir -p $assets_dir
-mkdir -p $isopy_python_dir
+mkdir -p $isopy_assets_dir
+mkdir -p $isopy_env_python_dir
 
 if [ ! -e $python_path ]; then
     curl -L $python_url --output $python_path
     set +e
-    echo "$(cat $this_dir/sha256sums/$python_file_name.sha256)  $python_path" | \
+    echo "$(cat $isopy_branch_dir/sha256sums/$python_file_name.sha256)  $python_path" | \
         sha256sum --check --quiet -
     result=$?
     set -e
@@ -105,17 +116,14 @@ if [ ! -e $python_path ]; then
     fi
 fi
 
-if [ ! -e $isopy_python_dir/bin ]; then
-    T=$(mktemp -d -t isopy-bootstrap-XXXXXX)
-    trap 'rm -rf -- "$T"' EXIT
-    tar xf $python_path -C $T
-    mkdir -p $isopy_python_dir
-    mv $T/python/* $isopy_python_dir
-    rm -rf $T
-    PATH=$isopy_python_dir/bin:$PATH \
+if [ ! -e $isopy_env_python_dir/bin ]; then
+    tar xf $python_path -C $temp_dir
+    mkdir -p $isopy_env_python_dir
+    mv $temp_dir/python/* $isopy_env_python_dir
+    PATH=$isopy_env_python_dir/bin:$PATH \
         python3 -m pip install --upgrade pip
-    PATH=$isopy_python_dir/bin:$PATH \
-        python3 -m pip install -r $this_dir/requirements.txt
+    PATH=$isopy_env_python_dir/bin:$PATH \
+        python3 -m pip install -r $isopy_branch_dir/requirements.txt
 fi
 
 cat > $isopy_env_path <<EOF
@@ -128,9 +136,9 @@ EOF
 cat > $script_path <<EOF
 #!/bin/bash
 set -euo pipefail
-PATH=$isopy_python_dir/bin:\$PATH \\
-  PYTHONPATH=$this_dir \\
-  exec python3 $this_dir/isopy_bin/main.py "\$@"
+PATH=$isopy_env_python_dir/bin:\$PATH \\
+  PYTHONPATH=$isopy_branch_dir \\
+  exec python3 $isopy_branch_dir/isopy_bin/main.py "\$@"
 EOF
 chmod +x $script_path
 echo "Wrapper script generated at $script_path; please make sure this file is on PATH"
