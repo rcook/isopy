@@ -10,9 +10,16 @@ usage() {
     echo 'Visit https://github.com/rcook/isopy for more information'
 }
 
-if [ $# -eq 0 ] || ([ $# -eq 1 ] && ( [ "$1" == '-h' ] || [ "$1" == '--help' ] )); then
+if [ $# -eq 0 ]; then
+    echo 'Invalid command line'
+    echo ''
     usage
     exit 1
+fi
+
+if ([ $# -eq 1 ] && ( [ "$1" == '-h' ] || [ "$1" == '--help' ] )); then
+    usage
+    exit 0
 fi
 
 script_path=
@@ -24,10 +31,19 @@ while [ $# -gt 0 ]; do
     if [ "$arg" == '-f' ] || [ "$arg" == '--force' ]; then
         if [ "$force" != '' ]; then
             echo '--force already specified'
+            echo ''
+            usage
             exit 1
         fi
         force=1
         continue
+    fi
+
+    if [[ "$arg" = -* ]]; then
+        echo "Invalid option $arg"
+        echo ''
+        usage
+        exit 1
     fi
 
     if [ "$script_path" != '' ]; then
@@ -39,6 +55,8 @@ done
 
 if [ "$script_path" == '' ]; then
     echo 'Specify output script path'
+    echo ''
+    usage
     exit 1
 fi
 
