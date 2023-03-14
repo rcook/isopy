@@ -3,6 +3,7 @@ from isopy_bin.commands.shell import do_shell
 from isopy_bin.commands.wrap import do_wrap
 from isopy_lib.cli import \
     add_env_arg, \
+    add_force_arg, \
     add_prune_paths_arg, \
     add_subcommand, \
     auto_description
@@ -42,9 +43,11 @@ def add_shell_subcommands(helper, subparsers):
             env=args.env,
             wrapper_path=args.wrapper_path,
             script_path=args.script_path,
-            base_dir=args.base_dir))
+            base_dir=args.base_dir,
+            force=args.force))
     helper.add_common_args(parser=p)
     add_env_arg(parser=p)
+    add_force_arg(parser=p)
     p.add_argument(
         "wrapper_path",
         metavar="WRAPPER_PATH",

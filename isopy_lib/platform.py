@@ -21,7 +21,7 @@ class Platform(ABC, namedtuple("Platform", ["name", "home_dir_meta", "home_dir",
         return self.name
 
     @abstractmethod
-    def path_env(self, env_config): raise NotImplementedError()
+    def path_env(self, env_config, export=True): raise NotImplementedError()
 
     @abstractmethod
     def exec(self, command=None, path_dirs=[], extra_env={}, prune_paths=False):
@@ -29,13 +29,14 @@ class Platform(ABC, namedtuple("Platform", ["name", "home_dir_meta", "home_dir",
 
 
 class UnixPlatform(Platform):
-    def path_env(self, env_config):
+    def path_env(self, env_config, export=True):
         bin_dirs = [
             dir_path(env_config.path, "..", env_config.python_dir, x)
             for x in self.python_bin_dirs
         ]
+        prefix = "export " if export else ""
         return \
-            "export PATH=" + \
+            f"{prefix}PATH=" + \
             "".join([f"{d}{os.pathsep}" for d in bin_dirs]) + \
             "$PATH"
 
@@ -56,7 +57,7 @@ class UnixPlatform(Platform):
 
 
 class WindowsPlatform(Platform):
-    def path_env(self, env_config):
+    def path_env(self, env_config, export=True):
         bin_dirs = [
             dir_path(env_config.path, "..", env_config.python_dir, x)
             for x in self.python_bin_dirs
