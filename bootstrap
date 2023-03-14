@@ -47,8 +47,6 @@ if [ "$force" == '' ] && [ -e "$script_path" ]; then
     exit 1
 fi
 
-exit 1
-
 this_dir=$(cd $(dirname $0); pwd -P)
 cache_dir=$HOME/.isopy
 python_version=3.11.1
