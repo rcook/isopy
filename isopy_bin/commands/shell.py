@@ -10,7 +10,7 @@ import os
 ISOPY_ENV_VAR_NAME = "ISOPY_ENV"
 
 
-def do_shell(ctx, env):
+def do_shell(ctx, env, prune_paths):
     if os.getenv(ISOPY_ENV_VAR_NAME) is not None:
         raise ReportableError(
             "You are already in an active isopy shell")
@@ -36,4 +36,7 @@ def do_shell(ctx, env):
         for d in PLATFORM.python_bin_dirs
     ]
     extra_env = {ISOPY_ENV_VAR_NAME: label}
-    PLATFORM.exec(path_dirs=path_dirs, extra_env=extra_env)
+    PLATFORM.exec(
+        path_dirs=path_dirs,
+        extra_env=extra_env,
+        prune_paths=prune_paths)

@@ -139,3 +139,15 @@ def add_detailed_arg(parser):
         action=argparse.BooleanOptionalAction,
         default=default,
         help=f"show detailed output (default: {default})")
+
+
+def add_prune_paths_arg(parser):
+    default = False
+
+    parser.add_argument(
+        "--prune",
+        dest="prune_paths",
+        metavar="PRUNE_PATHS",
+        action=argparse.BooleanOptionalAction,
+        default=default,
+        help=f"aggressively prune system PATH directories containing other Pythons (default: {default})")

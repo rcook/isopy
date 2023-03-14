@@ -3,6 +3,7 @@ from isopy_bin.commands.shell import do_shell
 from isopy_bin.commands.wrap import do_wrap
 from isopy_lib.cli import \
     add_env_arg, \
+    add_prune_paths_arg, \
     add_subcommand, \
     auto_description
 import argparse
@@ -13,17 +14,19 @@ def add_shell_subcommands(helper, subparsers):
         subparsers,
         "shell",
         **auto_description("open shell in environment"),
-        func=lambda ctx, args: do_shell(ctx=ctx, env=args.env))
+        func=lambda ctx, args: do_shell(ctx=ctx, env=args.env, prune_paths=args.prune_paths))
     helper.add_common_args(parser=p)
     add_env_arg(parser=p)
+    add_prune_paths_arg(parser=p)
 
     p = add_subcommand(
         subparsers,
         "exec",
         **auto_description("run command in shell in environment"),
-        func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command))
+        func=lambda ctx, args: do_exec(ctx=ctx, env=args.env, command=args.command, prune_paths=args.prune_paths))
     helper.add_common_args(parser=p)
     add_env_arg(parser=p)
+    add_prune_paths_arg(parser=p)
     p.add_argument(
         "command",
         nargs=argparse.REMAINDER,

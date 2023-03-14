@@ -3,33 +3,55 @@ from psutil import Process
 import os
 import platform
 import shlex
+import shutil
 
 
-Platform = namedtuple("Platform", [
-    "name",
-    "home_dir_meta",
-    "home_dir",
-    "python_executable_name",
-    "python_bin_dirs",
-    "exec",
-    "asset_os",
-    "asset_flavour"
-])
+PYTHON_PROGRAMS = [
+    "python3",
+    "python",
+    "pip3",
+    "pip"
+]
 
 
-def make_paths_str(paths_str, dirs):
+class Platform(namedtuple("Platform", ["name", "home_dir_meta", "home_dir", "python_executable_name", "python_bin_dirs", "exec", "asset_os", "asset_flavour"])):
+    def __str__(self):
+        return self.name
+
+
+# Only works on Unix-like file systems
+def prune_search_paths(paths):
+    if PLATFORM == WINDOWS:
+        raise NotImplementedError(f"Unsupported platform {PLATFORM}")
+
+    cleaned_paths = []
+    for p in paths:
+        python_programs = [
+            x
+            for x in
+            [shutil.which(x, path=p) for x in PYTHON_PROGRAMS]
+            if x is not None and not x.startswith("/usr/")
+        ]
+        if len(python_programs) == 0:
+            cleaned_paths.append(p)
+    return cleaned_paths
+
+
+def make_paths_str(paths_str, dirs, prune_paths=False):
     paths = [] if paths_str is None else paths_str.split(os.pathsep)
 
+    cleaned_paths = prune_search_paths(paths) if prune_paths else paths
+
     for d in dirs:
-        if d in paths:
-            paths.remove(d)
+        if d in cleaned_paths:
+            cleaned_paths.remove(d)
 
-    return os.pathsep.join(dirs + paths)
+    return os.pathsep.join(dirs + cleaned_paths)
 
 
-def exec_unix(command=None, path_dirs=[], extra_env={}):
+def exec_unix(command=None, path_dirs=[], extra_env={}, prune_paths=False):
     e = dict(os.environ)
-    e["PATH"] = make_paths_str(e["PATH"], path_dirs)
+    e["PATH"] = make_paths_str(e["PATH"], path_dirs, prune_paths=prune_paths)
     e.update(extra_env)
 
     if command is None:
@@ -42,7 +64,7 @@ def exec_unix(command=None, path_dirs=[], extra_env={}):
     os.execlpe(prog, *args, e)
 
 
-def exec_windows(command=None, path_dirs=[], extra_env={}):
+def exec_windows(command=None, path_dirs=[], extra_env={}, prune_paths=False):
     def get_shell():
         parent_process = Process(os.getppid())
         c = parent_process.cmdline()
@@ -52,7 +74,10 @@ def exec_windows(command=None, path_dirs=[], extra_env={}):
             raise NotImplementedError(f"Unsupported shell {c[0]}")
 
     shell = get_shell()
-    os.environ["PATH"] = make_paths_str(os.getenv("PATH"), path_dirs)
+    os.environ["PATH"] = make_paths_str(
+        os.getenv("PATH"),
+        path_dirs,
+        prune_paths=prune_paths)
     os.environ.update(extra_env)
 
     if command is None:
