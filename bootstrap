@@ -142,9 +142,9 @@ if [ "$stdout" == '1' ]; then
     output=/dev/stdout
     echo ''
     echo ''
-    echo '##################################################'
-    echo '##################################################'
-    echo ''
+    echo '--------------------------------------------------'
+    echo 'Copy and paste this into an executable shell script on PATH'
+    echo '--------------------------------------------------'
 elif [ "$script_path" != '' ]; then
     output=$script_path
 fi
@@ -157,14 +157,20 @@ PATH=$isopy_env_python_dir/bin:\$PATH \\
   PYTHONPATH=$isopy_branch_dir \\
   exec python3 $isopy_branch_dir/isopy_bin/main.py "\$@"
 EOF
-    if [ "$stdout" == '1' ]; then
-        echo ''
-        echo '##################################################'
-        echo '##################################################'
-        echo 'Copy and paste this into an executable shell script on PATH'
-        echo 'For further instructions, go to https://github.com/rcook/isopy'
-    else
+    if [ "$script_path" != '' ]; then
         chmod +x $output
         echo "Wrapper script generated at $output; please make sure this file is on PATH"
     fi
+fi
+
+if [ "$stdout" == '1' ]; then
+    echo '--------------------------------------------------'
+    echo ''
+    echo '--------------------------------------------------'
+    echo 'Or stick this at the top of one of your shell config files:'
+    echo '--------------------------------------------------'
+    echo "export PATH=$isopy_env_python_dir/bin:\$PATH"
+    echo '--------------------------------------------------'
+    echo ''
+    echo 'For further instructions, go to https://github.com/rcook/isopy'
 fi
