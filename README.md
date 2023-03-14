@@ -7,10 +7,12 @@ Released under [MIT License](LICENSE)
 
 ## Installation
 
-TBD: Install prebuilt binaries: eventually we'll build self-contained
-downloads using [PyInstaller][pyinstaller] or similar. For now, these
-instructions will assume that you're a developer, so please follow the
-bootstrapping instructions below.
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/bootstrap | bash -s -- --stdout
+```
+
+If you'd like to contribute to development of isopy, please follow the
+developer bootstrapping instructions below.
 
 ## Bootstrapping development environment
 
