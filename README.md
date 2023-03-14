@@ -40,7 +40,7 @@ $ python3 --version
 
 `$` indicates that the command is being run in the child shell.
 
-### Making an isopy environment available on shell startup
+## Making an isopy environment available on shell startup
 
 Note that putting the appropriate Python directory at the head of your
 `PATH` is all you really need to do:
@@ -72,7 +72,7 @@ if [ "$ISOPY_ENV" == '' ]; then
 fi
 ```
 
-### What does this all do?
+## What does this all do?
 
 * Intended to minimally impact your system
 * Tool downloads and manages standalone Python builds into a hidden
