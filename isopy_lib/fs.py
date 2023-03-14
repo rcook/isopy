@@ -1,8 +1,8 @@
 from contextlib import contextmanager
-from isopy_lib.__fs_private__ import dir_path, file_path
-from isopy_lib.platform import LINUX, MACOS, PLATFORM, WINDOWS
+from isopy_lib.errors import ReportableError
 from tempfile import NamedTemporaryFile
 import os
+import shutil
 
 
 def split_at_ext(s, exts):
@@ -15,23 +15,15 @@ def split_at_ext(s, exts):
     raise ValueError(f"Name {s} has unknown extension")
 
 
-def move_file(source, target, overwrite=False):
+def copy_file(source, target, overwrite=False):
+    # Obviously something could happen between the check and the
+    # copy, but I'm not going to be clever...
+    if not overwrite and os.path.exists(target):
+        raise ReportableError(f"Target file {target} already exists")
+
     target_dir = os.path.dirname(target)
     os.makedirs(target_dir, exist_ok=True)
-
-    if PLATFORM == LINUX or PLATFORM == MACOS:
-        if overwrite:
-            os.rename(source, target)
-        else:
-            os.link(source, target)
-            os.unlink(source)
-    elif PLATFORM == WINDOWS:
-        if overwrite:
-            os.replace(source, target)
-        else:
-            os.rename(source, target)
-    else:
-        raise NotImplementedError(f"Unsupported platform {PLATFORM}")
+    shutil.copyfile(source, target)
 
 
 @contextmanager

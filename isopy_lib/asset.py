@@ -2,7 +2,7 @@ from collections import namedtuple
 from isopy_lib.checksum import make_checksum_file_path, verify_checksum
 from isopy_lib.errors import ReportableError
 from isopy_lib.features import INCLUDE_VERSION_IN_PYTHON_DIR
-from isopy_lib.fs import dir_path, file_path, move_file, named_temporary_file, split_at_ext
+from isopy_lib.fs import dir_path, file_path, copy_file, named_temporary_file, split_at_ext
 from isopy_lib.platform import PLATFORM
 from isopy_lib.utils import parse_python_version_and_tag
 from isopy_lib.web import download_file
@@ -173,7 +173,7 @@ class AssetInfo(namedtuple("AssetInfo", ["browser_download_url", "name", "ext", 
                     f"Checksum verification on downloaded asset {f.name} failed; "
                     "file deleted")
 
-            move_file(f.name, p)
+            copy_file(f.name, p)
             ctx.logger.info(f"Asset downloaded to {p}")
 
     def extract(self, ctx, dir):
@@ -264,7 +264,7 @@ def get_assets(ctx, asset_filter, refresh):
                 download_file(
                     url=PYTHON_INDEX_URL,
                     local_path=f.name)
-                move_file(f.name, index_path, overwrite=True)
+                copy_file(f.name, index_path, overwrite=True)
             ctx.logger.debug(
                 f"Updated Python version index at {index_path}")
         else:
