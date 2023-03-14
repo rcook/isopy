@@ -28,7 +28,6 @@ mkdir -p $assets_dir
 mkdir -p $isopy_python_dir
 
 if [ ! -e $python_path ]; then
-    mkdir -p $assets_dir
     curl -L $python_url --output $python_path
     set +e
     echo "$(cat $this_dir/sha256sums/$python_file_name.sha256)  $python_path" | \
