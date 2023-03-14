@@ -134,7 +134,8 @@ def add_detailed_arg(parser):
     default = True
 
     parser.add_argument(
-        "--detailed",
+        "--detail",
+        dest="detailed",
         metavar="DETAILED",
         action=argparse.BooleanOptionalAction,
         default=default,
