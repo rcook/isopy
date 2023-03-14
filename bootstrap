@@ -89,6 +89,7 @@ fi
 
 if [ ! -e $isopy_python_dir/bin ]; then
     T=$(mktemp -d -t isopy-bootstrap-XXXXXX)
+    trap 'rm -rf "$T"' EXIT
     tar xf $python_path -C $T
     mkdir -p $isopy_python_dir
     mv $T/python/* $isopy_python_dir
