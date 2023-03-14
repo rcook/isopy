@@ -54,14 +54,50 @@ if (-not (Test-Path -Path $isopyPythonDir\python.exe)) {
             Remove-Item -Recurse -Force -Path $d
         }
     }
+
+    try {
+        $tempPath = $env:PATH
+        $env:PATH = $isopyPythonDir + ';' + $isopyScriptsDir + ';' + $env:PATH
+        & python -m pip install --upgrade pip
+        & python -m pip install -r $PSScriptRoot/requirements.txt
+    }
+    finally {
+        $env:PATH = $tempPath
+    }
 }
 
+Set-Content -Path $isopyEnvPath -Value (@"
+name: isopy
+python_dir: python
+python_version: $pythonVersion
+tag: '$tag'
+"@)
+
+$fileName = "isopy-$([System.Guid]::NewGuid()).ps1"
+$wrapperPath = Join-Path -Path $PSScriptRoot -ChildPath $fileName
+Set-Content -Path $wrapperPath -Value (@"
+#Requires -Version 5
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory = `$false, Position = 0, ValueFromRemainingArguments = `$true)]
+    [object[]] `$Arguments
+)
+
+Set-StrictMode -Version Latest
+`$ErrorActionPreference = 'Stop'
 try {
-    $tempPath = $env:PATH
-    $env:PATH = $isopyPythonDir + ';' + $isopyScriptsDir + ';' + $env:PATH
-    & python -m pip install --upgrade pip
-    & python -m pip install -r $PSScriptRoot/requirements.txt
+    `$tempPath = `$env:PATH
+    `$tempPythonPath = `$env:PYTHONPATH
+    `$env:PATH = '$isopyPythonDir' + ';' + ``
+        $isopyScriptsDir + ';' + ``
+        `$env:PATH
+    `$env:PYTHONPATH = '$PSScriptRoot'
+    & python.exe "$PSScriptRoot\isopy_bin\main.py" `$Arguments
 }
 finally {
-    $env:PATH = $tempPath
+    `$env:PYTHONPATH = `$tempPythonPath
+    `$env:PATH = `$tempPath
 }
+"@)
+
+Write-Host -Object "Generated wrapper script at $wrapperPath; rename to isopy.ps1 and move to somewhere on PATH"
