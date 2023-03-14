@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from isopy_lib.__fs_private__ import *
 from isopy_lib.errors import ReportableError
 from tempfile import NamedTemporaryFile
 import os
