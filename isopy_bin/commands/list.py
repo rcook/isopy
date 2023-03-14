@@ -5,7 +5,7 @@ from isopy_lib.pretty import show_table
 import os
 
 
-def transform(x, detailed):
+def transform(env_config, detailed):
     def truncate_path(s):
         if s == PLATFORM.home_dir:
             return PLATFORM.home_dir_meta
@@ -14,13 +14,15 @@ def transform(x, detailed):
         return s
 
     if detailed:
-        python_bin_dir = dir_path(x.path, "..", "bin")
+        name_or_dir = truncate_path(env_config.dir_config_path) \
+            if env_config.name is None \
+            else env_config.name
         return {
-            "path": truncate_path(x.path),
-            "name_or_dir": truncate_path(x.dir_config_path) if x.name is None else x.name,
-            "tag": x.tag,
-            "ver": x.python_version,
-            "PATH": f"export PATH={python_bin_dir}{os.pathsep}$PATH"
+            "path": truncate_path(env_config.path),
+            "name_or_dir": name_or_dir,
+            "tag": env_config.tag,
+            "ver": env_config.python_version,
+            "PATH": PLATFORM.path_env(env_config=env_config)
         }
     else:
         return {

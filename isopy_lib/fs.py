@@ -1,15 +1,8 @@
 from contextlib import contextmanager
+from isopy_lib.__fs_private__ import dir_path, file_path
 from isopy_lib.platform import LINUX, MACOS, PLATFORM, WINDOWS
 from tempfile import NamedTemporaryFile
 import os
-
-
-def dir_path(*args):
-    return os.path.abspath(os.path.join(*args))
-
-
-def file_path(*args):
-    return os.path.abspath(os.path.join(*args))
 
 
 def split_at_ext(s, exts):
