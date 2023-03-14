@@ -2,10 +2,11 @@
 set -euo pipefail
 
 usage() {
-    echo 'Usage: bootstrap [-h] [--force] SCRIPT_PATH'
+    echo 'Usage: bootstrap [-h] [--force] [--stdout] [SCRIPT_PATH]'
     echo ''
     echo '  SCRIPT_PATH  path to wrapper script'
     echo '  --force      force overwrite of wrapper script if it already exists'
+    echo '  --stdout     write wrapper script to stdout'
     echo ''
     echo 'Visit https://github.com/rcook/isopy for more information'
 }
@@ -22,6 +23,7 @@ fi
 
 script_path=
 force=
+stdout=
 while [ $# -gt 0 ]; do
     arg=$1
     shift
@@ -34,6 +36,17 @@ while [ $# -gt 0 ]; do
             exit 1
         fi
         force=1
+        continue
+    fi
+
+    if [ "$arg" == '-o' ] || [ "$arg" == '--stdout' ]; then
+        if [ "$stdout" != '' ]; then
+            echo '--stdout already specified'
+            echo ''
+            usage
+            exit 1
+        fi
+        stdout=1
         continue
     fi
 
@@ -50,13 +63,6 @@ while [ $# -gt 0 ]; do
     fi
     script_path=$(realpath $arg)
 done
-
-if [ "$script_path" == '' ]; then
-    echo 'Specify output script path'
-    echo ''
-    usage
-    exit 1
-fi
 
 if [ "$force" == '' ] && [ -e "$script_path" ]; then
     echo "Script $script_path already exists; specify --force to overwrite it"
@@ -132,12 +138,25 @@ python_version: $python_version
 tag: '$tag'
 EOF
 
-cat > $script_path <<EOF
+if [ "$stdout" == '1' ]; then
+    output=/dev/stdout
+elif [ "$script_path" != '' ]; then
+    output=$script_path
+fi
+
+if [ "$output" != '' ]; then
+    cat > $output <<EOF
 #!/bin/bash
 set -euo pipefail
 PATH=$isopy_env_python_dir/bin:\$PATH \\
   PYTHONPATH=$isopy_branch_dir \\
   exec python3 $isopy_branch_dir/isopy_bin/main.py "\$@"
 EOF
-chmod +x $script_path
-echo "Wrapper script generated at $script_path; please make sure this file is on PATH"
+    if [ "$stdout" == '1' ]; then
+        echo '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+        echo 'Copy and paste this into an executable shell script on PATH'
+    else
+        chmod +x $output
+        echo "Wrapper script generated at $output; please make sure this file is on PATH"
+    fi
+fi
