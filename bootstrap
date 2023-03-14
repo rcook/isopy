@@ -77,8 +77,7 @@ temp_dir=$(mktemp -d -t isopy-bootstrap-XXXXXX)
 trap 'rm -rf -- "$temp_dir"' EXIT
 
 if [ ! -e $isopy_branch_dir ]; then
-    #curl -L $isopy_url --output $temp_dir/isopy-$isopy_branch.zip
-    cp $HOME/Downloads/isopy.zip $temp_dir/isopy-$isopy_branch.zip
+    curl -L $isopy_url --output $temp_dir/isopy-$isopy_branch.zip
     unzip -q $temp_dir/isopy-$isopy_branch.zip -d $temp_dir
     mkdir -p $isopy_dir/src/$isopy_branch
     mv $temp_dir/isopy-$isopy_branch $temp_dir/$isopy_branch
