@@ -89,7 +89,7 @@ try {
     `$tempPath = `$env:PATH
     `$tempPythonPath = `$env:PYTHONPATH
     `$env:PATH = '$isopyPythonDir' + ';' + ``
-        $isopyScriptsDir + ';' + ``
+        '$isopyScriptsDir' + ';' + ``
         `$env:PATH
     `$env:PYTHONPATH = '$PSScriptRoot'
     & python.exe "$PSScriptRoot\isopy_bin\main.py" `$Arguments
