@@ -24,26 +24,15 @@ python3 --version
 cd /path/to/workspace
 git clone git@github.com:rcook/isopy.git
 cd isopy
-./bootstrap
 
-# Examine the contents of the isopy wrapper script
-which isopy
-cat -n ~/.local/bin/isopy
-     1	#!/bin/bash
-     2	set -euo pipefail
-     3	project_dir=$HOME/src/isopy
-     4	PATH=$HOME/.isopy/envs/isopy/cpython-3.11.1+20230116/bin:$PATH \
-     5	  PYTHONPATH=$project_dir \
-     6	  python3 $project_dir/isopy_bin/main.py "$@"
-
-# Now you should have an "isopy" script available on PATH
-isopy --help
+# Run the local (development) isopy
+./isopy --help
 
 # Configure this project to use the named environment "isopy"
-isopy use isopy
+./isopy use isopy
 
 # Run a local isopy shell
-isopy shell
+./isopy shell
 
 # In isopy shell, report version of isopy-installed Python interpreter
 $ python3 --version
@@ -53,24 +42,35 @@ $ python3 --version
 
 ### Making an isopy environment available on shell startup
 
-Note that the `PATH=$HOME/.isopy/envs/isopy/cpython-3.11.1+20230116/bin:$PATH`
-in the output shown above is the critical bit. If you want to use an
-environment globally (e.g. from your `.bashrc` add a line to modify your
-`PATH` environment variable in a similar way), e.g.
+Note that putting the appropriate Python directory at the head of your
+`PATH` is all you really need to do:
+
+Linux/macOS (bash or similar)
 
 ```bash
-export PATH=$HOME/.isopy/envs/isopy/cpython-3.11.1+20230116/bin:$PATH
+export PATH=$HOME/.isopy/envs/isopy/python/bin:$PATH
 ```
 
-You may, instead, be able to call out to the `shell` command instead at
-the end of your `.bashrc` file:
+Windows (PowerShell)
+
+```pwsh
+$env:Path = ~\.isopy\envs\isopy\python + ';' + ~\.isopy\envs\isopy\python\Scripts + ';' + $env:Path
+```
+
+Windows (Command Script)
+
+```pwsh
+set PATH=%USERPROFILE%\.isopy\envs\isopy\python;%USERPROFILE%\.isopy\envs\isopy\python\Scripts;%PATH%
+```
+
+You can also call out to the `shell` command instead at the end of your
+`.bashrc` or similar shell configuration file:
 
 ```bash
-isopy shell -e isopy
+if [ "$ISOPY_ENV" == '' ]; then
+     isopy shell -e isopy
+fi
 ```
-
-_Note that this has not been tested and may or may not work propertly
-since the wrapper scripts use [`exec`][man-exec]._
 
 ### What does this all do?
 
@@ -190,6 +190,5 @@ TBD
 
 TBD
 
-[man-exec]: https://linuxcommand.org/lc3_man_pages/exech.html
 [pyinstaller]: https://pyinstaller.org/
 [python-build-standalone]: https://github.com/indygreg/python-build-standalone/releases
