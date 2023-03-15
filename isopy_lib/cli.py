@@ -1,4 +1,4 @@
-from isopy_lib.doc import make_doc_url
+from isopy_lib.doc import DOC_BASE_URL, make_doc_url
 from isopy_lib.features import OPEN_HELP_IN_BROWSER
 from isopy_lib.platform import PLATFORM
 from isopy_lib.version import Version
@@ -26,8 +26,9 @@ class BrowserLaunchingArgumentParser(argparse.ArgumentParser):
         h = self.format_help()
         self._print_message(h, file)
         if OPEN_HELP_IN_BROWSER:
-            for m in re.findall("(?:^|\s)(https?:\/\/[^\s]+)(?:$|\s)", h):
-                PLATFORM.shell_open(m)
+            for url in re.findall("(?:^|\s)(https?:\/\/[^\s]+)(?:$|\s)", h):
+                if url != DOC_BASE_URL:
+                    PLATFORM.shell_open(url)
 
 
 def env_type(s):
