@@ -1,12 +1,33 @@
-from isopy_lib.doc import DOC_BASE_URL, make_doc_url
+from isopy_lib.doc import make_doc_url
+from isopy_lib.features import OPEN_HELP_IN_BROWSER
+from isopy_lib.platform import PLATFORM
 from isopy_lib.version import Version
 from operator import itemgetter
 import argparse
 import logging
 import re
+import sys
 
 
 ENV_RE = re.compile("^([A-Za-z0-9-_]+)$")
+
+
+class CapitalizedUsageHelpFormatter(argparse.HelpFormatter):
+    def add_usage(self, usage, actions, groups, prefix=None):
+        if prefix is None:
+            prefix = "Usage: "
+        return super().add_usage(usage, actions, groups, prefix)
+
+
+class BrowserLaunchingArgumentParser(argparse.ArgumentParser):
+    def print_help(self, file=None):
+        if file is None:
+            file = sys.stdout
+        h = self.format_help()
+        self._print_message(h, file)
+        if OPEN_HELP_IN_BROWSER:
+            for m in re.findall("(?:^|\s)(https?:\/\/[^\s]+)(?:$|\s)", h):
+                PLATFORM.shell_open(m)
 
 
 def env_type(s):

@@ -39,6 +39,9 @@ class Platform(ABC, namedtuple("Platform", ["name", "home_dir_meta", "home_dir",
     def exec(self, command=None, path_dirs=[], extra_env={}, prune_paths=False):
         raise NotImplementedError()
 
+    @abstractmethod
+    def shell_open(self, command): raise NotImplementedError()
+
 
 class UnixPlatform(Platform):
     def path_env(self, env_config, export=True):
@@ -66,6 +69,16 @@ class UnixPlatform(Platform):
             args = command
 
         os.execlpe(prog, *args, e)
+
+
+class LinuxPlatform(UnixPlatform):
+    def shell_open(self, command):
+        pass
+
+
+class MacOSPlatform(UnixPlatform):
+    def shell_open(self, command):
+        os.system(f"open \"{command}\"")
 
 
 class WindowsPlatform(Platform):
@@ -97,6 +110,9 @@ class WindowsPlatform(Platform):
             os.system(f"\"{shell}\" -NoExit -NoProfile")
         else:
             os.system(f"\"{shell}\" -NoProfile -Command {shlex.join(command)}")
+
+    def shell_open(self, command):
+        os.system(f"start \"\" \"{command}\"")
 
 
 # Only works on Unix-like file systems
@@ -161,7 +177,7 @@ def make_paths_str(paths_str, dirs, prune_paths=False):
     return os.pathsep.join(dirs + cleaned_paths)
 
 
-LINUX = UnixPlatform(
+LINUX = LinuxPlatform(
     name="Linux",
     home_dir_meta="$HOME",
     home_dir=os.path.expanduser("~"),
@@ -169,7 +185,7 @@ LINUX = UnixPlatform(
     python_bin_dirs=["bin"],
     asset_os="linux",
     asset_flavour="gnu")
-MACOS = UnixPlatform(
+MACOS = MacOSPlatform(
     name="macOS",
     home_dir_meta="$HOME",
     home_dir=os.path.expanduser("~"),

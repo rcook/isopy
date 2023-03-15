@@ -4,18 +4,20 @@ from isopy_bin.debug_subcommands import add_debug_subcommands
 from isopy_bin.env_subcommands import add_env_subcommands
 from isopy_bin.project_subcommands import add_project_subcommands
 from isopy_bin.shell_subcommands import add_shell_subcommands
-from isopy_lib.cli import add_cache_dir_arg, add_log_level_arg
+from isopy_lib.cli import \
+    BrowserLaunchingArgumentParser, \
+    CapitalizedUsageHelpFormatter, \
+    add_cache_dir_arg, \
+    add_log_level_arg
 from isopy_lib.context import Context
 from isopy_lib.doc import DOC_BASE_URL
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
 from isopy_lib.program_info import get_default_cache_dir
 from isopy_lib.xprint import xprint
-import argparse
 import colorama
 import logging
 import os
-import shutil
 import sys
 
 
@@ -35,10 +37,11 @@ def main(cwd, argv):
 
     h = _ArgHelper()
 
-    parser = argparse.ArgumentParser(
+    parser = BrowserLaunchingArgumentParser(
         prog="isopy",
         description="Isolated Python Tool",
-        epilog=f"See documentation at {DOC_BASE_URL}")
+        epilog=f"See documentation at {DOC_BASE_URL}",
+        formatter_class=CapitalizedUsageHelpFormatter)
 
     subparsers = parser.add_subparsers(required=True)
     add_debug_subcommands(helper=h, subparsers=subparsers)
