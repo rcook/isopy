@@ -130,9 +130,7 @@ def add_refresh_arg(parser):
         help=f"force download a new assets list (default: {default})")
 
 
-def add_detailed_arg(parser):
-    default = True
-
+def add_detailed_arg(parser, default=True):
     parser.add_argument(
         "--detail",
         dest="detailed",

@@ -7,7 +7,7 @@ import shutil
 import yaml
 
 
-def do_debug(ctx):
+def do_debug(ctx, detailed):
     def show(*args, **kwargs):
         xprint(colorama.Fore.YELLOW, *args, **kwargs)
 
@@ -30,43 +30,52 @@ def do_debug(ctx):
     for line in yaml.dump(d, sort_keys=True).splitlines():
         show(f"  {line}")
 
-    show("System search paths:")
-    for p in program_info.paths:
-        show(f"  {p}")
+    if detailed:
+        show("System search paths:")
+        for p in program_info.paths:
+            show(f"  {p}")
 
-    show("Python paths:")
-    for p in program_info.python_paths:
-        show(f"  {p}")
+    if detailed:
+        show("Python paths:")
+        for p in program_info.python_paths:
+            show(f"  {p}")
 
     show_value("cwd", program_info.cwd)
     show_value("cache_dir", program_info.cache_dir)
     show_value("checksum_dir", program_info.checksum_dir)
 
-    show(f"checksums:")
-    for f in program_info.checksum_paths:
-        show(f"  {f}")
+    if detailed:
+        show(f"checksums:")
+        for f in program_info.checksum_paths:
+            show(f"  {f}")
 
     show_value("frozen", program_info.frozen)
     show_value("app_path", program_info.app_path)
-    os.system(f"tree {program_info.app_path}")
 
-    # Deduplicate search path
-    paths = []
-    for p in program_info.paths:
-        if p not in paths:
-            paths.append(p)
+    if detailed:
+        os.system(f"tree {program_info.app_path}")
 
-    # Show Python programs accessible from search path
-    for program in PYTHON_PROGRAMS:
-        matches = [
-            x
-            for x in [
-                shutil.which(program, path=p)
-                for p in paths
+    if detailed:
+        # Deduplicate search path
+        paths = []
+        for p in program_info.paths:
+            if p not in paths:
+                paths.append(p)
+
+        # Show Python programs accessible from search path
+        for program in PYTHON_PROGRAMS:
+            matches = [
+                x
+                for x in [
+                    shutil.which(program, path=p)
+                    for p in paths
+                ]
+                if x is not None
             ]
-            if x is not None
-        ]
-        if len(matches) > 0:
-            xprint(colorama.Fore.GREEN, program)
-            for m in matches:
-                show(f"  {m}")
+            if len(matches) > 0:
+                xprint(colorama.Fore.GREEN, program)
+                for m in matches:
+                    show(f"  {m}")
+
+    if not detailed:
+        xprint(colorama.Fore.LIGHTWHITE_EX, "Pass --detail to get more detail")
