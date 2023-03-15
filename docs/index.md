@@ -12,6 +12,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/iso
 ## Windows (PowerShell)
 
 ```pwsh
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1)))
 ```
 
