@@ -58,7 +58,9 @@ while [ $# -gt 0 ]; do
     fi
 
     if [ "$script_path" != '' ]; then
-        echo ERROR
+        echo 'Script path already specifed'
+        echo ''
+        usage
         exit 1
     fi
     script_path=$(realpath $arg)
