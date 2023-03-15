@@ -18,7 +18,7 @@ PYTHON_PROGRAMS = [
 
 
 POWERSHELL_PATH = file_path(
-    os.getenv("WINDIR"),
+    os.getenv("WINDIR", "NOT_A_REAL_PATH"),
     "System32",
     "WindowsPowerShell",
     "v1.0",
