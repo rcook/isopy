@@ -59,7 +59,7 @@ class UnixPlatform(Platform):
         e.update(extra_env)
 
         if command is None:
-            prog = os.getenv("SHELL")
+            prog = infer_shell()
             args = [prog]
         else:
             prog = command[0]
@@ -86,31 +86,7 @@ class WindowsPlatform(Platform):
                 "$env:Path"
 
     def exec(self, command=None, path_dirs=[], extra_env={}, prune_paths=False):
-        # Figure out which shell to launch
-        def get_shell():
-            # Current process
-            p = Process()
-
-            # Is it the Python interpreter? If so, go to parent
-            c = p.cmdline()
-            if len(c) > 0 and c[0].lower() == PLATFORM.python_executable_name.lower():
-                p = p.parent()
-
-            # Is it a command script wrapper? If so, go to parent
-            c = p.cmdline()
-            if len(c) > 1 and c[0].lower() == CMD_PATH.lower() and c[1].lower() == "/c":
-                print("YES")
-                p = p.parent()
-
-            # "p" should be the real parent shell at this point
-            c = p.cmdline()
-            if len(c) >= 1:
-                p = c[0].lower()
-                if p == POWERSHELL_PATH.lower() or p == CMD_PATH.lower():
-                    return c[0]
-            raise NotImplementedError(f"Unsupported shell {c[0]}")
-
-        shell = get_shell()
+        shell = infer_shell()
         os.environ["PATH"] = make_paths_str(
             os.getenv("PATH"),
             path_dirs,
@@ -139,6 +115,38 @@ def prune_search_paths(paths):
         if len(python_programs) == 0:
             cleaned_paths.append(p)
     return cleaned_paths
+
+
+# Figure out which shell launched this program
+def infer_shell():
+    def infer_windows_shell():
+        # Current process
+        p = Process()
+
+        # Is it the Python interpreter? If so, go to parent
+        c = p.cmdline()
+        if len(c) > 0 and c[0].lower() == PLATFORM.python_executable_name.lower():
+            p = p.parent()
+
+        # Is it a command script wrapper? If so, go to parent
+        c = p.cmdline()
+        if len(c) > 1 and c[0].lower() == CMD_PATH.lower() and c[1].lower() == "/c":
+            p = p.parent()
+
+        # "p" should be the real parent shell at this point
+        c = p.cmdline()
+        if len(c) >= 1:
+            p = c[0].lower()
+            if p == POWERSHELL_PATH.lower() or p == CMD_PATH.lower():
+                return c[0]
+        raise NotImplementedError(f"Unsupported shell {c[0]}")
+
+    if PLATFORM in [LINUX, MACOS]:
+        return os.getenv("SHELL")
+    elif PLATFORM == WINDOWS:
+        return infer_windows_shell()
+    else:
+        raise NotImplementedError(f"Unsupported platform {PLATFORM}")
 
 
 def make_paths_str(paths_str, dirs, prune_paths=False):

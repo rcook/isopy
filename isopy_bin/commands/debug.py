@@ -1,4 +1,4 @@
-from isopy_lib.platform import PLATFORM, PYTHON_PROGRAMS
+from isopy_lib.platform import PLATFORM, PYTHON_PROGRAMS, infer_shell
 from isopy_lib.program_info import ProgramInfo
 from isopy_lib.xprint import xprint
 from psutil import Process
@@ -41,6 +41,7 @@ def do_debug(ctx, detailed):
         for p in program_info.python_paths:
             show(f"  {p}")
 
+    show_value("inferred_shell", infer_shell())
     show_value("cwd", program_info.cwd)
     show_value("cache_dir", program_info.cache_dir)
     show_value("checksum_dir", program_info.checksum_dir)
