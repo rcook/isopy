@@ -2,28 +2,39 @@
 set -euo pipefail
 
 usage() {
-    echo 'Usage: setup [-h] [--force] [--stdout] [SCRIPT_PATH]'
+    echo 'Usage: setup [-h] [--force] [LAUNCHER_PATH]'
     echo ''
-    echo '  SCRIPT_PATH  path to wrapper script'
-    echo '  --force      force overwrite of wrapper script if it already exists'
-    echo '  --stdout     write wrapper script to stdout'
+    echo '  LAUNCHER_PATH  path to launcher script'
+    echo '  --force        force overwrite of launcher script if it already exists'
     echo ''
-    echo 'Visit https://github.com/rcook/isopy for more information'
+    echo 'Visit https://rcook.github.io/isopy/ for more information'
 }
 
-if [ $# -eq 0 ]; then
-    usage
-    exit 1
-fi
+isopy_branch=main
+isopy_url=https://github.com/rcook/isopy/archive/refs/heads/$isopy_branch.zip
+isopy_dir=$HOME/.isopy
+isopy_bin_dir=$isopy_dir/bin
+isopy_src_dir=$isopy_dir/src
+isopy_assets_dir=$isopy_dir/assets
+isopy_branch_dir=$isopy_src_dir/$isopy_branch
+isopy_env_dir=$isopy_dir/envs/isopy
+isopy_env_path=$isopy_env_dir/env.yaml
+isopy_env_python_dir=$isopy_env_dir/python
 
 if ([ $# -eq 1 ] && ( [ "$1" == '-h' ] || [ "$1" == '--help' ] )); then
     usage
     exit 0
 fi
 
-script_path=
-force=
-stdout=
+# Default behaviour when called from curl
+if [ $# -eq 0 ]; then
+    launcher_path=$isopy_bin_dir/isopy
+    force=1
+else
+    launcher_path=
+    force=
+fi
+
 while [ $# -gt 0 ]; do
     arg=$1
     shift
@@ -39,17 +50,6 @@ while [ $# -gt 0 ]; do
         continue
     fi
 
-    if [ "$arg" == '-o' ] || [ "$arg" == '--stdout' ]; then
-        if [ "$stdout" != '' ]; then
-            echo '--stdout already specified'
-            echo ''
-            usage
-            exit 1
-        fi
-        stdout=1
-        continue
-    fi
-
     if [[ "$arg" = -* ]]; then
         echo "Invalid option $arg"
         echo ''
@@ -57,29 +57,19 @@ while [ $# -gt 0 ]; do
         exit 1
     fi
 
-    if [ "$script_path" != '' ]; then
-        echo 'Script path already specifed'
+    if [ "$launcher_path" != '' ]; then
+        echo 'Launcher path already specifed'
         echo ''
         usage
         exit 1
     fi
-    script_path=$(realpath $arg)
+    launcher_path=$(realpath $arg)
 done
 
-if [ "$force" == '' ] && [ -e "$script_path" ]; then
-    echo "Script $script_path already exists; specify --force to overwrite it"
+if [ "$force" == '' ] && [ -e "$launcher_path" ]; then
+    echo "Launcher $launcher_path already exists; specify --force to overwrite it"
     exit 1
 fi
-
-isopy_branch=main
-isopy_url=https://github.com/rcook/isopy/archive/refs/heads/$isopy_branch.zip
-isopy_dir=$HOME/.isopy
-isopy_src_dir=$isopy_dir/src
-isopy_assets_dir=$isopy_dir/assets
-isopy_branch_dir=$isopy_src_dir/$isopy_branch
-isopy_env_dir=$isopy_dir/envs/isopy
-isopy_env_path=$isopy_env_dir/env.yaml
-isopy_env_python_dir=$isopy_env_dir/python
 
 temp_dir=$(mktemp -d -t isopy-setup-XXXXXX)
 trap 'rm -rf -- "$temp_dir"' EXIT
@@ -109,6 +99,7 @@ fi
 python_url=https://github.com/indygreg/python-build-standalone/releases/download/$tag/$python_file_name
 python_path=$isopy_assets_dir/$python_file_name
 
+mkdir -p $isopy_bin_dir
 mkdir -p $isopy_assets_dir
 mkdir -p $isopy_env_python_dir
 
@@ -143,39 +134,19 @@ python_version: $python_version
 tag: '$tag'
 EOF
 
-if [ "$stdout" == '1' ]; then
-    output=/dev/stdout
-    echo ''
-    echo ''
-    echo '--------------------------------------------------'
-    echo 'Copy and paste this into an executable shell script on PATH'
-    echo '--------------------------------------------------'
-elif [ "$script_path" != '' ]; then
-    output=$script_path
-fi
-
-if [ "$output" != '' ]; then
-    cat > $output <<EOF
+cat > $launcher_path <<EOF
 #!/bin/bash
 set -euo pipefail
 PATH=$isopy_env_python_dir/bin:\$PATH \\
   PYTHONPATH=$isopy_branch_dir \\
   exec python3 $isopy_branch_dir/isopy_bin/main.py "\$@"
 EOF
-    if [ "$script_path" != '' ]; then
-        chmod +x $output
-        echo "Wrapper script generated at $output; please make sure this file is on PATH"
-    fi
-fi
-
-if [ "$stdout" == '1' ]; then
-    echo '--------------------------------------------------'
-    echo ''
-    echo '--------------------------------------------------'
-    echo 'Or stick this at the top of one of your shell config files:'
-    echo '--------------------------------------------------'
-    echo "export PATH=$isopy_env_python_dir/bin:\$PATH"
-    echo '--------------------------------------------------'
-    echo ''
-    echo 'For further instructions, go to https://github.com/rcook/isopy'
-fi
+chmod +x $launcher_path
+launcher_dir=$(dirname $launcher_path)
+echo '--------------------------------------------------'
+echo "Launcher script generated at $launcher_path"
+echo "To access isopy globally, either add $launcher_dir to the beginning of"
+echo "\$PATH or copy $launcher_path to a directory already on \$PATH."
+echo '--------------------------------------------------'
+echo 'Visit https://rcook.github.io/isopy/ for more information'
+echo '--------------------------------------------------'

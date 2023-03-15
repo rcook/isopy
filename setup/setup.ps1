@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 
 function Show-Usage {
   Write-Host -Object @"
-Usage: setup [-h] [--force] [--stdout] [LAUNCHER_PATH]
+Usage: setup [-h] [--force] [LAUNCHER_PATH]
 
   LAUNCHER_PATH  path to launcher script
   --force        force overwrite of launcher script if it already exists
@@ -74,7 +74,7 @@ while ($null -ne $argv) {
   }
 
   if ($null -ne $launcherPath) {
-    Write-Host -Object "Script path already specified`n"
+    Write-Host -Object "Launcher path already specified`n"
     Show-Usage
     exit 1
   }
@@ -86,7 +86,7 @@ while ($null -ne $argv) {
 }
 
 if ((-not $force) -and ($null -ne $launcherPath) -and (Test-Path -Path $launcherPath)) {
-  Write-Host -Object "Script $launcherPath already exists; specify --force to overwrite it"
+  Write-Host -Object "Launcher $launcherPath already exists; specify --force to overwrite it"
   exit 1
 }
 
@@ -123,8 +123,8 @@ $pythonFileName = "$pythonBaseName-x86_64-pc-windows-msvc-shared-install_only.ta
 $pythonUrl = "https://github.com/indygreg/python-build-standalone/releases/download/$tag/$pythonFileName"
 $pythonPath = Join-Path -Path $isopyAssetsDir -ChildPath $pythonFileName
 
-New-Item -ItemType Directory -Path $isopyAssetsDir -Force | Out-Null
 New-Item -ItemType Directory -Path $isopyBinDir -Force | Out-Null
+New-Item -ItemType Directory -Path $isopyAssetsDir -Force | Out-Null
 New-Item -ItemType Directory -Path $isopyEnvPythonDir -Force | Out-Null
 
 if (-not (Test-Path -Path $pythonPath)) {
