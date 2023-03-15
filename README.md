@@ -3,7 +3,7 @@
 [GitHub Pages documentation][github-pages]
 
 Isolated Python environment tool to download and manage Python builds
-downloaded from [Python Standalone Builds][python-build-standalone]
+downloaded from [Python Standalone Builds][python-build-standalone-releases]
 
 Released under [MIT License](LICENSE)
 
@@ -190,6 +190,21 @@ TBD
 
 TBD
 
+## Similar to
+
+This tool is similar in philosophy to the following projects:
+
+* [pyenv][pyenv]
+* [pyenv-win][pyenv-win]
+* [rbenv][rbenv]
+* [ruby-build][ruby-build]
+
+isopy is 99% Python clean-room implementation and doesn't borrow any code from
+these projects.
+
 [github-pages]: https://rcook.github.io/isopy/
-[pyinstaller]: https://pyinstaller.org/
-[python-build-standalone]: https://github.com/indygreg/python-build-standalone/releases
+[pyenv]: https://github.com/pyenv/pyenv
+[pyenv-win]: https://github.com/pyenv-win/pyenv-win
+[python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
+[rbenv]: https://github.com/rbenv/rbenv
+[ruby-build]: https://github.com/rbenv/ruby-build
