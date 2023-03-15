@@ -1,3 +1,4 @@
+from isopy_lib.doc import DOC_BASE_URL, make_doc_url
 from isopy_lib.version import Version
 from operator import itemgetter
 import argparse
@@ -17,7 +18,12 @@ def env_type(s):
 
 
 def add_subcommand(subparsers, *args, func, **kwargs):
-    parser = subparsers.add_parser(*args, **kwargs)
+    name = args[0]
+    doc_url = make_doc_url(command=name)
+    parser = subparsers.add_parser(
+        *args,
+        epilog=f"See documentation at {doc_url}",
+        **kwargs)
     parser.set_defaults(func=func)
     return parser
 

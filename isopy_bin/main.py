@@ -6,10 +6,10 @@ from isopy_bin.project_subcommands import add_project_subcommands
 from isopy_bin.shell_subcommands import add_shell_subcommands
 from isopy_lib.cli import add_cache_dir_arg, add_log_level_arg
 from isopy_lib.context import Context
+from isopy_lib.doc import DOC_BASE_URL
 from isopy_lib.errors import ReportableError
 from isopy_lib.fs import dir_path, file_path
-from isopy_lib.platform import PLATFORM
-from isopy_lib.program_info import ProgramInfo, get_default_cache_dir
+from isopy_lib.program_info import get_default_cache_dir
 from isopy_lib.xprint import xprint
 import argparse
 import colorama
@@ -35,19 +35,10 @@ def main(cwd, argv):
 
     h = _ArgHelper()
 
-    python_version_str = ".".join([str(s) for s in [
-        sys.version_info.major,
-        sys.version_info.minor,
-        sys.version_info.micro
-    ]])
-    extra_info = f"Using Python {python_version_str}"
-    if not ProgramInfo.get(cwd=cwd, cache_dir=default_cache_dir).frozen:
-        extra_info += f" ({shutil.which(PLATFORM.python_executable_name)})"
-
     parser = argparse.ArgumentParser(
         prog="isopy",
         description="Isolated Python Tool",
-        epilog=extra_info)
+        epilog=f"See documentation at {DOC_BASE_URL}")
 
     subparsers = parser.add_subparsers(required=True)
     add_debug_subcommands(helper=h, subparsers=subparsers)

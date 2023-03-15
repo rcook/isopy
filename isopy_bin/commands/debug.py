@@ -5,6 +5,7 @@ from psutil import AccessDenied, Process
 import colorama
 import os
 import shutil
+import sys
 import yaml
 
 
@@ -104,3 +105,14 @@ def do_debug(ctx, detailed):
                     show(f"      {x}")
 
             p = p.parent()
+
+    show_value("python_version", ".".join([str(s) for s in [
+        sys.version_info.major,
+        sys.version_info.minor,
+        sys.version_info.micro
+    ]]))
+
+    if not program_info.frozen:
+        show_value(
+            "python_path",
+            shutil.which(PLATFORM.python_executable_name))
