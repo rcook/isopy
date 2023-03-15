@@ -8,7 +8,7 @@ Manages multiple isolated versions of Python obtained from
 ### Linux and macOS (bash)
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/setup/setup | bash -s -- --stdout
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/setup/setup | bash
 ```
 
 ### Windows (PowerShell)
