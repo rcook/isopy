@@ -111,10 +111,10 @@ if (-not (Test-Path -Path $isopyBranchDir)) {
 
 $yamlPath = Join-Path -Path $isopyBranchDir -ChildPath .isopy.yaml
 $c = (Get-Content -Path $yamlPath) -join ' '
-$m = [regex]::Match($c, "python_version: '?([^\s']+)'?")
+$m = [regex]::Match($c, "python_version: ['`"]?([^\s'`"]+)['`"]?")
 if (-not $m.Success) { throw 'Regex match failed' }
 $pythonVersion = $m.Groups[1].Value
-$m = [regex]::Match($c, "tag: '?([^\s']+)'?")
+$m = [regex]::Match($c, "tag: ['`"]?([^\s'`"]+)['`"]?")
 if (-not $m.Success) { throw 'Regex match failed' }
 $tag = $m.Groups[1].Value
 $pythonBaseName = "cpython-$pythonVersion+$tag"
