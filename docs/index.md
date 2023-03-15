@@ -13,3 +13,11 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/iso
 ```pwsh
 & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1)))
 ```
+
+## TBD
+
+Reference similar tools:
+
+* [pyenv][pyenv]
+
+[pyenv]: https://github.com/pyenv/pyenv
