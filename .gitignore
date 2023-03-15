@@ -1,5 +1,2 @@
 __pycache__/
 *.pyc
-/.isopy.local.yaml
-/build/
-/dist/
