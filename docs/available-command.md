@@ -1,7 +1,7 @@
 ## `available` command
 
-> :warning: **Work in progress**: Many of the commands have crappy
-> names, if you have any better ideas, [file an issue][issues]
+> **Work in progress**: Many of the commands have crappy names, if you
+have any better ideas, [file an issue][issues]
 
 Lists Python packages available for download from
 [Python Standalone Builds][python-build-standalone-releases]. The
@@ -19,7 +19,7 @@ frequently. Use `--refresh` to force redownload of the index.
 | `--python-version` | Python version        |
 | `--[no-]refresh`   | Refresh package index |
 
-Global options `--log-level` and `--cache-dir` also apply
+Global options `--log-level` and `--cache-dir` also apply.
 
 [issues]: https://github.com/rcook/isopy/issues
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
