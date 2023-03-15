@@ -179,28 +179,11 @@ tag: '$tag'
 
 
     $wrapper = @"
-#Requires -Version 5
-[CmdletBinding()]
-param(
-    [Parameter(Mandatory = `$false, Position = 0, ValueFromRemainingArguments = `$true)]
-    [object[]] `$Arguments
-)
-
-Set-StrictMode -Version Latest
-`$ErrorActionPreference = 'Stop'
-try {
-    `$tempPath = `$env:PATH
-    `$tempPythonPath = `$env:PYTHONPATH
-    `$env:Path = '$isopyEnvPythonDir' + ';' + ``
-        '$isopyEnvScriptsDir' + ';' + ``
-        `$env:Path
-    `$env:PYTHONPATH = '$isopyBranchDir'
-    & python.exe "$isopyBranchDir\isopy_bin\main.py" `$Arguments
-}
-finally {
-    `$env:PYTHONPATH = `$tempPythonPath
-    `$env:Path = `$tempPath
-}
+@echo off
+setlocal
+set PATH=$isopyEnvPythonDir;$isopyEnvScriptsDir;%PATH%
+set PYTHONPATH=$isopyBranchDir
+python "$isopyBranchDir\isopy_bin\main.py" %*
 "@
 
     if ($stdout) {
