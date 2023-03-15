@@ -86,10 +86,25 @@ class WindowsPlatform(Platform):
                 "$env:Path"
 
     def exec(self, command=None, path_dirs=[], extra_env={}, prune_paths=False):
+        # Figure out which shell to launch
         def get_shell():
-            parent_process = Process(os.getppid())
-            c = parent_process.cmdline()
-            if len(c) == 1:
+            # Current process
+            p = Process()
+
+            # Is it the Python interpreter? If so, go to parent
+            c = p.cmdline()
+            if len(c) > 0 and c[0].lower() == PLATFORM.python_executable_name.lower():
+                p = p.parent()
+
+            # Is it a command script wrapper? If so, go to parent
+            c = p.cmdline()
+            if len(c) > 1 and c[0].lower() == CMD_PATH.lower() and c[1].lower() == "/c":
+                print("YES")
+                p = p.parent()
+
+            # "p" should be the real parent shell at this point
+            c = p.cmdline()
+            if len(c) >= 1:
                 p = c[0].lower()
                 if p == POWERSHELL_PATH.lower() or p == CMD_PATH.lower():
                     return c[0]
