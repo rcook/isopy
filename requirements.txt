@@ -1,5 +1,4 @@
 colorama
 psutil
-pyinstaller
 pyyaml
 requests
