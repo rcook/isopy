@@ -18,5 +18,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 
 _[Usage](usage.md) \| [Developers][readme]_
 
+[issues]: https://github.com/rcook/isopy/issues
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
 [readme]: https://github.com/rcook/isopy/blob/main/README.md
