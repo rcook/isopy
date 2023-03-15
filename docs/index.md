@@ -13,7 +13,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/iso
 
 ```pwsh
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
-& ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1)))
+& ([ScriptBlock]::Create((iwr -useb https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1)))
 ```
 
 _[Usage](usage.md) \| [Developers][readme]_
