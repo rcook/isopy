@@ -1,7 +1,7 @@
 from isopy_lib.platform import PLATFORM, PYTHON_PROGRAMS, infer_shell
 from isopy_lib.program_info import ProgramInfo
 from isopy_lib.xprint import xprint
-from psutil import Process
+from psutil import AccessDenied, Process
 import colorama
 import os
 import shutil
@@ -90,13 +90,17 @@ def do_debug(ctx, detailed):
         show("Process hierarchy:")
         p = Process()
         while p is not None:
-            name = p.name()
-            pid = p.pid
-            c = p.cmdline()
-            paths = p.environ()["PATH"].split(os.pathsep)
-            show(f"  {name} ({pid})")
-            show(f"    {c}")
-            show(f"    System search path:")
-            for x in paths:
-                show(f"      {x}")
+            show(f"  {p.name()} ({p.pid})")
+            show(f"    {p.cmdline()}")
+
+            try:
+                paths = p.environ()["PATH"].split(os.pathsep)
+            except AccessDenied:
+                paths = None
+
+            if paths is not None:
+                show(f"    System search path:")
+                for x in paths:
+                    show(f"      {x}")
+
             p = p.parent()
