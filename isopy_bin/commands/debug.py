@@ -49,8 +49,11 @@ def do_debug(ctx, detailed):
         for f in program_info.checksum_paths:
             show(f"  {f}")
 
-    show_value("frozen", program_info.frozen)
     show_value("app_path", program_info.app_path)
+    show_value("frozen", program_info.frozen)
+    show_value(
+        "bootstrapped_isopy",
+        program_info.app_path.startswith(program_info.cache_dir + os.sep))
 
     if detailed:
         os.system(f"tree {program_info.app_path}")
@@ -78,4 +81,4 @@ def do_debug(ctx, detailed):
                     show(f"  {m}")
 
     if not detailed:
-        xprint(colorama.Fore.LIGHTWHITE_EX, "Pass --detail to get more detail")
+        xprint(colorama.Fore.BLUE, "Pass --detail to get more detail")
