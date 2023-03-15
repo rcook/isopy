@@ -1,6 +1,6 @@
 # isopy
 
-[Documentation](https://rcook.github.io/isopy/)
+[GitHub Pages documentation][github-pages]
 
 Isolated Python environment tool to download and manage Python builds
 downloaded from [Python Standalone Builds][python-build-standalone]
@@ -9,17 +9,7 @@ Released under [MIT License](LICENSE)
 
 ## Installation
 
-### Linux and macOS (bash)
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/setup/setup | bash -s -- --stdout
-```
-
-### Windows (PowerShell)
-
-```pwsh
-. { iwr -useb https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1 } | iex; setup --stdout
-```
+See [GitHub Pages documentation][github-pages] for installation instructions.
 
 ## Bootstrapping development environment
 
@@ -200,5 +190,6 @@ TBD
 
 TBD
 
+[github-pages]: https://rcook.github.io/isopy/
 [pyinstaller]: https://pyinstaller.org/
 [python-build-standalone]: https://github.com/indygreg/python-build-standalone/releases

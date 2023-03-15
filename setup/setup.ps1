@@ -10,13 +10,12 @@ $ErrorActionPreference = 'Stop'
 
 function Show-Usage {
   Write-Host -Object @"
-Usage: setup [-h] [--force] [--stdout] [SCRIPT_PATH]
+Usage: setup [-h] [--force] [--stdout] [LAUNCHER_PATH]
 
-  SCRIPT_PATH  path to wrapper script
-  --force      force overwrite of wrapper script if it already exists
-  --stdout     write wrapper script to stdout
+  LAUNCHER_PATH  path to launcher script
+  --force        force overwrite of launcher script if it already exists
 
-Visit https://github.com/rcook/isopy for more information
+Visit https://rcook.github.io/isopy/ for more information
 "@
 }
 
@@ -26,21 +25,34 @@ function New-TemporaryDirectory {
   New-Item -ItemType Directory -Path (Join-Path -Path $tempDir -ChildPath $name)
 }
 
+$isopyBranch = 'main'
+$isopyUrl = "https://github.com/rcook/isopy/archive/refs/heads/$isopyBranch.zip"
+$isopyDir = Join-Path -Path $env:USERPROFILE -ChildPath .isopy
+$isopyBinDir = Join-Path -Path $isopyDir -ChildPath bin
+$isopySrcDir = Join-Path -Path $isopyDir -ChildPath src
+$isopyAssetsDir = Join-Path -Path $isopyDir -ChildPath assets
+$isopyBranchDir = Join-Path -Path $isopySrcDir -ChildPath $isopyBranch
+$isopyEnvDir = Join-Path -Path $isopyDir -ChildPath envs\isopy
+$isopyEnvPath = Join-Path -Path $isopyEnvDir -ChildPath env.yaml
+$isopyEnvPythonDir = Join-Path -Path $isopyEnvDir -ChildPath python
+$isopyEnvScriptsDir = Join-Path -Path $isopyEnvPythonDir -ChildPath Scripts
 
 $argv = @() + $Arguments
-if (($argv.Length -eq 1) -and ($null -eq $argv[0])) {
-  Show-Usage
-  exit 1
-}
-
 if ($argv -in @('-h', '--help')) {
   Show-Usage
   exit 0
 }
 
-$scriptPath = $null
-$force = $null
-$stdout = $null
+# Default behaviour when called from iwr/iex
+if (($argv.Length -eq 1) -and ($null -eq $argv[0])) {
+  $launcherPath = Join-Path -Path $isopyBinDir -ChildPath isopy.cmd
+  $force = $true
+}
+else {
+  $launcherPath = $null
+  $force = $null
+}
+
 while ($null -ne $argv) {
   [string] $arg, [string[]] $argv = $argv
   if ($arg.Length -eq 0) { break }
@@ -55,49 +67,28 @@ while ($null -ne $argv) {
     continue
   }
 
-  if ($arg -in @('-o', '--stdout')) {
-    if ($null -ne $stdout) {
-      Write-Host -Object "--stdout already specified`n"
-      Show-Usage
-      exit 1
-    }
-    $stdout = $true
-    continue
-  }
-
   if ($arg.StartsWith('-')) {
     Write-Host -Object "Invalid option $arg`n"
     Show-Usage
     exit 1
   }
 
-  if ($null -ne $scriptPath) {
+  if ($null -ne $launcherPath) {
     Write-Host -Object "Script path already specified`n"
     Show-Usage
     exit 1
   }
 
-  [string] $scriptPath = Resolve-Path -Path $arg -ErrorAction SilentlyContinue -ErrorVariable _frperror
-  if (-not $scriptPath) {
-    $scriptPath = $_frperror[0].TargetObject
+  [string] $launcherPath = Resolve-Path -Path $arg -ErrorAction SilentlyContinue -ErrorVariable _frperror
+  if (-not $launcherPath) {
+    $launcherPath = $_frperror[0].TargetObject
   }
 }
 
-if ((-not $force) -and ($null -ne $scriptPath) -and (Test-Path -Path $scriptPath)) {
-  Write-Host -Object "Script $scriptPath already exists; specify --force to overwrite it"
+if ((-not $force) -and ($null -ne $launcherPath) -and (Test-Path -Path $launcherPath)) {
+  Write-Host -Object "Script $launcherPath already exists; specify --force to overwrite it"
   exit 1
 }
-
-$isopyBranch = 'main'
-$isopyUrl = "https://github.com/rcook/isopy/archive/refs/heads/$isopyBranch.zip"
-$isopyDir = Join-Path -Path $env:USERPROFILE -ChildPath .isopy
-$isopySrcDir = Join-Path -Path $isopyDir -ChildPath src
-$isopyAssetsDir = Join-Path -Path $isopyDir -ChildPath assets
-$isopyBranchDir = Join-Path -Path $isopySrcDir -ChildPath $isopyBranch
-$isopyEnvDir = Join-Path -Path $isopyDir -ChildPath envs\isopy
-$isopyEnvPath = Join-Path -Path $isopyEnvDir -ChildPath env.yaml
-$isopyEnvPythonDir = Join-Path -Path $isopyEnvDir -ChildPath python
-$isopyEnvScriptsDir = Join-Path -Path $isopyEnvPythonDir -ChildPath Scripts
 
 $tempDir = New-TemporaryDirectory
 if (-not (Test-Path -Path $isopyBranchDir)) {
@@ -133,6 +124,7 @@ $pythonUrl = "https://github.com/indygreg/python-build-standalone/releases/downl
 $pythonPath = Join-Path -Path $isopyAssetsDir -ChildPath $pythonFileName
 
 New-Item -ItemType Directory -Path $isopyAssetsDir -Force | Out-Null
+New-Item -ItemType Directory -Path $isopyBinDir -Force | Out-Null
 New-Item -ItemType Directory -Path $isopyEnvPythonDir -Force | Out-Null
 
 if (-not (Test-Path -Path $pythonPath)) {
@@ -177,37 +169,23 @@ python_version: $pythonVersion
 tag: '$tag'
 "@)
 
-
-$wrapper = @"
-Set-Content -Path foo.cmd -Value @"
+$launcher = @"
 @echo off
 setlocal
 set PATH=$isopyEnvPythonDir;$isopyEnvScriptsDir;%PATH%
 set PYTHONPATH=$isopyBranchDir
 python "$isopyBranchDir\isopy_bin\main.py" %*
-`"@
 "@
 
-if ($stdout) {
-  Write-Host -Object @"
---------------------------------------------------
-Create a Windows command file on PATH containing the following
---------------------------------------------------
-"@
-  Write-Host -Object $wrapper
-  Write-Host -Object @"
---------------------------------------------------
+Set-Content -Path $launcherPath -Value $launcher
+$launcherDir = (Get-Item -Path $launcherPath).Directory.FullName
+Write-Host -Object @"
 
 --------------------------------------------------
-Or stick this at the top of your PowerShell profile file:
+Launcher script generated at $launcherPath
+To access isopy globally, either add $launcherDir to the beginning of
+%PATH% or copy $launcherPath to a directory already on %PATH%.
 --------------------------------------------------
-`$env:Path = '$isopyEnvPythonDir' + ';' + ``
-    '$isopyEnvScriptsDir' + ';' + ``
-    `$env:Path
+Visit https://rcook.github.io/isopy/ for more information
 --------------------------------------------------
 "@
-}
-else {
-  Set-Content -Path $scriptPath -Value $wrapper
-  Write-Host -Object "Wrapper script generated at $scriptPath; please make sure this file is on PATH"
-}
