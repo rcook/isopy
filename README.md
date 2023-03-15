@@ -199,8 +199,8 @@ This tool is similar in philosophy to the following projects:
 * [rbenv][rbenv]
 * [ruby-build][ruby-build]
 
-isopy is 99% Python clean-room implementation and doesn't borrow any code from
-these projects.
+isopy is a 99% Python clean-room implementation and doesn't borrow any code from
+these projects. The bootstrapper/setup is written in bash and PowerShell.
 
 [github-pages]: https://rcook.github.io/isopy/
 [pyenv]: https://github.com/pyenv/pyenv
