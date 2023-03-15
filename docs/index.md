@@ -15,7 +15,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/iso
 & ([ScriptBlock]::Create((iwr https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1)))
 ```
 
-_Developers start [here][readme]_
+_[Usage](usage.md) | [Developers][readme]_
 
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
 [readme]: https://github.com/rcook/isopy/blob/main/README.md
