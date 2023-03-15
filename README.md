@@ -7,14 +7,22 @@ Released under [MIT License](LICENSE)
 
 ## Installation
 
+### Linux and macOS (bash)
+
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/bootstrap | bash -s -- --stdout
 ```
 
-If you'd like to contribute to development of isopy, please follow the
-developer bootstrapping instructions below.
+### Windows (PowerShell)
+
+```pwsh
+. { iwr -useb https://raw.githubusercontent.com/rcook/isopy/main/bootstrap.ps1 } | iex; bootstrap --stdout
+```
 
 ## Bootstrapping development environment
+
+If you'd like to contribute to development of isopy, please follow the
+developer bootstrapping instructions below.
 
 ```bash
 # Report version of system-wide Python interpreter
