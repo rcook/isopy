@@ -1,5 +1,6 @@
 from isopy_lib.env import get_env_config
 from isopy_lib.errors import ReportableError
+from isopy_lib.features import GENERATE_CMD_WRAPPERS
 from isopy_lib.fs import dir_path
 from isopy_lib.platform import LINUX, MACOS, PLATFORM, WINDOWS
 import os
@@ -12,8 +13,16 @@ set -euo pipefail
   exec {python_executable_name} {script_path} "$@"
 """
 
-POWERSHELL_WRAPPER_TEMPLATE = """
-#Requires -Version 5
+
+if GENERATE_CMD_WRAPPERS:
+    WINDOWS_WRAPPER_TEMPLATE = """@echo off
+setlocal
+{path_env}
+set PYTHONPATH={base_dir}
+{python_executable_name} "{script_path}" %*
+"""
+else:
+    WINDOWS_WRAPPER_TEMPLATE = """#Requires -Version 5
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false, Position = 0, ValueFromRemainingArguments = $true)]
@@ -42,7 +51,7 @@ def do_wrap(ctx, env, wrapper_path, script_path, base_dir, force):
     if PLATFORM in [LINUX, MACOS]:
         wrapper_template = BASH_WRAPPER_TEMPLATE
     elif PLATFORM == WINDOWS:
-        wrapper_template = POWERSHELL_WRAPPER_TEMPLATE
+        wrapper_template = WINDOWS_WRAPPER_TEMPLATE
     else:
         raise NotImplementedError(f"Unsupported platform {PLATFORM}")
 

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from isopy_lib.__fs_private__ import dir_path, file_path
+from isopy_lib.features import GENERATE_CMD_WRAPPERS
 from psutil import Process
 import os
 import platform
@@ -73,10 +74,16 @@ class WindowsPlatform(Platform):
             dir_path(env_config.path, "..", env_config.python_dir, x)
             for x in self.python_bin_dirs
         ]
-        return \
-            "$env:Path = " + \
-            "".join([f"'{d}' + '{os.pathsep}' + " for d in bin_dirs]) + \
-            "$env:Path"
+        if GENERATE_CMD_WRAPPERS:
+            return \
+                f"set PATH=" + \
+                "".join([f"{d}{os.pathsep}" for d in bin_dirs]) + \
+                "%PATH%"
+        else:
+            return \
+                "$env:Path = " + \
+                "".join([f"'{d}' + '{os.pathsep}' + " for d in bin_dirs]) + \
+                "$env:Path"
 
     def exec(self, command=None, path_dirs=[], extra_env={}, prune_paths=False):
         def get_shell():
