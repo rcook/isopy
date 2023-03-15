@@ -1,6 +1,6 @@
 # isopy
 
-[GitHub Pages documentation][github-pages]
+[GitHub Pages documentation][github-pages] including [usage][usage]
 
 Isolated Python environment tool to download and manage Python builds
 downloaded from [Python Standalone Builds][python-build-standalone-releases]
@@ -130,66 +130,6 @@ cd /path/to/workspace/isopy
 isopy exec -e isopy pyinstaller isopy.spec
 ```
 
-## Usage
-
-### `debug` subcommand
-
-Dumps out useful runtime troubleshooting information.
-
-### `available` subcommand
-
-Lists versions of Python available for download from
-[python-build-standalone][python-build-standalone] optionally filtered
-by Python version and/or tag. The release index is cached locally since
-this is fairly expensive to download. Use `--refresh` to force download
-of the index.
-
-### `download` subcommand
-
-Downloads a Python distribution from
-[python-build-standalone][python-build-standalone] optionally filtered
-by Python version and/or tag without extracting it to an environment.
-
-### `downloaded` subcommand
-
-Lists locally downloaded Python distributions.
-
-### `list` subcommand
-
-Lists environments.
-
-### `new` subcommand
-
-TBD
-
-### `init` subcommand
-
-TBD
-
-### `use` subcommand
-
-TBD
-
-### `create` subcommand
-
-TBD
-
-### `info` subcommand
-
-TBD
-
-### `shell` subcommand
-
-TBD
-
-### `exec` subcommand
-
-TBD
-
-### `wrap` subcommand
-
-TBD
-
 ## Similar to
 
 This tool is similar in philosophy to the following projects:
@@ -208,3 +148,4 @@ these projects. The bootstrapper/setup is written in bash and PowerShell.
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
 [rbenv]: https://github.com/rbenv/rbenv
 [ruby-build]: https://github.com/rbenv/ruby-build
+[usage]: https://rcook.github.io/isopy/usage

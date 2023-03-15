@@ -1,4 +1,4 @@
-# isopy usage
+## Usage
 
 * [available](available-command.md)
 * [create](create-command.md)
