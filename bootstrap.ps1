@@ -179,17 +179,19 @@ tag: '$tag'
 
 
     $wrapper = @"
+Set-Content -Path foo.cmd -Value @"
 @echo off
 setlocal
 set PATH=$isopyEnvPythonDir;$isopyEnvScriptsDir;%PATH%
 set PYTHONPATH=$isopyBranchDir
 python "$isopyBranchDir\isopy_bin\main.py" %*
+`"@
 "@
 
     if ($stdout) {
       Write-Host -Object @"
 --------------------------------------------------
-Copy and paste this into a PowerShell script on PATH
+Create a Windows command file on PATH containing the following
 --------------------------------------------------
 "@
       Write-Host -Object $wrapper
