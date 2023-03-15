@@ -1,7 +1,7 @@
 ## `available` command
 
-> **Work in progress**: Many of the commands have crappy names, if you
-have any better ideas, [file an issue][issues]
+> **Work in progress**: Many of the commands have crappy names.
+> If you can do better, please [file an issue][issues].
 
 Lists Python packages available for download from
 [Python Standalone Builds][python-build-standalone-releases]. The
