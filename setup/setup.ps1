@@ -1,5 +1,5 @@
-New-Module -Name isopybootstrap -ScriptBlock {
-  function bootstrap() {
+New-Module -Name isopysetup -ScriptBlock {
+  function setup() {
     param(
       [Parameter(Mandatory = $false, Position = 0, ValueFromRemainingArguments = $true)]
       [object[]] $Arguments
@@ -10,7 +10,7 @@ New-Module -Name isopybootstrap -ScriptBlock {
 
     function Show-Usage {
       Write-Host -Object @"
-Usage: bootstrap [-h] [--force] [--stdout] [SCRIPT_PATH]
+Usage: setup [-h] [--force] [--stdout] [SCRIPT_PATH]
 
   SCRIPT_PATH  path to wrapper script
   --force      force overwrite of wrapper script if it already exists
@@ -212,5 +212,5 @@ Or stick this at the top of your PowerShell profile file:
       Write-Host -Object "Wrapper script generated at $scriptPath; please make sure this file is on PATH"
     }
   }
-  Export-ModuleMember -Function bootstrap
+  Export-ModuleMember -Function setup
 }

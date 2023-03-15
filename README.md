@@ -10,13 +10,13 @@ Released under [MIT License](LICENSE)
 ### Linux and macOS (bash)
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/bootstrap | bash -s -- --stdout
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/rcook/isopy/main/setup/setup | bash -s -- --stdout
 ```
 
 ### Windows (PowerShell)
 
 ```pwsh
-. { iwr -useb https://raw.githubusercontent.com/rcook/isopy/main/bootstrap.ps1 } | iex; bootstrap --stdout
+. { iwr -useb https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1 } | iex; setup --stdout
 ```
 
 ## Bootstrapping development environment

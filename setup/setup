@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-    echo 'Usage: bootstrap [-h] [--force] [--stdout] [SCRIPT_PATH]'
+    echo 'Usage: setup [-h] [--force] [--stdout] [SCRIPT_PATH]'
     echo ''
     echo '  SCRIPT_PATH  path to wrapper script'
     echo '  --force      force overwrite of wrapper script if it already exists'
@@ -81,7 +81,7 @@ isopy_env_dir=$isopy_dir/envs/isopy
 isopy_env_path=$isopy_env_dir/env.yaml
 isopy_env_python_dir=$isopy_env_dir/python
 
-temp_dir=$(mktemp -d -t isopy-bootstrap-XXXXXX)
+temp_dir=$(mktemp -d -t isopy-setup-XXXXXX)
 trap 'rm -rf -- "$temp_dir"' EXIT
 
 if [ ! -e $isopy_branch_dir ]; then
