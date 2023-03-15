@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from isopy_lib.__fs_private__ import dir_path
+from isopy_lib.__fs_private__ import dir_path, file_path
 from psutil import Process
 import os
 import platform
@@ -14,6 +14,17 @@ PYTHON_PROGRAMS = [
     "pip3",
     "pip"
 ]
+
+
+POWERSHELL_PATH = file_path(
+    os.getenv("WINDIR"),
+    "System32",
+    "WindowsPowerShell",
+    "v1.0",
+    "powershell.exe")
+
+
+CMD_PATH = os.getenv("ComSpec")
 
 
 class Platform(ABC, namedtuple("Platform", ["name", "home_dir_meta", "home_dir", "python_executable_name", "python_bin_dirs", "asset_os", "asset_flavour"])):
@@ -71,10 +82,11 @@ class WindowsPlatform(Platform):
         def get_shell():
             parent_process = Process(os.getppid())
             c = parent_process.cmdline()
-            if len(c) == 1 and c[0].endswith("powershell.exe"):
-                return c[0]
-            else:
-                raise NotImplementedError(f"Unsupported shell {c[0]}")
+            if len(c) == 1:
+                p = c[0].lower()
+                if p == POWERSHELL_PATH.lower() or p == CMD_PATH.lower():
+                    return c[0]
+            raise NotImplementedError(f"Unsupported shell {c[0]}")
 
         shell = get_shell()
         os.environ["PATH"] = make_paths_str(
