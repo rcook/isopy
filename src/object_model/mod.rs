@@ -1,12 +1,13 @@
 mod asset_info;
+mod attributes;
 
-pub use self::asset_info::Arch;
-pub use self::asset_info::ArchiveType;
 pub use self::asset_info::AssetInfo;
-pub use self::asset_info::Family;
-pub use self::asset_info::Flavour;
-pub use self::asset_info::Platform;
-pub use self::asset_info::Subflavour;
-pub use self::asset_info::Tag;
-pub use self::asset_info::Variant;
-pub use self::asset_info::OS;
+pub use self::attributes::Arch;
+pub use self::attributes::ArchiveType;
+pub use self::attributes::Family;
+pub use self::attributes::Flavour;
+pub use self::attributes::Platform;
+pub use self::attributes::Subflavour;
+pub use self::attributes::Tag;
+pub use self::attributes::Variant;
+pub use self::attributes::OS;
