@@ -45,12 +45,12 @@ fn main_inner() -> Result<()> {
 
     for package in packages {
         for asset in package.assets {
-            match AssetInfo::from_asset_name(&asset.name) {
-                Some(asset_info) => {
-                    _ = set.insert(asset_info.flavour);
-                }
-                _ => {}
+            if AssetInfo::definitely_not_an_asset(&asset.name) {
+                continue;
             }
+            println!("{:?}", asset.name);
+            let asset_info = AssetInfo::from_asset_name(&asset.name).expect("Should parse");
+            _ = set.insert(asset_info.flavour);
         }
     }
 
