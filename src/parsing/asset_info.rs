@@ -1,7 +1,9 @@
+use crate::version::Version;
+
 const SUPPORTED_EXTS: [&str; 1] = [".tar.zst"];
 
 #[derive(Debug, PartialEq)]
-struct AssetInfo {
+pub struct AssetInfo {
     family: Family,
     version: Version,
     tag: Tag,
@@ -17,18 +19,6 @@ struct AssetInfo {
 struct Family(String);
 
 impl Family {
-    fn from_str<S>(s: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self(s.into())
-    }
-}
-
-#[derive(Debug, PartialEq)]
-struct Version(String);
-
-impl Version {
     fn from_str<S>(s: S) -> Self
     where
         S: Into<String>,
@@ -123,7 +113,7 @@ impl Ext {
 
 #[allow(unused)]
 impl AssetInfo {
-    fn from_asset_name(s: &str) -> Option<Self> {
+    pub fn from_asset_name(s: &str) -> Option<Self> {
         let mut ext = None::<Ext>;
         let mut ext_len = 0;
         for e in SUPPORTED_EXTS {
@@ -157,7 +147,7 @@ impl AssetInfo {
             return None;
         }
 
-        let version = Version::from_str(parts[0]);
+        let version = Version::parse(parts[0])?;
 
         let tag = Tag::from_str(parts[1]);
 
@@ -202,14 +192,15 @@ impl AssetInfo {
 
 #[cfg(test)]
 mod tests {
-    use super::{Arch, AssetInfo, Ext, Family, Flavour, Platform, Subflavour, Tag, Version, OS};
+    use super::{Arch, AssetInfo, Ext, Family, Flavour, Platform, Subflavour, Tag, OS};
+    use crate::version::Version;
     use rstest::rstest;
 
     #[rstest]
     #[case(
         AssetInfo {
             family: Family::from_str("cpython"),
-            version: Version::from_str("3.10.9"),
+            version: Version::parse("3.10.9").expect("Should parse"),
             tag: Tag::from_str("20230116"),
             arch: Arch::from_str("aarch64"),
             platform: Platform::from_str("apple"),

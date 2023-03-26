@@ -4,10 +4,12 @@ mod config;
 mod error;
 mod parsing;
 mod serialization;
+mod version;
 
 use crate::cli::Args;
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
+use crate::parsing::AssetInfo;
 use crate::serialization::{HttpBinIPResponse, Package};
 use clap::Parser;
 use colour::red_ln;
@@ -42,9 +44,12 @@ fn main_inner() -> Result<()> {
     println!("packages[0].assets[0].name={}", asset.name);
     println!("packages[0].assets[0].url={}", asset.url.as_str());
 
+    let asset_info = AssetInfo::from_asset_name(&asset.name);
+    println!("asset_info={:?}", asset_info);
+    /*
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
     println!("{:#?}", response);
-
+    */
     Ok(())
 }
 
