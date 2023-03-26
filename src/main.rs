@@ -2,14 +2,14 @@
 mod cli;
 mod config;
 mod error;
-mod parsing;
+mod object_model;
 mod serialization;
 mod version;
 
 use crate::cli::Args;
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
-use crate::parsing::{Arch, ArchiveType, AssetInfo, Variant, OS};
+use crate::object_model::{Arch, ArchiveType, AssetInfo, Variant, OS};
 use crate::serialization::{HttpBinIPResponse, Package};
 use clap::Parser;
 use colour::red_ln;
