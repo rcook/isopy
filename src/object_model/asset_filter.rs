@@ -39,6 +39,7 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
+    #[cfg(target_os = "linux")]
     pub fn default_for_platform() -> Self {
         Self {
             archive_type: Some(ArchiveType::TarGZ),
