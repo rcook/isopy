@@ -1,10 +1,13 @@
+#![allow(unused_imports)]
 mod cli;
 mod config;
 mod error;
+mod serialization;
 
 use crate::cli::Args;
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
+use crate::serialization::Package;
 use clap::Parser;
 use colour::red_ln;
 use serde_json::{from_str, Value};
@@ -30,11 +33,10 @@ fn main_inner() -> Result<()> {
     let assets_dir = isopy_config.dir.join("assets");
     let index_path = assets_dir.join("index.json");
     let index_json = read_to_string(index_path)?;
-    let index_vec = from_str::<Vec<Value>>(&index_json)?;
-    let first_value = &index_vec[0];
-    for key in first_value.as_object().unwrap().keys() {
-        println!("{:?}", key);
-    }
+    let packages = from_str::<Vec<Package>>(&index_json)?;
+    let package = &packages[0];
+    let asset = &package.assets[0];
+    println!("asset={:?}", asset);
     Ok(())
 }
 
