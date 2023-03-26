@@ -1,3 +1,4 @@
+mod asset_filter;
 mod asset_info;
 mod attributes;
 

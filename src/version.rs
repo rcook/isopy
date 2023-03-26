@@ -6,6 +6,15 @@ pub struct Version {
 }
 
 impl Version {
+    #[allow(unused)]
+    pub fn new(major: i32, minor: i32, build: i32) -> Self {
+        Self {
+            major: major,
+            minor: minor,
+            build: build,
+        }
+    }
+
     pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,

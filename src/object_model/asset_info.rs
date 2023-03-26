@@ -124,9 +124,10 @@ impl AssetInfo {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        Arch, ArchiveType, AssetInfo, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
+    use super::super::attributes::{
+        Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
     };
+    use super::AssetInfo;
     use crate::version::Version;
     use rstest::rstest;
 
@@ -136,7 +137,7 @@ mod tests {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
-            version: Version::parse("3.10.9").expect("Should parse"),
+            version: Version::new(3, 10, 9),
             tag: Tag::NewStyle(String::from("20230116")),
             arch: Arch::AArch64,
             platform: Platform::Apple,
@@ -153,7 +154,7 @@ mod tests {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: Version::parse("3.10.9").expect("Should parse"),
+            version: Version::new(3, 10, 9),
             tag: Tag::NewStyle(String::from("20230116")),
             arch: Arch::AArch64,
             platform: Platform::Apple,
@@ -170,7 +171,7 @@ mod tests {
             name: String::from("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
-            version: Version::parse("3.10.2").expect("Should parse"),
+            version: Version::new(3, 10, 2),
             tag: Tag::OldStyle(String::from("20220220T1113")),
             arch: Arch::AArch64,
             platform: Platform::Apple,
