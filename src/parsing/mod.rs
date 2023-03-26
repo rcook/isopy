@@ -1,1 +1,1 @@
-mod asset_name;
+mod asset_info;
