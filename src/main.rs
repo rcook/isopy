@@ -54,16 +54,9 @@ fn main_inner() -> Result<()> {
     }
     println!("count={}", asset_infos.len());
 
-    let mut asset_filter = AssetFilter::default();
-    asset_filter.archive_type = Some(ArchiveType::TarGZ);
-    asset_filter.family = Some(Family::CPython);
+    let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(Version::new(3, 11, 1));
     asset_filter.tag = Some(Tag::NewStyle(String::from("20230116")));
-    asset_filter.arch = Some(Arch::X86_64);
-    asset_filter.platform = Some(Platform::Unknown);
-    asset_filter.os = Some(OS::Linux);
-    asset_filter.flavour = Some(Flavour::GNU);
-    asset_filter.variant = Some(Variant::InstallOnly);
 
     let filtered_asset_infos = asset_filter.filter(asset_infos.iter().map(|x| x).into_iter());
     println!("filtered_count={}", filtered_asset_infos.len());

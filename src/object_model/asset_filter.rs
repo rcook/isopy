@@ -22,7 +22,7 @@ pub struct AssetFilter {
 
 impl AssetFilter {
     #[allow(unused)]
-    pub fn default() -> Self {
+    pub fn all() -> Self {
         Self {
             archive_type: None,
             family: None,
@@ -35,6 +35,23 @@ impl AssetFilter {
             subflavour0: None,
             subflavour1: None,
             variant: None,
+        }
+    }
+
+    #[allow(unused)]
+    pub fn default_for_platform() -> Self {
+        Self {
+            archive_type: Some(ArchiveType::TarGZ),
+            family: Some(Family::CPython),
+            version: None,
+            tag: None,
+            arch: Some(Arch::X86_64),
+            platform: Some(Platform::Unknown),
+            os: Some(OS::Linux),
+            flavour: Some(Flavour::GNU),
+            subflavour0: None,
+            subflavour1: None,
+            variant: Some(Variant::InstallOnly),
         }
     }
 
