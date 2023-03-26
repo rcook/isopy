@@ -1,8 +1,16 @@
+const SUPPORTED_EXTS: [&str; 1] = [".tar.zst"];
+
 #[derive(Debug, PartialEq)]
 struct AssetInfo {
     family: Family,
     version: Version,
     tag: Tag,
+    arch: Arch,
+    platform: Platform,
+    os: OS,
+    flavour: Flavour,
+    subflavour: Subflavour,
+    ext: Ext,
 }
 
 #[derive(Debug, PartialEq)]
@@ -41,9 +49,97 @@ impl Tag {
     }
 }
 
+#[derive(Debug, PartialEq)]
+struct Arch(String);
+
+impl Arch {
+    fn from_str<S>(s: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self(s.into())
+    }
+}
+
+#[derive(Debug, PartialEq)]
+struct Platform(String);
+
+impl Platform {
+    fn from_str<S>(s: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self(s.into())
+    }
+}
+
+#[derive(Debug, PartialEq)]
+struct OS(String);
+
+impl OS {
+    fn from_str<S>(s: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self(s.into())
+    }
+}
+
+#[derive(Debug, PartialEq)]
+struct Flavour(String);
+
+impl Flavour {
+    fn from_str<S>(s: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self(s.into())
+    }
+}
+
+#[derive(Debug, PartialEq)]
+struct Subflavour(String);
+
+impl Subflavour {
+    fn from_str<S>(s: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self(s.into())
+    }
+}
+
+#[derive(Debug, PartialEq)]
+struct Ext(String);
+
+impl Ext {
+    fn from_str<S>(s: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self(s.into())
+    }
+}
+
 #[allow(unused)]
 impl AssetInfo {
     fn from_asset_name(s: &str) -> Option<Self> {
+        let mut ext = None::<Ext>;
+        let mut ext_len = 0;
+        for e in SUPPORTED_EXTS {
+            if (s.ends_with(e)) {
+                ext = Some(Ext::from_str(e));
+                ext_len = e.len();
+                break;
+            }
+        }
+        if ext.is_none() {
+            return None;
+        }
+
+        let ext = ext.unwrap();
+        let s = &s[..s.len() - ext_len];
+
         let mut iter = s.split("-").into_iter();
 
         let family = Family::from_str(match iter.next() {
@@ -62,19 +158,51 @@ impl AssetInfo {
         }
 
         let version = Version::from_str(parts[0]);
+
         let tag = Tag::from_str(parts[1]);
+
+        let arch = Arch::from_str(match iter.next() {
+            Some(x) => x,
+            None => return None,
+        });
+
+        let platform = Platform::from_str(match iter.next() {
+            Some(x) => x,
+            None => return None,
+        });
+
+        let os = OS::from_str(match iter.next() {
+            Some(x) => x,
+            None => return None,
+        });
+
+        let flavour = Flavour::from_str(match iter.next() {
+            Some(x) => x,
+            None => return None,
+        });
+
+        let subflavour = Subflavour::from_str(match iter.next() {
+            Some(x) => x,
+            None => return None,
+        });
 
         Some(Self {
             family: family,
             version: version,
             tag: tag,
+            arch: arch,
+            platform: platform,
+            os: os,
+            flavour: flavour,
+            subflavour: subflavour,
+            ext: ext,
         })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{AssetInfo, Family, Tag, Version};
+    use super::{Arch, AssetInfo, Ext, Family, Flavour, Platform, Subflavour, Tag, Version, OS};
     use rstest::rstest;
 
     #[rstest]
@@ -82,7 +210,13 @@ mod tests {
         AssetInfo {
             family: Family::from_str("cpython"),
             version: Version::from_str("3.10.9"),
-            tag: Tag::from_str("20230116")
+            tag: Tag::from_str("20230116"),
+            arch: Arch::from_str("aarch64"),
+            platform: Platform::from_str("apple"),
+            os: OS::from_str("darwin"),
+            flavour: Flavour::from_str("debug"),
+            subflavour: Subflavour::from_str("full"),
+            ext: Ext::from_str(".tar.zst"),
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
     )]
