@@ -7,7 +7,7 @@ mod serialization;
 mod version;
 
 use crate::cli::{Args, Command};
-use crate::commands::{do_available, do_filter};
+use crate::commands::{do_available, do_download, do_downloaded};
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
@@ -29,8 +29,9 @@ fn main_inner() -> Result<()> {
     let config = Config::from_dir(dir);
 
     match args.command {
-        Command::Filter => do_filter(&config)?,
         Command::Available => do_available(&config)?,
+        Command::Download => do_download(&config)?,
+        Command::Downloaded => do_downloaded(&config)?,
     }
 
     Ok(())
@@ -42,8 +43,3 @@ fn main() {
         _ => {}
     }
 }
-
-/*
-let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
-println!("{:#?}", response);
-*/

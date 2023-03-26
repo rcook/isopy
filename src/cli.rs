@@ -11,6 +11,7 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    Filter,
     Available,
+    Download,
+    Downloaded,
 }
