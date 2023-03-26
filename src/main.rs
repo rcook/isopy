@@ -38,7 +38,7 @@ fn main_inner() -> Result<()> {
     let packages = from_str::<Vec<Package>>(&index_json)?;
     let package = &packages[0];
     let asset = &package.assets[0];
-    println!("asset={:?}", asset);
+    println!("packages[0].assets[0].url={}", asset.url.as_str());
 
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
     println!("{:#?}", response);
