@@ -6,74 +6,112 @@ const SUBFLAVOURS: [&str; 1] = ["full"]; // Should be a set!
 
 #[derive(Debug, PartialEq)]
 pub struct AssetInfo {
-    name: String,
-    family: Family,
-    version: Version,
-    tag: Tag,
-    arch: Arch,
-    platform: Platform,
-    os: OS,
-    flavour: Flavour,
+    pub name: String,
+    pub family: Family,
+    pub version: Version,
+    pub tag: Tag,
+    pub arch: Arch,
+    pub platform: Platform,
+    pub os: OS,
+    pub flavour: Flavour,
     subflavour: Option<Subflavour>,
     ext: Ext,
 }
 
 #[derive(Debug, PartialEq)]
-struct Family(String);
+pub enum Family {
+    CPython,
+}
 
 impl Family {
-    fn from_str<S>(s: S) -> Self
+    fn from_str<S>(s: S) -> Option<Self>
     where
-        S: Into<String>,
+        S: AsRef<str>,
     {
-        Self(s.into())
+        Some(match s.as_ref() {
+            "cpython" => Self::CPython,
+            _ => return None,
+        })
     }
 }
 
 #[derive(Debug, PartialEq)]
-enum Tag {
+pub enum Tag {
     NewStyle(String),
     OldStyle(String),
 }
 
 #[derive(Debug, PartialEq)]
-struct Arch(String);
+pub enum Arch {
+    AArch64,
+    I686,
+    X86_64,
+    X86_64V2,
+    X86_64V3,
+    X86_64V4,
+}
 
 impl Arch {
-    fn from_str<S>(s: S) -> Self
+    fn from_str<S>(s: S) -> Option<Self>
     where
-        S: Into<String>,
+        S: AsRef<str>,
     {
-        Self(s.into())
+        Some(match s.as_ref() {
+            "aarch64" => Self::AArch64,
+            "i686" => Self::I686,
+            "x86_64" => Self::X86_64,
+            "x86_64_v2" => Self::X86_64V2,
+            "x86_64_v3" => Self::X86_64V3,
+            "x86_64_v4" => Self::X86_64V4,
+            _ => return None,
+        })
     }
 }
 
 #[derive(Debug, PartialEq)]
-struct Platform(String);
+pub enum Platform {
+    PC,
+    Apple,
+    Unknown,
+}
 
 impl Platform {
-    fn from_str<S>(s: S) -> Self
+    fn from_str<S>(s: S) -> Option<Self>
     where
-        S: Into<String>,
+        S: AsRef<str>,
     {
-        Self(s.into())
+        Some(match s.as_ref() {
+            "pc" => Self::PC,
+            "apple" => Self::Apple,
+            "unknown" => Self::Unknown,
+            _ => return None,
+        })
     }
 }
 
 #[derive(Debug, PartialEq)]
-struct OS(String);
+pub enum OS {
+    Darwin,
+    Linux,
+    Windows,
+}
 
 impl OS {
-    fn from_str<S>(s: S) -> Self
+    fn from_str<S>(s: S) -> Option<Self>
     where
-        S: Into<String>,
+        S: AsRef<str>,
     {
-        Self(s.into())
+        Some(match s.as_ref() {
+            "darwin" => Self::Darwin,
+            "linux" => Self::Linux,
+            "windows" => Self::Windows,
+            _ => return None,
+        })
     }
 }
 
-#[derive(Debug, PartialEq)]
-struct Flavour(String);
+#[derive(Debug, Eq, Hash, PartialEq)]
+pub struct Flavour(String);
 
 impl Flavour {
     fn from_str<S>(s: S) -> Self
@@ -143,7 +181,7 @@ impl AssetInfo {
 
         let mut iter = base_name.split("-").into_iter();
 
-        let family = Family::from_str(iter.next()?);
+        let family = Family::from_str(iter.next()?)?;
 
         let version_tag = iter.next()?;
 
@@ -156,11 +194,11 @@ impl AssetInfo {
 
         let version = Version::parse(version_str)?;
 
-        let arch = Arch::from_str(iter.next()?);
+        let arch = Arch::from_str(iter.next()?)?;
 
-        let platform = Platform::from_str(iter.next()?);
+        let platform = Platform::from_str(iter.next()?)?;
 
-        let os = OS::from_str(iter.next()?);
+        let os = OS::from_str(iter.next()?)?;
 
         let flavour = Flavour::from_str(iter.next()?);
 
@@ -207,12 +245,12 @@ mod tests {
     #[case(
         AssetInfo {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"),
-            family: Family::from_str("cpython"),
+            family: Family::from_str("cpython").expect("Should parse"),
             version: Version::parse("3.10.9").expect("Should parse"),
             tag: Tag::NewStyle(String::from("20230116")),
-            arch: Arch::from_str("aarch64"),
-            platform: Platform::from_str("apple"),
-            os: OS::from_str("darwin"),
+            arch: Arch::from_str("aarch64").expect("Should parse"),
+            platform: Platform::from_str("apple").expect("Should parse"),
+            os: OS::from_str("darwin").expect("Should parse"),
             flavour: Flavour::from_str("debug"),
             subflavour: Some(Subflavour::from_str("full")),
             ext: Ext::from_str(".tar.zst"),
@@ -222,12 +260,12 @@ mod tests {
     #[case(
         AssetInfo {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"),
-            family: Family::from_str("cpython"),
+            family: Family::from_str("cpython").expect("Should parse"),
             version: Version::parse("3.10.9").expect("Should parse"),
             tag: Tag::NewStyle(String::from("20230116")),
-            arch: Arch::from_str("aarch64"),
-            platform: Platform::from_str("apple"),
-            os: OS::from_str("darwin"),
+            arch: Arch::from_str("aarch64").expect("Should parse"),
+            platform: Platform::from_str("apple").expect("Should parse"),
+            os: OS::from_str("darwin").expect("Should parse"),
             flavour: Flavour::from_str("install_only"),
             subflavour: None,
             ext: Ext::from_str(".tar.gz"),
@@ -237,12 +275,12 @@ mod tests {
     #[case(
         AssetInfo {
             name: String::from("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"),
-            family: Family::from_str("cpython"),
+            family: Family::from_str("cpython").expect("Should parse"),
             version: Version::parse("3.10.2").expect("Should parse"),
             tag: Tag::OldStyle(String::from("20220220T1113")),
-            arch: Arch::from_str("aarch64"),
-            platform: Platform::from_str("apple"),
-            os: OS::from_str("darwin"),
+            arch: Arch::from_str("aarch64").expect("Should parse"),
+            platform: Platform::from_str("apple").expect("Should parse"),
+            os: OS::from_str("darwin").expect("Should parse"),
             flavour: Flavour::from_str("debug"),
             subflavour: None,
             ext: Ext::from_str(".tar.zst"),

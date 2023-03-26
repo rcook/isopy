@@ -16,6 +16,7 @@ use colour::red_ln;
 use reqwest::blocking::get;
 use serde::Deserialize;
 use serde_json::{from_str, Value};
+use std::collections::HashSet;
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
@@ -40,14 +41,20 @@ fn main_inner() -> Result<()> {
     let index_json = read_to_string(index_path)?;
     let packages = from_str::<Vec<Package>>(&index_json)?;
 
+    let mut set = HashSet::new();
+
     for package in packages {
         for asset in package.assets {
-            let temp = AssetInfo::from_asset_name(&asset.name);
-            if temp.is_none() {
-                println!("{}", asset.name)
+            match AssetInfo::from_asset_name(&asset.name) {
+                Some(asset_info) => {
+                    _ = set.insert(asset_info.flavour);
+                }
+                _ => {}
             }
         }
     }
+
+    println!("set={:?}", set);
 
     /*
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
