@@ -111,6 +111,20 @@ impl Ext {
 #[allow(unused)]
 impl AssetInfo {
     pub fn from_asset_name(s: &str) -> Option<Self> {
+        fn definitely_not_an_asset(s: &str) -> bool {
+            if "libuuid-1.0.3.tar.gz" == s {
+                true
+            } else if "SHA256SUMS" == s {
+                true
+            } else {
+                s.ends_with(".sha256")
+            }
+        }
+
+        if definitely_not_an_asset(s) {
+            return None;
+        }
+
         let mut ext = None::<Ext>;
         let mut ext_len = 0;
         for e in EXTS {

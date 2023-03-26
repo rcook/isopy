@@ -42,11 +42,9 @@ fn main_inner() -> Result<()> {
 
     for package in packages {
         for asset in package.assets {
-            if asset.name != "SHA256SUMS" && !asset.name.ends_with(".sha256") {
-                let temp = AssetInfo::from_asset_name(&asset.name);
-                if temp.is_none() {
-                    println!("{}", asset.name)
-                }
+            let temp = AssetInfo::from_asset_name(&asset.name);
+            if temp.is_none() {
+                println!("{}", asset.name)
             }
         }
     }
