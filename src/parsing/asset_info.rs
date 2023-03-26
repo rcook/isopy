@@ -1,6 +1,6 @@
 use crate::version::Version;
 
-const SUPPORTED_EXTS: [&str; 1] = [".tar.zst"];
+const SUPPORTED_EXTS: [&str; 2] = [".tar.gz", ".tar.zst"];
 
 #[derive(Debug, PartialEq)]
 pub struct AssetInfo {
@@ -11,7 +11,7 @@ pub struct AssetInfo {
     platform: Platform,
     os: OS,
     flavour: Flavour,
-    subflavour: Subflavour,
+    subflavour: Option<Subflavour>,
     ext: Ext,
 }
 
@@ -153,7 +153,7 @@ impl AssetInfo {
 
         let flavour = Flavour::from_str(iter.next()?);
 
-        let subflavour = Subflavour::from_str(iter.next()?);
+        let subflavour = iter.next().map(Subflavour::from_str);
 
         Some(Self {
             family: family,
@@ -185,10 +185,24 @@ mod tests {
             platform: Platform::from_str("apple"),
             os: OS::from_str("darwin"),
             flavour: Flavour::from_str("debug"),
-            subflavour: Subflavour::from_str("full"),
+            subflavour: Some(Subflavour::from_str("full")),
             ext: Ext::from_str(".tar.zst"),
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
+    )]
+    #[case(
+        AssetInfo {
+            family: Family::from_str("cpython"),
+            version: Version::parse("3.10.9").expect("Should parse"),
+            tag: Tag::from_str("20230116"),
+            arch: Arch::from_str("aarch64"),
+            platform: Platform::from_str("apple"),
+            os: OS::from_str("darwin"),
+            flavour: Flavour::from_str("install_only"),
+            subflavour: None,
+            ext: Ext::from_str(".tar.gz"),
+        },
+        "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
     )]
     fn test_from_asset_name(#[case] expected_result: AssetInfo, #[case] input: &str) {
         assert_eq!(Some(expected_result), AssetInfo::from_asset_name(input))
