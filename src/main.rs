@@ -9,7 +9,7 @@ mod version;
 use crate::cli::Args;
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
-use crate::parsing::AssetInfo;
+use crate::parsing::{Arch, ArchiveType, AssetInfo, Variant, OS};
 use crate::serialization::{HttpBinIPResponse, Package};
 use clap::Parser;
 use colour::red_ln;
@@ -47,7 +47,13 @@ fn main_inner() -> Result<()> {
                 continue;
             }
             let asset_info = AssetInfo::from_asset_name(&asset.name).expect("Should parse");
-            println!("{:?}", asset_info);
+            if asset_info.archive_type == ArchiveType::TarGZ
+                && asset_info.os == OS::Linux
+                && asset_info.arch == Arch::X86_64
+                && asset_info.variant == Some(Variant::InstallOnly)
+            {
+                println!("{:?}", asset_info);
+            }
         }
     }
 
