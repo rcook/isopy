@@ -1,5 +1,4 @@
 use crate::version::Version;
-use std::collections::{hash_set, HashSet};
 
 #[derive(Debug, PartialEq)]
 pub struct AssetInfo {
@@ -132,7 +131,7 @@ impl OS {
     }
 }
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Flavour {
     GNU,
     MSVC,
@@ -227,26 +226,14 @@ impl AssetInfo {
         }
 
         let (archive_type, base_name) = ArchiveType::from_asset_name(s)?;
-        println!("archive_type={:?}", archive_type);
-        println!("base_name={:?}", base_name);
 
         let mut iter = base_name.split("-").into_iter();
 
         let family = Family::from_str(iter.next()?)?;
-        println!("family={:?}", family);
-
         let (version, mut tag_opt) = parse_version_and_tag_opt(iter.next()?)?;
-        println!("version={:?}", version);
-        println!("tag={:?}", tag_opt);
-
         let arch = Arch::from_str(iter.next()?)?;
-        println!("arch={:?}", arch);
-
         let platform = Platform::from_str(iter.next()?)?;
-        println!("platform={:?}", platform);
-
         let os = OS::from_str(iter.next()?)?;
-        println!("os={:?}", os);
 
         let mut need_flavour = true;
         let mut flavour_opt = None;
@@ -257,13 +244,8 @@ impl AssetInfo {
         let mut need_variant = true;
         let mut variant_opt = None;
         let mut need_tag = tag_opt.is_none();
-
         while need_flavour || need_subflavour0 || need_subflavour1 || need_variant || need_tag {
             let temp = iter.next()?;
-            println!(
-                "LOOP flavour={:?} subflavour0={:?} subflavour1={:?} variant={:?} tag={:?} temp={:?}",
-                flavour_opt, subflavour0_opt, subflavour1_opt, variant_opt, tag_opt, temp
-            );
             if need_flavour {
                 need_flavour = false;
                 flavour_opt = Flavour::from_str(temp);
@@ -300,15 +282,8 @@ impl AssetInfo {
             unimplemented!()
         }
 
-        println!("flavour={:?}", flavour_opt);
-        println!("subflavour0={:?}", subflavour0_opt);
-        println!("subflavour1={:?}", subflavour1_opt);
-        println!("variant={:?}", variant_opt);
-        println!("tag={:?}", tag_opt);
-
         if iter.next().is_some() {
-            println!("PROBLEM!");
-            todo!()
+            unimplemented!()
         }
 
         Some(Self {

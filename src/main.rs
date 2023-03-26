@@ -41,20 +41,15 @@ fn main_inner() -> Result<()> {
     let index_json = read_to_string(index_path)?;
     let packages = from_str::<Vec<Package>>(&index_json)?;
 
-    let mut set = HashSet::new();
-
     for package in packages {
         for asset in package.assets {
             if AssetInfo::definitely_not_an_asset(&asset.name) {
                 continue;
             }
-            println!("{:?}", asset.name);
             let asset_info = AssetInfo::from_asset_name(&asset.name).expect("Should parse");
-            _ = set.insert(asset_info.flavour);
+            println!("{:?}", asset_info);
         }
     }
-
-    println!("set={:?}", set);
 
     /*
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
