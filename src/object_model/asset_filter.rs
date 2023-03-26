@@ -160,11 +160,10 @@ impl AssetFilter {
 mod tests {
     use super::super::asset_info::AssetInfo;
     use super::super::attributes::{
-        Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
+        Arch, ArchiveType, Family, Platform, Subflavour, Tag, Variant, OS,
     };
     use super::AssetFilter;
     use crate::version::Version;
-    use rstest::rstest;
 
     #[test]
     fn test_basics() {
@@ -172,14 +171,14 @@ mod tests {
 
         assert_eq!(
             vec![&a0, &a1, &a2],
-            AssetFilter::default().filter(vec![&a0, &a1, &a2])
+            AssetFilter::all().filter(vec![&a0, &a1, &a2])
         );
 
-        let mut asset_filter = AssetFilter::default();
+        let mut asset_filter = AssetFilter::all();
         asset_filter.archive_type = Some(ArchiveType::TarGZ);
         assert_eq!(vec![&a1], asset_filter.filter(vec![&a0, &a1, &a2]));
 
-        let mut asset_filter = AssetFilter::default();
+        let mut asset_filter = AssetFilter::all();
         asset_filter.archive_type = Some(ArchiveType::TarZST);
         assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]))
     }

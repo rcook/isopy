@@ -125,7 +125,7 @@ impl AssetInfo {
 #[cfg(test)]
 mod tests {
     use super::super::attributes::{
-        Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
+        Arch, ArchiveType, Family, Platform, Subflavour, Tag, Variant, OS,
     };
     use super::AssetInfo;
     use crate::version::Version;
