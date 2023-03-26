@@ -75,9 +75,19 @@ mod tests {
     #[test]
     fn test_basics() {
         let (a0, a1, a2) = make_test_artifacts();
+
+        assert_eq!(
+            vec![&a0, &a1, &a2],
+            AssetFilter::default().filter(vec![&a0, &a1, &a2])
+        );
+
         let mut asset_filter = AssetFilter::default();
         asset_filter.archive_type = Some(ArchiveType::TarGZ);
-        assert_eq!(vec![&a1], asset_filter.filter(vec![&a0, &a1, &a2]))
+        assert_eq!(vec![&a1], asset_filter.filter(vec![&a0, &a1, &a2]));
+
+        let mut asset_filter = AssetFilter::default();
+        asset_filter.archive_type = Some(ArchiveType::TarZST);
+        assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]))
     }
 
     fn make_test_artifacts() -> (AssetInfo, AssetInfo, AssetInfo) {
