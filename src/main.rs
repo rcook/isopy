@@ -7,9 +7,11 @@ mod serialization;
 use crate::cli::Args;
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
-use crate::serialization::Package;
+use crate::serialization::{HttpBinIPResponse, Package};
 use clap::Parser;
 use colour::red_ln;
+use reqwest::blocking::get;
+use serde::Deserialize;
 use serde_json::{from_str, Value};
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -37,6 +39,10 @@ fn main_inner() -> Result<()> {
     let package = &packages[0];
     let asset = &package.assets[0];
     println!("asset={:?}", asset);
+
+    let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
+    println!("{:#?}", response);
+
     Ok(())
 }
 
