@@ -39,17 +39,14 @@ fn main_inner() -> Result<()> {
     let index_path = assets_dir.join("index.json");
     let index_json = read_to_string(index_path)?;
     let packages = from_str::<Vec<Package>>(&index_json)?;
-    let package = &packages[0];
-    let asset = &package.assets[0];
 
-    println!("packages[0].assets[0].name={}", asset.name);
-    println!("packages[0].assets[0].url={}", asset.url.as_str());
-
-    for asset in &packages[0].assets {
-        if asset.name != "SHA256SUMS" && !asset.name.ends_with(".sha256") {
-            let temp = AssetInfo::from_asset_name(&asset.name);
-            if temp.is_none() {
-                println!("{}", asset.name)
+    for package in packages {
+        for asset in package.assets {
+            if asset.name != "SHA256SUMS" && !asset.name.ends_with(".sha256") {
+                let temp = AssetInfo::from_asset_name(&asset.name);
+                if temp.is_none() {
+                    println!("{}", asset.name)
+                }
             }
         }
     }
@@ -58,6 +55,7 @@ fn main_inner() -> Result<()> {
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
     println!("{:#?}", response);
     */
+
     Ok(())
 }
 
