@@ -22,7 +22,7 @@ pub struct AssetFilter {
 
 impl AssetFilter {
     #[allow(unused)]
-    fn default() -> Self {
+    pub fn default() -> Self {
         Self {
             archive_type: None,
             family: None,
@@ -39,7 +39,7 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
-    fn filter<'a, A>(&self, asset_infos: A) -> Vec<&'a AssetInfo>
+    pub fn filter<'a, A>(&self, asset_infos: A) -> Vec<&'a AssetInfo>
     where
         A: IntoIterator<Item = &'a AssetInfo>,
     {
@@ -52,6 +52,82 @@ impl AssetFilter {
             {
                 return false;
             }
+
+            if !this
+                .family
+                .as_ref()
+                .map(|x| item.family == *x)
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
+            if !this
+                .version
+                .as_ref()
+                .map(|x| item.version == *x)
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
+            if !this.tag.as_ref().map(|x| item.tag == *x).unwrap_or(true) {
+                return false;
+            }
+
+            if !this.arch.as_ref().map(|x| item.arch == *x).unwrap_or(true) {
+                return false;
+            }
+
+            if !this
+                .platform
+                .as_ref()
+                .map(|x| item.platform == *x)
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
+            if !this.os.as_ref().map(|x| item.os == *x).unwrap_or(true) {
+                return false;
+            }
+
+            if !this
+                .flavour
+                .as_ref()
+                .map(|x| item.flavour.as_ref() == Some(x))
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
+            if !this
+                .subflavour0
+                .as_ref()
+                .map(|x| item.subflavour0.as_ref() == Some(x))
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
+            if !this
+                .subflavour1
+                .as_ref()
+                .map(|x| item.subflavour1.as_ref() == Some(x))
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
+            if !this
+                .variant
+                .as_ref()
+                .map(|x| item.variant.as_ref() == Some(x))
+                .unwrap_or(true)
+            {
+                return false;
+            }
+
             true
         }
 

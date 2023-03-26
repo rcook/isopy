@@ -9,8 +9,11 @@ mod version;
 use crate::cli::Args;
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
-use crate::object_model::{Arch, ArchiveType, AssetInfo, Variant, OS};
+use crate::object_model::{
+    Arch, ArchiveType, AssetFilter, AssetInfo, Family, Flavour, Platform, Tag, Variant, OS,
+};
 use crate::serialization::{HttpBinIPResponse, Package};
+use crate::version::Version;
 use clap::Parser;
 use colour::red_ln;
 use reqwest::blocking::get;
@@ -41,22 +44,32 @@ fn main_inner() -> Result<()> {
     let index_json = read_to_string(index_path)?;
     let packages = from_str::<Vec<Package>>(&index_json)?;
 
+    let mut asset_infos = Vec::new();
     for package in packages {
         for asset in package.assets {
-            if AssetInfo::definitely_not_an_asset(&asset.name) {
-                continue;
-            }
-            let asset_info = AssetInfo::from_asset_name(&asset.name).expect("Should parse");
-            if asset_info.archive_type == ArchiveType::TarGZ
-                && asset_info.os == OS::Linux
-                && asset_info.arch == Arch::X86_64
-                && asset_info.variant == Some(Variant::InstallOnly)
-            {
-                println!("{:?}", asset_info);
+            if !AssetInfo::definitely_not_an_asset(&asset.name) {
+                asset_infos.push(AssetInfo::from_asset_name(&asset.name).expect("Should parse"));
             }
         }
     }
+    println!("count={}", asset_infos.len());
 
+    let mut asset_filter = AssetFilter::default();
+    asset_filter.archive_type = Some(ArchiveType::TarGZ);
+    asset_filter.family = Some(Family::CPython);
+    asset_filter.version = Some(Version::new(3, 11, 1));
+    asset_filter.tag = Some(Tag::NewStyle(String::from("20230116")));
+    asset_filter.arch = Some(Arch::X86_64);
+    asset_filter.platform = Some(Platform::Unknown);
+    asset_filter.os = Some(OS::Linux);
+    asset_filter.flavour = Some(Flavour::GNU);
+    asset_filter.variant = Some(Variant::InstallOnly);
+
+    let filtered_asset_infos = asset_filter.filter(asset_infos.iter().map(|x| x).into_iter());
+    println!("filtered_count={}", filtered_asset_infos.len());
+    for a in filtered_asset_infos {
+        println!("a={:?}", a)
+    }
     /*
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
     println!("{:#?}", response);
