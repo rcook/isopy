@@ -132,15 +132,9 @@ impl AssetInfo {
 
         let mut iter = s.split("-").into_iter();
 
-        let family = Family::from_str(match iter.next() {
-            Some(x) => x,
-            None => return None,
-        });
+        let family = Family::from_str(iter.next()?);
 
-        let version_tag = match iter.next() {
-            Some(x) => x,
-            None => return None,
-        };
+        let version_tag = iter.next()?;
 
         let parts = version_tag.split("+").collect::<Vec<_>>();
         if parts.len() != 2 {
@@ -151,30 +145,15 @@ impl AssetInfo {
 
         let tag = Tag::from_str(parts[1]);
 
-        let arch = Arch::from_str(match iter.next() {
-            Some(x) => x,
-            None => return None,
-        });
+        let arch = Arch::from_str(iter.next()?);
 
-        let platform = Platform::from_str(match iter.next() {
-            Some(x) => x,
-            None => return None,
-        });
+        let platform = Platform::from_str(iter.next()?);
 
-        let os = OS::from_str(match iter.next() {
-            Some(x) => x,
-            None => return None,
-        });
+        let os = OS::from_str(iter.next()?);
 
-        let flavour = Flavour::from_str(match iter.next() {
-            Some(x) => x,
-            None => return None,
-        });
+        let flavour = Flavour::from_str(iter.next()?);
 
-        let subflavour = Subflavour::from_str(match iter.next() {
-            Some(x) => x,
-            None => return None,
-        });
+        let subflavour = Subflavour::from_str(iter.next()?);
 
         Some(Self {
             family: family,
