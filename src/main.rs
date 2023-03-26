@@ -2,6 +2,7 @@
 mod cli;
 mod config;
 mod error;
+mod parsing;
 mod serialization;
 
 use crate::cli::Args;
@@ -38,6 +39,7 @@ fn main_inner() -> Result<()> {
     let packages = from_str::<Vec<Package>>(&index_json)?;
     let package = &packages[0];
     let asset = &package.assets[0];
+    println!("packages[0].assets[0].name={}", asset.name);
     println!("packages[0].assets[0].url={}", asset.url.as_str());
 
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
