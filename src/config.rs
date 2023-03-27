@@ -29,6 +29,7 @@ impl Config {
                     assets.push(Asset {
                         name: asset_record.name,
                         url: asset_record.url,
+                        size: asset_record.size,
                         meta: meta,
                     });
                 }

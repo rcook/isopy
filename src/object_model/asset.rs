@@ -5,5 +5,6 @@ use reqwest::Url;
 pub struct Asset {
     pub name: String,
     pub url: Url,
+    pub size: i64,
     pub meta: AssetMeta,
 }
