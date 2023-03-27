@@ -1,4 +1,4 @@
-use super::asset_info::AssetInfo;
+use super::asset::Asset;
 use super::attributes::{
     Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
 };
@@ -57,11 +57,11 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
-    pub fn filter<'a, A>(&self, asset_infos: A) -> Vec<&'a AssetInfo>
+    pub fn filter<'a, A>(&self, assets: A) -> Vec<&'a Asset>
     where
-        A: IntoIterator<Item = &'a AssetInfo>,
+        A: IntoIterator<Item = &'a Asset>,
     {
-        fn predicate(this: &AssetFilter, item: &&AssetInfo) -> bool {
+        fn predicate(this: &AssetFilter, item: &&Asset) -> bool {
             if !this
                 .archive_type
                 .as_ref()
@@ -149,16 +149,13 @@ impl AssetFilter {
             true
         }
 
-        asset_infos
-            .into_iter()
-            .filter(|x| predicate(self, x))
-            .collect()
+        assets.into_iter().filter(|x| predicate(self, x)).collect()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::asset_info::AssetInfo;
+    use super::super::asset::Asset;
     use super::super::attributes::{ArchiveType, Tag};
     use super::AssetFilter;
 
@@ -184,20 +181,20 @@ mod tests {
         assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
-    fn make_test_artifacts() -> (AssetInfo, AssetInfo, AssetInfo, AssetInfo) {
-        let a0 = AssetInfo::from_asset_name(
+    fn make_test_artifacts() -> (Asset, Asset, Asset, Asset) {
+        let a0 = Asset::from_asset_name(
             "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst",
         )
         .expect("Should parse");
-        let a1 = AssetInfo::from_asset_name(
+        let a1 = Asset::from_asset_name(
             "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz",
         )
         .expect("Should parse");
-        let a2 = AssetInfo::from_asset_name(
+        let a2 = Asset::from_asset_name(
             "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst",
         )
         .expect("Should parse");
-        let a3 = AssetInfo::from_asset_name(
+        let a3 = Asset::from_asset_name(
             "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
         )
         .expect("Should parse");

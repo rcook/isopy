@@ -4,7 +4,7 @@ use super::attributes::{
 use crate::version::Version;
 
 #[derive(Debug, PartialEq)]
-pub struct AssetInfo {
+pub struct Asset {
     pub name: String,
     pub archive_type: ArchiveType,
     pub family: Family,
@@ -20,7 +20,7 @@ pub struct AssetInfo {
 }
 
 #[allow(unused)]
-impl AssetInfo {
+impl Asset {
     pub fn definitely_not_an_asset(s: &str) -> bool {
         if "libuuid-1.0.3.tar.gz" == s {
             true
@@ -127,13 +127,13 @@ mod tests {
     use super::super::attributes::{
         Arch, ArchiveType, Family, Platform, Subflavour, Tag, Variant, OS,
     };
-    use super::AssetInfo;
+    use super::Asset;
     use crate::version::Version;
     use rstest::rstest;
 
     #[rstest]
     #[case(
-        AssetInfo {
+        Asset {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
@@ -150,7 +150,7 @@ mod tests {
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
     )]
     #[case(
-        AssetInfo {
+        Asset {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
@@ -167,7 +167,7 @@ mod tests {
         "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
     )]
     #[case(
-        AssetInfo {
+        Asset {
             name: String::from("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
@@ -184,7 +184,7 @@ mod tests {
         "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"
     )]
     #[case(
-        AssetInfo {
+        Asset {
             name: String::from("cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
@@ -200,7 +200,7 @@ mod tests {
         },
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
     )]
-    fn test_from_asset_name(#[case] expected_result: AssetInfo, #[case] input: &str) {
-        assert_eq!(Some(expected_result), AssetInfo::from_asset_name(input))
+    fn test_from_asset_name(#[case] expected_result: Asset, #[case] input: &str) {
+        assert_eq!(Some(expected_result), Asset::from_asset_name(input))
     }
 }

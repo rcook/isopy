@@ -4,11 +4,11 @@ use crate::object_model::{AssetFilter, Tag};
 use crate::version::Version;
 
 pub fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let asset_infos = config.read_asset_infos()?;
+    let assets = config.read_assets()?;
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(version.clone());
     asset_filter.tag = tag.clone();
-    let matching_assets = asset_filter.filter(asset_infos.iter().map(|x| x).into_iter());
+    let matching_assets = asset_filter.filter(assets.iter().map(|x| x).into_iter());
     let asset = match matching_assets.len() {
         1 => matching_assets.first().expect("Must exist"),
         0 => {
