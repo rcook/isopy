@@ -1,7 +1,9 @@
 use crate::config::Config;
 use crate::error::{user, Result};
 use crate::object_model::{AssetFilter, EnvName, Tag, Version};
+use crate::serialization::EnvRecord;
 use crate::util::unpack_file;
+use std::path::PathBuf;
 
 pub async fn do_create(
     config: &Config,
@@ -52,7 +54,17 @@ pub async fn do_create(
         )));
     }
 
-    unpack_file(&output_path, env_dir)?;
+    unpack_file(&output_path, &env_dir)?;
+
+    let env_record = EnvRecord {
+        name: env_name.clone(),
+        python_dir: PathBuf::from("python"),
+        python_version: asset.meta.version.clone(),
+        tag: asset.meta.tag.clone(),
+    };
+
+    let env_path = env_dir.join("env.yaml");
+    std::fs::write(env_path, serde_yaml::to_string(&env_record)?)?;
 
     Ok(())
 }

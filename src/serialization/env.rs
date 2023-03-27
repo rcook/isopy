@@ -1,16 +1,31 @@
-use super::helpers::{deserialize_tag, deserialize_version};
-use crate::object_model::{Tag, Version};
-use serde::Deserialize;
+use super::helpers::{
+    deserialize_env_name, deserialize_tag, deserialize_version, serialize_env_name, serialize_tag,
+    serialize_version,
+};
+use crate::object_model::{EnvName, Tag, Version};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EnvRecord {
-    #[serde(rename = "name")]
-    pub name: String,
+    #[serde(
+        rename = "name",
+        deserialize_with = "deserialize_env_name",
+        serialize_with = "serialize_env_name"
+    )]
+    pub name: EnvName,
     #[serde(rename = "python_dir")]
     pub python_dir: PathBuf,
-    #[serde(rename = "python_version", deserialize_with = "deserialize_version")]
+    #[serde(
+        rename = "python_version",
+        deserialize_with = "deserialize_version",
+        serialize_with = "serialize_version"
+    )]
     pub python_version: Version,
-    #[serde(rename = "tag", deserialize_with = "deserialize_tag")]
+    #[serde(
+        rename = "tag",
+        deserialize_with = "deserialize_tag",
+        serialize_with = "serialize_tag"
+    )]
     pub tag: Tag,
 }

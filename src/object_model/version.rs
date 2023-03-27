@@ -3,6 +3,7 @@ pub struct Version {
     major: i32,
     minor: i32,
     build: i32,
+    value: String,
 }
 
 impl Version {
@@ -12,6 +13,7 @@ impl Version {
             major: major,
             minor: minor,
             build: build,
+            value: format!("{}.{}.{}", major, minor, build),
         }
     }
 
@@ -28,11 +30,11 @@ impl Version {
         let minor = parts[1].parse().ok()?;
         let build = parts[2].parse().ok()?;
 
-        Some(Version {
-            major: major,
-            minor: minor,
-            build: build,
-        })
+        Some(Version::new(major, minor, build))
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.value
     }
 }
 
@@ -42,14 +44,7 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        assert_eq!(
-            Some(Version {
-                major: 1,
-                minor: 2,
-                build: 3
-            }),
-            Version::parse("1.2.3")
-        )
+        assert_eq!(Some(Version::new(1, 2, 3)), Version::parse("1.2.3"))
     }
 }
 

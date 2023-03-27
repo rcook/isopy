@@ -8,6 +8,10 @@ impl Tag {
     {
         Self(s.into())
     }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 }
 
 impl std::fmt::Display for Tag {
