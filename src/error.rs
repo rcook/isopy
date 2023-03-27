@@ -5,9 +5,10 @@ pub enum Error {
     User(String),
     Reportable(String, ReportableError),
     IO(std::io::Error),
+    Json(serde_json::Error),
     Reqwest(reqwest::Error),
-    SerdeJson(serde_json::Error),
     Template(indicatif::style::TemplateError),
+    Yaml(serde_yaml::Error),
 }
 
 #[derive(Debug)]
@@ -29,7 +30,13 @@ impl From<reqwest::Error> for Error {
 
 impl From<serde_json::Error> for Error {
     fn from(e: serde_json::Error) -> Self {
-        Self::SerdeJson(e)
+        Self::Json(e)
+    }
+}
+
+impl From<serde_yaml::Error> for Error {
+    fn from(e: serde_yaml::Error) -> Self {
+        Self::Yaml(e)
     }
 }
 

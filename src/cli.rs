@@ -21,6 +21,7 @@ pub enum Command {
         tag: Option<Tag>,
     },
     Downloaded,
+    List,
 }
 
 fn parse_version(s: &str) -> Result<Version, String> {
