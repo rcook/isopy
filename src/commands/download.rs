@@ -33,8 +33,7 @@ pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) 
     };
     println!("{}", asset.name);
 
-    let assets_dir = config.dir.join("assets");
-    let output_path = assets_dir.join(&asset.name);
+    let output_path = config.assets_dir.join(&asset.name);
 
     if output_path.exists() {
         return Err(user(format!(

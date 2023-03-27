@@ -8,16 +8,23 @@ use std::path::PathBuf;
 #[derive(Debug)]
 pub struct Config {
     pub dir: PathBuf,
+    pub assets_dir: PathBuf,
+    pub envs_dir: PathBuf,
 }
 
 impl Config {
     pub fn from_dir(dir: PathBuf) -> Self {
-        Self { dir: dir }
+        let assets_dir = dir.join("assets");
+        let envs_dir = dir.join("envs");
+        Self {
+            dir: dir,
+            assets_dir: assets_dir,
+            envs_dir: envs_dir,
+        }
     }
 
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
-        let assets_dir = self.dir.join("assets");
-        let index_path = assets_dir.join("index.json");
+        let index_path = self.assets_dir.join("index.json");
         let index_json = read_to_string(index_path)?;
         let package_records = from_str::<Vec<PackageRecord>>(&index_json)?;
 
