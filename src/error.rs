@@ -7,11 +7,18 @@ pub enum Error {
     IO(std::io::Error),
     Reqwest(reqwest::Error),
     SerdeJson(serde_json::Error),
+    Template(indicatif::style::TemplateError),
 }
 
 #[derive(Debug)]
 pub enum ReportableError {
     CouldNotGetIsopyDir,
+}
+
+impl From<indicatif::style::TemplateError> for Error {
+    fn from(e: indicatif::style::TemplateError) -> Self {
+        Self::Template(e)
+    }
 }
 
 impl From<reqwest::Error> for Error {

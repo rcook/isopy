@@ -4,6 +4,7 @@ mod config;
 mod error;
 mod object_model;
 mod serialization;
+mod util;
 
 use crate::cli::{Args, Command};
 use crate::commands::{do_available, do_download, do_downloaded};
@@ -13,6 +14,7 @@ use clap::Parser;
 use colour::red_ln;
 use std::path::PathBuf;
 use std::process::exit;
+use tokio;
 
 fn default_isopy_dir() -> Option<PathBuf> {
     let home_dir = home::home_dir()?;
@@ -20,7 +22,7 @@ fn default_isopy_dir() -> Option<PathBuf> {
     Some(isopy_dir)
 }
 
-fn main_inner() -> Result<()> {
+async fn main_inner() -> Result<()> {
     let args = Args::parse();
     let dir = args
         .dir
@@ -30,15 +32,16 @@ fn main_inner() -> Result<()> {
 
     match args.command {
         Command::Available => do_available(&config)?,
-        Command::Download { version, tag } => do_download(&config, &version, &tag)?,
+        Command::Download { version, tag } => do_download(&config, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&config)?,
     }
 
     Ok(())
 }
 
-fn main() {
-    exit(match main_inner() {
+#[tokio::main]
+async fn main() {
+    exit(match main_inner().await {
         Ok(_) => exitcode::OK,
         Err(Error::Reportable(msg, _)) => {
             red_ln!("{}", msg);

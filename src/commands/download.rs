@@ -1,8 +1,10 @@
 use crate::config::Config;
 use crate::error::{user, Result};
 use crate::object_model::{AssetFilter, Tag, Version};
+use crate::util::download_file;
+use reqwest::Client;
 
-pub fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
+pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
     let assets = config.read_assets()?;
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(version.clone());
@@ -30,9 +32,19 @@ pub fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Res
         }
     };
     println!("{}", asset.name);
-    todo!()
-    /*
-    let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;
-    println!("{:#?}", response);
-    */
+
+    let assets_dir = config.dir.join("assets");
+    let output_path = assets_dir.join(&asset.name);
+
+    if output_path.exists() {
+        return Err(user(format!(
+            "File {} already exists",
+            output_path.display()
+        )));
+    }
+
+    let client = Client::builder().build()?;
+    download_file(&client, asset.url.clone(), &output_path).await?;
+
+    Ok(())
 }
