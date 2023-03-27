@@ -1,9 +1,7 @@
 use crate::config::Config;
 use crate::error::{user, Result};
 use crate::object_model::{AssetFilter, Tag, Version};
-use flate2::read::GzDecoder;
-use std::fs::File;
-use tar::Archive;
+use crate::util::unpack_file;
 
 pub async fn do_create(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
     let assets = config.read_assets()?;
@@ -43,10 +41,7 @@ pub async fn do_create(config: &Config, version: &Version, tag: &Option<Tag>) ->
         )));
     }
 
-    let tar_gz = File::open(output_path)?;
-    let tar = GzDecoder::new(tar_gz);
-    let mut archive = Archive::new(tar);
-    archive.unpack("TEMP")?;
+    unpack_file(&output_path, "TEMP")?;
 
     Ok(())
 }
