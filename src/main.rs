@@ -33,7 +33,11 @@ async fn main_inner() -> Result<()> {
 
     match args.command {
         Command::Available => do_available(&config)?,
-        Command::Create { version, tag } => do_create(&config, &version, &tag).await?,
+        Command::Create {
+            env_name,
+            version,
+            tag,
+        } => do_create(&config, &env_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&config, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&config)?,
         Command::List => do_list(&config).await?,

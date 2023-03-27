@@ -1,9 +1,14 @@
 use crate::config::Config;
 use crate::error::{user, Result};
-use crate::object_model::{AssetFilter, Tag, Version};
+use crate::object_model::{AssetFilter, EnvName, Tag, Version};
 use crate::util::unpack_file;
 
-pub async fn do_create(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
+pub async fn do_create(
+    config: &Config,
+    env_name: &EnvName,
+    version: &Version,
+    tag: &Option<Tag>,
+) -> Result<()> {
     let assets = config.read_assets()?;
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(version.clone());
@@ -30,10 +35,8 @@ pub async fn do_create(config: &Config, version: &Version, tag: &Option<Tag>) ->
             )))
         }
     };
-    println!("{}", asset.name);
 
     let output_path = config.assets_dir.join(&asset.name);
-
     if !output_path.exists() {
         return Err(user(format!(
             "File {} does not exist",
@@ -41,7 +44,15 @@ pub async fn do_create(config: &Config, version: &Version, tag: &Option<Tag>) ->
         )));
     }
 
-    unpack_file(&output_path, "TEMP")?;
+    let env_dir = env_name.dir(&config);
+    if env_dir.exists() {
+        return Err(user(format!(
+            "Environment directory {} already exists",
+            env_dir.display()
+        )));
+    }
+
+    unpack_file(&output_path, env_dir)?;
 
     Ok(())
 }

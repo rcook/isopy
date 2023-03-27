@@ -1,3 +1,4 @@
+use crate::object_model::EnvName;
 use crate::object_model::{Tag, Version};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
@@ -16,6 +17,8 @@ pub struct Args {
 pub enum Command {
     Available,
     Create {
+        #[arg(value_parser = parse_env_name)]
+        env_name: EnvName,
         #[arg(value_parser = parse_version)]
         version: Version,
         #[arg(short = 't', long = "tag", value_parser = parse_tag)]
@@ -29,6 +32,10 @@ pub enum Command {
     },
     Downloaded,
     List,
+}
+
+fn parse_env_name(s: &str) -> Result<EnvName, String> {
+    EnvName::parse(s).ok_or(String::from("invalid env name"))
 }
 
 fn parse_version(s: &str) -> Result<Version, String> {

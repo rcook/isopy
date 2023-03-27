@@ -6,6 +6,7 @@ pub enum Error {
     Reportable(String, ReportableError),
     IO(std::io::Error),
     Json(serde_json::Error),
+    Regex(regex::Error),
     Reqwest(reqwest::Error),
     Template(indicatif::style::TemplateError),
     Yaml(serde_yaml::Error),
@@ -19,6 +20,12 @@ pub enum ReportableError {
 impl From<indicatif::style::TemplateError> for Error {
     fn from(e: indicatif::style::TemplateError) -> Self {
         Self::Template(e)
+    }
+}
+
+impl From<regex::Error> for Error {
+    fn from(e: regex::Error) -> Self {
+        Self::Regex(e)
     }
 }
 
