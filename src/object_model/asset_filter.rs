@@ -1,7 +1,7 @@
-use super::AssetMeta;
-use super::Tag;
-use super::Version;
-use super::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS};
+use super::{
+    Arch, ArchiveType, Asset, AssetMeta, Family, Flavour, Platform, Subflavour, Tag, Variant,
+    Version, OS,
+};
 use std::iter::Iterator;
 
 #[allow(unused)]
@@ -74,11 +74,11 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
-    pub fn filter<'a, A>(&self, asset_names: A) -> Vec<&'a AssetMeta>
+    pub fn filter<'a, A>(&self, assets: A) -> Vec<&'a Asset>
     where
-        A: IntoIterator<Item = &'a AssetMeta>,
+        A: IntoIterator<Item = &'a Asset>,
     {
-        fn predicate(this: &AssetFilter, item: &&AssetMeta) -> bool {
+        fn predicate(this: &AssetFilter, item: &AssetMeta) -> bool {
             if !this
                 .archive_type
                 .as_ref()
@@ -166,9 +166,9 @@ impl AssetFilter {
             true
         }
 
-        asset_names
+        assets
             .into_iter()
-            .filter(|x| predicate(self, x))
+            .filter(|x| predicate(self, &x.meta))
             .collect()
     }
 }

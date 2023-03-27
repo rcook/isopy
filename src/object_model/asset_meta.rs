@@ -4,7 +4,6 @@ use super::version::Version;
 
 #[derive(Debug, PartialEq)]
 pub struct AssetMeta {
-    pub name: String,
     pub archive_type: ArchiveType,
     pub family: Family,
     pub version: Version,
@@ -105,7 +104,6 @@ impl AssetMeta {
         }
 
         Some(Self {
-            name: String::from(s),
             archive_type: archive_type,
             family: family,
             version: version,
