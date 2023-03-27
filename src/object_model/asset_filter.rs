@@ -10,7 +10,7 @@ pub struct AssetFilter {
     pub archive_type: Option<ArchiveType>,
     pub family: Option<Family>,
     pub version: Option<Version>,
-    pub tag: Option<Tag>,
+    pub tag_str: Option<String>,
     pub arch: Option<Arch>,
     pub platform: Option<Platform>,
     pub os: Option<OS>,
@@ -27,7 +27,7 @@ impl AssetFilter {
             archive_type: None,
             family: None,
             version: None,
-            tag: None,
+            tag_str: None,
             arch: None,
             platform: None,
             os: None,
@@ -45,7 +45,7 @@ impl AssetFilter {
             archive_type: Some(ArchiveType::TarGZ),
             family: Some(Family::CPython),
             version: None,
-            tag: None,
+            tag_str: None,
             arch: Some(Arch::X86_64),
             platform: Some(Platform::Unknown),
             os: Some(OS::Linux),
@@ -89,7 +89,19 @@ impl AssetFilter {
                 return false;
             }
 
-            if !this.tag.as_ref().map(|x| item.tag == *x).unwrap_or(true) {
+            fn compare(tag_str: &str, item: &&AssetInfo) -> bool {
+                match &item.tag {
+                    Tag::NewStyle(s) => tag_str == s,
+                    Tag::OldStyle(s) => tag_str == s,
+                }
+            }
+
+            if !this
+                .tag_str
+                .as_ref()
+                .map(|x| compare(x, item))
+                .unwrap_or(true)
+            {
                 return false;
             }
 
@@ -159,19 +171,16 @@ impl AssetFilter {
 #[cfg(test)]
 mod tests {
     use super::super::asset_info::AssetInfo;
-    use super::super::attributes::{
-        Arch, ArchiveType, Family, Platform, Subflavour, Tag, Variant, OS,
-    };
+    use super::super::attributes::ArchiveType;
     use super::AssetFilter;
-    use crate::version::Version;
 
     #[test]
     fn test_basics() {
-        let (a0, a1, a2) = make_test_artifacts();
+        let (a0, a1, a2, a3) = make_test_artifacts();
 
         assert_eq!(
-            vec![&a0, &a1, &a2],
-            AssetFilter::all().filter(vec![&a0, &a1, &a2])
+            vec![&a0, &a1, &a2, &a3],
+            AssetFilter::all().filter(vec![&a0, &a1, &a2, &a3])
         );
 
         let mut asset_filter = AssetFilter::all();
@@ -180,52 +189,30 @@ mod tests {
 
         let mut asset_filter = AssetFilter::all();
         asset_filter.archive_type = Some(ArchiveType::TarZST);
-        assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]))
+        assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]));
+
+        let mut asset_filter = AssetFilter::all();
+        asset_filter.tag_str = Some(String::from("20210724T1424"));
+        assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
-    fn make_test_artifacts() -> (AssetInfo, AssetInfo, AssetInfo) {
-        let a0 = AssetInfo {
-            name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"),
-            archive_type: ArchiveType::TarZST,
-            family: Family::CPython,
-            version: Version::new(3, 10, 9),
-            tag: Tag::NewStyle(String::from("20230116")),
-            arch: Arch::AArch64,
-            platform: Platform::Apple,
-            os: OS::Darwin,
-            flavour: None,
-            subflavour0: Some(Subflavour::Debug),
-            subflavour1: None,
-            variant: Some(Variant::Full),
-        };
-        let a1 = AssetInfo {
-            name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"),
-            archive_type: ArchiveType::TarGZ,
-            family: Family::CPython,
-            version: Version::new(3, 10, 9),
-            tag: Tag::NewStyle(String::from("20230116")),
-            arch: Arch::AArch64,
-            platform: Platform::Apple,
-            os: OS::Darwin,
-            flavour: None,
-            subflavour0: None,
-            subflavour1: None,
-            variant: Some(Variant::InstallOnly),
-        };
-        let a2 = AssetInfo {
-            name: String::from("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"),
-            archive_type: ArchiveType::TarZST,
-            family: Family::CPython,
-            version: Version::new(3, 10, 2),
-            tag: Tag::OldStyle(String::from("20220220T1113")),
-            arch: Arch::AArch64,
-            platform: Platform::Apple,
-            os: OS::Darwin,
-            flavour: None,
-            subflavour0: Some(Subflavour::Debug),
-            subflavour1: None,
-            variant: None,
-        };
-        (a0, a1, a2)
+    fn make_test_artifacts() -> (AssetInfo, AssetInfo, AssetInfo, AssetInfo) {
+        let a0 = AssetInfo::from_asset_name(
+            "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst",
+        )
+        .expect("Should parse");
+        let a1 = AssetInfo::from_asset_name(
+            "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz",
+        )
+        .expect("Should parse");
+        let a2 = AssetInfo::from_asset_name(
+            "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst",
+        )
+        .expect("Should parse");
+        let a3 = AssetInfo::from_asset_name(
+            "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
+        )
+        .expect("Should parse");
+        (a0, a1, a2, a3)
     }
 }

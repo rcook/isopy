@@ -13,6 +13,7 @@ use crate::error::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
 use std::path::PathBuf;
+use std::process::exit;
 
 fn default_isopy_dir() -> Option<PathBuf> {
     let home_dir = home::home_dir()?;
@@ -30,7 +31,7 @@ fn main_inner() -> Result<()> {
 
     match args.command {
         Command::Available => do_available(&config)?,
-        Command::Download => do_download(&config)?,
+        Command::Download { version, tag_str } => do_download(&config, &version, &tag_str)?,
         Command::Downloaded => do_downloaded(&config)?,
     }
 
@@ -38,8 +39,22 @@ fn main_inner() -> Result<()> {
 }
 
 fn main() {
-    match main_inner() {
-        Err(Error::Reportable(msg, _)) => red_ln!("{}", msg),
-        _ => {}
-    }
+    exit(match main_inner() {
+        Ok(_) => {
+            println!("SUCCESS");
+            exitcode::OK
+        }
+        Err(Error::Reportable(msg, _)) => {
+            red_ln!("{}", msg);
+            exitcode::USAGE
+        }
+        Err(Error::User(msg)) => {
+            red_ln!("{}", msg);
+            exitcode::USAGE
+        }
+        e => {
+            println!("e={:?}", e);
+            exitcode::USAGE
+        }
+    })
 }

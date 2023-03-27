@@ -38,7 +38,7 @@ impl Family {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Tag {
     NewStyle(String),
     OldStyle(String),

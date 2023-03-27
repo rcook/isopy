@@ -2,6 +2,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
+    User(String),
     Reportable(String, ReportableError),
     IO(std::io::Error),
     Reqwest(reqwest::Error),
@@ -29,6 +30,13 @@ impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
         Self::IO(e)
     }
+}
+
+pub fn user<M>(msg: M) -> Error
+where
+    M: Into<String>,
+{
+    Error::User(msg.into())
 }
 
 pub fn could_not_get_isopy_dir<M>(msg: M) -> Error

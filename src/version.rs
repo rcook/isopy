@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Version {
     major: i32,
     minor: i32,
@@ -50,5 +50,11 @@ mod tests {
             }),
             Version::parse("1.2.3")
         )
+    }
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.build)
     }
 }
