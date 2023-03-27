@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::object_model::Asset;
+use crate::object_model::AssetName;
 use crate::serialization::PackageRecord;
 use serde_json::from_str;
 use std::fs::read_to_string;
@@ -15,20 +15,20 @@ impl Config {
         Self { dir: dir }
     }
 
-    pub fn read_assets(&self) -> Result<Vec<Asset>> {
+    pub fn read_asset_names(&self) -> Result<Vec<AssetName>> {
         let assets_dir = self.dir.join("assets");
         let index_path = assets_dir.join("index.json");
         let index_json = read_to_string(index_path)?;
         let packages = from_str::<Vec<PackageRecord>>(&index_json)?;
 
-        let mut assets = Vec::new();
+        let mut asset_names = Vec::new();
         for package in packages {
             for asset in package.assets {
-                if !Asset::definitely_not_an_asset(&asset.name) {
-                    assets.push(Asset::from_asset_name(&asset.name).expect("Should parse"));
+                if !AssetName::definitely_not_an_asset_name(&asset.name) {
+                    asset_names.push(AssetName::parse(&asset.name).expect("Should parse"));
                 }
             }
         }
-        Ok(assets)
+        Ok(asset_names)
     }
 }

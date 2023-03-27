@@ -1,8 +1,7 @@
-use super::asset::Asset;
-use super::attributes::{
-    Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
-};
-use crate::version::Version;
+use super::asset_name::AssetName;
+use super::attributes::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS};
+use super::tag::Tag;
+use super::version::Version;
 use std::iter::Iterator;
 
 #[allow(unused)]
@@ -57,11 +56,11 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
-    pub fn filter<'a, A>(&self, assets: A) -> Vec<&'a Asset>
+    pub fn filter<'a, A>(&self, asset_names: A) -> Vec<&'a AssetName>
     where
-        A: IntoIterator<Item = &'a Asset>,
+        A: IntoIterator<Item = &'a AssetName>,
     {
-        fn predicate(this: &AssetFilter, item: &&Asset) -> bool {
+        fn predicate(this: &AssetFilter, item: &&AssetName) -> bool {
             if !this
                 .archive_type
                 .as_ref()
@@ -149,14 +148,18 @@ impl AssetFilter {
             true
         }
 
-        assets.into_iter().filter(|x| predicate(self, x)).collect()
+        asset_names
+            .into_iter()
+            .filter(|x| predicate(self, x))
+            .collect()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::super::asset::Asset;
-    use super::super::attributes::{ArchiveType, Tag};
+    use super::super::asset_name::AssetName;
+    use super::super::attributes::ArchiveType;
+    use super::super::tag::Tag;
     use super::AssetFilter;
 
     #[test]
@@ -177,24 +180,21 @@ mod tests {
         assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]));
 
         let mut asset_filter = AssetFilter::all();
-        asset_filter.tag = Some(Tag::new("20210724T1424"));
+        asset_filter.tag = Some(Tag::parse("20210724T1424"));
         assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
-    fn make_test_artifacts() -> (Asset, Asset, Asset, Asset) {
-        let a0 = Asset::from_asset_name(
-            "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst",
-        )
-        .expect("Should parse");
-        let a1 = Asset::from_asset_name(
-            "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz",
-        )
-        .expect("Should parse");
-        let a2 = Asset::from_asset_name(
-            "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst",
-        )
-        .expect("Should parse");
-        let a3 = Asset::from_asset_name(
+    fn make_test_artifacts() -> (AssetName, AssetName, AssetName, AssetName) {
+        let a0 =
+            AssetName::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst")
+                .expect("Should parse");
+        let a1 =
+            AssetName::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz")
+                .expect("Should parse");
+        let a2 =
+            AssetName::parse("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst")
+                .expect("Should parse");
+        let a3 = AssetName::parse(
             "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
         )
         .expect("Should parse");

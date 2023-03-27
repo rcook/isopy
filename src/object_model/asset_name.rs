@@ -1,10 +1,9 @@
-use super::attributes::{
-    Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
-};
-use crate::version::Version;
+use super::attributes::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS};
+use super::tag::Tag;
+use super::version::Version;
 
 #[derive(Debug, PartialEq)]
-pub struct Asset {
+pub struct AssetName {
     pub name: String,
     pub archive_type: ArchiveType,
     pub family: Family,
@@ -20,8 +19,8 @@ pub struct Asset {
 }
 
 #[allow(unused)]
-impl Asset {
-    pub fn definitely_not_an_asset(s: &str) -> bool {
+impl AssetName {
+    pub fn definitely_not_an_asset_name(s: &str) -> bool {
         if "libuuid-1.0.3.tar.gz" == s {
             true
         } else if "SHA256SUMS" == s {
@@ -31,12 +30,12 @@ impl Asset {
         }
     }
 
-    pub fn from_asset_name(s: &str) -> Option<Self> {
+    pub fn parse(s: &str) -> Option<Self> {
         fn parse_version_and_tag_opt(s: &str) -> Option<(Version, Option<Tag>)> {
             let parts = s.split("+").collect::<Vec<_>>();
             let (version_str, tag) = match parts.len() {
                 1 => (parts[0], None),
-                2 => (parts[0], Some(Tag::new(parts[1]))),
+                2 => (parts[0], Some(Tag::parse(parts[1]))),
                 _ => return None,
             };
 
@@ -44,15 +43,15 @@ impl Asset {
             Some((version, tag))
         }
 
-        let (archive_type, base_name) = ArchiveType::from_asset_name(s)?;
+        let (archive_type, base_name) = ArchiveType::parse(s)?;
 
         let mut iter = base_name.split("-").into_iter();
 
-        let family = Family::from_str(iter.next()?)?;
+        let family = Family::parse(iter.next()?)?;
         let (version, mut tag_opt) = parse_version_and_tag_opt(iter.next()?)?;
-        let arch = Arch::from_str(iter.next()?)?;
-        let platform = Platform::from_str(iter.next()?)?;
-        let os = OS::from_str(iter.next()?)?;
+        let arch = Arch::parse(iter.next()?)?;
+        let platform = Platform::parse(iter.next()?)?;
+        let os = OS::parse(iter.next()?)?;
 
         let mut need_flavour = true;
         let mut flavour_opt = None;
@@ -67,35 +66,35 @@ impl Asset {
             let temp = iter.next()?;
             if need_flavour {
                 need_flavour = false;
-                flavour_opt = Flavour::from_str(temp);
+                flavour_opt = Flavour::parse(temp);
                 if flavour_opt.is_some() {
                     continue;
                 }
             }
             if need_subflavour0 {
                 need_subflavour0 = false;
-                subflavour0_opt = Subflavour::from_str(temp);
+                subflavour0_opt = Subflavour::parse(temp);
                 if subflavour0_opt.is_some() {
                     continue;
                 }
             }
             if need_subflavour1 {
                 need_subflavour1 = false;
-                subflavour1_opt = Subflavour::from_str(temp);
+                subflavour1_opt = Subflavour::parse(temp);
                 if subflavour1_opt.is_some() {
                     continue;
                 }
             }
             if need_variant {
                 need_variant = false;
-                variant_opt = Variant::from_str(temp);
+                variant_opt = Variant::parse(temp);
                 if variant_opt.is_some() {
                     continue;
                 }
             }
             if need_tag {
                 need_tag = false;
-                tag_opt = Some(Tag::new(temp));
+                tag_opt = Some(Tag::parse(temp));
                 continue;
             }
             unimplemented!()
@@ -124,21 +123,20 @@ impl Asset {
 
 #[cfg(test)]
 mod tests {
-    use super::super::attributes::{
-        Arch, ArchiveType, Family, Platform, Subflavour, Tag, Variant, OS,
-    };
-    use super::Asset;
-    use crate::version::Version;
+    use super::super::attributes::{Arch, ArchiveType, Family, Platform, Subflavour, Variant, OS};
+    use super::super::tag::Tag;
+    use super::super::version::Version;
+    use super::AssetName;
     use rstest::rstest;
 
     #[rstest]
     #[case(
-        Asset {
+        AssetName {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
-            tag: Tag::new("20230116"),
+            tag: Tag::parse("20230116"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -150,12 +148,12 @@ mod tests {
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
     )]
     #[case(
-        Asset {
+        AssetName {
             name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
-            tag: Tag::new("20230116"),
+            tag: Tag::parse("20230116"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -167,12 +165,12 @@ mod tests {
         "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
     )]
     #[case(
-        Asset {
+        AssetName {
             name: String::from("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 2),
-            tag: Tag::new("20220220T1113"),
+            tag: Tag::parse("20220220T1113"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -184,12 +182,12 @@ mod tests {
         "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"
     )]
     #[case(
-        Asset {
+        AssetName {
             name: String::from("cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::parse("3.9.6").expect("Should parse"),
-            tag: Tag::new("20210724T1424"),
+            tag: Tag::parse("20210724T1424"),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -200,7 +198,7 @@ mod tests {
         },
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
     )]
-    fn test_from_asset_name(#[case] expected_result: Asset, #[case] input: &str) {
-        assert_eq!(Some(expected_result), Asset::from_asset_name(input))
+    fn test_parse(#[case] expected_result: AssetName, #[case] input: &str) {
+        assert_eq!(Some(expected_result), AssetName::parse(input))
     }
 }

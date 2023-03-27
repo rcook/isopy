@@ -1,5 +1,4 @@
-use crate::object_model::Tag;
-use crate::version::Version;
+use crate::object_model::{Tag, Version};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 use std::result::Result;
@@ -29,5 +28,5 @@ fn parse_version(s: &str) -> Result<Version, String> {
 }
 
 fn parse_tag(s: &str) -> Result<Tag, String> {
-    Ok(Tag::new(s))
+    Ok(Tag::parse(s))
 }

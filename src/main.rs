@@ -4,7 +4,6 @@ mod config;
 mod error;
 mod object_model;
 mod serialization;
-mod version;
 
 use crate::cli::{Args, Command};
 use crate::commands::{do_available, do_download, do_downloaded};
@@ -40,10 +39,7 @@ fn main_inner() -> Result<()> {
 
 fn main() {
     exit(match main_inner() {
-        Ok(_) => {
-            println!("SUCCESS");
-            exitcode::OK
-        }
+        Ok(_) => exitcode::OK,
         Err(Error::Reportable(msg, _)) => {
             red_ln!("{}", msg);
             exitcode::USAGE

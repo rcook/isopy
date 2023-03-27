@@ -5,7 +5,7 @@ pub enum ArchiveType {
 }
 
 impl ArchiveType {
-    pub fn from_asset_name<S>(s: S) -> Option<(Self, String)>
+    pub fn parse<S>(s: S) -> Option<(Self, String)>
     where
         S: AsRef<str>,
     {
@@ -27,7 +27,7 @@ pub enum Family {
 }
 
 impl Family {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
@@ -35,24 +35,6 @@ impl Family {
             "cpython" => Self::CPython,
             _ => return None,
         })
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct Tag(String);
-
-impl Tag {
-    pub fn new<S>(s: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self(s.into())
-    }
-}
-
-impl std::fmt::Display for Tag {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
     }
 }
 
@@ -67,7 +49,7 @@ pub enum Arch {
 }
 
 impl Arch {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
@@ -91,7 +73,7 @@ pub enum Platform {
 }
 
 impl Platform {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
@@ -112,7 +94,7 @@ pub enum OS {
 }
 
 impl OS {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
@@ -133,7 +115,7 @@ pub enum Flavour {
 }
 
 impl Flavour {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
@@ -158,7 +140,7 @@ pub enum Subflavour {
 }
 
 impl Subflavour {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
@@ -182,7 +164,7 @@ pub enum Variant {
 }
 
 impl Variant {
-    pub fn from_str<S>(s: S) -> Option<Self>
+    pub fn parse<S>(s: S) -> Option<Self>
     where
         S: AsRef<str>,
     {
