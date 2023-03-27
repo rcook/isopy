@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::result::Result;
 
 #[derive(Parser, Debug)]
+#[command(version)]
 pub struct Args {
     #[arg(short = 'd', long = "dir")]
     pub dir: Option<PathBuf>,
