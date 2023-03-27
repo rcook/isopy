@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::object_model::AssetInfo;
-use crate::serialization::Package;
+use crate::serialization::PackageRecord;
 use serde_json::from_str;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -19,7 +19,7 @@ impl Config {
         let assets_dir = self.dir.join("assets");
         let index_path = assets_dir.join("index.json");
         let index_json = read_to_string(index_path)?;
-        let packages = from_str::<Vec<Package>>(&index_json)?;
+        let packages = from_str::<Vec<PackageRecord>>(&index_json)?;
 
         let mut asset_infos = Vec::new();
         for package in packages {

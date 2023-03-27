@@ -159,7 +159,7 @@ impl AssetFilter {
 #[cfg(test)]
 mod tests {
     use super::super::asset_info::AssetInfo;
-    use super::super::attributes::ArchiveType;
+    use super::super::attributes::{ArchiveType, Tag};
     use super::AssetFilter;
 
     #[test]
