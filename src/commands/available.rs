@@ -3,11 +3,11 @@ use crate::error::Result;
 use crate::object_model::AssetFilter;
 
 pub fn do_available(config: &Config) -> Result<()> {
-    let asset_names = config.read_asset_names()?;
-    for asset_name in
-        AssetFilter::default_for_platform().filter(asset_names.iter().map(|x| x).into_iter())
+    let asset_metas = config.read_asset_metas()?;
+    for asset_meta in
+        AssetFilter::default_for_platform().filter(asset_metas.iter().map(|x| x).into_iter())
     {
-        println!("{}", asset_name.name)
+        println!("{}", asset_meta.name)
     }
     Ok(())
 }

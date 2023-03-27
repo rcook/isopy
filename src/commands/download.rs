@@ -3,13 +3,13 @@ use crate::error::{user, Result};
 use crate::object_model::{AssetFilter, Tag, Version};
 
 pub fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let asset_names = config.read_asset_names()?;
+    let asset_metas = config.read_asset_metas()?;
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(version.clone());
     asset_filter.tag = tag.clone();
-    let matching_asset_names = asset_filter.filter(asset_names.iter().map(|x| x).into_iter());
-    let asset_name = match matching_asset_names.len() {
-        1 => matching_asset_names.first().expect("Must exist"),
+    let matching_asset_metas = asset_filter.filter(asset_metas.iter().map(|x| x).into_iter());
+    let asset_meta = match matching_asset_metas.len() {
+        1 => matching_asset_metas.first().expect("Must exist"),
         0 => {
             return Err(user(format!(
                 "No asset matching version {} and tag {}",
@@ -29,7 +29,7 @@ pub fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Res
             )))
         }
     };
-    println!("asset_name={:?}", asset_name);
+    println!("{}", asset_meta.name);
     todo!()
     /*
     let response = get("https://httpbin.org/ip")?.json::<HttpBinIPResponse>()?;

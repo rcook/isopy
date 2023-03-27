@@ -1,7 +1,7 @@
-use super::asset_name::AssetName;
-use super::attributes::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS};
-use super::tag::Tag;
-use super::version::Version;
+use super::AssetMeta;
+use super::Tag;
+use super::Version;
+use super::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS};
 use std::iter::Iterator;
 
 #[allow(unused)]
@@ -56,11 +56,29 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
-    pub fn filter<'a, A>(&self, asset_names: A) -> Vec<&'a AssetName>
+    #[cfg(target_os = "macos")]
+    pub fn default_for_platform() -> Self {
+        Self {
+            archive_type: Some(ArchiveType::TarGZ),
+            family: Some(Family::CPython),
+            version: None,
+            tag: None,
+            arch: Some(Arch::X86_64),
+            platform: Some(Platform::Apple),
+            os: Some(OS::Darwin),
+            flavour: None,
+            subflavour0: None,
+            subflavour1: None,
+            variant: Some(Variant::InstallOnly),
+        }
+    }
+
+    #[allow(unused)]
+    pub fn filter<'a, A>(&self, asset_names: A) -> Vec<&'a AssetMeta>
     where
-        A: IntoIterator<Item = &'a AssetName>,
+        A: IntoIterator<Item = &'a AssetMeta>,
     {
-        fn predicate(this: &AssetFilter, item: &&AssetName) -> bool {
+        fn predicate(this: &AssetFilter, item: &&AssetMeta) -> bool {
             if !this
                 .archive_type
                 .as_ref()
@@ -157,10 +175,10 @@ impl AssetFilter {
 
 #[cfg(test)]
 mod tests {
-    use super::super::asset_name::AssetName;
-    use super::super::attributes::ArchiveType;
-    use super::super::tag::Tag;
+    use super::ArchiveType;
     use super::AssetFilter;
+    use super::AssetMeta;
+    use super::Tag;
 
     #[test]
     fn test_basics() {
@@ -184,17 +202,17 @@ mod tests {
         assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
-    fn make_test_artifacts() -> (AssetName, AssetName, AssetName, AssetName) {
+    fn make_test_artifacts() -> (AssetMeta, AssetMeta, AssetMeta, AssetMeta) {
         let a0 =
-            AssetName::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst")
+            AssetMeta::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst")
                 .expect("Should parse");
         let a1 =
-            AssetName::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz")
+            AssetMeta::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz")
                 .expect("Should parse");
         let a2 =
-            AssetName::parse("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst")
+            AssetMeta::parse("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst")
                 .expect("Should parse");
-        let a3 = AssetName::parse(
+        let a3 = AssetMeta::parse(
             "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
         )
         .expect("Should parse");
