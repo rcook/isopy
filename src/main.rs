@@ -4,6 +4,7 @@ mod config;
 mod error;
 mod object_model;
 mod serialization;
+mod ui;
 mod util;
 
 use crate::cli::{Args, Command};

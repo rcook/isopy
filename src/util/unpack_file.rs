@@ -1,44 +1,42 @@
 use crate::error::Result;
+use crate::ui::make_progress_bar;
 use flate2::read::GzDecoder;
-use indicatif::{ProgressBar, ProgressStyle};
-use std::fs::File;
+use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
-use tar::Archive;
+use tar::{Archive, Entry};
 
 pub fn unpack_file<P, Q>(path: P, dir: Q) -> Result<()>
 where
     P: AsRef<Path>,
     Q: AsRef<Path>,
 {
-    fn make_progress_bar<P>(path: P) -> Result<ProgressBar>
-    where
-        P: AsRef<Path>,
-    {
-        let progress_bar = ProgressBar::new(100);
-        progress_bar.set_style(ProgressStyle::default_bar()
-            .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")?
-            .progress_chars("#>-"));
-        progress_bar.set_message(format!("Unpacking {}", path.as_ref().display()));
-        Ok(progress_bar)
+    fn unpack_entry(entry: &mut Entry<GzDecoder<File>>, path: PathBuf) -> Result<()> {
+        let mut dir = path.clone();
+        dir.pop();
+        create_dir_all(&dir)?;
+        entry.unpack(&path)?;
+        Ok(())
     }
 
-    let progress_bar = make_progress_bar(&path)?;
-    let file = File::open(path)?;
+    // Open once to get number of entries (is this necessary?)
+    let file = File::open(&path)?;
+    let decoder = GzDecoder::new(file);
+    let mut archive = Archive::new(decoder);
+    let size = archive.entries()?.count();
+
+    // Open a second time to unpack
+    let file = File::open(&path)?;
     let decoder = GzDecoder::new(file);
     let mut archive = Archive::new(decoder);
 
-    archive
-        .entries()?
-        .filter_map(|e| e.ok())
-        .map(|mut entry| -> Result<PathBuf> {
-            let path = entry.path()?.into_owned();
-            println!("path={:?}", path);
-            entry.unpack(&path)?;
-            Ok(path)
-        })
-        .for_each(|x| println!("> {:?}", x));
+    let progress_bar = make_progress_bar(size as u64)?;
+    progress_bar.set_message(format!("Unpacking {}", path.as_ref().display()));
 
-    // progress_bar.set_position(100);
+    for (idx, mut entry) in archive.entries()?.filter_map(|e| e.ok()).enumerate() {
+        let path = dir.as_ref().join(entry.path()?);
+        unpack_entry(&mut entry, path)?;
+        progress_bar.set_position(idx as u64);
+    }
 
     progress_bar.finish_with_message("Done");
 
