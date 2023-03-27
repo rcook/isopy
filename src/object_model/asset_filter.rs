@@ -175,10 +175,8 @@ impl AssetFilter {
 
 #[cfg(test)]
 mod tests {
-    use super::ArchiveType;
-    use super::AssetFilter;
-    use super::AssetMeta;
-    use super::Tag;
+    use super::{ArchiveType, Asset, AssetFilter, AssetMeta, Tag};
+    use reqwest::Url;
 
     #[test]
     fn test_basics() {
@@ -202,20 +200,39 @@ mod tests {
         assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
-    fn make_test_artifacts() -> (AssetMeta, AssetMeta, AssetMeta, AssetMeta) {
-        let a0 =
-            AssetMeta::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst")
-                .expect("Should parse");
-        let a1 =
-            AssetMeta::parse("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz")
-                .expect("Should parse");
-        let a2 =
-            AssetMeta::parse("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst")
-                .expect("Should parse");
-        let a3 = AssetMeta::parse(
-            "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
-        )
-        .expect("Should parse");
+    fn make_test_artifacts() -> (Asset, Asset, Asset, Asset) {
+        let a0 = Asset {
+            name: String::from(""),
+            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            meta: AssetMeta::parse(
+                "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst",
+            )
+            .expect("Should parse"),
+        };
+        let a1 = Asset {
+            name: String::from(""),
+            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            meta: AssetMeta::parse(
+                "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz",
+            )
+            .expect("Should parse"),
+        };
+        let a2 = Asset {
+            name: String::from(""),
+            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            meta: AssetMeta::parse(
+                "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst",
+            )
+            .expect("Should parse"),
+        };
+        let a3 = Asset {
+            name: String::from(""),
+            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            meta: AssetMeta::parse(
+                "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
+            )
+            .expect("Should parse"),
+        };
         (a0, a1, a2, a3)
     }
 }

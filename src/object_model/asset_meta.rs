@@ -130,7 +130,6 @@ mod tests {
     #[rstest]
     #[case(
         AssetMeta {
-            name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
@@ -147,7 +146,6 @@ mod tests {
     )]
     #[case(
         AssetMeta {
-            name: String::from("cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
@@ -164,7 +162,6 @@ mod tests {
     )]
     #[case(
         AssetMeta {
-            name: String::from("cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"),
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 2),
@@ -181,7 +178,6 @@ mod tests {
     )]
     #[case(
         AssetMeta {
-            name: String::from("cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"),
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::parse("3.9.6").expect("Should parse"),
