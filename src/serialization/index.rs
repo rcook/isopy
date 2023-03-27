@@ -1,11 +1,12 @@
-use super::helpers::deserialize_url;
+use super::helpers::{deserialize_tag, deserialize_url};
+use crate::object_model::Tag;
 use reqwest::Url;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct PackageRecord {
-    #[serde(rename = "tag_name")]
-    pub tag: String,
+    #[serde(rename = "tag_name", deserialize_with = "deserialize_tag")]
+    pub tag: Tag,
     #[serde(rename = "assets")]
     pub assets: Vec<AssetRecord>,
 }
