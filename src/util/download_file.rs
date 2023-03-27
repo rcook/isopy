@@ -12,9 +12,6 @@ where
     U: IntoUrl,
     P: AsRef<Path>,
 {
-    let temp_url = url.into_url()?;
-    let url_str = String::from(temp_url.as_str());
-
     fn make_progress_bar(url_str: &String, total_size: u64) -> Result<ProgressBar> {
         let progress_bar = ProgressBar::new(total_size);
         progress_bar.set_style(ProgressStyle::default_bar()
@@ -24,6 +21,8 @@ where
         Ok(progress_bar)
     }
 
+    let temp_url = url.into_url()?;
+    let url_str = String::from(temp_url.as_str());
     let response = client.get(temp_url).send().await?;
     let total_size = response
         .content_length()
