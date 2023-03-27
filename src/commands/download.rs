@@ -10,7 +10,7 @@ pub fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Res
     asset_filter.tag = tag.clone();
     let matching_assets = asset_filter.filter(asset_infos.iter().map(|x| x).into_iter());
     let asset = match matching_assets.len() {
-        1 => matching_assets.first(),
+        1 => matching_assets.first().expect("Must exist"),
         0 => {
             return Err(user(format!(
                 "No asset matching version {} and tag {}",
