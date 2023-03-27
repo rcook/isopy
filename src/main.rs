@@ -31,7 +31,7 @@ fn main_inner() -> Result<()> {
 
     match args.command {
         Command::Available => do_available(&config)?,
-        Command::Download { version, tag_str } => do_download(&config, &version, &tag_str)?,
+        Command::Download { version, tag } => do_download(&config, &version, &tag)?,
         Command::Downloaded => do_downloaded(&config)?,
     }
 

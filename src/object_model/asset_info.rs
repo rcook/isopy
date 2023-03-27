@@ -36,7 +36,7 @@ impl AssetInfo {
             let parts = s.split("+").collect::<Vec<_>>();
             let (version_str, tag) = match parts.len() {
                 1 => (parts[0], None),
-                2 => (parts[0], Some(Tag::NewStyle(String::from(parts[1])))),
+                2 => (parts[0], Some(Tag::new(parts[1]))),
                 _ => return None,
             };
 
@@ -95,7 +95,7 @@ impl AssetInfo {
             }
             if need_tag {
                 need_tag = false;
-                tag_opt = Some(Tag::OldStyle(String::from(temp)));
+                tag_opt = Some(Tag::new(temp));
                 continue;
             }
             unimplemented!()
@@ -138,7 +138,7 @@ mod tests {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
-            tag: Tag::NewStyle(String::from("20230116")),
+            tag: Tag::new("20230116"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -155,7 +155,7 @@ mod tests {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
-            tag: Tag::NewStyle(String::from("20230116")),
+            tag: Tag::new("20230116"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -172,7 +172,7 @@ mod tests {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 2),
-            tag: Tag::OldStyle(String::from("20220220T1113")),
+            tag: Tag::new("20220220T1113"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -189,7 +189,7 @@ mod tests {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::parse("3.9.6").expect("Should parse"),
-            tag: Tag::OldStyle(String::from("20210724T1424")),
+            tag: Tag::new("20210724T1424"),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,

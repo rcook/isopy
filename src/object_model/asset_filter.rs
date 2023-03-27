@@ -10,7 +10,7 @@ pub struct AssetFilter {
     pub archive_type: Option<ArchiveType>,
     pub family: Option<Family>,
     pub version: Option<Version>,
-    pub tag_str: Option<String>,
+    pub tag: Option<Tag>,
     pub arch: Option<Arch>,
     pub platform: Option<Platform>,
     pub os: Option<OS>,
@@ -27,7 +27,7 @@ impl AssetFilter {
             archive_type: None,
             family: None,
             version: None,
-            tag_str: None,
+            tag: None,
             arch: None,
             platform: None,
             os: None,
@@ -45,7 +45,7 @@ impl AssetFilter {
             archive_type: Some(ArchiveType::TarGZ),
             family: Some(Family::CPython),
             version: None,
-            tag_str: None,
+            tag: None,
             arch: Some(Arch::X86_64),
             platform: Some(Platform::Unknown),
             os: Some(OS::Linux),
@@ -89,19 +89,7 @@ impl AssetFilter {
                 return false;
             }
 
-            fn compare(tag_str: &str, item: &&AssetInfo) -> bool {
-                match &item.tag {
-                    Tag::NewStyle(s) => tag_str == s,
-                    Tag::OldStyle(s) => tag_str == s,
-                }
-            }
-
-            if !this
-                .tag_str
-                .as_ref()
-                .map(|x| compare(x, item))
-                .unwrap_or(true)
-            {
+            if !this.tag.as_ref().map(|x| item.tag == *x).unwrap_or(true) {
                 return false;
             }
 
@@ -192,7 +180,7 @@ mod tests {
         assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]));
 
         let mut asset_filter = AssetFilter::all();
-        asset_filter.tag_str = Some(String::from("20210724T1424"));
+        asset_filter.tag = Some(Tag::new("20210724T1424"));
         assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
