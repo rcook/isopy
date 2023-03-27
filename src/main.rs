@@ -7,7 +7,7 @@ mod serialization;
 mod util;
 
 use crate::cli::{Args, Command};
-use crate::commands::{do_available, do_download, do_downloaded, do_list};
+use crate::commands::{do_available, do_create, do_download, do_downloaded, do_list};
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
@@ -32,6 +32,7 @@ async fn main_inner() -> Result<()> {
 
     match args.command {
         Command::Available => do_available(&config)?,
+        Command::Create { version, tag } => do_create(&config, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&config, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&config)?,
         Command::List => do_list(&config).await?,

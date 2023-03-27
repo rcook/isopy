@@ -15,6 +15,12 @@ pub struct Args {
 #[derive(Debug, Subcommand)]
 pub enum Command {
     Available,
+    Create {
+        #[arg(value_parser = parse_version)]
+        version: Version,
+        #[arg(short = 't', long = "tag", value_parser = parse_tag)]
+        tag: Option<Tag>,
+    },
     Download {
         #[arg(value_parser = parse_version)]
         version: Version,
