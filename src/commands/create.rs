@@ -1,8 +1,8 @@
+use super::helpers::{create_env_dir, get_asset};
 use crate::config::Config;
-use crate::error::{user, Result};
-use crate::object_model::{AssetFilter, EnvName, Tag, Version};
+use crate::error::Result;
+use crate::object_model::{EnvName, Tag, Version};
 use crate::serialization::EnvRecord;
-use crate::util::unpack_file;
 use std::path::PathBuf;
 
 pub async fn do_create(
@@ -12,58 +12,19 @@ pub async fn do_create(
     tag: &Option<Tag>,
 ) -> Result<()> {
     let assets = config.read_assets()?;
-    let mut asset_filter = AssetFilter::default_for_platform();
-    asset_filter.version = Some(version.clone());
-    asset_filter.tag = tag.clone();
-    let matching_assets = asset_filter.filter(assets.iter().map(|x| x).into_iter());
-    let asset = match matching_assets.len() {
-        1 => matching_assets.first().expect("Must exist"),
-        0 => {
-            return Err(user(format!(
-                "No asset matching version {} and tag {}",
-                version,
-                tag.as_ref()
-                    .map(Tag::to_string)
-                    .unwrap_or(String::from("(none)"))
-            )))
-        }
-        _ => {
-            return Err(user(format!(
-                "More than one asset matching version {} and tag {}",
-                version,
-                tag.as_ref()
-                    .map(Tag::to_string)
-                    .unwrap_or(String::from("(none)"))
-            )))
-        }
-    };
+    let asset = get_asset(&assets, version, tag)?;
 
-    let output_path = config.assets_dir.join(&asset.name);
-    if !output_path.exists() {
-        return Err(user(format!(
-            "File {} does not exist",
-            output_path.display()
-        )));
-    }
-
+    let archive_path = config.assets_dir.join(&asset.name);
     let env_dir = env_name.dir(&config);
-    if env_dir.exists() {
-        return Err(user(format!(
-            "Environment directory {} already exists",
-            env_dir.display()
-        )));
-    }
+    create_env_dir(&archive_path, &env_dir)?;
 
-    unpack_file(&output_path, &env_dir)?;
-
+    let env_path = env_dir.join("env.yaml");
     let env_record = EnvRecord {
         name: env_name.clone(),
         python_dir: PathBuf::from("python"),
         python_version: asset.meta.version.clone(),
         tag: asset.tag.clone(),
     };
-
-    let env_path = env_dir.join("env.yaml");
     std::fs::write(env_path, serde_yaml::to_string(&env_record)?)?;
 
     Ok(())

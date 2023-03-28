@@ -32,6 +32,7 @@ pub enum Command {
     },
     Downloaded,
     Info,
+    Init,
     List,
     New {
         #[arg(value_parser = parse_version)]

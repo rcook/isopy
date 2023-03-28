@@ -29,3 +29,23 @@ pub struct EnvRecord {
     )]
     pub tag: Tag,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct HashedEnvRecord {
+    #[serde(rename = "dir_config_path")]
+    pub config_path: PathBuf,
+    #[serde(rename = "python_dir")]
+    pub python_dir: PathBuf,
+    #[serde(
+        rename = "python_version",
+        deserialize_with = "deserialize_version",
+        serialize_with = "serialize_version"
+    )]
+    pub python_version: Version,
+    #[serde(
+        rename = "tag",
+        deserialize_with = "deserialize_tag",
+        serialize_with = "serialize_tag"
+    )]
+    pub tag: Tag,
+}
