@@ -1,8 +1,9 @@
 use crate::config::Config;
-use crate::error::{user, Result};
+use crate::error::{fatal, user, Result};
 use crate::object_model::{AssetFilter, Tag, Version};
 use crate::util::{download_file, validate_sha256_checksum};
 use reqwest::Client;
+use std::fs::remove_file;
 
 pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
     let assets = config.read_assets()?;
@@ -46,7 +47,17 @@ pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) 
     download_file(&client, asset.url.clone(), &output_path).await?;
 
     let is_valid = validate_sha256_checksum(&output_path, &asset.tag)?;
-    assert!(is_valid); // TBD
+    if !is_valid {
+        remove_file(&output_path)?;
+        return Err(fatal(format!(
+            "SHA256 checksum validation failed on {}",
+            output_path.display()
+        )));
+    }
 
+    println!(
+        "SHA256 checksum validation succeeded on {}",
+        output_path.display()
+    );
     Ok(())
 }
