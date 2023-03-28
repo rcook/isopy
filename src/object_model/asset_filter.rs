@@ -1,6 +1,5 @@
 use super::{
-    Arch, ArchiveType, Asset, AssetMeta, Family, Flavour, Platform, Subflavour, Tag, Variant,
-    Version, OS,
+    Arch, ArchiveType, Asset, Family, Flavour, Platform, Subflavour, Tag, Variant, Version, OS,
 };
 use std::iter::Iterator;
 
@@ -78,11 +77,11 @@ impl AssetFilter {
     where
         A: IntoIterator<Item = &'a Asset>,
     {
-        fn predicate(this: &AssetFilter, item: &AssetMeta) -> bool {
+        fn predicate(this: &AssetFilter, asset: &Asset) -> bool {
             if !this
                 .archive_type
                 .as_ref()
-                .map(|x| item.archive_type == *x)
+                .map(|x| asset.meta.archive_type == *x)
                 .unwrap_or(true)
             {
                 return false;
@@ -91,7 +90,7 @@ impl AssetFilter {
             if !this
                 .family
                 .as_ref()
-                .map(|x| item.family == *x)
+                .map(|x| asset.meta.family == *x)
                 .unwrap_or(true)
             {
                 return false;
@@ -100,37 +99,47 @@ impl AssetFilter {
             if !this
                 .version
                 .as_ref()
-                .map(|x| item.version == *x)
+                .map(|x| asset.meta.version == *x)
                 .unwrap_or(true)
             {
                 return false;
             }
 
-            if !this.tag.as_ref().map(|x| item.tag == *x).unwrap_or(true) {
+            if !this.tag.as_ref().map(|x| asset.tag == *x).unwrap_or(true) {
                 return false;
             }
 
-            if !this.arch.as_ref().map(|x| item.arch == *x).unwrap_or(true) {
+            if !this
+                .arch
+                .as_ref()
+                .map(|x| asset.meta.arch == *x)
+                .unwrap_or(true)
+            {
                 return false;
             }
 
             if !this
                 .platform
                 .as_ref()
-                .map(|x| item.platform == *x)
+                .map(|x| asset.meta.platform == *x)
                 .unwrap_or(true)
             {
                 return false;
             }
 
-            if !this.os.as_ref().map(|x| item.os == *x).unwrap_or(true) {
+            if !this
+                .os
+                .as_ref()
+                .map(|x| asset.meta.os == *x)
+                .unwrap_or(true)
+            {
                 return false;
             }
 
             if !this
                 .flavour
                 .as_ref()
-                .map(|x| item.flavour.as_ref() == Some(x))
+                .map(|x| asset.meta.flavour.as_ref() == Some(x))
                 .unwrap_or(true)
             {
                 return false;
@@ -139,7 +148,7 @@ impl AssetFilter {
             if !this
                 .subflavour0
                 .as_ref()
-                .map(|x| item.subflavour0.as_ref() == Some(x))
+                .map(|x| asset.meta.subflavour0.as_ref() == Some(x))
                 .unwrap_or(true)
             {
                 return false;
@@ -148,7 +157,7 @@ impl AssetFilter {
             if !this
                 .subflavour1
                 .as_ref()
-                .map(|x| item.subflavour1.as_ref() == Some(x))
+                .map(|x| asset.meta.subflavour1.as_ref() == Some(x))
                 .unwrap_or(true)
             {
                 return false;
@@ -157,7 +166,7 @@ impl AssetFilter {
             if !this
                 .variant
                 .as_ref()
-                .map(|x| item.variant.as_ref() == Some(x))
+                .map(|x| asset.meta.variant.as_ref() == Some(x))
                 .unwrap_or(true)
             {
                 return false;
@@ -166,16 +175,13 @@ impl AssetFilter {
             true
         }
 
-        assets
-            .into_iter()
-            .filter(|x| predicate(self, &x.meta))
-            .collect()
+        assets.into_iter().filter(|x| predicate(self, &x)).collect()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{ArchiveType, Asset, AssetFilter, AssetMeta, Tag};
+    use super::super::{ArchiveType, Asset, AssetFilter, AssetMeta, Tag};
     use reqwest::Url;
 
     #[test]
@@ -203,6 +209,7 @@ mod tests {
     fn make_test_artifacts() -> (Asset, Asset, Asset, Asset) {
         let a0 = Asset {
             name: String::from(""),
+            tag: Tag::parse("tag"),
             url: Url::parse("https://httpbin.org").expect("Must parse"),
             size: 0,
             meta: AssetMeta::parse(
@@ -212,6 +219,7 @@ mod tests {
         };
         let a1 = Asset {
             name: String::from(""),
+            tag: Tag::parse("tag"),
             url: Url::parse("https://httpbin.org").expect("Must parse"),
             size: 0,
             meta: AssetMeta::parse(
@@ -221,6 +229,7 @@ mod tests {
         };
         let a2 = Asset {
             name: String::from(""),
+            tag: Tag::parse("tag"),
             url: Url::parse("https://httpbin.org").expect("Must parse"),
             size: 0,
             meta: AssetMeta::parse(
@@ -230,6 +239,7 @@ mod tests {
         };
         let a3 = Asset {
             name: String::from(""),
+            tag: Tag::parse("20210724T1424"),
             url: Url::parse("https://httpbin.org").expect("Must parse"),
             size: 0,
             meta: AssetMeta::parse(

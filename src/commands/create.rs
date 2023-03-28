@@ -60,7 +60,7 @@ pub async fn do_create(
         name: env_name.clone(),
         python_dir: PathBuf::from("python"),
         python_version: asset.meta.version.clone(),
-        tag: asset.meta.tag.clone(),
+        tag: asset.tag.clone(),
     };
 
     let env_path = env_dir.join("env.yaml");

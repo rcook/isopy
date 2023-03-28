@@ -35,6 +35,7 @@ impl Config {
                     let meta = AssetMeta::parse(&asset_record.name).expect("Should parse");
                     assets.push(Asset {
                         name: asset_record.name,
+                        tag: package_record.tag.clone(),
                         url: asset_record.url,
                         size: asset_record.size,
                         meta: meta,

@@ -1,13 +1,10 @@
-use super::attributes::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS};
-use super::tag::Tag;
-use super::version::Version;
+use super::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, Version, OS};
 
 #[derive(Debug, PartialEq)]
 pub struct AssetMeta {
     pub archive_type: ArchiveType,
     pub family: Family,
     pub version: Version,
-    pub tag: Tag,
     pub arch: Arch,
     pub platform: Platform,
     pub os: OS,
@@ -107,7 +104,6 @@ impl AssetMeta {
             archive_type: archive_type,
             family: family,
             version: version,
-            tag: tag_opt.expect("Should be set"),
             arch: arch,
             platform: platform,
             os: os,
@@ -121,10 +117,9 @@ impl AssetMeta {
 
 #[cfg(test)]
 mod tests {
-    use super::super::attributes::{Arch, ArchiveType, Family, Platform, Subflavour, Variant, OS};
-    use super::super::tag::Tag;
-    use super::super::version::Version;
-    use super::AssetMeta;
+    use super::super::{
+        Arch, ArchiveType, AssetMeta, Family, Platform, Subflavour, Variant, Version, OS,
+    };
     use rstest::rstest;
 
     #[rstest]
@@ -133,7 +128,6 @@ mod tests {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
-            tag: Tag::parse("20230116"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -149,7 +143,6 @@ mod tests {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::new(3, 10, 9),
-            tag: Tag::parse("20230116"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -165,7 +158,6 @@ mod tests {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
             version: Version::new(3, 10, 2),
-            tag: Tag::parse("20220220T1113"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -181,7 +173,6 @@ mod tests {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
             version: Version::parse("3.9.6").expect("Should parse"),
-            tag: Tag::parse("20210724T1424"),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,
