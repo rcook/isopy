@@ -10,7 +10,7 @@ use std::path::Path;
 
 static SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
 
-fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> {
+pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> {
     let sha256_file_name = format!("{}.sha256sums", tag.as_str());
     let file = SHA256SUMS_DIR
         .get_file(&sha256_file_name)

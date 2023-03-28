@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::error::{user, Result};
 use crate::object_model::{AssetFilter, Tag, Version};
-use crate::util::download_file;
+use crate::util::{download_file, validate_sha256_checksum};
 use reqwest::Client;
 
 pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
@@ -44,6 +44,9 @@ pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) 
 
     let client = Client::builder().build()?;
     download_file(&client, asset.url.clone(), &output_path).await?;
+
+    let is_valid = validate_sha256_checksum(&output_path, &asset.tag)?;
+    assert!(is_valid); // TBD
 
     Ok(())
 }
