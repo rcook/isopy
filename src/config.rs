@@ -1,7 +1,6 @@
 use crate::error::Result;
-use crate::object_model::{Asset, AssetMeta};
-use crate::serialization::PackageRecord;
-use serde_json::from_str;
+use crate::object_model::{Asset, AssetMeta, EnvName};
+use crate::serialization::{EnvRecord, PackageRecord};
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
@@ -26,7 +25,7 @@ impl Config {
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_path = self.assets_dir.join("index.json");
         let index_json = read_to_string(index_path)?;
-        let package_records = from_str::<Vec<PackageRecord>>(&index_json)?;
+        let package_records = serde_json::from_str::<Vec<PackageRecord>>(&index_json)?;
 
         let mut assets = Vec::new();
         for package_record in package_records {
@@ -44,5 +43,16 @@ impl Config {
             }
         }
         Ok(assets)
+    }
+
+    pub fn read_env(&self, env_name: &EnvName) -> Result<Option<EnvRecord>> {
+        let env_config_path = self.envs_dir.join(env_name.as_str()).join("env.yaml");
+        if !env_config_path.is_file() {
+            return Ok(None);
+        }
+
+        let s = read_to_string(&env_config_path)?;
+        let env = serde_yaml::from_str::<EnvRecord>(&s)?;
+        Ok(Some(env))
     }
 }
