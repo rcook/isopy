@@ -8,11 +8,14 @@ mod ui;
 mod util;
 
 use crate::cli::{Args, Command};
-use crate::commands::{do_available, do_create, do_download, do_downloaded, do_list, do_shell};
+use crate::commands::{
+    do_available, do_create, do_download, do_downloaded, do_info, do_list, do_new, do_shell,
+};
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
+use std::env::current_dir;
 use std::path::PathBuf;
 use std::process::exit;
 use tokio;
@@ -24,12 +27,13 @@ fn default_isopy_dir() -> Option<PathBuf> {
 }
 
 async fn main_inner() -> Result<()> {
+    let cwd = current_dir()?;
     let args = Args::parse();
     let dir = args
         .dir
         .or_else(default_isopy_dir)
         .ok_or_else(|| could_not_get_isopy_dir("Could not find .isopy directory"))?;
-    let config = Config::from_dir(dir);
+    let config = Config::from_dir(cwd, dir);
 
     match args.command {
         Command::Available => do_available(&config)?,
@@ -40,7 +44,9 @@ async fn main_inner() -> Result<()> {
         } => do_create(&config, &env_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&config, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&config)?,
+        Command::Info => do_info(&config)?,
         Command::List => do_list(&config).await?,
+        Command::New { version, tag } => do_new(&config, &version, &tag)?,
         Command::Shell { env_name } => do_shell(&config, &env_name)?,
     }
 
@@ -60,7 +66,7 @@ async fn main() {
             exitcode::USAGE
         }
         e => {
-            println!("e={:?}", e);
+            red_ln!("Unhandled error: {:?}", e);
             exitcode::USAGE
         }
     })

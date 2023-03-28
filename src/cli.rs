@@ -31,7 +31,14 @@ pub enum Command {
         tag: Option<Tag>,
     },
     Downloaded,
+    Info,
     List,
+    New {
+        #[arg(value_parser = parse_version)]
+        version: Version,
+        #[arg(short = 't', long = "tag", value_parser = parse_tag)]
+        tag: Option<Tag>,
+    },
     Shell {
         #[arg(short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,

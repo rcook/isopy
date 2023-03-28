@@ -5,18 +5,21 @@ use crate::util::osstr_to_str;
 use std::fs::{read_dir, read_to_string};
 use std::path::PathBuf;
 
+// TODO: Rename to App
 #[derive(Debug)]
 pub struct Config {
+    pub cwd: PathBuf,
     pub dir: PathBuf,
     pub assets_dir: PathBuf,
     pub envs_dir: PathBuf,
 }
 
 impl Config {
-    pub fn from_dir(dir: PathBuf) -> Self {
+    pub fn from_dir(cwd: PathBuf, dir: PathBuf) -> Self {
         let assets_dir = dir.join("assets");
         let envs_dir = dir.join("envs");
         Self {
+            cwd: cwd,
             dir: dir,
             assets_dir: assets_dir,
             envs_dir: envs_dir,

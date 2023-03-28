@@ -33,6 +33,28 @@ where
     s.serialize_str(x.as_str())
 }
 
+pub fn deserialize_tag_opt<'de, D>(deserializer: D) -> Result<Option<Tag>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s_opt: Option<String> = Option::deserialize(deserializer)?;
+    if let Some(s) = s_opt {
+        Ok(Some(Tag::parse(s)))
+    } else {
+        Ok(None)
+    }
+}
+
+pub fn serialize_tag_opt<S>(tag: &Option<Tag>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    if let Some(ref t) = *tag {
+        return s.serialize_str(t.as_str());
+    }
+    s.serialize_none()
+}
+
 pub fn deserialize_url<'de, D>(deserializer: D) -> Result<Url, D::Error>
 where
     D: Deserializer<'de>,
