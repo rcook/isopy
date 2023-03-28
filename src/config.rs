@@ -1,7 +1,8 @@
 use crate::error::Result;
 use crate::object_model::{Asset, AssetMeta, EnvName};
 use crate::serialization::{EnvRecord, PackageRecord};
-use std::fs::read_to_string;
+use crate::util::osstr_to_str;
+use std::fs::{read_dir, read_to_string};
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -43,6 +44,25 @@ impl Config {
             }
         }
         Ok(assets)
+    }
+
+    pub fn read_envs(&self) -> Result<Vec<EnvRecord>> {
+        let mut envs = Vec::new();
+        for d in read_dir(&self.envs_dir)? {
+            let env_name = match EnvName::parse(osstr_to_str(&d?.file_name())?) {
+                Some(x) => x,
+                None => continue,
+            };
+
+            let env = match self.read_env(&env_name)? {
+                Some(x) => x,
+                None => continue,
+            };
+
+            envs.push(env)
+        }
+
+        Ok(envs)
     }
 
     pub fn read_env(&self, env_name: &EnvName) -> Result<Option<EnvRecord>> {
