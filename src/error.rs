@@ -3,6 +3,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
     Env(std::env::VarError),
+    Fatal(String),
     IO(std::io::Error),
     Json(serde_json::Error),
     Regex(regex::Error),
@@ -72,4 +73,11 @@ where
     M: Into<String>,
 {
     Error::Reportable(msg.into(), ReportableError::CouldNotGetIsopyDir)
+}
+
+pub fn fatal<M>(msg: M) -> Error
+where
+    M: Into<String>,
+{
+    Error::Fatal(msg.into())
 }
