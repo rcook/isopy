@@ -40,6 +40,7 @@ pub enum Command {
         #[arg(short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+    Scratch,
     Shell {
         #[arg(short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,
