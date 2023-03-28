@@ -12,6 +12,7 @@ pub struct AssetMeta {
     pub subflavour0: Option<Subflavour>,
     pub subflavour1: Option<Subflavour>,
     pub variant: Option<Variant>,
+    pub parsed_tag: Tag,
 }
 
 #[allow(unused)]
@@ -111,6 +112,7 @@ impl AssetMeta {
             subflavour0: subflavour0_opt,
             subflavour1: subflavour1_opt,
             variant: variant_opt,
+            parsed_tag: tag_opt.expect("Must be present"),
         })
     }
 }
@@ -118,7 +120,7 @@ impl AssetMeta {
 #[cfg(test)]
 mod tests {
     use super::super::{
-        Arch, ArchiveType, AssetMeta, Family, Platform, Subflavour, Variant, Version, OS,
+        Arch, ArchiveType, AssetMeta, Family, Platform, Subflavour, Tag, Variant, Version, OS,
     };
     use rstest::rstest;
 
@@ -135,6 +137,7 @@ mod tests {
             subflavour0: Some(Subflavour::Debug),
             subflavour1: None,
             variant: Some(Variant::Full),
+            parsed_tag: Tag::parse(String::from("20230116"))
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
     )]
@@ -150,6 +153,7 @@ mod tests {
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
+            parsed_tag: Tag::parse(String::from("20230116"))
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
     )]
@@ -165,6 +169,7 @@ mod tests {
             subflavour0: Some(Subflavour::Debug),
             subflavour1: None,
             variant: None,
+            parsed_tag: Tag::parse(String::from("20220220T1113"))
         },
         "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"
     )]
@@ -180,6 +185,7 @@ mod tests {
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
+            parsed_tag: Tag::parse(String::from("20210724T1424"))
         },
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
     )]
