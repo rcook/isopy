@@ -6,7 +6,12 @@ use std::env::{set_var, var, VarError};
 
 const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
 
-pub fn do_shell(config: &Config, env_name: &EnvName) -> Result<()> {
+pub fn do_shell(config: &Config, env_name_opt: &Option<EnvName>) -> Result<()> {
+    let env_name = match env_name_opt {
+        Some(x) => x,
+        _ => todo!(),
+    };
+
     do_shell_platform(config, env_name)
 }
 

@@ -33,8 +33,8 @@ pub enum Command {
     Downloaded,
     List,
     Shell {
-        #[arg(value_parser = parse_env_name)]
-        env_name: EnvName,
+        #[arg(short = 'e', long = "env", value_parser = parse_env_name)]
+        env_name: Option<EnvName>,
     },
 }
 
