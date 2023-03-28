@@ -1,7 +1,7 @@
 {
   "files.eol": "\n",
   "files.exclude": {
-    ".vscode/": true,
-    "target/": true,
+    "**/.vscode/": true,
+    "**/target/": true,
   }
 }
