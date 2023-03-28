@@ -10,7 +10,7 @@ mod util;
 use crate::cli::{Args, Command};
 use crate::commands::{
     do_available, do_create, do_download, do_downloaded, do_info, do_init, do_list, do_new,
-    do_shell,
+    do_shell, do_use,
 };
 use crate::config::Config;
 use crate::error::{could_not_get_isopy_dir, Error, Result};
@@ -52,6 +52,7 @@ async fn main_inner() -> Result<()> {
         Command::New { version, tag } => do_new(&config, &version, &tag)?,
         Command::Scratch => do_scratch(&config)?,
         Command::Shell { env_name } => do_shell(&config, &env_name)?,
+        Command::Use => do_use(&config)?,
     }
 
     Ok(())
@@ -70,7 +71,7 @@ async fn main() {
             exitcode::USAGE
         }
         e => {
-            red_ln!("Unhandled error: {:?}", e);
+            red_ln!("Unhandled error: {:#?}", e);
             exitcode::USAGE
         }
     })

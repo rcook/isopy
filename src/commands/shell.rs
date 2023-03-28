@@ -1,14 +1,76 @@
 use crate::config::Config;
 use crate::error::{user, Result};
 use crate::object_model::EnvName;
-use crate::serialization::HashedEnvRecord;
+use crate::serialization::{EnvRecord, HashedEnvRecord, UseRecord};
 use crate::util::path_to_str;
 use md5::compute;
 use std::env::{set_var, var, VarError};
 use std::fs::read_to_string;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
+
+struct ShellInfo {
+    env_name: EnvName,
+    python_dir: PathBuf,
+}
+
+fn get_use_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
+    let hex_digest = format!("{:x}", compute(path_to_str(&config.cwd)?));
+    let use_config_path = config.uses_dir.join(&hex_digest).join("use.yaml");
+    if !use_config_path.is_file() {
+        return Ok(None);
+    }
+
+    let s = read_to_string(use_config_path)?;
+    let use_record = serde_yaml::from_str::<UseRecord>(&s)?;
+    let env_config_path = config
+        .envs_dir
+        .join(use_record.env_name.as_str())
+        .join("env.yaml");
+    if !env_config_path.is_file() {
+        return Ok(None);
+    }
+
+    let s = read_to_string(env_config_path)?;
+    let env_record = serde_yaml::from_str::<EnvRecord>(&s)?;
+    return Ok(Some(ShellInfo {
+        env_name: env_record.name,
+        python_dir: env_record.python_dir,
+    }));
+}
+
+fn get_project_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
+    let project_config_path = config.cwd.join(".isopy.yaml");
+    if !project_config_path.is_file() {
+        return Ok(None);
+    }
+
+    let hex_digest = format!("{:x}", compute(path_to_str(&project_config_path)?));
+    let env_config_path = config.hashed_dir.join(&hex_digest).join("env.yaml");
+    if !env_config_path.is_file() {
+        return Ok(None);
+    }
+
+    let s = read_to_string(env_config_path)?;
+    let hashed_env_record = serde_yaml::from_str::<HashedEnvRecord>(&s)?;
+    return Ok(Some(ShellInfo {
+        env_name: EnvName::parse(&hex_digest).expect("Must be a valid environment"),
+        python_dir: hashed_env_record.python_dir,
+    }));
+}
+
+fn get_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
+    if let Some(shell_info) = get_use_shell_info(config)? {
+        return Ok(Some(shell_info));
+    }
+
+    if let Some(shell_info) = get_project_shell_info(config)? {
+        return Ok(Some(shell_info));
+    }
+
+    Ok(None)
+}
 
 pub fn do_shell(config: &Config, env_name_opt: &Option<EnvName>) -> Result<()> {
     match var(ISOPY_ENV_NAME) {
@@ -28,19 +90,12 @@ pub fn do_shell(config: &Config, env_name_opt: &Option<EnvName>) -> Result<()> {
 
             do_shell_platform(config, &env.name.as_str(), &env.python_dir)?;
         }
-        _ => {
-            let config_path = config.cwd.join(".isopy.yaml");
-            let hex_digest = format!("{:x}", compute(path_to_str(&config_path)?));
-            let env_config_path = config.dir.join("hashed").join(hex_digest).join("env.yaml");
-            let s = read_to_string(env_config_path)?;
-            let hashed_env_record = serde_yaml::from_str::<HashedEnvRecord>(&s)?;
-
-            do_shell_platform(
-                config,
-                path_to_str(&hashed_env_record.config_path)?,
-                &hashed_env_record.python_dir,
-            )?;
-        }
+        _ => match get_shell_info(config)? {
+            Some(shell_info) => {
+                do_shell_platform(config, shell_info.env_name.as_str(), &shell_info.python_dir)?;
+            }
+            _ => todo!(),
+        },
     };
 
     Ok(())

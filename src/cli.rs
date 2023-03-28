@@ -45,6 +45,7 @@ pub enum Command {
         #[arg(short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,
     },
+    Use,
 }
 
 fn parse_env_name(s: &str) -> Result<EnvName, String> {

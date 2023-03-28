@@ -12,17 +12,23 @@ pub struct Config {
     pub dir: PathBuf,
     pub assets_dir: PathBuf,
     pub envs_dir: PathBuf,
+    pub hashed_dir: PathBuf,
+    pub uses_dir: PathBuf,
 }
 
 impl Config {
     pub fn from_dir(cwd: PathBuf, dir: PathBuf) -> Self {
         let assets_dir = dir.join("assets");
         let envs_dir = dir.join("envs");
+        let hashed_dir = dir.join("hashed");
+        let uses_dir = dir.join("uses");
         Self {
             cwd: cwd,
             dir: dir,
             assets_dir: assets_dir,
             envs_dir: envs_dir,
+            hashed_dir: hashed_dir,
+            uses_dir: uses_dir,
         }
     }
 

@@ -9,6 +9,7 @@ mod list;
 mod new;
 mod scratch;
 mod shell;
+mod use_;
 
 pub use self::available::do_available;
 pub use self::create::do_create;
@@ -20,3 +21,4 @@ pub use self::list::do_list;
 pub use self::new::do_new;
 pub use self::scratch::do_scratch;
 pub use self::shell::do_shell;
+pub use self::use_::do_use;
