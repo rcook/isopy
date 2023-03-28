@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::app::App;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::path::PathBuf;
@@ -24,8 +24,8 @@ impl EnvName {
     }
 
     #[allow(unused)]
-    pub fn dir(&self, config: &Config) -> PathBuf {
-        config.envs_dir.join(&self.0)
+    pub fn dir(&self, app: &App) -> PathBuf {
+        app.envs_dir.join(&self.0)
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::app::App;
 use crate::error::{fatal, Result};
 use crate::object_model::{AssetMeta, Tag};
 use hex::decode;
@@ -45,8 +45,8 @@ pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> 
     }
 }
 
-pub fn check_sha256sums(config: &Config) -> Result<()> {
-    for e in read_dir(&config.assets_dir)? {
+pub fn check_sha256sums(app: &App) -> Result<()> {
+    for e in read_dir(&app.assets_dir)? {
         let e = e?;
         let archive_file_name = e.file_name();
         let asset_name = archive_file_name

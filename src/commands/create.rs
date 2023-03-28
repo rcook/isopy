@@ -1,21 +1,21 @@
 use super::helpers::{create_env_dir, get_asset};
-use crate::config::Config;
+use crate::app::App;
 use crate::error::Result;
 use crate::object_model::{EnvName, Tag, Version};
 use crate::serialization::EnvRecord;
 use std::path::PathBuf;
 
 pub async fn do_create(
-    config: &Config,
+    app: &App,
     env_name: &EnvName,
     version: &Version,
     tag: &Option<Tag>,
 ) -> Result<()> {
-    let assets = config.read_assets()?;
+    let assets = app.read_assets()?;
     let asset = get_asset(&assets, version, tag)?;
 
-    let archive_path = config.assets_dir.join(&asset.name);
-    let env_dir = env_name.dir(&config);
+    let archive_path = app.assets_dir.join(&asset.name);
+    let env_dir = env_name.dir(&app);
     create_env_dir(&archive_path, &env_dir)?;
 
     let env_path = env_dir.join("env.yaml");

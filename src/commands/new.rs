@@ -1,11 +1,11 @@
-use crate::config::Config;
+use crate::app::App;
 use crate::error::{user, Result};
 use crate::object_model::{Tag, Version};
 use crate::serialization::ProjectRecord;
 use crate::util::{is_already_exists, safe_write_to_file};
 
-pub fn do_new(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let config_path = config.cwd.join(".isopy.yaml");
+pub fn do_new(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
+    let config_path = app.cwd.join(".isopy.yaml");
     let project_record = ProjectRecord {
         python_version: version.clone(),
         tag: tag.clone(),

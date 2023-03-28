@@ -1,12 +1,12 @@
-use crate::config::Config;
+use crate::app::App;
 use crate::error::{fatal, user, Result};
 use crate::object_model::{AssetFilter, Tag, Version};
 use crate::util::{download_file, validate_sha256_checksum};
 use reqwest::Client;
 use std::fs::remove_file;
 
-pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let assets = config.read_assets()?;
+pub async fn do_download(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
+    let assets = app.read_assets()?;
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(version.clone());
     asset_filter.tag = tag.clone();
@@ -34,7 +34,7 @@ pub async fn do_download(config: &Config, version: &Version, tag: &Option<Tag>) 
     };
     println!("{}", asset.name);
 
-    let output_path = config.assets_dir.join(&asset.name);
+    let output_path = app.assets_dir.join(&asset.name);
 
     if output_path.exists() {
         return Err(user(format!(

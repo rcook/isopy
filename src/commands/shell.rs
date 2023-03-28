@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::app::App;
 use crate::error::{user, Result};
 use crate::object_model::EnvName;
 use crate::serialization::{EnvRecord, HashedEnvRecord, UseRecord};
@@ -15,16 +15,16 @@ struct ShellInfo {
     python_dir: PathBuf,
 }
 
-fn get_use_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
-    let hex_digest = format!("{:x}", compute(path_to_str(&config.cwd)?));
-    let use_config_path = config.uses_dir.join(&hex_digest).join("use.yaml");
+fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
+    let hex_digest = format!("{:x}", compute(path_to_str(&app.cwd)?));
+    let use_config_path = app.uses_dir.join(&hex_digest).join("use.yaml");
     if !use_config_path.is_file() {
         return Ok(None);
     }
 
     let s = read_to_string(use_config_path)?;
     let use_record = serde_yaml::from_str::<UseRecord>(&s)?;
-    let env_config_path = config
+    let env_config_path = app
         .envs_dir
         .join(use_record.env_name.as_str())
         .join("env.yaml");
@@ -40,14 +40,14 @@ fn get_use_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
     }));
 }
 
-fn get_project_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
-    let project_config_path = config.cwd.join(".isopy.yaml");
+fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
+    let project_config_path = app.cwd.join(".isopy.yaml");
     if !project_config_path.is_file() {
         return Ok(None);
     }
 
     let hex_digest = format!("{:x}", compute(path_to_str(&project_config_path)?));
-    let env_config_path = config.hashed_dir.join(&hex_digest).join("env.yaml");
+    let env_config_path = app.hashed_dir.join(&hex_digest).join("env.yaml");
     if !env_config_path.is_file() {
         return Ok(None);
     }
@@ -60,19 +60,19 @@ fn get_project_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
     }));
 }
 
-fn get_shell_info(config: &Config) -> Result<Option<ShellInfo>> {
-    if let Some(shell_info) = get_use_shell_info(config)? {
+fn get_shell_info(app: &App) -> Result<Option<ShellInfo>> {
+    if let Some(shell_info) = get_use_shell_info(app)? {
         return Ok(Some(shell_info));
     }
 
-    if let Some(shell_info) = get_project_shell_info(config)? {
+    if let Some(shell_info) = get_project_shell_info(app)? {
         return Ok(Some(shell_info));
     }
 
     Ok(None)
 }
 
-pub fn do_shell(config: &Config, env_name_opt: &Option<EnvName>) -> Result<()> {
+pub fn do_shell(app: &App, env_name_opt: &Option<EnvName>) -> Result<()> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             return Err(user("You are already in an isopy shell"));
@@ -83,16 +83,16 @@ pub fn do_shell(config: &Config, env_name_opt: &Option<EnvName>) -> Result<()> {
 
     match env_name_opt {
         Some(env_name) => {
-            let env = match config.read_env(env_name)? {
+            let env = match app.read_env(env_name)? {
                 Some(x) => x,
                 _ => return Err(user(format!("No environment named {}", env_name))),
             };
 
-            do_shell_platform(config, &env.name.as_str(), &env.python_dir)?;
+            do_shell_platform(app, &env.name.as_str(), &env.python_dir)?;
         }
-        _ => match get_shell_info(config)? {
+        _ => match get_shell_info(app)? {
             Some(shell_info) => {
-                do_shell_platform(config, shell_info.env_name.as_str(), &shell_info.python_dir)?;
+                do_shell_platform(app, shell_info.env_name.as_str(), &shell_info.python_dir)?;
             }
             _ => todo!(),
         },
@@ -102,7 +102,7 @@ pub fn do_shell(config: &Config, env_name_opt: &Option<EnvName>) -> Result<()> {
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-fn do_shell_platform<P>(config: &Config, env_name: &str, python_dir: P) -> Result<()>
+fn do_shell_platform<P>(app: &App, env_name: &str, python_dir: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -110,7 +110,7 @@ where
 
     let shell = var("SHELL")?;
     set_var(ISOPY_ENV_NAME, env_name);
-    let python_bin_dir = config.envs_dir.join(env_name).join(&python_dir).join("bin");
+    let python_bin_dir = app.envs_dir.join(env_name).join(&python_dir).join("bin");
     let mut new_path = String::new();
     new_path.push_str(path_to_str(&python_bin_dir)?);
     new_path.push(':');

@@ -1,8 +1,8 @@
-use crate::config::Config;
+use crate::app::App;
 use crate::error::Result;
 
-pub async fn do_list(config: &Config) -> Result<()> {
-    for env in config.read_envs()? {
+pub async fn do_list(app: &App) -> Result<()> {
+    for env in app.read_envs()? {
         println!(
             "{}, {}, {}, {}",
             env.name,
