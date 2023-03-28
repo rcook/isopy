@@ -2,13 +2,14 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    User(String),
-    Reportable(String, ReportableError),
+    Env(std::env::VarError),
     IO(std::io::Error),
     Json(serde_json::Error),
     Regex(regex::Error),
+    Reportable(String, ReportableError),
     Reqwest(reqwest::Error),
     Template(indicatif::style::TemplateError),
+    User(String),
     Yaml(serde_yaml::Error),
 }
 
@@ -44,6 +45,12 @@ impl From<serde_json::Error> for Error {
 impl From<serde_yaml::Error> for Error {
     fn from(e: serde_yaml::Error) -> Self {
         Self::Yaml(e)
+    }
+}
+
+impl From<std::env::VarError> for Error {
+    fn from(e: std::env::VarError) -> Self {
+        Self::Env(e)
     }
 }
 

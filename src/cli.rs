@@ -32,6 +32,10 @@ pub enum Command {
     },
     Downloaded,
     List,
+    Shell {
+        #[arg(value_parser = parse_env_name)]
+        env_name: EnvName,
+    },
 }
 
 fn parse_env_name(s: &str) -> Result<EnvName, String> {
