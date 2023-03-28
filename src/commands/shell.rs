@@ -1,16 +1,17 @@
 use crate::config::Config;
 use crate::error::Result;
 use crate::object_model::EnvName;
-use exec::execvp;
 use std::env::{set_var, var};
 
 pub fn do_shell(config: &Config, env_name: &EnvName) -> Result<()> {
     do_shell_platform(config, env_name)
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 fn do_shell_platform(config: &Config, env_name: &EnvName) -> Result<()> {
-    // TODo:
+    use exec::execvp;
+
+    // TODO:
     //let temp = var("ISOPY_ENV");
 
     let shell = var("SHELL")?;
