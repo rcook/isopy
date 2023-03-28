@@ -5,9 +5,9 @@ use std::path::PathBuf;
 use std::result::Result;
 
 #[derive(Parser, Debug)]
-#[command(version)]
+#[command(about = "Isolated Python Tool Rust Edition!", version)]
 pub struct Args {
-    #[arg(short = 'd', long = "dir")]
+    #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir")]
     pub dir: Option<PathBuf>,
     #[command(subcommand)]
     pub command: Command,
@@ -15,36 +15,47 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    #[command(about = "List Python packages available for download")]
     Available,
+    #[command(about = "Create named Python environment")]
     Create {
-        #[arg(value_parser = parse_env_name)]
+        #[arg(help = "Environment name", value_parser = parse_env_name)]
         env_name: EnvName,
-        #[arg(value_parser = parse_version)]
+        #[arg(help = "Python version", value_parser = parse_version)]
         version: Version,
-        #[arg(short = 't', long = "tag", value_parser = parse_tag)]
+        #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+    #[command(about = "Download Python package")]
     Download {
-        #[arg(value_parser = parse_version)]
+        #[arg(help = "Python version", value_parser = parse_version)]
         version: Version,
-        #[arg(short = 't', long = "tag", value_parser = parse_tag)]
+        #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+    #[command(about = "List downloaded Python package")]
     Downloaded,
+    #[command(about = "Show info about current Python environment")]
     Info,
+    #[command(about = "Initialize current Python environment")]
     Init,
+    #[command(about = "List named Python environments")]
     List,
+    #[command(about = "Create project Python environment")]
     New {
-        #[arg(value_parser = parse_version)]
+        #[arg(help = "Python version", value_parser = parse_version)]
         version: Version,
-        #[arg(short = 't', long = "tag", value_parser = parse_tag)]
+        #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+    #[command(about = "Experimental")]
     Scratch,
+    #[command(about = "Start shell for current Python environment")]
     Shell {
-        #[arg(short = 'e', long = "env", value_parser = parse_env_name)]
+        #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,
     },
+    #[command(about = "Use specified named Python environment for current directory")]
     Use,
 }
 
