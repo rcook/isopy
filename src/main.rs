@@ -50,7 +50,7 @@ async fn main_inner() -> Result<()> {
         Command::Init => do_init(&config)?,
         Command::List => do_list(&config).await?,
         Command::New { version, tag } => do_new(&config, &version, &tag)?,
-        Command::Scratch => do_scratch()?,
+        Command::Scratch => do_scratch(&config)?,
         Command::Shell { env_name } => do_shell(&config, &env_name)?,
     }
 

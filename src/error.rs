@@ -4,6 +4,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     Env(std::env::VarError),
     Fatal(String),
+    Hex(hex::FromHexError),
     IO(std::io::Error),
     Json(serde_json::Error),
     Regex(regex::Error),
@@ -17,6 +18,12 @@ pub enum Error {
 #[derive(Debug)]
 pub enum ReportableError {
     CouldNotGetIsopyDir,
+}
+
+impl From<hex::FromHexError> for Error {
+    fn from(e: hex::FromHexError) -> Self {
+        Self::Hex(e)
+    }
 }
 
 impl From<indicatif::style::TemplateError> for Error {
