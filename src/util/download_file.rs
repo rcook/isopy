@@ -14,7 +14,7 @@ where
 {
     let temp_url = url.into_url()?;
     let url_str = String::from(temp_url.as_str());
-    let response = client.get(temp_url).send().await?;
+    let response = client.get(temp_url).send().await?.error_for_status()?;
     let size = response
         .content_length()
         .ok_or(user("Failed to get content length"))?;
