@@ -39,7 +39,7 @@ async fn main_inner() -> Result<()> {
     let app = App::new(cwd, dir);
 
     match args.command {
-        Command::Available => do_available(&app)?,
+        Command::Available => do_available(&app).await?,
         Command::Create {
             env_name,
             version,
