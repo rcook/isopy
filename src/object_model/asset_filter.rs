@@ -73,6 +73,24 @@ impl AssetFilter {
     }
 
     #[allow(unused)]
+    #[cfg(target_os = "windows")]
+    pub fn default_for_platform() -> Self {
+        Self {
+            archive_type: Some(ArchiveType::TarGZ),
+            family: Some(Family::CPython),
+            version: None,
+            tag: None,
+            arch: Some(Arch::X86_64),
+            platform: Some(Platform::PC),
+            os: Some(OS::Windows),
+            flavour: Some(Flavour::MSVC),
+            subflavour0: Some(Subflavour::Shared),
+            subflavour1: None,
+            variant: Some(Variant::InstallOnly),
+        }
+    }
+
+    #[allow(unused)]
     pub fn filter<'a, A>(&self, assets: A) -> Vec<&'a Asset>
     where
         A: IntoIterator<Item = &'a Asset>,

@@ -7,6 +7,7 @@ use md5::compute;
 use std::env::{set_var, var, VarError};
 use std::fs::read_to_string;
 use std::path::{Path, PathBuf};
+use std::process::ExitStatus;
 
 const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
 
@@ -102,21 +103,53 @@ pub fn do_shell(app: &App, env_name_opt: &Option<EnvName>) -> Result<()> {
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-fn do_shell_platform<P>(app: &App, env_name: &str, python_dir: P) -> Result<()>
+fn do_shell_platform<P>(app: &App, env_name: &str, python_dir: P) -> Result<ExitStatus>
 where
     P: AsRef<Path>,
 {
     use exec::execvp;
 
-    let shell = var("SHELL")?;
     set_var(ISOPY_ENV_NAME, env_name);
-    let python_bin_dir = app.envs_dir.join(env_name).join(&python_dir).join("bin");
+
     let mut new_path = String::new();
+    let python_bin_dir = app.envs_dir.join(env_name).join(&python_dir).join("bin");
     new_path.push_str(path_to_str(&python_bin_dir)?);
     new_path.push(':');
     new_path.push_str(&var("PATH")?);
     set_var("PATH", new_path);
 
-    let _ = execvp(shell, ["bash"]);
+    let shell = var("SHELL")?;
+    let _ = execvp(&shell, [&shell]);
     unreachable!()
+}
+
+#[cfg(any(target_os = "windows"))]
+fn do_shell_platform<P>(app: &App, env_name: &str, python_dir: P) -> Result<ExitStatus>
+where
+    P: AsRef<Path>,
+{
+    use crate::util::{get_windows_shell_info, WindowsShellKind};
+    use std::process::Command;
+
+    let shell_info = get_windows_shell_info()?;
+
+    set_var(ISOPY_ENV_NAME, env_name);
+
+    let mut new_path = String::new();
+    let python_bin_dir = app.envs_dir.join(env_name).join(&python_dir).join("bin");
+    new_path.push_str(path_to_str(&python_bin_dir)?);
+    new_path.push(';');
+    let python_scripts_dir = python_bin_dir.join("Scripts");
+    new_path.push_str(path_to_str(&python_scripts_dir)?);
+    new_path.push(';');
+    new_path.push_str(&var("PATH")?);
+    set_var("PATH", new_path);
+
+    Ok(match shell_info.kind {
+        WindowsShellKind::Cmd => Command::new(shell_info.path).arg("/k").status()?,
+        WindowsShellKind::PowerShell => Command::new(shell_info.path)
+            .arg("-NoExit")
+            .arg("-NoProfile")
+            .status()?,
+    })
 }
