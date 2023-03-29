@@ -11,6 +11,7 @@ pub enum Error {
     Reportable(String, ReportableError),
     Reqwest(reqwest::Error),
     Template(indicatif::style::TemplateError),
+    ToStr(reqwest::header::ToStrError),
     User(String),
     Yaml(serde_yaml::Error),
 }
@@ -41,6 +42,12 @@ impl From<regex::Error> for Error {
 impl From<reqwest::Error> for Error {
     fn from(e: reqwest::Error) -> Self {
         Self::Reqwest(e)
+    }
+}
+
+impl From<reqwest::header::ToStrError> for Error {
+    fn from(e: reqwest::header::ToStrError) -> Self {
+        Self::ToStr(e)
     }
 }
 

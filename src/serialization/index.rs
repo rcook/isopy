@@ -1,7 +1,7 @@
 use super::helpers::{deserialize_tag, deserialize_url};
 use crate::object_model::Tag;
 use reqwest::Url;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
 pub struct PackageRecord {
@@ -19,4 +19,10 @@ pub struct AssetRecord {
     pub name: String,
     #[serde(rename = "size")]
     pub size: i64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct IndexRecord {
+    #[serde(rename = "last_modified")]
+    pub last_modified: String,
 }

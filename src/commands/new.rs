@@ -12,7 +12,7 @@ pub fn do_new(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
     };
 
     let s = serde_yaml::to_string(&project_record)?;
-    match safe_write_to_file(&config_path, s) {
+    match safe_write_to_file(&config_path, s, false) {
         Ok(_) => {
             println!(
                 "Wrote project configuration file to {}",
