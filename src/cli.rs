@@ -15,9 +15,12 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    #[command(about = "List Python packages available for download")]
+    #[command(
+        name = "available",
+        about = "List Python packages available for download"
+    )]
     Available,
-    #[command(about = "Create named Python environment")]
+    #[command(name = "create", about = "Create named Python environment")]
     Create {
         #[arg(help = "Environment name", value_parser = parse_env_name)]
         env_name: EnvName,
@@ -26,38 +29,44 @@ pub enum Command {
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
-    #[command(about = "Download Python package")]
+    #[command(name = "download", about = "Download Python package")]
     Download {
         #[arg(help = "Python version", value_parser = parse_version)]
         version: Version,
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
-    #[command(about = "List downloaded Python package")]
+    #[command(name = "downloaded", about = "List downloaded Python package")]
     Downloaded,
-    #[command(about = "List downloaded Python package")]
+    #[command(name = "exec", about = "List downloaded Python package")]
     Exec,
-    #[command(about = "Execute command in shell for current Python environment")]
+    #[command(
+        name = "info",
+        about = "Execute command in shell for current Python environment"
+    )]
     Info,
-    #[command(about = "Initialize current Python environment")]
+    #[command(name = "init", about = "Initialize current Python environment")]
     Init,
-    #[command(about = "List named Python environments")]
+    #[command(name = "list", about = "List named Python environments")]
     List,
-    #[command(about = "Create project Python environment")]
+    #[command(name = "new", about = "New project Python environment")]
     New {
         #[arg(help = "Python version", value_parser = parse_version)]
         version: Version,
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
-    #[command(about = "Experimental")]
+    #[command(name = "scratch", about = "Experimental")]
     Scratch,
-    #[command(about = "Start shell for current Python environment")]
+    #[command(name = "shell", about = "Start shell for current Python environment")]
     Shell {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,
     },
-    #[command(about = "Use specified named Python environment for current directory")]
+    #[command(
+        name = "use",
+        about = "Use specified named Python environment for current directory"
+    )]
     Use,
 }
 
