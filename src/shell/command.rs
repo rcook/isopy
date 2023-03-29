@@ -50,16 +50,18 @@ impl Command {
     }
 
     #[cfg(any(target_os = "windows"))]
-    pub fn exec(app: &App, shell_info: &ShellInfo) -> Result<ExitStatus> {
-        use crate::util::{get_windows_shell_info, WindowsShellKind};
+    pub fn exec(&self, app: &App, shell_info: &ShellInfo) -> Result<ExitStatus> {
+        use crate::shell::{get_windows_shell_info, WindowsShellKind};
         use std::process::Command;
 
-        let shell_info = get_windows_shell_info()?;
+        let windows_shell_info = get_windows_shell_info()?;
 
-        set_var(ISOPY_ENV_NAME, env_name);
+        set_var(ISOPY_ENV_NAME, shell_info.env_name.as_str());
 
         let mut new_path = String::new();
-        let python_bin_dir = app.envs_dir.join(env_name).join(&python_dir).join("bin");
+        let python_bin_dir = app
+            .env_dir(&shell_info.env_name)
+            .join(&shell_info.python_dir);
         new_path.push_str(path_to_str(&python_bin_dir)?);
         new_path.push(';');
         let python_scripts_dir = python_bin_dir.join("Scripts");
@@ -68,9 +70,9 @@ impl Command {
         new_path.push_str(&var("PATH")?);
         set_var("PATH", new_path);
 
-        Ok(match shell_info.kind {
-            WindowsShellKind::Cmd => Command::new(shell_info.path).arg("/k").status()?,
-            WindowsShellKind::PowerShell => Command::new(shell_info.path)
+        Ok(match windows_shell_info.kind {
+            WindowsShellKind::Cmd => Command::new(windows_shell_info.path).arg("/k").status()?,
+            WindowsShellKind::PowerShell => Command::new(windows_shell_info.path)
                 .arg("-NoExit")
                 .arg("-NoProfile")
                 .status()?,
