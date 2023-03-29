@@ -10,8 +10,8 @@ mod util;
 use crate::app::App;
 use crate::cli::{Args, Command};
 use crate::commands::{
-    do_available, do_create, do_download, do_downloaded, do_info, do_init, do_list, do_new,
-    do_shell, do_use,
+    do_available, do_create, do_download, do_downloaded, do_exec, do_info, do_init, do_list,
+    do_new, do_shell, do_use,
 };
 use crate::error::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
@@ -46,6 +46,7 @@ async fn main_inner() -> Result<()> {
         } => do_create(&app, &env_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&app, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&app)?,
+        Command::Exec => do_exec(&app)?,
         Command::Info => do_info(&app)?,
         Command::Init => do_init(&app)?,
         Command::List => do_list(&app).await?,

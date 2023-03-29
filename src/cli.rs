@@ -35,7 +35,9 @@ pub enum Command {
     },
     #[command(about = "List downloaded Python package")]
     Downloaded,
-    #[command(about = "Show info about current Python environment")]
+    #[command(about = "List downloaded Python package")]
+    Exec,
+    #[command(about = "Execute command in shell for current Python environment")]
     Info,
     #[command(about = "Initialize current Python environment")]
     Init,
