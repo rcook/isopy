@@ -4,6 +4,7 @@ mod commands;
 mod error;
 mod object_model;
 mod serialization;
+mod shell;
 mod ui;
 mod util;
 

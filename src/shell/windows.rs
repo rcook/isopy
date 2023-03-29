@@ -1,4 +1,4 @@
-use super::{get_parent_pid, get_pid, get_process_from_pid};
+use super::proc::{get_parent_pid, get_pid, get_process_from_pid};
 use crate::error::{fatal, Result};
 use lazy_static::lazy_static;
 use same_file::is_same_file;
@@ -36,6 +36,7 @@ lazy_static! {
     };
 }
 
+#[allow(unused)]
 pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
     let mut system = System::new();
     let pid = get_pid()?;
