@@ -1,7 +1,5 @@
-use crate::app::App;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::path::PathBuf;
 
 lazy_static! {
     static ref ENV_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
@@ -21,11 +19,6 @@ impl EnvName {
 
     pub fn as_str(&self) -> &str {
         &self.0
-    }
-
-    #[allow(unused)]
-    pub fn dir(&self, app: &App) -> PathBuf {
-        app.envs_dir.join(&self.0)
     }
 }
 

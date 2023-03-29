@@ -54,6 +54,10 @@ impl App {
         Ok(assets)
     }
 
+    pub fn env_dir(&self, env_name: &EnvName) -> PathBuf {
+        self.envs_dir.join(env_name.as_str())
+    }
+
     pub fn read_envs(&self) -> Result<Vec<EnvRecord>> {
         let mut envs = Vec::new();
         for d in read_dir(&self.envs_dir)? {
