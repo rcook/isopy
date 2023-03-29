@@ -20,6 +20,7 @@ pub enum Command {
         about = "List Python packages available for download"
     )]
     Available,
+
     #[command(name = "create", about = "Create named Python environment")]
     Create {
         #[arg(help = "Environment name", value_parser = parse_env_name)]
@@ -29,6 +30,7 @@ pub enum Command {
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+
     #[command(name = "download", about = "Download Python package")]
     Download {
         #[arg(help = "Python version", value_parser = parse_version)]
@@ -36,19 +38,28 @@ pub enum Command {
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+
     #[command(name = "downloaded", about = "List downloaded Python package")]
     Downloaded,
+
     #[command(name = "exec", about = "List downloaded Python package")]
-    Exec,
+    Exec {
+        #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
+        env_name: Option<EnvName>,
+    },
+
     #[command(
         name = "info",
         about = "Execute command in shell for current Python environment"
     )]
     Info,
+
     #[command(name = "init", about = "Initialize current Python environment")]
     Init,
+
     #[command(name = "list", about = "List named Python environments")]
     List,
+
     #[command(name = "new", about = "New project Python environment")]
     New {
         #[arg(help = "Python version", value_parser = parse_version)]
@@ -56,13 +67,16 @@ pub enum Command {
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
         tag: Option<Tag>,
     },
+
     #[command(name = "scratch", about = "Experimental")]
     Scratch,
+
     #[command(name = "shell", about = "Start shell for current Python environment")]
     Shell {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,
     },
+
     #[command(
         name = "use",
         about = "Use specified named Python environment for current directory"
