@@ -1,13 +1,14 @@
 use super::helpers::{create_env_dir, get_asset};
 use crate::app::App;
 use crate::error::Result;
+use crate::object_model::EnvName;
 use crate::serialization::{HashedEnvRecord, ProjectRecord};
 use crate::util::path_to_str;
 use md5::compute;
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
-pub fn do_use(app: &App) -> Result<()> {
+pub fn do_use(app: &App, _env_name_opt: &Option<EnvName>) -> Result<()> {
     let config_path = app.cwd.join(".isopy.yaml");
     let s = read_to_string(&config_path)?;
     let project_record = serde_yaml::from_str::<ProjectRecord>(&s)?;

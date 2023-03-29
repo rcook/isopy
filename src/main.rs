@@ -54,7 +54,7 @@ async fn main_inner() -> Result<()> {
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
         Command::Scratch => do_scratch(&app)?,
         Command::Shell { env_name } => do_shell(&app, &env_name)?,
-        Command::Use => do_use(&app)?,
+        Command::Use { env_name } => do_use(&app, &env_name)?,
     }
 
     Ok(())
