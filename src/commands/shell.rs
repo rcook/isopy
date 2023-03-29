@@ -61,16 +61,31 @@ fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
     }));
 }
 
-fn get_shell_info(app: &App) -> Result<Option<ShellInfo>> {
+fn get_shell_info(app: &App, env_name_opt: &Option<EnvName>) -> Result<ShellInfo> {
+    if let Some(env_name) = env_name_opt {
+        match app.read_env(&env_name)? {
+            Some(env_record) => {
+                return Ok(ShellInfo {
+                    env_name: env_record.name,
+                    python_dir: env_record.python_dir,
+                })
+            }
+            _ => return Err(user(format!("No environment named {}", env_name))),
+        };
+    }
+
     if let Some(shell_info) = get_use_shell_info(app)? {
-        return Ok(Some(shell_info));
+        return Ok(shell_info);
     }
 
     if let Some(shell_info) = get_project_shell_info(app)? {
-        return Ok(Some(shell_info));
+        return Ok(shell_info);
     }
 
-    Ok(None)
+    Err(user(format!(
+        "Couldn't infer environment for directory {}",
+        app.cwd.display()
+    )))
 }
 
 pub fn do_shell(app: &App, env_name_opt: &Option<EnvName>) -> Result<()> {
@@ -82,23 +97,8 @@ pub fn do_shell(app: &App, env_name_opt: &Option<EnvName>) -> Result<()> {
         Err(e) => return Err(e)?,
     }
 
-    match env_name_opt {
-        Some(env_name) => {
-            let env = match app.read_env(env_name)? {
-                Some(x) => x,
-                _ => return Err(user(format!("No environment named {}", env_name))),
-            };
-
-            do_shell_platform(app, &env.name.as_str(), &env.python_dir)?;
-        }
-        _ => match get_shell_info(app)? {
-            Some(shell_info) => {
-                do_shell_platform(app, shell_info.env_name.as_str(), &shell_info.python_dir)?;
-            }
-            _ => todo!(),
-        },
-    };
-
+    let shell_info = get_shell_info(app, env_name_opt)?;
+    do_shell_platform(app, shell_info.env_name.as_str(), &shell_info.python_dir)?;
     Ok(())
 }
 
