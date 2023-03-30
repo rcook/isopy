@@ -32,6 +32,10 @@ impl App {
         }
     }
 
+    pub fn make_asset_path(&self, asset: &Asset) -> PathBuf {
+        self.assets_dir.join(&asset.name)
+    }
+
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_path = self.assets_dir.join("index.json");
         let index_json = read_to_string(index_path)?;

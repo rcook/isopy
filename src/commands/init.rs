@@ -1,6 +1,6 @@
 use super::helpers::get_asset;
 use crate::app::App;
-use crate::commands::helpers::{download_asset, make_asset_path};
+use crate::commands::helpers::download_asset;
 use crate::error::Result;
 use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
 use crate::util::{safe_write_file, unpack_file};
@@ -15,7 +15,7 @@ pub async fn do_init(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, &project_record.python_version, &project_record.tag)?;
 
-    let mut asset_path = make_asset_path(app, &asset);
+    let mut asset_path = app.make_asset_path(&asset);
     if !asset_path.is_file() {
         asset_path = download_asset(app, asset).await?;
     }

@@ -38,12 +38,8 @@ pub fn get_asset<'a>(
     }
 }
 
-pub fn make_asset_path(app: &App, asset: &Asset) -> PathBuf {
-    app.assets_dir.join(&asset.name)
-}
-
 pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
-    let asset_path = make_asset_path(app, asset);
+    let asset_path = app.make_asset_path(asset);
     if asset_path.exists() {
         return Err(user(format!(
             "Asset {} already downloaded",
