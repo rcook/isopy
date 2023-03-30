@@ -3,8 +3,7 @@ use crate::app::App;
 use crate::commands::helpers::{download_asset, make_asset_path};
 use crate::error::Result;
 use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
-use crate::util::{path_to_str, safe_write_file, unpack_file};
-use md5::compute;
+use crate::util::{safe_write_file, unpack_file};
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
@@ -21,19 +20,19 @@ pub async fn do_init(app: &App) -> Result<()> {
         asset_path = download_asset(app, asset).await?;
     }
 
-    let hex_digest = format!("{:x}", compute(path_to_str(&project_config_path)?));
-    let env_dir = app.dir.join("hashed").join(hex_digest);
-    unpack_file(&asset_path, &env_dir)?;
+    let anonymous_env_dir = app.anonymous_env_dir(&project_config_path)?;
+    unpack_file(&asset_path, &anonymous_env_dir)?;
 
-    let env_path = env_dir.join("env.yaml");
-    let env_record = AnonymousEnvRecord {
-        config_path: project_config_path,
-        python_dir: PathBuf::from("python"),
-        python_version: asset.meta.version.clone(),
-        tag: asset.tag.clone(),
-    };
-
-    safe_write_file(env_path, serde_yaml::to_string(&env_record)?, false)?;
+    safe_write_file(
+        anonymous_env_dir.join("env.yaml"),
+        serde_yaml::to_string(&AnonymousEnvRecord {
+            config_path: project_config_path,
+            python_dir: PathBuf::from("python"),
+            python_version: asset.meta.version.clone(),
+            tag: asset.tag.clone(),
+        })?,
+        false,
+    )?;
 
     Ok(())
 }
