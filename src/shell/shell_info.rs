@@ -4,6 +4,7 @@ use crate::object_model::EnvName;
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
 use crate::util::path_to_str;
 use md5::compute;
+use serde_yaml::from_str;
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
@@ -22,21 +23,18 @@ fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
         return Ok(None);
     }
 
-    let s = read_to_string(use_config_path)?;
-    let use_record = serde_yaml::from_str::<UseRecord>(&s)?;
-    let env_config_path = app
-        .envs_dir
-        .join(use_record.env_name.as_str())
-        .join("env.yaml");
-    if !env_config_path.is_file() {
+    let use_record = from_str::<UseRecord>(&read_to_string(&use_config_path)?)?;
+    let named_env_config_path = app.named_env_dir(&use_record.env_name).join("env.yaml");
+    if !named_env_config_path.is_file() {
         return Ok(None);
     }
 
-    let s = read_to_string(env_config_path)?;
-    let env_record = serde_yaml::from_str::<NamedEnvRecord>(&s)?;
+    let named_env_record = from_str::<NamedEnvRecord>(&read_to_string(&named_env_config_path)?)?;
     return Ok(Some(ShellInfo {
-        env_name: env_record.name,
-        full_python_dir: app.envs_dir.join(&hex_digest).join(env_record.python_dir),
+        env_name: named_env_record.name.clone(),
+        full_python_dir: app
+            .named_env_dir(&named_env_record.name)
+            .join(named_env_record.python_dir),
     }));
 }
 
@@ -65,14 +63,11 @@ fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
 
 pub fn get_shell_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<ShellInfo> {
     if let Some(env_name) = env_name_opt {
-        match app.read_env(env_name)? {
+        match app.read_named_env(env_name)? {
             Some(env_record) => {
                 return Ok(ShellInfo {
                     env_name: env_record.name,
-                    full_python_dir: app
-                        .envs_dir
-                        .join(env_name.as_str())
-                        .join(env_record.python_dir),
+                    full_python_dir: app.named_env_dir(env_name).join(env_record.python_dir),
                 })
             }
             _ => return Err(user(format!("No environment named {}", env_name))),

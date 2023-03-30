@@ -16,18 +16,19 @@ pub async fn do_create(
     let asset = get_asset(&assets, version, tag)?;
 
     let archive_path = app.assets_dir.join(&asset.name);
-    let env_dir = app.env_dir(&env_name);
-    unpack_file(&archive_path, &env_dir)?;
+    let named_env_dir = app.named_env_dir(&env_name);
+    unpack_file(&archive_path, &named_env_dir)?;
 
-    let env_path = env_dir.join("env.yaml");
-    let env_record = NamedEnvRecord {
-        name: env_name.clone(),
-        python_dir: PathBuf::from("python"),
-        python_version: asset.meta.version.clone(),
-        tag: asset.tag.clone(),
-    };
-
-    safe_write_to_file(env_path, serde_yaml::to_string(&env_record)?, false)?;
+    safe_write_to_file(
+        named_env_dir.join("env.yaml"),
+        serde_yaml::to_string(&NamedEnvRecord {
+            name: env_name.clone(),
+            python_dir: PathBuf::from("python"),
+            python_version: asset.meta.version.clone(),
+            tag: asset.tag.clone(),
+        })?,
+        false,
+    )?;
 
     Ok(())
 }

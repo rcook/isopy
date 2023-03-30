@@ -10,7 +10,7 @@ pub struct App {
     pub cwd: PathBuf,
     pub dir: PathBuf,
     pub assets_dir: PathBuf,
-    pub envs_dir: PathBuf,
+    pub named_envs_dir: PathBuf,
     pub hashed_dir: PathBuf,
     pub uses_dir: PathBuf,
 }
@@ -18,14 +18,14 @@ pub struct App {
 impl App {
     pub fn new(cwd: PathBuf, dir: PathBuf) -> Self {
         let assets_dir = dir.join("assets");
-        let envs_dir = dir.join("envs");
+        let named_envs_dir = dir.join("envs");
         let hashed_dir = dir.join("hashed");
         let uses_dir = dir.join("uses");
         Self {
             cwd: cwd,
             dir: dir,
             assets_dir: assets_dir,
-            envs_dir: envs_dir,
+            named_envs_dir: named_envs_dir,
             hashed_dir: hashed_dir,
             uses_dir: uses_dir,
         }
@@ -54,37 +54,37 @@ impl App {
         Ok(assets)
     }
 
-    pub fn env_dir(&self, env_name: &EnvName) -> PathBuf {
-        self.envs_dir.join(env_name.as_str())
+    pub fn named_env_dir(&self, env_name: &EnvName) -> PathBuf {
+        self.named_envs_dir.join(env_name.as_str())
     }
 
-    pub fn read_envs(&self) -> Result<Vec<NamedEnvRecord>> {
-        let mut envs = Vec::new();
-        for d in read_dir(&self.envs_dir)? {
+    pub fn read_named_envs(&self) -> Result<Vec<NamedEnvRecord>> {
+        let mut named_envs = Vec::new();
+        for d in read_dir(&self.named_envs_dir)? {
             let env_name = match EnvName::parse(osstr_to_str(&d?.file_name())?) {
                 Some(x) => x,
                 None => continue,
             };
 
-            let env = match self.read_env(&env_name)? {
+            let named_env = match self.read_named_env(&env_name)? {
                 Some(x) => x,
                 None => continue,
             };
 
-            envs.push(env)
+            named_envs.push(named_env)
         }
 
-        Ok(envs)
+        Ok(named_envs)
     }
 
-    pub fn read_env(&self, env_name: &EnvName) -> Result<Option<NamedEnvRecord>> {
-        let env_config_path = self.envs_dir.join(env_name.as_str()).join("env.yaml");
+    pub fn read_named_env(&self, env_name: &EnvName) -> Result<Option<NamedEnvRecord>> {
+        let env_config_path = self.named_envs_dir.join(env_name.as_str()).join("env.yaml");
         if !env_config_path.is_file() {
             return Ok(None);
         }
 
         let s = read_to_string(&env_config_path)?;
-        let env = serde_yaml::from_str::<NamedEnvRecord>(&s)?;
-        Ok(Some(env))
+        let named_env = serde_yaml::from_str::<NamedEnvRecord>(&s)?;
+        Ok(Some(named_env))
     }
 }
