@@ -29,7 +29,7 @@ impl Command {
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    pub fn exec(&self, app: &App, shell_info: &ShellInfo) -> Result<ExitStatus> {
+    pub fn exec(&self, _app: &App, shell_info: &ShellInfo) -> Result<ExitStatus> {
         use exec::execvp;
 
         set_var(ISOPY_ENV_NAME, shell_info.env_name.as_str());
