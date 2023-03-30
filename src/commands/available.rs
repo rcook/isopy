@@ -2,7 +2,7 @@ use crate::app::App;
 use crate::error::Result;
 use crate::object_model::AssetFilter;
 use crate::serialization::IndexRecord;
-use crate::util::{download_file, safe_write_to_file, ISOPY_USER_AGENT};
+use crate::util::{download_file, safe_write_file, ISOPY_USER_AGENT};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use std::fs::read_to_string;
@@ -39,7 +39,7 @@ pub async fn do_available(app: &App) -> Result<()> {
     if response.status() != StatusCode::NOT_MODIFIED {
         println!("New releases are available");
         if let Some(last_modified) = response.headers().get(LAST_MODIFIED) {
-            safe_write_to_file(
+            safe_write_file(
                 &index_yaml_path,
                 serde_yaml::to_string(&IndexRecord {
                     last_modified: String::from(last_modified.to_str()?),

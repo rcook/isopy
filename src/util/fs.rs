@@ -18,7 +18,7 @@ where
     Ok(options.open(path)?)
 }
 
-pub fn safe_write_to_file<P, C>(path: P, contents: C, overwrite: bool) -> Result<()>
+pub fn safe_write_file<P, C>(path: P, contents: C, overwrite: bool) -> Result<()>
 where
     P: AsRef<Path>,
     C: AsRef<[u8]>,

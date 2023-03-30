@@ -2,7 +2,7 @@ use super::helpers::get_asset;
 use crate::app::App;
 use crate::error::Result;
 use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
-use crate::util::{path_to_str, safe_write_to_file, unpack_file};
+use crate::util::{path_to_str, safe_write_file, unpack_file};
 use md5::compute;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -32,7 +32,7 @@ pub fn do_init(app: &App) -> Result<()> {
         tag: asset.tag.clone(),
     };
 
-    safe_write_to_file(env_path, serde_yaml::to_string(&env_record)?, false)?;
+    safe_write_file(env_path, serde_yaml::to_string(&env_record)?, false)?;
 
     Ok(())
 }
