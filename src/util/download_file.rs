@@ -1,5 +1,5 @@
 use crate::error::{user, Result};
-use crate::ui::make_progress_bar;
+use crate::ui::ProgressIndicator;
 use futures_util::StreamExt;
 use reqwest::{Client, IntoUrl};
 use std::cmp::min;
@@ -15,12 +15,10 @@ where
     let temp_url = url.into_url()?;
     let url_str = String::from(temp_url.as_str());
     let response = client.get(temp_url).send().await?.error_for_status()?;
-    let size = response
-        .content_length()
-        .ok_or(user("Failed to get content length"))?;
+    let size_opt = response.content_length();
 
-    let progress_bar = make_progress_bar(size)?;
-    progress_bar.set_message(format!("Downloading {}", url_str));
+    let indicator = ProgressIndicator::new(size_opt)?;
+    indicator.set_message(format!("Downloading {}", url_str));
 
     let mut file = File::create(&output_path)?;
     let mut downloaded: u64 = 0;
@@ -28,12 +26,16 @@ where
     while let Some(item) = stream.next().await {
         let chunk = item?;
         file.write_all(&chunk)?;
-        let new = min(downloaded + (chunk.len() as u64), size);
-        downloaded = new;
-        progress_bar.set_position(new);
+
+        downloaded = match size_opt {
+            Some(size) => min(downloaded + chunk.len() as u64, size),
+            None => downloaded + chunk.len() as u64,
+        };
+
+        indicator.set_position(downloaded);
     }
 
-    progress_bar.finish_with_message(format!(
+    indicator.finish_with_message(format!(
         "Downloaded {} to {}",
         url_str,
         output_path.as_ref().display()

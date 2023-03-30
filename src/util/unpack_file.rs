@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::ui::make_progress_bar;
+use crate::ui::ProgressIndicator;
 use flate2::read::GzDecoder;
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
@@ -29,16 +29,16 @@ where
     let decoder = GzDecoder::new(file);
     let mut archive = Archive::new(decoder);
 
-    let progress_bar = make_progress_bar(size as u64)?;
-    progress_bar.set_message(format!("Unpacking {}", path.as_ref().display()));
+    let indicator = ProgressIndicator::new(Some(size as u64))?;
+    indicator.set_message(format!("Unpacking {}", path.as_ref().display()));
 
     for (idx, mut entry) in archive.entries()?.filter_map(|e| e.ok()).enumerate() {
         let path = dir.as_ref().join(entry.path()?);
         unpack_entry(&mut entry, path)?;
-        progress_bar.set_position(idx as u64);
+        indicator.set_position(idx as u64);
     }
 
-    progress_bar.finish_with_message("Done");
+    indicator.finish_with_message("Done");
 
     Ok(())
 }
