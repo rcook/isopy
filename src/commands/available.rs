@@ -2,7 +2,7 @@ use crate::app::App;
 use crate::error::Result;
 use crate::object_model::AssetFilter;
 use crate::serialization::IndexRecord;
-use crate::util::{download_file, safe_write_to_file};
+use crate::util::{download_file, safe_write_to_file, ISOPY_USER_AGENT};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use std::fs::read_to_string;
@@ -30,7 +30,7 @@ pub async fn do_available(app: &App) -> Result<()> {
 
     let mut request = client
         .head(LATEST_RELEASE_URL)
-        .header(USER_AGENT, "isopyrs");
+        .header(USER_AGENT, ISOPY_USER_AGENT);
     if let Some(last_modified) = last_modified_opt {
         request = request.header(IF_MODIFIED_SINCE, last_modified);
     }

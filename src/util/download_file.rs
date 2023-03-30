@@ -8,6 +8,8 @@ use std::cmp::min;
 use std::io::Write;
 use std::path::Path;
 
+pub const ISOPY_USER_AGENT: &'static str = "isopy";
+
 pub async fn download_file<U, P>(
     client: &Client,
     url: U,
@@ -20,7 +22,7 @@ where
 {
     let temp_url = url.into_url()?;
     let url_str = String::from(temp_url.as_str());
-    let request = client.get(temp_url).header(USER_AGENT, "isopy");
+    let request = client.get(temp_url).header(USER_AGENT, ISOPY_USER_AGENT);
     let response = request.send().await?.error_for_status()?;
     let size_opt = response.content_length();
 
