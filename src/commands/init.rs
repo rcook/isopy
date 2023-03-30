@@ -1,5 +1,6 @@
 use super::helpers::get_asset;
 use crate::app::App;
+use crate::commands::helpers::{download_asset, make_asset_path};
 use crate::error::Result;
 use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
 use crate::util::{path_to_str, safe_write_file, unpack_file};
@@ -7,7 +8,7 @@ use md5::compute;
 use std::fs::read_to_string;
 use std::path::PathBuf;
 
-pub fn do_init(app: &App) -> Result<()> {
+pub async fn do_init(app: &App) -> Result<()> {
     let project_config_path = app.cwd.join(".isopy.yaml");
     let s = read_to_string(&project_config_path)?;
     let project_record = serde_yaml::from_str::<ProjectRecord>(&s)?;
@@ -15,14 +16,14 @@ pub fn do_init(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, &project_record.python_version, &project_record.tag)?;
 
-    let archive_path = app.assets_dir.join(&asset.name);
-    if !archive_path.is_file() {
-        todo!("Download the archive automatically: for now, use the \"download\" command")
+    let mut asset_path = make_asset_path(app, &asset);
+    if !asset_path.is_file() {
+        asset_path = download_asset(app, asset).await?;
     }
 
     let hex_digest = format!("{:x}", compute(path_to_str(&project_config_path)?));
     let env_dir = app.dir.join("hashed").join(hex_digest);
-    unpack_file(&archive_path, &env_dir)?;
+    unpack_file(&asset_path, &env_dir)?;
 
     let env_path = env_dir.join("env.yaml");
     let env_record = AnonymousEnvRecord {

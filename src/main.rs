@@ -49,7 +49,7 @@ async fn main_inner() -> Result<()> {
         Command::Downloaded => do_downloaded(&app)?,
         Command::Exec { env_name } => do_exec(&app, env_name.as_ref())?,
         Command::Info => do_info(&app)?,
-        Command::Init => do_init(&app)?,
+        Command::Init => do_init(&app).await?,
         Command::List => do_list(&app).await?,
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
         Command::Scratch => do_scratch(&app)?,

@@ -11,9 +11,6 @@ isopyrs available
 ```bash
 cd /path/to/project
 
-# Download this version of Python
-isopyrs download 3.11.1 -t 20230116
-
 # Create an .isopy.yaml configuration file
 isopyrs new 3.11.1 -t 20230116
 
