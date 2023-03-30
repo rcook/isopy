@@ -1,9 +1,10 @@
 use crate::error::Result;
 use crate::object_model::{Asset, AssetMeta, EnvName};
 use crate::serialization::{NamedEnvRecord, PackageRecord};
-use crate::util::osstr_to_str;
+use crate::util::{osstr_to_str, path_to_str};
+use md5::compute;
 use std::fs::{read_dir, read_to_string};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct App {
@@ -11,7 +12,7 @@ pub struct App {
     pub dir: PathBuf,
     pub assets_dir: PathBuf,
     pub named_envs_dir: PathBuf,
-    pub hashed_dir: PathBuf,
+    pub anonymous_envs_dir: PathBuf,
     pub uses_dir: PathBuf,
 }
 
@@ -19,14 +20,14 @@ impl App {
     pub fn new(cwd: PathBuf, dir: PathBuf) -> Self {
         let assets_dir = dir.join("assets");
         let named_envs_dir = dir.join("envs");
-        let hashed_dir = dir.join("hashed");
+        let anonymous_envs_dir = dir.join("hashed");
         let uses_dir = dir.join("uses");
         Self {
             cwd: cwd,
             dir: dir,
             assets_dir: assets_dir,
             named_envs_dir: named_envs_dir,
-            hashed_dir: hashed_dir,
+            anonymous_envs_dir: anonymous_envs_dir,
             uses_dir: uses_dir,
         }
     }
@@ -78,13 +79,31 @@ impl App {
     }
 
     pub fn read_named_env(&self, env_name: &EnvName) -> Result<Option<NamedEnvRecord>> {
-        let env_config_path = self.named_envs_dir.join(env_name.as_str()).join("env.yaml");
-        if !env_config_path.is_file() {
+        let named_env_config_path = self.named_envs_dir.join(env_name.as_str()).join("env.yaml");
+        if !named_env_config_path.is_file() {
             return Ok(None);
         }
 
-        let s = read_to_string(&env_config_path)?;
+        let s = read_to_string(&named_env_config_path)?;
         let named_env = serde_yaml::from_str::<NamedEnvRecord>(&s)?;
         Ok(Some(named_env))
+    }
+
+    pub fn anonymous_env_dir<P>(&self, project_config_path: P) -> Result<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        let digest = compute(path_to_str(project_config_path.as_ref())?);
+        let hex_digest = format!("{:x}", digest);
+        Ok(self.anonymous_envs_dir.join(&hex_digest))
+    }
+
+    pub fn use_dir<P>(&self, dir: P) -> Result<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        let digest = compute(path_to_str(dir.as_ref())?);
+        let hex_digest = format!("{:x}", digest);
+        Ok(self.uses_dir.join(&hex_digest))
     }
 }
