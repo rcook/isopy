@@ -1,4 +1,4 @@
-use crate::error::{user, Result};
+use crate::error::Result;
 use crate::ui::ProgressIndicator;
 use futures_util::StreamExt;
 use reqwest::{Client, IntoUrl};
