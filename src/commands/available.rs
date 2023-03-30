@@ -2,7 +2,7 @@ use crate::app::App;
 use crate::error::Result;
 use crate::object_model::AssetFilter;
 use crate::serialization::IndexRecord;
-use crate::util::safe_write_to_file;
+use crate::util::{download_file, safe_write_to_file};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use std::fs::read_to_string;
@@ -46,17 +46,9 @@ pub async fn do_available(app: &App) -> Result<()> {
                 })?,
                 true,
             )?;
-        }
 
-        let contents = client
-            .get(RELEASES_URL)
-            .header(USER_AGENT, "isopy")
-            .send()
-            .await?
-            .error_for_status()?
-            .text()
-            .await?;
-        safe_write_to_file(index_json_path, contents, true)?;
+            download_file(&client, RELEASES_URL, index_json_path, true).await?;
+        }
     }
 
     let assets = app.read_assets()?;

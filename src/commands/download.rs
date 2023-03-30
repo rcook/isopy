@@ -44,7 +44,7 @@ pub async fn do_download(app: &App, version: &Version, tag: &Option<Tag>) -> Res
     }
 
     let client = Client::builder().build()?;
-    download_file(&client, asset.url.clone(), &output_path).await?;
+    download_file(&client, asset.url.clone(), &output_path, true).await?;
 
     let is_valid = validate_sha256_checksum(&output_path, &asset.tag)?;
     if !is_valid {
