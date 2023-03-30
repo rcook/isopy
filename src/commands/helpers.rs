@@ -1,7 +1,5 @@
 use crate::error::{user, Result};
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
-use crate::util::unpack_file;
-use std::path::Path;
 
 pub fn get_asset<'a>(
     assets: &'a Vec<Asset>,
@@ -33,27 +31,4 @@ pub fn get_asset<'a>(
             )))
         }
     }
-}
-
-pub fn create_env_dir<P, Q>(archive_path: P, env_dir: Q) -> Result<()>
-where
-    P: AsRef<Path>,
-    Q: AsRef<Path>,
-{
-    if !archive_path.as_ref().exists() {
-        return Err(user(format!(
-            "File {} does not exist",
-            archive_path.as_ref().display()
-        )));
-    }
-
-    if env_dir.as_ref().exists() {
-        return Err(user(format!(
-            "Environment directory {} already exists",
-            env_dir.as_ref().display()
-        )));
-    }
-
-    unpack_file(&archive_path, &env_dir)?;
-    Ok(())
 }

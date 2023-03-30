@@ -1,8 +1,8 @@
-use super::helpers::{create_env_dir, get_asset};
+use super::helpers::get_asset;
 use crate::app::App;
 use crate::error::Result;
 use crate::serialization::{HashedEnvRecord, ProjectRecord};
-use crate::util::{path_to_str, safe_write_to_file};
+use crate::util::{path_to_str, safe_write_to_file, unpack_file};
 use md5::compute;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -18,8 +18,7 @@ pub fn do_init(app: &App) -> Result<()> {
     let archive_path = app.assets_dir.join(&asset.name);
     let hex_digest = format!("{:x}", compute(path_to_str(&config_path)?));
     let env_dir = app.dir.join("hashed").join(hex_digest);
-
-    create_env_dir(&archive_path, &env_dir)?;
+    unpack_file(&archive_path, &env_dir)?;
 
     let env_path = env_dir.join("env.yaml");
     let env_record = HashedEnvRecord {
