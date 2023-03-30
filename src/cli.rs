@@ -82,8 +82,8 @@ pub enum Command {
         about = "Use specified named Python environment for current directory"
     )]
     Use {
-        #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
-        env_name: Option<EnvName>,
+        #[arg(help = "Environment name", value_parser = parse_env_name)]
+        env_name: EnvName,
     },
 }
 

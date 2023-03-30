@@ -3,6 +3,7 @@ use crate::app::App;
 use crate::error::Result;
 use crate::object_model::{EnvName, Tag, Version};
 use crate::serialization::EnvRecord;
+use crate::util::safe_write_to_file;
 use std::path::PathBuf;
 
 pub async fn do_create(
@@ -25,7 +26,8 @@ pub async fn do_create(
         python_version: asset.meta.version.clone(),
         tag: asset.tag.clone(),
     };
-    std::fs::write(env_path, serde_yaml::to_string(&env_record)?)?;
+
+    safe_write_to_file(env_path, serde_yaml::to_string(&env_record)?, false)?;
 
     Ok(())
 }

@@ -2,7 +2,7 @@ use super::helpers::{create_env_dir, get_asset};
 use crate::app::App;
 use crate::error::Result;
 use crate::serialization::{HashedEnvRecord, ProjectRecord};
-use crate::util::path_to_str;
+use crate::util::{path_to_str, safe_write_to_file};
 use md5::compute;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -28,7 +28,8 @@ pub fn do_init(app: &App) -> Result<()> {
         python_version: asset.meta.version.clone(),
         tag: asset.tag.clone(),
     };
-    std::fs::write(env_path, serde_yaml::to_string(&env_record)?)?;
+
+    safe_write_to_file(env_path, serde_yaml::to_string(&env_record)?, false)?;
 
     Ok(())
 }

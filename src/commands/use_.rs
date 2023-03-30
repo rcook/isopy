@@ -1,35 +1,31 @@
-use super::helpers::{create_env_dir, get_asset};
 use crate::app::App;
-use crate::error::Result;
+use crate::error::{user, Result};
 use crate::object_model::EnvName;
-use crate::serialization::{HashedEnvRecord, ProjectRecord};
-use crate::util::path_to_str;
+use crate::serialization::UseRecord;
+use crate::shell::get_shell_info;
+use crate::util::{path_to_str, safe_write_to_file};
 use md5::compute;
-use std::fs::read_to_string;
-use std::path::PathBuf;
 
-pub fn do_use(app: &App, _env_name_opt: &Option<EnvName>) -> Result<()> {
-    let config_path = app.cwd.join(".isopy.yaml");
-    let s = read_to_string(&config_path)?;
-    let project_record = serde_yaml::from_str::<ProjectRecord>(&s)?;
+pub fn do_use(app: &App, env_name: &EnvName) -> Result<()> {
+    let hex_digest = format!("{:x}", compute(path_to_str(&app.cwd)?));
 
-    let assets = app.read_assets()?;
-    let asset = get_asset(&assets, &project_record.python_version, &project_record.tag)?;
+    let use_yaml_path = app.uses_dir.join(&hex_digest).join("use.yaml");
+    if use_yaml_path.is_file() {
+        return Err(user(format!(
+            "Use is already configured for directory {}",
+            app.cwd.display()
+        )));
+    }
 
-    let archive_path = app.assets_dir.join(&asset.name);
-    let hex_digest = format!("{:x}", compute(path_to_str(&config_path)?));
-    let env_dir = app.dir.join("hashed").join(hex_digest);
+    let shell_info = get_shell_info(app, Some(env_name))?;
 
-    create_env_dir(&archive_path, &env_dir)?;
-
-    let env_path = env_dir.join("env.yaml");
-    let env_record = HashedEnvRecord {
-        config_path: config_path,
-        python_dir: PathBuf::from("python"),
-        python_version: asset.meta.version.clone(),
-        tag: asset.tag.clone(),
-    };
-    std::fs::write(env_path, serde_yaml::to_string(&env_record)?)?;
-
+    safe_write_to_file(
+        use_yaml_path,
+        serde_yaml::to_string(&UseRecord {
+            dir: app.cwd.clone(),
+            env_name: shell_info.env_name,
+        })?,
+        false,
+    )?;
     Ok(())
 }

@@ -47,13 +47,13 @@ async fn main_inner() -> Result<()> {
         } => do_create(&app, &env_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&app, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&app)?,
-        Command::Exec { env_name } => do_exec(&app, &env_name)?,
+        Command::Exec { env_name } => do_exec(&app, env_name.as_ref())?,
         Command::Info => do_info(&app)?,
         Command::Init => do_init(&app)?,
         Command::List => do_list(&app).await?,
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
         Command::Scratch => do_scratch(&app)?,
-        Command::Shell { env_name } => do_shell(&app, &env_name)?,
+        Command::Shell { env_name } => do_shell(&app, env_name.as_ref())?,
         Command::Use { env_name } => do_use(&app, &env_name)?,
     }
 

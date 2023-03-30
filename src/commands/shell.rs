@@ -4,7 +4,9 @@ use crate::object_model::EnvName;
 use crate::shell::{get_shell_info, Command, ISOPY_ENV_NAME};
 use std::env::{var, VarError};
 
-pub fn do_shell(app: &App, env_name_opt: &Option<EnvName>) -> Result<()> {
+// TBD: Implement for Windows
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub fn do_shell(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             return Err(user("You are already in an isopy shell"));

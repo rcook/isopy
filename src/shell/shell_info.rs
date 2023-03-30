@@ -63,9 +63,9 @@ fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
     }));
 }
 
-pub fn get_shell_info(app: &App, env_name_opt: &Option<EnvName>) -> Result<ShellInfo> {
+pub fn get_shell_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<ShellInfo> {
     if let Some(env_name) = env_name_opt {
-        match app.read_env(&env_name)? {
+        match app.read_env(env_name)? {
             Some(env_record) => {
                 return Ok(ShellInfo {
                     env_name: env_record.name,
