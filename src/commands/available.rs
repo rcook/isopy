@@ -48,7 +48,7 @@ pub async fn do_available(app: &App) -> Result<()> {
             )?;
         }
 
-        let contents = Client::new()
+        let contents = client
             .get(RELEASES_URL)
             .header(USER_AGENT, "isopy")
             .send()
