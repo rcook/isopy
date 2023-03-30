@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct EnvRecord {
+pub struct NamedEnvRecord {
     #[serde(
         rename = "name",
         deserialize_with = "deserialize_env_name",
@@ -31,7 +31,7 @@ pub struct EnvRecord {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct HashedEnvRecord {
+pub struct AnonymousEnvRecord {
     #[serde(rename = "dir_config_path")]
     pub config_path: PathBuf,
     #[serde(rename = "python_dir")]

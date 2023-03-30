@@ -2,7 +2,7 @@ use super::helpers::get_asset;
 use crate::app::App;
 use crate::error::Result;
 use crate::object_model::{EnvName, Tag, Version};
-use crate::serialization::EnvRecord;
+use crate::serialization::NamedEnvRecord;
 use crate::util::{safe_write_to_file, unpack_file};
 use std::path::PathBuf;
 
@@ -20,7 +20,7 @@ pub async fn do_create(
     unpack_file(&archive_path, &env_dir)?;
 
     let env_path = env_dir.join("env.yaml");
-    let env_record = EnvRecord {
+    let env_record = NamedEnvRecord {
         name: env_name.clone(),
         python_dir: PathBuf::from("python"),
         python_version: asset.meta.version.clone(),

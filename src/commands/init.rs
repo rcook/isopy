@@ -1,7 +1,7 @@
 use super::helpers::get_asset;
 use crate::app::App;
 use crate::error::Result;
-use crate::serialization::{HashedEnvRecord, ProjectRecord};
+use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
 use crate::util::{path_to_str, safe_write_to_file, unpack_file};
 use md5::compute;
 use std::fs::read_to_string;
@@ -21,7 +21,7 @@ pub fn do_init(app: &App) -> Result<()> {
     unpack_file(&archive_path, &env_dir)?;
 
     let env_path = env_dir.join("env.yaml");
-    let env_record = HashedEnvRecord {
+    let env_record = AnonymousEnvRecord {
         config_path: config_path,
         python_dir: PathBuf::from("python"),
         python_version: asset.meta.version.clone(),

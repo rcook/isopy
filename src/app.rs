@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::object_model::{Asset, AssetMeta, EnvName};
-use crate::serialization::{EnvRecord, PackageRecord};
+use crate::serialization::{NamedEnvRecord, PackageRecord};
 use crate::util::osstr_to_str;
 use std::fs::{read_dir, read_to_string};
 use std::path::PathBuf;
@@ -58,7 +58,7 @@ impl App {
         self.envs_dir.join(env_name.as_str())
     }
 
-    pub fn read_envs(&self) -> Result<Vec<EnvRecord>> {
+    pub fn read_envs(&self) -> Result<Vec<NamedEnvRecord>> {
         let mut envs = Vec::new();
         for d in read_dir(&self.envs_dir)? {
             let env_name = match EnvName::parse(osstr_to_str(&d?.file_name())?) {
@@ -77,14 +77,14 @@ impl App {
         Ok(envs)
     }
 
-    pub fn read_env(&self, env_name: &EnvName) -> Result<Option<EnvRecord>> {
+    pub fn read_env(&self, env_name: &EnvName) -> Result<Option<NamedEnvRecord>> {
         let env_config_path = self.envs_dir.join(env_name.as_str()).join("env.yaml");
         if !env_config_path.is_file() {
             return Ok(None);
         }
 
         let s = read_to_string(&env_config_path)?;
-        let env = serde_yaml::from_str::<EnvRecord>(&s)?;
+        let env = serde_yaml::from_str::<NamedEnvRecord>(&s)?;
         Ok(Some(env))
     }
 }
