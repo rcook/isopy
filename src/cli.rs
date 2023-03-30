@@ -57,7 +57,10 @@ pub enum Command {
     #[command(name = "init", about = "Initialize current Python environment")]
     Init,
 
-    #[command(name = "list", about = "List named Python environments")]
+    #[command(
+        name = "list",
+        about = "List named and anonymous Python environments and uses"
+    )]
     List,
 
     #[command(name = "new", about = "New project Python environment")]
