@@ -9,9 +9,10 @@ use std::path::PathBuf;
 
 pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
 
+#[derive(Debug)]
 pub struct ShellInfo {
     pub env_name: EnvName,
-    pub python_dir: PathBuf,
+    pub full_python_dir: PathBuf,
 }
 
 fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
@@ -35,7 +36,7 @@ fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
     let env_record = serde_yaml::from_str::<EnvRecord>(&s)?;
     return Ok(Some(ShellInfo {
         env_name: env_record.name,
-        python_dir: env_record.python_dir,
+        full_python_dir: app.envs_dir.join(&hex_digest).join(env_record.python_dir),
     }));
 }
 
@@ -55,7 +56,10 @@ fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
     let hashed_env_record = serde_yaml::from_str::<HashedEnvRecord>(&s)?;
     return Ok(Some(ShellInfo {
         env_name: EnvName::parse(&hex_digest).expect("Must be a valid environment"),
-        python_dir: hashed_env_record.python_dir,
+        full_python_dir: app
+            .hashed_dir
+            .join(&hex_digest)
+            .join(hashed_env_record.python_dir),
     }));
 }
 
@@ -65,7 +69,10 @@ pub fn get_shell_info(app: &App, env_name_opt: &Option<EnvName>) -> Result<Shell
             Some(env_record) => {
                 return Ok(ShellInfo {
                     env_name: env_record.name,
-                    python_dir: env_record.python_dir,
+                    full_python_dir: app
+                        .envs_dir
+                        .join(env_name.as_str())
+                        .join(env_record.python_dir),
                 })
             }
             _ => return Err(user(format!("No environment named {}", env_name))),

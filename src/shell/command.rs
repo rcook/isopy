@@ -61,7 +61,7 @@ impl Command {
         let mut new_path = String::new();
         let python_bin_dir = app
             .env_dir(&shell_info.env_name)
-            .join(&shell_info.python_dir);
+            .join(&shell_info.full_python_dir);
         new_path.push_str(path_to_str(&python_bin_dir)?);
         new_path.push(';');
         let python_scripts_dir = python_bin_dir.join("Scripts");
