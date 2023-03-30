@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::object_model::{Asset, AssetMeta, EnvName};
-use crate::serialization::{NamedEnvRecord, PackageRecord};
+use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, PackageRecord, UseRecord};
 use crate::util::{osstr_to_str, path_to_str};
 use md5::compute;
 use std::fs::{read_dir, read_to_string};
@@ -79,7 +79,7 @@ impl App {
     }
 
     pub fn read_named_env(&self, env_name: &EnvName) -> Result<Option<NamedEnvRecord>> {
-        let named_env_config_path = self.named_envs_dir.join(env_name.as_str()).join("env.yaml");
+        let named_env_config_path = self.named_env_dir(env_name).join("env.yaml");
         if !named_env_config_path.is_file() {
             return Ok(None);
         }
@@ -98,6 +98,43 @@ impl App {
         Ok(self.anonymous_envs_dir.join(&hex_digest))
     }
 
+    pub fn read_anonymous_env<S>(&self, hex_digest: S) -> Result<Option<AnonymousEnvRecord>>
+    where
+        S: AsRef<str>,
+    {
+        let anonymous_env_config_path = self
+            .anonymous_envs_dir
+            .join(hex_digest.as_ref())
+            .join("env.yaml");
+        if !anonymous_env_config_path.is_file() {
+            return Ok(None);
+        }
+
+        let s = read_to_string(&anonymous_env_config_path)?;
+        let anonymous_env = serde_yaml::from_str::<AnonymousEnvRecord>(&s)?;
+        Ok(Some(anonymous_env))
+    }
+
+    pub fn read_anonymous_envs(&self) -> Result<Vec<AnonymousEnvRecord>> {
+        let mut anonymous_envs = Vec::new();
+
+        if self.anonymous_envs_dir.is_dir() {
+            for d in read_dir(&self.anonymous_envs_dir)? {
+                let file_name = d?.file_name();
+                let hex_digest = osstr_to_str(&file_name)?;
+
+                let anonymous_env = match self.read_anonymous_env(&hex_digest)? {
+                    Some(x) => x,
+                    None => continue,
+                };
+
+                anonymous_envs.push(anonymous_env)
+            }
+        }
+
+        Ok(anonymous_envs)
+    }
+
     pub fn use_dir<P>(&self, dir: P) -> Result<PathBuf>
     where
         P: AsRef<Path>,
@@ -105,5 +142,39 @@ impl App {
         let digest = compute(path_to_str(dir.as_ref())?);
         let hex_digest = format!("{:x}", digest);
         Ok(self.uses_dir.join(&hex_digest))
+    }
+
+    pub fn read_use<S>(&self, hex_digest: S) -> Result<Option<UseRecord>>
+    where
+        S: AsRef<str>,
+    {
+        let use_config_path = self.uses_dir.join(hex_digest.as_ref()).join("use.yaml");
+        if !use_config_path.is_file() {
+            return Ok(None);
+        }
+
+        let s = read_to_string(&use_config_path)?;
+        let use_ = serde_yaml::from_str::<UseRecord>(&s)?;
+        Ok(Some(use_))
+    }
+
+    pub fn read_uses(&self) -> Result<Vec<UseRecord>> {
+        let mut uses = Vec::new();
+
+        if self.uses_dir.is_dir() {
+            for d in read_dir(&self.uses_dir)? {
+                let file_name = d?.file_name();
+                let hex_digest = osstr_to_str(&file_name)?;
+
+                let use_ = match self.read_use(&hex_digest)? {
+                    Some(x) => x,
+                    None => continue,
+                };
+
+                uses.push(use_)
+            }
+        }
+
+        Ok(uses)
     }
 }
