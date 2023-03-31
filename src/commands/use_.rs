@@ -1,8 +1,8 @@
 use crate::app::App;
+use crate::env_info::get_env_info;
 use crate::error::{user, Result};
 use crate::object_model::EnvName;
 use crate::serialization::UseRecord;
-use crate::shell::get_shell_info;
 use crate::util::{path_to_str, safe_write_file};
 use md5::compute;
 
@@ -17,13 +17,13 @@ pub fn do_use(app: &App, env_name: &EnvName) -> Result<()> {
         )));
     }
 
-    let shell_info = get_shell_info(app, Some(env_name))?;
+    let env_info = get_env_info(app, Some(env_name))?;
 
     safe_write_file(
         use_yaml_path,
         serde_yaml::to_string(&UseRecord {
             dir: app.cwd.clone(),
-            env_name: shell_info.env_name,
+            env_name: env_info.env_name,
         })?,
         false,
     )?;

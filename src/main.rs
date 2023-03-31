@@ -1,6 +1,7 @@
 mod app;
 mod cli;
 mod commands;
+mod env_info;
 mod error;
 mod helpers;
 mod object_model;

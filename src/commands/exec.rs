@@ -1,7 +1,8 @@
 use crate::app::App;
+use crate::env_info::get_env_info;
 use crate::error::Result;
 use crate::object_model::EnvName;
-use crate::shell::{get_shell_info, Command};
+use crate::shell::Command;
 
 pub fn do_exec(
     app: &App,
@@ -9,12 +10,12 @@ pub fn do_exec(
     program: &String,
     args: Vec<String>,
 ) -> Result<()> {
-    let shell_info = get_shell_info(app, env_name_opt)?;
     let mut command = Command::new(program);
     for arg in args {
         command.arg(arg);
     }
 
-    command.exec(&shell_info)?;
+    let env_info = get_env_info(app, env_name_opt)?;
+    command.exec(&env_info)?;
     Ok(())
 }

@@ -1,7 +1,8 @@
 use crate::app::App;
+use crate::env_info::{get_env_info, ISOPY_ENV_NAME};
 use crate::error::{user, Result};
 use crate::object_model::EnvName;
-use crate::shell::{get_shell_info, Command, ISOPY_ENV_NAME};
+use crate::shell::Command;
 use std::env::{var, VarError};
 
 pub fn do_shell(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
@@ -13,7 +14,7 @@ pub fn do_shell(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
         Err(e) => return Err(e)?,
     }
 
-    let shell_info = get_shell_info(app, env_name_opt)?;
-    Command::new_shell().exec(&shell_info)?;
+    let env_info = get_env_info(app, env_name_opt)?;
+    Command::new_shell().exec(&env_info)?;
     Ok(())
 }

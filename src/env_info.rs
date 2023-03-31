@@ -9,12 +9,12 @@ use std::path::PathBuf;
 pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
 
 #[derive(Debug)]
-pub struct ShellInfo {
+pub struct EnvInfo {
     pub env_name: EnvName,
     pub full_python_dir: PathBuf,
 }
 
-fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
+fn get_use_env_info(app: &App) -> Result<Option<EnvInfo>> {
     let use_dir = app.use_dir(&app.cwd)?;
     let use_config_path = use_dir.join("use.yaml");
     if !use_config_path.is_file() {
@@ -28,7 +28,7 @@ fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
     }
 
     let named_env_record = from_str::<NamedEnvRecord>(&read_to_string(&named_env_config_path)?)?;
-    return Ok(Some(ShellInfo {
+    return Ok(Some(EnvInfo {
         env_name: named_env_record.name.clone(),
         full_python_dir: app
             .named_env_dir(&named_env_record.name)
@@ -36,7 +36,7 @@ fn get_use_shell_info(app: &App) -> Result<Option<ShellInfo>> {
     }));
 }
 
-fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
+fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
     let project_config_path = app.cwd.join(".isopy.yaml");
     if !project_config_path.is_file() {
         return Ok(None);
@@ -50,17 +50,17 @@ fn get_project_shell_info(app: &App) -> Result<Option<ShellInfo>> {
 
     let s = read_to_string(anonymous_env_config_path)?;
     let anonymous_env_record = serde_yaml::from_str::<AnonymousEnvRecord>(&s)?;
-    return Ok(Some(ShellInfo {
+    return Ok(Some(EnvInfo {
         env_name: EnvName::parse("ANONYMOUS").expect("Must be a valid environment"),
         full_python_dir: anonymous_env_dir.join(anonymous_env_record.python_dir),
     }));
 }
 
-pub fn get_shell_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<ShellInfo> {
+pub fn get_env_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<EnvInfo> {
     if let Some(env_name) = env_name_opt {
         match app.read_named_env(env_name)? {
             Some(env_record) => {
-                return Ok(ShellInfo {
+                return Ok(EnvInfo {
                     env_name: env_record.name,
                     full_python_dir: app.named_env_dir(env_name).join(env_record.python_dir),
                 })
@@ -69,12 +69,12 @@ pub fn get_shell_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<Shell
         };
     }
 
-    if let Some(shell_info) = get_use_shell_info(app)? {
-        return Ok(shell_info);
+    if let Some(env_info) = get_use_env_info(app)? {
+        return Ok(env_info);
     }
 
-    if let Some(shell_info) = get_project_shell_info(app)? {
-        return Ok(shell_info);
+    if let Some(env_info) = get_project_env_info(app)? {
+        return Ok(env_info);
     }
 
     Err(user(format!(
