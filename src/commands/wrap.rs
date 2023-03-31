@@ -11,6 +11,13 @@ use tinytemplate::TinyTemplate;
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const PYTHON_EXECUTABLE_NAME: &'static str = "python3";
 
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+const WRAPPER_TEMPLATE: &'static str = r#"#!/bin/bash
+set -euo pipefail
+{path_env} \
+PYTHONPATH={base_dir} \
+exec {python_executable_name} {script_path} "$@""#;
+
 #[derive(Serialize)]
 struct Context {
     path_env: String,
@@ -30,18 +37,13 @@ pub fn do_wrap(
         "PATH={}:$PATH",
         env_info.full_python_dir.join("bin").display()
     );
-    let template = r#"#!/bin/bash
-set -euo pipefail
-{path_env} \
-PYTHONPATH={base_dir} \
-exec {python_executable_name} {script_path} "$@""#;
 
-    let mut t = TinyTemplate::new();
-    t.add_template("WRAPPER", template)?;
+    let mut template = TinyTemplate::new();
+    template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;
 
     safe_write_file(
         wrapper_path,
-        t.render(
+        template.render(
             "WRAPPER",
             &Context {
                 path_env: path_env,
