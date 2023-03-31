@@ -1,3 +1,0 @@
-[submodule "exec-rs"]
-	path = exec-rs
-	url = https://github.com/rcook/exec-rs.git
