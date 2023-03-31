@@ -19,7 +19,7 @@ lazy_static = "1.4.0"
 md5 = "0.7.0"
 path-absolutize = "3.0.14"
 regex = "1.7.3"
-reqwest = { version = "0.11.15", features = ["blocking", "json", "serde_json", "stream"] }
+reqwest = { version = "0.11.15", features = ["stream"] }
 rstest = "0.17.0"
 same-file = "1.0.6"
 serde = { version = "1.0.158", features = ["derive"] }
