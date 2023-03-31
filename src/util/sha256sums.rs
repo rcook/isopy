@@ -1,11 +1,10 @@
-use crate::app::App;
 use crate::error::{fatal, Result};
-use crate::object_model::{AssetMeta, Tag};
+use crate::object_model::Tag;
 use hex::decode;
 use include_dir::{include_dir, Dir};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use std::fs::{read, read_dir};
+use std::fs::read;
 use std::path::Path;
 
 static SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
@@ -43,23 +42,4 @@ pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> 
             Ok(expected_hash == hash)
         }
     }
-}
-
-pub fn check_sha256sums(app: &App) -> Result<()> {
-    for e in read_dir(&app.assets_dir)? {
-        let e = e?;
-        let archive_file_name = e.file_name();
-        let asset_name = archive_file_name
-            .to_str()
-            .ok_or(fatal("Could not retrieve file name"))?;
-        match AssetMeta::parse(asset_name) {
-            Some(asset_meta) => match validate_sha256_checksum(&e.path(), &asset_meta.parsed_tag) {
-                Ok(is_valid) => println!("{}: {}", e.path().display(), is_valid),
-                Err(e) => println!("Error: {:?}", e),
-            },
-            _ => {}
-        }
-    }
-
-    Ok(())
 }
