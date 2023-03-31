@@ -6,7 +6,12 @@ use std::env::{var, VarError};
 
 // TBD: Implement for Windows
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-pub fn do_exec(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
+pub fn do_exec(
+    app: &App,
+    env_name_opt: Option<&EnvName>,
+    program: &String,
+    args: Vec<String>,
+) -> Result<()> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             return Err(user("You are already in an isopy shell"));
@@ -16,9 +21,11 @@ pub fn do_exec(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
     }
 
     let shell_info = get_shell_info(app, env_name_opt)?;
-    Command::new("bash")
-        .arg("-c")
-        .arg("ls -al")
-        .exec(app, &shell_info)?;
+    let mut command = Command::new(program);
+    for arg in args {
+        command.arg(arg);
+    }
+
+    command.exec(app, &shell_info)?;
     Ok(())
 }

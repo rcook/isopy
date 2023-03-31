@@ -47,7 +47,11 @@ async fn main_inner() -> Result<()> {
         } => do_create(&app, &env_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&app, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&app)?,
-        Command::Exec { env_name } => do_exec(&app, env_name.as_ref())?,
+        Command::Exec {
+            env_name,
+            program,
+            args,
+        } => do_exec(&app, env_name.as_ref(), &program, args)?,
         Command::Info => do_info(&app)?,
         Command::Init => do_init(&app).await?,
         Command::List => do_list(&app).await?,

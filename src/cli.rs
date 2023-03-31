@@ -46,6 +46,13 @@ pub enum Command {
     Exec {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
         env_name: Option<EnvName>,
+
+        #[arg(help = "Program to run in environment")]
+        program: String,
+
+        #[arg(help = "Zero or more arguments to pass to program")]
+        #[clap(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
 
     #[command(

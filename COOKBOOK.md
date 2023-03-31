@@ -20,3 +20,10 @@ isopyrs init
 # Start a shell
 isopyrs shell
 ```
+
+## "Show version of Python in my environment"
+
+```bash
+cd /path/to/project
+isopyrs exec python3 --version
+```

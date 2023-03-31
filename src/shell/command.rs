@@ -4,9 +4,11 @@ use crate::error::Result;
 use crate::util::path_to_str;
 use std::env::{set_var, var};
 use std::ffi::OsString;
+use std::iter::once;
 use std::process::ExitStatus;
 
 pub struct Command {
+    program: Option<OsString>,
     args: Vec<OsString>,
 }
 
@@ -16,7 +18,15 @@ impl Command {
         S: Into<OsString>,
     {
         Self {
-            args: vec![program.into()],
+            program: Some(program.into()),
+            args: Vec::new(),
+        }
+    }
+
+    pub fn new_shell() -> Self {
+        Self {
+            program: None,
+            args: Vec::new(),
         }
     }
 
@@ -41,9 +51,17 @@ impl Command {
         new_path.push_str(&var("PATH")?);
         set_var("PATH", new_path);
 
-        let shell = var("SHELL")?;
-        let _ = execvp(&shell, self.args.iter());
-        unreachable!()
+        match &self.program {
+            Some(program) => {
+                let _ = execvp(program, once(program).chain(self.args.iter()));
+                unreachable!()
+            }
+            None => {
+                let shell = OsString::from(var("SHELL")?);
+                let _ = execvp(&shell, once(&shell).chain(self.args.iter()));
+                unreachable!()
+            }
+        }
     }
 
     #[cfg(any(target_os = "windows"))]

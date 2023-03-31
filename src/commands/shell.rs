@@ -16,6 +16,6 @@ pub fn do_shell(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
     }
 
     let shell_info = get_shell_info(app, env_name_opt)?;
-    Command::new("bash").exec(app, &shell_info)?;
+    Command::new_shell().exec(app, &shell_info)?;
     Ok(())
 }
