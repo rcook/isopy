@@ -1,6 +1,7 @@
 use crate::object_model::EnvName;
 use crate::object_model::{Tag, Version};
 use clap::{Parser, Subcommand};
+use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use std::result::Result;
 
@@ -11,7 +12,7 @@ use std::result::Result;
     version
 )]
 pub struct Args {
-    #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir")]
+    #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_path)]
     pub dir: Option<PathBuf>,
     #[command(subcommand)]
     pub command: Command,
@@ -82,9 +83,6 @@ pub enum Command {
         tag: Option<Tag>,
     },
 
-    #[command(name = "scratch", about = "Experimental")]
-    Scratch,
-
     #[command(name = "shell", about = "Start shell for current Python environment")]
     Shell {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
@@ -99,6 +97,23 @@ pub enum Command {
         #[arg(help = "Environment name", value_parser = parse_env_name)]
         env_name: EnvName,
     },
+
+    #[command(name = "wrap", about = "Generate wrapper script for Python script")]
+    Wrap {
+        #[arg(help = "Wrapper path", value_parser = parse_path)]
+        wrapper_path: PathBuf,
+        #[arg(help = "Script path", value_parser = parse_path)]
+        script_path: PathBuf,
+        #[arg(help = "Base directory", value_parser = parse_path)]
+        base_dir: PathBuf,
+    },
+}
+
+fn parse_path(s: &str) -> Result<PathBuf, String> {
+    PathBuf::from(s)
+        .absolutize()
+        .map_err(|_| String::from("invalid path"))
+        .map(|x| x.to_path_buf())
 }
 
 fn parse_env_name(s: &str) -> Result<EnvName, String> {

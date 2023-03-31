@@ -14,12 +14,11 @@ use crate::app::App;
 use crate::cli::{Args, Command};
 use crate::commands::{
     do_available, do_create, do_download, do_downloaded, do_exec, do_info, do_init, do_list,
-    do_new, do_shell, do_use,
+    do_new, do_shell, do_use, do_wrap,
 };
 use crate::error::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
-use commands::do_scratch;
 use std::env::current_dir;
 use std::path::PathBuf;
 use std::process::exit;
@@ -58,9 +57,13 @@ async fn main_inner() -> Result<()> {
         Command::Init => do_init(&app).await?,
         Command::List => do_list(&app).await?,
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
-        Command::Scratch => do_scratch(&app)?,
         Command::Shell { env_name } => do_shell(&app, env_name.as_ref())?,
         Command::Use { env_name } => do_use(&app, &env_name)?,
+        Command::Wrap {
+            wrapper_path,
+            script_path,
+            base_dir,
+        } => do_wrap(&app, &wrapper_path, &script_path, &base_dir)?,
     }
 
     Ok(())
