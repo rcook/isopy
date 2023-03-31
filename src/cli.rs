@@ -5,7 +5,11 @@ use std::path::PathBuf;
 use std::result::Result;
 
 #[derive(Parser, Debug)]
-#[command(about = "Isolated Python Tool Rust Edition!", version)]
+#[command(
+    about = "Isolated Python Tool Rust Edition!",
+    after_help = "https://rcook.github.io/isopy/\nhttps://github.com/rcook/isopyrs\nhttps://github.com/rcook/isopy",
+    version
+)]
 pub struct Args {
     #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir")]
     pub dir: Option<PathBuf>,
