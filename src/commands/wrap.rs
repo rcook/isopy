@@ -3,13 +3,14 @@ use crate::env_info::{get_env_info, EnvInfo};
 use crate::error::Result;
 use crate::util::safe_write_file;
 use serde::Serialize;
-use std::fs::{metadata, set_permissions};
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use tinytemplate::TinyTemplate;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const PYTHON_EXECUTABLE_NAME: &'static str = "python3";
+
+#[cfg(target_os = "windows")]
+const PYTHON_EXECUTABLE_NAME: &'static str = "python";
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const WRAPPER_TEMPLATE: &'static str = r#"#!/bin/bash
@@ -17,6 +18,13 @@ set -euo pipefail
 {path_env} \
 PYTHONPATH={base_dir} \
 exec {python_executable_name} {script_path} "$@""#;
+
+#[cfg(target_os = "windows")]
+const WRAPPER_TEMPLATE: &'static str = r#"@echo off
+setlocal
+{path_env}
+set PYTHONPATH={base_dir}
+{python_executable_name} "{script_path}" %*"#;
 
 #[derive(Serialize)]
 struct Context {
@@ -64,13 +72,33 @@ fn make_path_env(env_info: &EnvInfo) -> String {
     )
 }
 
+#[cfg(target_os = "windows")]
+fn make_path_env(env_info: &EnvInfo) -> String {
+    format!(
+        "PATH={};{};%PATH%",
+        env_info.full_python_dir.display(),
+        env_info.full_python_dir.join("Scripts").display()
+    )
+}
+
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn set_file_attributes<P>(wrapper_path: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
+    use std::fs::{metadata, set_permissions};
+    use std::os::unix::fs::PermissionsExt;
+
     let mut permissions = metadata(&wrapper_path)?.permissions();
     permissions.set_mode(permissions.mode() | 0o100);
     set_permissions(&wrapper_path, permissions)?;
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+fn set_file_attributes<P>(_wrapper_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
     Ok(())
 }
