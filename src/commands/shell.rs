@@ -4,8 +4,6 @@ use crate::object_model::EnvName;
 use crate::shell::{get_shell_info, Command, ISOPY_ENV_NAME};
 use std::env::{var, VarError};
 
-// TBD: Implement for Windows
-#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub fn do_shell(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
@@ -16,6 +14,6 @@ pub fn do_shell(app: &App, env_name_opt: Option<&EnvName>) -> Result<()> {
     }
 
     let shell_info = get_shell_info(app, env_name_opt)?;
-    Command::new_shell().exec(app, &shell_info)?;
+    Command::new_shell().exec(&shell_info)?;
     Ok(())
 }

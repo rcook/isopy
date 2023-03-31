@@ -1,10 +1,8 @@
 use super::{ShellInfo, ISOPY_ENV_NAME};
-use crate::app::App;
 use crate::error::Result;
 use crate::util::path_to_str;
 use std::env::{set_var, var};
 use std::ffi::OsString;
-use std::iter::once;
 use std::process::ExitStatus;
 
 pub struct Command {
@@ -39,8 +37,9 @@ impl Command {
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    pub fn exec(&self, _app: &App, shell_info: &ShellInfo) -> Result<ExitStatus> {
+    pub fn exec(&self, shell_info: &ShellInfo) -> Result<ExitStatus> {
         use exec::execvp;
+        use std::iter::once;
 
         set_var(ISOPY_ENV_NAME, shell_info.env_name.as_str());
 
@@ -65,7 +64,7 @@ impl Command {
     }
 
     #[cfg(any(target_os = "windows"))]
-    pub fn exec(&self, app: &App, shell_info: &ShellInfo) -> Result<ExitStatus> {
+    pub fn exec(&self, shell_info: &ShellInfo) -> Result<ExitStatus> {
         use crate::shell::{get_windows_shell_info, WindowsShellKind};
         use std::process::Command;
 
@@ -82,12 +81,39 @@ impl Command {
         new_path.push_str(&var("PATH")?);
         set_var("PATH", new_path);
 
-        Ok(match windows_shell_info.kind {
-            WindowsShellKind::Cmd => Command::new(windows_shell_info.path).arg("/k").status()?,
-            WindowsShellKind::PowerShell => Command::new(windows_shell_info.path)
-                .arg("-NoExit")
-                .arg("-NoProfile")
-                .status()?,
-        })
+        let mut command = match &self.program {
+            Some(program) => match windows_shell_info.kind {
+                WindowsShellKind::Cmd => {
+                    let mut command = Command::new(windows_shell_info.path);
+                    command.arg("/k");
+                    command
+                }
+                WindowsShellKind::PowerShell => {
+                    let mut command = Command::new(windows_shell_info.path);
+                    command.arg("-NoProfile");
+                    command.arg(program);
+                    command
+                }
+            },
+            None => match windows_shell_info.kind {
+                WindowsShellKind::Cmd => {
+                    let mut command = Command::new(windows_shell_info.path);
+                    command.arg("/k");
+                    command
+                }
+                WindowsShellKind::PowerShell => {
+                    let mut command = Command::new(windows_shell_info.path);
+                    command.arg("-NoExit");
+                    command.arg("-NoProfile");
+                    command
+                }
+            },
+        };
+
+        for arg in &self.args {
+            command.arg(arg);
+        }
+
+        Ok(command.status()?)
     }
 }
