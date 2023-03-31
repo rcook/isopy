@@ -11,6 +11,7 @@ pub enum Error {
     Reportable(String, ReportableError),
     Reqwest(reqwest::Error),
     Template(indicatif::style::TemplateError),
+    TinyTemplate(tinytemplate::error::Error),
     ToStr(reqwest::header::ToStrError),
     User(String),
     Yaml(serde_yaml::Error),
@@ -72,6 +73,12 @@ impl From<std::env::VarError> for Error {
 impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
         Self::IO(e)
+    }
+}
+
+impl From<tinytemplate::error::Error> for Error {
+    fn from(e: tinytemplate::error::Error) -> Self {
+        Self::TinyTemplate(e)
     }
 }
 
