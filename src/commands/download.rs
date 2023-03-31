@@ -1,6 +1,6 @@
-use super::helpers::{download_asset, get_asset};
 use crate::app::App;
 use crate::error::Result;
+use crate::helpers::{download_asset, get_asset};
 use crate::object_model::{Tag, Version};
 
 pub async fn do_download(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {

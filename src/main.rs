@@ -2,6 +2,7 @@ mod app;
 mod cli;
 mod commands;
 mod error;
+mod helpers;
 mod object_model;
 mod serialization;
 mod shell;

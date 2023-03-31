@@ -1,7 +1,6 @@
-use super::helpers::get_asset;
 use crate::app::App;
-use crate::commands::helpers::download_asset;
 use crate::error::Result;
+use crate::helpers::{download_asset, get_asset};
 use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
 use crate::util::{safe_write_file, unpack_file};
 use std::fs::read_to_string;
