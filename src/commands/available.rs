@@ -1,8 +1,7 @@
 use crate::app::App;
 use crate::object_model::{AssetFilter, LastModified};
 use crate::result::Result;
-use crate::serialization::IndexRecord;
-use crate::util::{download_file, safe_write_file, ISOPY_USER_AGENT};
+use crate::util::{download_file, ISOPY_USER_AGENT};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode};
 
@@ -13,10 +12,9 @@ const RELEASES_URL: &'static str =
     "https://api.github.com/repos/indygreg/python-build-standalone/releases";
 
 pub async fn do_available(app: &App) -> Result<()> {
-    let index_yaml_path = app.assets_dir.join("index.yaml");
     let index_json_path = app.assets_dir.join("index.json");
 
-    let last_modified_opt = app.index_last_modified()?;
+    let last_modified_opt = app.read_index_last_modified()?;
 
     let client = Client::new();
 
@@ -30,16 +28,10 @@ pub async fn do_available(app: &App) -> Result<()> {
     let response = request.send().await?.error_for_status()?;
     if response.status() != StatusCode::NOT_MODIFIED {
         println!("New releases are available");
-        if let Some(last_modified) = response.headers().get(LAST_MODIFIED) {
-            safe_write_file(
-                &index_yaml_path,
-                serde_yaml::to_string(&IndexRecord {
-                    last_modified: LastModified::parse(last_modified.to_str()?),
-                })?,
-                true,
-            )?;
-
+        if let Some(h) = response.headers().get(LAST_MODIFIED) {
             download_file(&client, RELEASES_URL, index_json_path, true).await?;
+            let last_modified = LastModified::parse(h.to_str()?);
+            app.write_index_last_modified(&last_modified)?;
         }
     }
 

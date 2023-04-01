@@ -3,7 +3,7 @@ use crate::result::Result;
 use crate::serialization::{
     AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, UseRecord,
 };
-use crate::util::{osstr_to_str, path_to_str};
+use crate::util::{osstr_to_str, path_to_str, safe_write_file};
 use md5::compute;
 use std::fs::{read_dir, read_to_string};
 use std::path::{Path, PathBuf};
@@ -34,7 +34,7 @@ impl App {
         }
     }
 
-    pub fn index_last_modified(&self) -> Result<Option<LastModified>> {
+    pub fn read_index_last_modified(&self) -> Result<Option<LastModified>> {
         let index_yaml_path = self.assets_dir.join("index.yaml");
         Ok(if index_yaml_path.is_file() {
             let s = read_to_string(&index_yaml_path)?;
@@ -43,6 +43,18 @@ impl App {
         } else {
             None
         })
+    }
+
+    pub fn write_index_last_modified(&self, last_modified: &LastModified) -> Result<()> {
+        let index_yaml_path = self.assets_dir.join("index.yaml");
+        safe_write_file(
+            &index_yaml_path,
+            serde_yaml::to_string(&IndexRecord {
+                last_modified: last_modified.clone(),
+            })?,
+            true,
+        )?;
+        Ok(())
     }
 
     pub fn make_asset_path(&self, asset: &Asset) -> PathBuf {

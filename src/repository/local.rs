@@ -1,6 +1,7 @@
-use super::{Repository, Response, Stream};
+use super::{Repository, Response, ResponseInfo, Stream};
+use crate::object_model::LastModified;
 use crate::result::{Error, Result};
-use crate::util::ContentLength;
+use crate::util::{to_last_modified, to_system_time, ContentLength};
 use async_trait::async_trait;
 use bytes::Bytes;
 use std::fs::{metadata, File};
@@ -22,13 +23,26 @@ impl LocalRepository {
 
 #[async_trait]
 impl Repository for LocalRepository {
-    async fn get_index(&self) -> Result<Box<dyn Response>> {
+    async fn get_latest_index(
+        &self,
+        last_modified: &Option<LastModified>,
+    ) -> Result<Option<ResponseInfo>> {
         let index_json_path = self.dir.join("assets").join("index.json");
-        let content_length = metadata(&index_json_path)?.len();
-        Ok(Box::new(LocalResponse::new(
-            index_json_path,
-            content_length,
-        )))
+
+        let m = metadata(&index_json_path)?;
+
+        let modified = m.modified()?;
+
+        if let Some(l) = last_modified {
+            if modified <= to_system_time(l)? {
+                return Ok(None);
+            }
+        }
+
+        let new_last_modified = to_last_modified(&modified)?;
+        let content_length = m.len();
+        let resp = Box::new(LocalResponse::new(index_json_path, content_length));
+        Ok(Some((new_last_modified, Some(content_length), resp)))
     }
 }
 
