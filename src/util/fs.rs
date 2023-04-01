@@ -37,9 +37,15 @@ where
     Ok(())
 }
 
-pub fn is_already_exists(e: &Error) -> bool {
-    match e {
-        Error::IO(x) => x.kind() == ErrorKind::AlreadyExists,
+pub fn is_already_exists(error: &Error) -> bool {
+    match error {
+        Error::Other(e) => {
+            if let Some(io_error) = e.downcast_ref::<std::io::Error>() {
+                io_error.kind() == ErrorKind::AlreadyExists
+            } else {
+                false
+            }
+        }
         _ => false,
     }
 }

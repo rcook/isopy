@@ -2,19 +2,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    Env(std::env::VarError),
     Fatal(String),
-    Hex(hex::FromHexError),
-    IO(std::io::Error),
-    Json(serde_json::Error),
-    Regex(regex::Error),
     Reportable(String, ReportableError),
-    Reqwest(reqwest::Error),
-    Template(indicatif::style::TemplateError),
-    TinyTemplate(tinytemplate::error::Error),
-    ToStr(reqwest::header::ToStrError),
     User(String),
-    Yaml(serde_yaml::Error),
+    Other(Box<dyn std::error::Error>),
 }
 
 #[derive(Debug)]
@@ -22,63 +13,12 @@ pub enum ReportableError {
     CouldNotGetIsopyDir,
 }
 
-impl From<hex::FromHexError> for Error {
-    fn from(e: hex::FromHexError) -> Self {
-        Self::Hex(e)
-    }
-}
-
-impl From<indicatif::style::TemplateError> for Error {
-    fn from(e: indicatif::style::TemplateError) -> Self {
-        Self::Template(e)
-    }
-}
-
-impl From<regex::Error> for Error {
-    fn from(e: regex::Error) -> Self {
-        Self::Regex(e)
-    }
-}
-
-impl From<reqwest::Error> for Error {
-    fn from(e: reqwest::Error) -> Self {
-        Self::Reqwest(e)
-    }
-}
-
-impl From<reqwest::header::ToStrError> for Error {
-    fn from(e: reqwest::header::ToStrError) -> Self {
-        Self::ToStr(e)
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(e: serde_json::Error) -> Self {
-        Self::Json(e)
-    }
-}
-
-impl From<serde_yaml::Error> for Error {
-    fn from(e: serde_yaml::Error) -> Self {
-        Self::Yaml(e)
-    }
-}
-
-impl From<std::env::VarError> for Error {
-    fn from(e: std::env::VarError) -> Self {
-        Self::Env(e)
-    }
-}
-
-impl From<std::io::Error> for Error {
-    fn from(e: std::io::Error) -> Self {
-        Self::IO(e)
-    }
-}
-
-impl From<tinytemplate::error::Error> for Error {
-    fn from(e: tinytemplate::error::Error) -> Self {
-        Self::TinyTemplate(e)
+impl<E> From<E> for Error
+where
+    E: std::error::Error + 'static,
+{
+    fn from(e: E) -> Self {
+        Self::Other(Box::new(e))
     }
 }
 

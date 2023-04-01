@@ -81,7 +81,7 @@ async fn main() {
             red_ln!("{}", msg);
             exitcode::USAGE
         }
-        e => {
+        Err(e) => {
             red_ln!("Unhandled error: {:#?}", e);
             exitcode::USAGE
         }
