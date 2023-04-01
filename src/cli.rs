@@ -83,6 +83,18 @@ pub enum Command {
         tag: Option<Tag>,
     },
 
+    #[command(name = "scratch", about = "Experimental")]
+    Scratch {
+        #[arg(help = "Root directory for local repository")]
+        local_repository_dir: PathBuf,
+
+        #[arg(help = "Output path")]
+        index_json_path1: PathBuf,
+
+        #[arg(help = "Output path")]
+        index_json_path2: PathBuf,
+    },
+
     #[command(name = "shell", about = "Start shell for current Python environment")]
     Shell {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
