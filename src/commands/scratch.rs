@@ -1,7 +1,6 @@
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
-use crate::util::{ContentLength, Indicator};
-use std::fs::File;
+use crate::util::{safe_create_file, ContentLength, Indicator};
 use std::io::Write;
 use std::path::Path;
 
@@ -29,7 +28,7 @@ where
     let mut response = repository.get_index().await?;
     let indicator = Indicator::new(response.content_length())?;
     let mut stream = response.bytes_stream()?;
-    let mut file = File::create(index_json_path)?;
+    let mut file = safe_create_file(index_json_path, false)?;
     let mut downloaded = 0;
     indicator.set_message("Fetching index");
     while let Some(item) = stream.next().await {
