@@ -2,9 +2,9 @@ mod app;
 mod cli;
 mod commands;
 mod env_info;
-mod error;
 mod helpers;
 mod object_model;
+mod result;
 mod serialization;
 mod shell;
 mod ui;
@@ -16,7 +16,7 @@ use crate::commands::{
     do_available, do_create, do_download, do_downloaded, do_exec, do_info, do_init, do_list,
     do_new, do_shell, do_use, do_wrap,
 };
-use crate::error::{could_not_get_isopy_dir, Error, Result};
+use crate::result::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
 use std::env::current_dir;

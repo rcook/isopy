@@ -1,5 +1,5 @@
-use crate::error::{fatal, Result};
 use crate::object_model::Tag;
+use crate::result::{fatal, Result};
 use hex::decode;
 use include_dir::{include_dir, Dir};
 use sha2::{Digest, Sha256};

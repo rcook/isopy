@@ -1,7 +1,7 @@
 use crate::app::App;
 use crate::env_info::get_env_info;
-use crate::error::Result;
 use crate::object_model::EnvName;
+use crate::result::Result;
 use crate::shell::Command;
 
 pub fn do_exec(

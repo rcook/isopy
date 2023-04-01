@@ -1,7 +1,7 @@
 use crate::app::App;
 use crate::env_info::{get_env_info, ISOPY_ENV_NAME};
-use crate::error::{user, Result};
 use crate::object_model::EnvName;
+use crate::result::{user, Result};
 use crate::shell::Command;
 use std::env::{var, VarError};
 

@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::result::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
 use std::time::Duration;

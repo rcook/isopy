@@ -1,5 +1,5 @@
 use crate::env_info::{EnvInfo, ISOPY_ENV_NAME};
-use crate::error::Result;
+use crate::result::Result;
 use crate::util::path_to_str;
 use std::env::{set_var, var};
 use std::ffi::OsString;

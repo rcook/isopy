@@ -1,6 +1,6 @@
 use crate::app::App;
-use crate::error::{fatal, user, Result};
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
+use crate::result::{fatal, user, Result};
 use crate::util::{download_file, validate_sha256_checksum};
 use reqwest::Client;
 use std::fs::remove_file;

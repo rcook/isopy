@@ -1,5 +1,5 @@
 use crate::app::App;
-use crate::error::Result;
+use crate::result::Result;
 
 pub async fn do_list(app: &App) -> Result<()> {
     let named_envs = app.read_named_envs()?;

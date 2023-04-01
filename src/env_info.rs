@@ -1,6 +1,6 @@
 use crate::app::App;
-use crate::error::{user, Result};
 use crate::object_model::EnvName;
+use crate::result::{user, Result};
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
 use serde_yaml::from_str;
 use std::fs::read_to_string;

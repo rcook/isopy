@@ -1,4 +1,4 @@
-use crate::error::{fatal, Result};
+use crate::result::{fatal, Result};
 use sysinfo::{get_current_pid, Pid, Process, ProcessExt, System, SystemExt};
 
 #[allow(unused)]

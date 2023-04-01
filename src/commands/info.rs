@@ -1,6 +1,6 @@
 use crate::app::App;
-use crate::error::Result;
 use crate::object_model::Tag;
+use crate::result::Result;
 use crate::serialization::ProjectRecord;
 use std::fs::read_to_string;
 

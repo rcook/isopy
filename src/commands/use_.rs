@@ -1,7 +1,7 @@
 use crate::app::App;
 use crate::env_info::get_env_info;
-use crate::error::{user, Result};
 use crate::object_model::EnvName;
+use crate::result::{user, Result};
 use crate::serialization::UseRecord;
 use crate::util::{path_to_str, safe_write_file};
 use md5::compute;

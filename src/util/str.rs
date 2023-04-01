@@ -1,4 +1,4 @@
-use crate::error::{fatal, Result};
+use crate::result::{fatal, Result};
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
 

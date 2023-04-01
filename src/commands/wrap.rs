@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::env_info::{get_env_info, EnvInfo};
-use crate::error::Result;
+use crate::result::Result;
 use crate::util::safe_write_file;
 use serde::Serialize;
 use std::path::{Path, PathBuf};

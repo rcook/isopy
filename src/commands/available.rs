@@ -1,6 +1,6 @@
 use crate::app::App;
-use crate::error::Result;
 use crate::object_model::AssetFilter;
+use crate::result::Result;
 use crate::serialization::IndexRecord;
 use crate::util::{download_file, safe_write_file, ISOPY_USER_AGENT};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};

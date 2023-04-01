@@ -1,5 +1,5 @@
-use crate::error::Result;
 use crate::object_model::{Asset, AssetMeta, EnvName};
+use crate::result::Result;
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, PackageRecord, UseRecord};
 use crate::util::{osstr_to_str, path_to_str};
 use md5::compute;

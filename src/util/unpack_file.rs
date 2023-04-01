@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::result::Result;
 use crate::ui::ProgressIndicator;
 use flate2::read::GzDecoder;
 use std::fs::{create_dir_all, File};

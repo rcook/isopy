@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::result::Result;
 use crate::ui::ProgressIndicator;
 use crate::util::safe_create_file;
 use futures_util::StreamExt;
