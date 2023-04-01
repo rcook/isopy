@@ -31,7 +31,6 @@ impl GitHubRepository {
 impl Repository for GitHubRepository {
     async fn get_index(&self) -> Result<Box<dyn Response>> {
         let index_json_url = self.url.join("/assets/index.json")?;
-        println!("index_json_url={:?}", index_json_url);
         Ok(Box::new(GitHubResponse::new(
             self.client.get(index_json_url).send().await?,
         )))
