@@ -62,7 +62,15 @@ async fn main_inner() -> Result<()> {
             local_repository_dir,
             index_json_path1,
             index_json_path2,
-        } => do_scratch(&local_repository_dir, &index_json_path1, &index_json_path2).await?,
+        } => {
+            do_scratch(
+                &app,
+                &local_repository_dir,
+                &index_json_path1,
+                &index_json_path2,
+            )
+            .await?
+        }
         Command::Shell { env_name } => do_shell(&app, env_name.as_ref())?,
         Command::Use { env_name } => do_use(&app, &env_name)?,
         Command::Wrap {

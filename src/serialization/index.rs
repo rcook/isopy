@@ -1,5 +1,7 @@
-use super::helpers::{deserialize_tag, deserialize_url};
-use crate::object_model::Tag;
+use super::helpers::{
+    deserialize_last_modified, deserialize_tag, deserialize_url, serialize_last_modified,
+};
+use crate::object_model::{LastModified, Tag};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
@@ -23,6 +25,10 @@ pub struct AssetRecord {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct IndexRecord {
-    #[serde(rename = "last_modified")]
-    pub last_modified: String,
+    #[serde(
+        rename = "last_modified",
+        deserialize_with = "deserialize_last_modified",
+        serialize_with = "serialize_last_modified"
+    )]
+    pub last_modified: LastModified,
 }

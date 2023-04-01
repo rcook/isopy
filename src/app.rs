@@ -1,6 +1,8 @@
-use crate::object_model::{Asset, AssetMeta, EnvName};
+use crate::object_model::{Asset, AssetMeta, EnvName, LastModified};
 use crate::result::Result;
-use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, PackageRecord, UseRecord};
+use crate::serialization::{
+    AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, UseRecord,
+};
 use crate::util::{osstr_to_str, path_to_str};
 use md5::compute;
 use std::fs::{read_dir, read_to_string};
@@ -30,6 +32,17 @@ impl App {
             anonymous_envs_dir: anonymous_envs_dir,
             uses_dir: uses_dir,
         }
+    }
+
+    pub fn index_last_modified(&self) -> Result<Option<LastModified>> {
+        let index_yaml_path = self.assets_dir.join("index.yaml");
+        Ok(if index_yaml_path.is_file() {
+            let s = read_to_string(&index_yaml_path)?;
+            let index_record = serde_yaml::from_str::<IndexRecord>(&s)?;
+            Some(index_record.last_modified)
+        } else {
+            None
+        })
     }
 
     pub fn make_asset_path(&self, asset: &Asset) -> PathBuf {

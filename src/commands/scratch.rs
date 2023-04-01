@@ -1,3 +1,4 @@
+use crate::app::App;
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
 use crate::util::{safe_create_file, ContentLength, Indicator};
@@ -5,6 +6,7 @@ use std::io::Write;
 use std::path::Path;
 
 pub async fn do_scratch<P, Q, R>(
+    app: &App,
     local_repository_dir: P,
     index_json_path1: Q,
     index_json_path2: R,
