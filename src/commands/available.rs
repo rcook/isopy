@@ -1,39 +1,38 @@
 use crate::app::App;
-use crate::constants::{LATEST_RELEASE_URL, RELEASES_URL};
-use crate::object_model::{AssetFilter, LastModified, RepositoryName};
-use crate::result::Result;
-use crate::util::{download_file, ISOPY_USER_AGENT};
-use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
-use reqwest::{Client, StatusCode};
+use crate::object_model::AssetFilter;
+use crate::result::{user, Result};
+use crate::util::download_the_next_generation;
 
 pub async fn do_available(app: &App) -> Result<()> {
-    let index_json_path = app.assets_dir.join("index.json");
+    update_index_if_necessary(app).await?;
+    show_available_downloads(app)?;
+    Ok(())
+}
 
-    let last_modified_opt = app.read_index_last_modified(&RepositoryName::Default)?;
+async fn update_index_if_necessary(app: &App) -> Result<()> {
+    let repositories = app.read_repositories()?;
+    let repository = repositories
+        .first()
+        .ok_or(user("No asset repositories are configured"))?;
 
-    let client = Client::new();
-
-    let mut request = client
-        .head(LATEST_RELEASE_URL)
-        .header(USER_AGENT, ISOPY_USER_AGENT);
-    if let Some(last_modified) = last_modified_opt {
-        request = request.header(IF_MODIFIED_SINCE, last_modified.as_str());
+    let current_last_modified = app.read_index_last_modified(&repository.name)?;
+    if let Some(mut response) = repository
+        .repository
+        .get_latest_index(&current_last_modified)
+        .await?
+    {
+        let index_json_path = app.get_index_json_path(&repository.name);
+        download_the_next_generation("index", &mut response, index_json_path).await?;
+        app.write_index_last_modified(&repository.name, &response.last_modified())?;
     }
 
-    let response = request.send().await?.error_for_status()?;
-    if response.status() != StatusCode::NOT_MODIFIED {
-        println!("New releases are available");
-        if let Some(h) = response.headers().get(LAST_MODIFIED) {
-            download_file(&client, RELEASES_URL, index_json_path, true).await?;
-            let last_modified = LastModified::parse(h.to_str()?);
-            app.write_index_last_modified(&RepositoryName::Default, &last_modified)?;
-        }
-    }
+    Ok(())
+}
 
+fn show_available_downloads(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
     for asset in AssetFilter::default_for_platform().filter(assets.iter().map(|x| x).into_iter()) {
         println!("{}", asset.name)
     }
-
     Ok(())
 }
