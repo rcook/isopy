@@ -9,7 +9,6 @@ mod repository;
 mod result;
 mod serialization;
 mod shell;
-mod ui;
 mod util;
 
 use crate::app::App;
