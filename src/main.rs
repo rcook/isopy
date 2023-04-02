@@ -17,7 +17,7 @@ use crate::commands::{
     do_available, do_create, do_download, do_downloaded, do_exec, do_generate_repositories_yaml,
     do_info, do_init, do_list, do_new, do_scratch, do_shell, do_use, do_wrap,
 };
-use crate::result::{could_not_get_isopy_dir, Error, Result};
+use crate::result::{could_not_infer_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
 use std::env::current_dir;
@@ -37,7 +37,7 @@ async fn main_inner() -> Result<()> {
     let dir = args
         .dir
         .or_else(default_isopy_dir)
-        .ok_or_else(|| could_not_get_isopy_dir("Could not find .isopy directory"))?;
+        .ok_or_else(|| could_not_infer_isopy_dir())?;
     let app = App::new(cwd, dir);
 
     match args.command {
@@ -78,8 +78,8 @@ async fn main_inner() -> Result<()> {
 async fn main() {
     exit(match main_inner().await {
         Ok(_) => exitcode::OK,
-        Err(Error::Reportable(msg, _)) => {
-            red_ln!("{}", msg);
+        Err(Error::Reportable { message, .. }) => {
+            red_ln!("{}", message);
             exitcode::USAGE
         }
         Err(Error::User(msg)) => {

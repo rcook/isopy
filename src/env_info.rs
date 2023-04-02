@@ -2,8 +2,7 @@ use crate::app::App;
 use crate::object_model::EnvName;
 use crate::result::{user, Result};
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
-use serde_yaml::from_str;
-use std::fs::read_to_string;
+use crate::util::read_yaml_file;
 use std::path::PathBuf;
 
 pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
@@ -21,13 +20,13 @@ fn get_use_env_info(app: &App) -> Result<Option<EnvInfo>> {
         return Ok(None);
     }
 
-    let use_record = from_str::<UseRecord>(&read_to_string(&use_config_path)?)?;
+    let use_record = read_yaml_file::<UseRecord, _>(&use_config_path)?;
     let named_env_config_path = app.named_env_dir(&use_record.env_name).join("env.yaml");
     if !named_env_config_path.is_file() {
         return Ok(None);
     }
 
-    let named_env_record = from_str::<NamedEnvRecord>(&read_to_string(&named_env_config_path)?)?;
+    let named_env_record = read_yaml_file::<NamedEnvRecord, _>(&named_env_config_path)?;
     return Ok(Some(EnvInfo {
         env_name: named_env_record.name.clone(),
         full_python_dir: app
@@ -48,8 +47,7 @@ fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
         return Ok(None);
     }
 
-    let s = read_to_string(anonymous_env_config_path)?;
-    let anonymous_env_record = serde_yaml::from_str::<AnonymousEnvRecord>(&s)?;
+    let anonymous_env_record = read_yaml_file::<AnonymousEnvRecord, _>(&anonymous_env_config_path)?;
     return Ok(Some(EnvInfo {
         env_name: EnvName::parse("ANONYMOUS").expect("Must be a valid environment"),
         full_python_dir: anonymous_env_dir.join(anonymous_env_record.python_dir),

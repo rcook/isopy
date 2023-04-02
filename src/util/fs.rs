@@ -1,6 +1,7 @@
-use crate::result::{Error, Result};
-use std::fs::{create_dir_all, write, File, OpenOptions};
-use std::io::{ErrorKind, Write};
+use crate::result::{translate_io_error, translate_yaml_error, Error, Result};
+use serde::de::DeserializeOwned;
+use std::fs::{create_dir_all, read_to_string, write, File, OpenOptions};
+use std::io::{ErrorKind as IOErrorKind, Write};
 use std::path::{Path, PathBuf};
 
 pub fn safe_create_file<P>(path: P, overwrite: bool) -> Result<File>
@@ -37,15 +38,81 @@ where
     Ok(())
 }
 
+pub fn read_yaml_file<T, P>(path: P) -> Result<T>
+where
+    P: AsRef<Path>,
+    T: DeserializeOwned,
+{
+    let json = read_to_string(&path).map_err(|e| translate_io_error(e, &path))?;
+    read_yaml_helper(&json, path)
+}
+
 pub fn is_already_exists(error: &Error) -> bool {
     match error {
         Error::Other(e) => {
             if let Some(io_error) = e.downcast_ref::<std::io::Error>() {
-                io_error.kind() == ErrorKind::AlreadyExists
+                io_error.kind() == IOErrorKind::AlreadyExists
             } else {
                 false
             }
         }
         _ => false,
+    }
+}
+
+fn read_yaml_helper<T, P>(json: &str, path: P) -> Result<T>
+where
+    P: AsRef<Path>,
+    T: DeserializeOwned,
+{
+    Ok(serde_yaml::from_str::<T>(&json).map_err(|e| translate_yaml_error(e, &path))?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{read_yaml_file, read_yaml_helper};
+    use crate::result::{Error, ErrorInfo, Result};
+    use std::path::PathBuf;
+    use tempdir::TempDir;
+
+    #[test]
+    fn test_file_does_not_exist() -> Result<()> {
+        let temp_dir = TempDir::new("isopyrs-test")?;
+        let does_not_exist_path = temp_dir.path().join("does-not-exist");
+
+        let result = read_yaml_file::<i32, _>(&does_not_exist_path);
+
+        let error = result.expect_err("must be an error");
+        let (message, path) = match error {
+            Error::Reportable { message, info } => match info {
+                ErrorInfo::FileNotFound { path, .. } => (message, path),
+                _ => panic!(),
+            },
+            _ => panic!(),
+        };
+        assert!(message.contains(does_not_exist_path.to_str().expect("must succeed")));
+        assert!(path == does_not_exist_path);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty() -> Result<()> {
+        let p = PathBuf::from("/path/to/file");
+
+        let result = read_yaml_helper::<String, _>("", &p);
+
+        let error = result.expect_err("must be an error");
+        let (message, path) = match error {
+            Error::Reportable { message, info } => match info {
+                ErrorInfo::YamlError { path, .. } => (message, path),
+                _ => panic!(),
+            },
+            _ => panic!(),
+        };
+        assert!(message.contains(p.to_str().expect("must succeed")));
+        assert!(path == p);
+
+        Ok(())
     }
 }

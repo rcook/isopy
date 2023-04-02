@@ -2,12 +2,11 @@ use crate::app::App;
 use crate::object_model::Tag;
 use crate::result::Result;
 use crate::serialization::ProjectRecord;
-use std::fs::read_to_string;
+use crate::util::read_yaml_file;
 
 pub fn do_info(app: &App) -> Result<()> {
-    let config_path = app.cwd.join(".isopy.yaml");
-    let s = read_to_string(&config_path)?;
-    let project_record = serde_yaml::from_str::<ProjectRecord>(&s)?;
+    let project_config_path = app.cwd.join(".isopy.yaml");
+    let project_record = read_yaml_file::<ProjectRecord, _>(&project_config_path)?;
     println!("python_version: {}", project_record.python_version);
     println!(
         "tag: {}",

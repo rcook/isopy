@@ -2,14 +2,12 @@ use crate::app::App;
 use crate::helpers::{download_asset, get_asset};
 use crate::result::Result;
 use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
-use crate::util::{safe_write_file, unpack_file};
-use std::fs::read_to_string;
+use crate::util::{read_yaml_file, safe_write_file, unpack_file};
 use std::path::PathBuf;
 
 pub async fn do_init(app: &App) -> Result<()> {
     let project_config_path = app.cwd.join(".isopy.yaml");
-    let s = read_to_string(&project_config_path)?;
-    let project_record = serde_yaml::from_str::<ProjectRecord>(&s)?;
+    let project_record = read_yaml_file::<ProjectRecord, _>(&project_config_path)?;
 
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, &project_record.python_version, &project_record.tag)?;

@@ -16,6 +16,7 @@ pub async fn do_list(app: &App) -> Result<()> {
         }
     }
 
+    println!("HELLO");
     let anonymous_envs = app.read_anonymous_envs()?;
     if anonymous_envs.len() > 0 {
         println!("Anonymous environments:");
@@ -30,6 +31,7 @@ pub async fn do_list(app: &App) -> Result<()> {
         }
     }
 
+    println!("HELLO");
     let uses = app.read_uses()?;
     if uses.len() > 0 {
         println!("Uses:");

@@ -6,7 +6,7 @@ use crate::serialization::{
     AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, RepositoriesRecord,
     RepositoryRecord, UseRecord,
 };
-use crate::util::{dir_url, osstr_to_str, path_to_str, safe_write_file};
+use crate::util::{dir_url, osstr_to_str, path_to_str, read_yaml_file, safe_write_file};
 use md5::compute;
 use std::fs::{read_dir, read_to_string};
 use std::path::{Path, PathBuf};
@@ -45,8 +45,7 @@ impl App {
     pub fn read_repositories(&self) -> Result<Vec<Repository>> {
         let repositories_yaml_path = self.assets_dir.join("repositories.yaml");
         let repositories_record = if repositories_yaml_path.is_file() {
-            let s = read_to_string(repositories_yaml_path)?;
-            serde_yaml::from_str::<RepositoriesRecord>(&s)?
+            read_yaml_file::<RepositoriesRecord, _>(repositories_yaml_path)?
         } else {
             let repositories_record = RepositoriesRecord {
                 repositories: vec![
@@ -92,9 +91,7 @@ impl App {
     ) -> Result<Option<LastModified>> {
         let index_yaml_path = self.get_index_yaml_path(repository_name);
         Ok(if index_yaml_path.is_file() {
-            let s = read_to_string(&index_yaml_path)?;
-            let index_record = serde_yaml::from_str::<IndexRecord>(&s)?;
-            Some(index_record.last_modified)
+            Some(read_yaml_file::<IndexRecord, _>(&index_yaml_path)?.last_modified)
         } else {
             None
         })
@@ -179,9 +176,9 @@ impl App {
             return Ok(None);
         }
 
-        let s = read_to_string(&named_env_config_path)?;
-        let named_env = serde_yaml::from_str::<NamedEnvRecord>(&s)?;
-        Ok(Some(named_env))
+        Ok(Some(read_yaml_file::<NamedEnvRecord, _>(
+            &named_env_config_path,
+        )?))
     }
 
     pub fn anonymous_env_dir<P>(&self, project_config_path: P) -> Result<PathBuf>
@@ -205,9 +202,9 @@ impl App {
             return Ok(None);
         }
 
-        let s = read_to_string(&anonymous_env_config_path)?;
-        let anonymous_env = serde_yaml::from_str::<AnonymousEnvRecord>(&s)?;
-        Ok(Some(anonymous_env))
+        Ok(Some(read_yaml_file::<AnonymousEnvRecord, _>(
+            &anonymous_env_config_path,
+        )?))
     }
 
     pub fn read_anonymous_envs(&self) -> Result<Vec<AnonymousEnvRecord>> {
@@ -248,9 +245,7 @@ impl App {
             return Ok(None);
         }
 
-        let s = read_to_string(&use_config_path)?;
-        let use_ = serde_yaml::from_str::<UseRecord>(&s)?;
-        Ok(Some(use_))
+        Ok(Some(read_yaml_file::<UseRecord, _>(&use_config_path)?))
     }
 
     pub fn read_uses(&self) -> Result<Vec<UseRecord>> {
