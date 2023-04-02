@@ -4,17 +4,16 @@ use crate::util::ContentLength;
 use async_trait::async_trait;
 use bytes::Bytes;
 
-pub type ResponseInfo = (LastModified, Option<ContentLength>, Box<dyn Response>);
-
 #[async_trait]
 pub trait Repository {
     async fn get_latest_index(
         &self,
         last_modified: &Option<LastModified>,
-    ) -> Result<Option<ResponseInfo>>;
+    ) -> Result<Option<Box<dyn Response>>>;
 }
 
 pub trait Response {
+    fn last_modified(&self) -> &LastModified;
     fn content_length(&self) -> Option<ContentLength>;
     fn bytes_stream(&mut self) -> Result<Box<dyn Stream>>;
 }

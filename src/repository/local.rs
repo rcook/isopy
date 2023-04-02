@@ -1,4 +1,4 @@
-use super::{Repository, Response, ResponseInfo, Stream};
+use super::{Repository, Response, Stream};
 use crate::object_model::LastModified;
 use crate::result::{Error, Result};
 use crate::util::{to_last_modified, to_system_time, ContentLength};
@@ -26,7 +26,7 @@ impl Repository for LocalRepository {
     async fn get_latest_index(
         &self,
         last_modified: &Option<LastModified>,
-    ) -> Result<Option<ResponseInfo>> {
+    ) -> Result<Option<Box<dyn Response>>> {
         let index_json_path = self.dir.join("assets").join("index.json");
 
         let m = metadata(&index_json_path)?;
@@ -41,29 +41,38 @@ impl Repository for LocalRepository {
 
         let new_last_modified = to_last_modified(&modified)?;
         let content_length = m.len();
-        let resp = Box::new(LocalResponse::new(index_json_path, content_length));
-        Ok(Some((new_last_modified, Some(content_length), resp)))
+        Ok(Some(Box::new(LocalResponse::new(
+            new_last_modified,
+            content_length,
+            index_json_path,
+        ))))
     }
 }
 
 struct LocalResponse {
-    path: PathBuf,
+    last_modified: LastModified,
     content_length: ContentLength,
+    path: PathBuf,
 }
 
 impl LocalResponse {
-    fn new<P>(path: P, content_length: ContentLength) -> Self
+    fn new<P>(last_modified: LastModified, content_length: ContentLength, path: P) -> Self
     where
         P: Into<PathBuf>,
     {
         Self {
-            path: path.into(),
+            last_modified: last_modified,
             content_length: content_length,
+            path: path.into(),
         }
     }
 }
 
 impl Response for LocalResponse {
+    fn last_modified(&self) -> &LastModified {
+        &self.last_modified
+    }
+
     fn content_length(&self) -> Option<ContentLength> {
         Some(self.content_length)
     }

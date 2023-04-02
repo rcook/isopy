@@ -47,8 +47,8 @@ where
     P: AsRef<Path>,
 {
     let response_opt = repository.get_latest_index(last_modified).await?;
-    if let Some((new_last_modified, content_length, mut response)) = response_opt {
-        let indicator = Indicator::new(content_length)?;
+    if let Some(mut response) = response_opt {
+        let indicator = Indicator::new(response.content_length())?;
         let mut stream = response.bytes_stream()?;
         let mut file = safe_create_file(index_json_path, false)?;
         let mut downloaded = 0;
@@ -61,7 +61,7 @@ where
         }
         indicator.set_message("Index fetched");
         indicator.finish();
-        Ok(Some(new_last_modified))
+        Ok(Some(response.last_modified().clone()))
     } else {
         Ok(None)
     }

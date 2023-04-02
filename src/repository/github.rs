@@ -1,4 +1,4 @@
-use super::{Repository, Response, ResponseInfo, Stream};
+use super::{Repository, Response, Stream};
 use crate::object_model::LastModified;
 use crate::result::{Error, Result};
 use crate::util::ContentLength;
@@ -35,7 +35,7 @@ impl Repository for GitHubRepository {
     async fn get_latest_index(
         &self,
         last_modified: &Option<LastModified>,
-    ) -> Result<Option<ResponseInfo>> {
+    ) -> Result<Option<Box<dyn Response>>> {
         let latest_url = self.url.join("latest")?;
         let mut head_request = self
             .client
@@ -60,45 +60,35 @@ impl Repository for GitHubRepository {
 
         let index_request = self.client.get(self.url.clone());
         let index_response = index_request.send().await?;
-        let content_length = index_response.content_length();
-        let resp = Box::new(GitHubResponse::new(index_response));
-        Ok(Some((new_last_modified, content_length, resp)))
-
-        /*
-        if response.status() != StatusCode::NOT_MODIFIED {
-            println!("New releases are available");
-            if let Some(last_modified) = response.headers().get(LAST_MODIFIED) {
-                safe_write_file(
-                    &index_yaml_path,
-                    serde_yaml::to_string(&IndexRecord {
-                        last_modified: LastModified::parse(last_modified.to_str()?),
-                    })?,
-                    true,
-                )?;
-
-                download_file(&client, RELEASES_URL, index_json_path, true).await?;
-            }
-        }
-        */
+        Ok(Some(Box::new(GitHubResponse::new(
+            new_last_modified,
+            index_response,
+        ))))
     }
 }
 
 struct GitHubResponse {
-    response: Option<ReqwestResponse>,
+    last_modified: LastModified,
     content_length: Option<ContentLength>,
+    response: Option<ReqwestResponse>,
 }
 
 impl GitHubResponse {
-    fn new(response: ReqwestResponse) -> Self {
+    fn new(last_modified: LastModified, response: ReqwestResponse) -> Self {
         let content_length = response.content_length();
         Self {
-            response: Some(response),
+            last_modified: last_modified,
             content_length: content_length,
+            response: Some(response),
         }
     }
 }
 
 impl Response for GitHubResponse {
+    fn last_modified(&self) -> &LastModified {
+        &self.last_modified
+    }
+
     fn content_length(&self) -> Option<ContentLength> {
         self.content_length
     }
