@@ -1,5 +1,6 @@
 use crate::constants::RELEASES_URL;
 use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, RepositoryName};
+use crate::repository::{GitHubRepository, LocalRepository, Repository as RepositoryTrait};
 use crate::result::Result;
 use crate::serialization::{
     AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, RepositoriesRecord,
@@ -9,6 +10,11 @@ use crate::util::{dir_url, osstr_to_str, path_to_str, safe_write_file};
 use md5::compute;
 use std::fs::{read_dir, read_to_string};
 use std::path::{Path, PathBuf};
+
+pub struct Repository {
+    pub name: RepositoryName,
+    pub repository: Box<dyn RepositoryTrait>,
+}
 
 #[derive(Debug)]
 pub struct App {
@@ -36,11 +42,11 @@ impl App {
         }
     }
 
-    pub fn read_repositories(&self) -> Result<RepositoriesRecord> {
+    pub fn read_repositories(&self) -> Result<Vec<Repository>> {
         let repositories_yaml_path = self.assets_dir.join("repositories.yaml");
-        if repositories_yaml_path.is_file() {
+        let repositories_record = if repositories_yaml_path.is_file() {
             let s = read_to_string(repositories_yaml_path)?;
-            Ok(serde_yaml::from_str::<RepositoriesRecord>(&s)?)
+            serde_yaml::from_str::<RepositoriesRecord>(&s)?
         } else {
             let repositories_record = RepositoriesRecord {
                 repositories: vec![
@@ -61,8 +67,23 @@ impl App {
                 serde_yaml::to_string(&repositories_record)?,
                 false,
             )?;
-            Ok(repositories_record)
-        }
+            repositories_record
+        };
+
+        let all_repositories = repositories_record
+            .repositories
+            .into_iter()
+            .map(Self::make_repository)
+            .collect::<Result<Vec<_>>>()?;
+        let enabled_repositories = all_repositories
+            .into_iter()
+            .filter(|x| x.1)
+            .map(|x| Repository {
+                name: x.0,
+                repository: x.2,
+            })
+            .collect::<Vec<_>>();
+        Ok(enabled_repositories)
     }
 
     pub fn read_index_last_modified(
@@ -250,6 +271,19 @@ impl App {
         }
 
         Ok(uses)
+    }
+
+    fn make_repository(
+        record: RepositoryRecord,
+    ) -> Result<(RepositoryName, bool, Box<dyn RepositoryTrait>)> {
+        Ok(match record {
+            RepositoryRecord::GitHub { name, url, enabled } => {
+                (name, enabled, Box::new(GitHubRepository::new(url.clone())?))
+            }
+            RepositoryRecord::Local { name, dir, enabled } => {
+                (name, enabled, Box::new(LocalRepository::new(dir)))
+            }
+        })
     }
 
     fn get_index_yaml_path(&self, repository_name: &RepositoryName) -> PathBuf {
