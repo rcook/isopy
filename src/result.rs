@@ -17,7 +17,11 @@ pub enum ErrorInfo {
         path: PathBuf,
         inner: Option<std::io::Error>,
     },
-    YamlError {
+    Json {
+        path: PathBuf,
+        inner: Option<serde_json::Error>,
+    },
+    Yaml {
         path: PathBuf,
         inner: Option<serde_yaml::Error>,
     },
@@ -83,6 +87,22 @@ where
 }
 
 /// Attach file path to error
+pub fn translate_json_error<P>(e: serde_json::Error, path: P) -> Error
+where
+    P: AsRef<Path>,
+{
+    let p = PathBuf::from(path.as_ref());
+    let m = format!("{} in {}", e.to_string(), p.display());
+    Error::Reportable {
+        message: m,
+        info: crate::result::ErrorInfo::Json {
+            path: p,
+            inner: Some(e),
+        },
+    }
+}
+
+/// Attach file path to error
 pub fn translate_yaml_error<P>(e: serde_yaml::Error, path: P) -> Error
 where
     P: AsRef<Path>,
@@ -91,7 +111,7 @@ where
     let m = format!("{} in {}", e.to_string(), p.display());
     Error::Reportable {
         message: m,
-        info: crate::result::ErrorInfo::YamlError {
+        info: crate::result::ErrorInfo::Yaml {
             path: p,
             inner: Some(e),
         },

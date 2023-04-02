@@ -6,9 +6,11 @@ use crate::serialization::{
     AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, RepositoriesRecord,
     RepositoryRecord, UseRecord,
 };
-use crate::util::{dir_url, osstr_to_str, path_to_str, read_yaml_file, safe_write_file};
+use crate::util::{
+    dir_url, osstr_to_str, path_to_str, read_json_file, read_yaml_file, safe_write_file,
+};
 use md5::compute;
-use std::fs::{read_dir, read_to_string};
+use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 
 pub struct Repository {
@@ -125,9 +127,8 @@ impl App {
     }
 
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
-        let index_path = self.assets_dir.join("index.json");
-        let index_json = read_to_string(index_path)?;
-        let package_records = serde_json::from_str::<Vec<PackageRecord>>(&index_json)?;
+        let index_json_path = self.assets_dir.join("index.json");
+        let package_records = read_json_file::<Vec<PackageRecord>, _>(&index_json_path)?;
 
         let mut assets = Vec::new();
         for package_record in package_records {

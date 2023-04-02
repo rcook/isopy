@@ -1,4 +1,6 @@
-use crate::result::{translate_io_error, translate_yaml_error, Error, Result};
+use crate::result::{
+    translate_io_error, translate_json_error, translate_yaml_error, Error, Result,
+};
 use serde::de::DeserializeOwned;
 use std::fs::{create_dir_all, read_to_string, write, File, OpenOptions};
 use std::io::{ErrorKind as IOErrorKind, Write};
@@ -38,6 +40,15 @@ where
     Ok(())
 }
 
+pub fn read_json_file<T, P>(path: P) -> Result<T>
+where
+    P: AsRef<Path>,
+    T: DeserializeOwned,
+{
+    let json = read_to_string(&path).map_err(|e| translate_io_error(e, &path))?;
+    read_json_helper(&json, path)
+}
+
 pub fn read_yaml_file<T, P>(path: P) -> Result<T>
 where
     P: AsRef<Path>,
@@ -58,6 +69,14 @@ pub fn is_already_exists(error: &Error) -> bool {
         }
         _ => false,
     }
+}
+
+fn read_json_helper<T, P>(json: &str, path: P) -> Result<T>
+where
+    P: AsRef<Path>,
+    T: DeserializeOwned,
+{
+    Ok(serde_json::from_str::<T>(&json).map_err(|e| translate_json_error(e, &path))?)
 }
 
 fn read_yaml_helper<T, P>(json: &str, path: P) -> Result<T>
