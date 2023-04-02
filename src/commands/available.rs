@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::constants::{LATEST_RELEASE_URL, RELEASES_URL};
-use crate::object_model::{AssetFilter, LastModified};
+use crate::object_model::{AssetFilter, LastModified, RepositoryName};
 use crate::result::Result;
 use crate::util::{download_file, ISOPY_USER_AGENT};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
@@ -9,7 +9,7 @@ use reqwest::{Client, StatusCode};
 pub async fn do_available(app: &App) -> Result<()> {
     let index_json_path = app.assets_dir.join("index.json");
 
-    let last_modified_opt = app.read_index_last_modified()?;
+    let last_modified_opt = app.read_index_last_modified(&RepositoryName::Default)?;
 
     let client = Client::new();
 
@@ -26,7 +26,7 @@ pub async fn do_available(app: &App) -> Result<()> {
         if let Some(h) = response.headers().get(LAST_MODIFIED) {
             download_file(&client, RELEASES_URL, index_json_path, true).await?;
             let last_modified = LastModified::parse(h.to_str()?);
-            app.write_index_last_modified(&last_modified)?;
+            app.write_index_last_modified(&RepositoryName::Default, &last_modified)?;
         }
     }
 

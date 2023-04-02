@@ -1,4 +1,4 @@
-use crate::object_model::{Asset, AssetMeta, EnvName, LastModified};
+use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, RepositoryName};
 use crate::result::Result;
 use crate::serialization::{
     AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, UseRecord,
@@ -34,8 +34,11 @@ impl App {
         }
     }
 
-    pub fn read_index_last_modified(&self) -> Result<Option<LastModified>> {
-        let index_yaml_path = self.assets_dir.join("index.yaml");
+    pub fn read_index_last_modified(
+        &self,
+        repository_name: &RepositoryName,
+    ) -> Result<Option<LastModified>> {
+        let index_yaml_path = self.get_index_yaml_path(repository_name);
         Ok(if index_yaml_path.is_file() {
             let s = read_to_string(&index_yaml_path)?;
             let index_record = serde_yaml::from_str::<IndexRecord>(&s)?;
@@ -45,8 +48,12 @@ impl App {
         })
     }
 
-    pub fn write_index_last_modified(&self, last_modified: &LastModified) -> Result<()> {
-        let index_yaml_path = self.assets_dir.join("index.yaml");
+    pub fn write_index_last_modified(
+        &self,
+        repository_name: &RepositoryName,
+        last_modified: &LastModified,
+    ) -> Result<()> {
+        let index_yaml_path = self.get_index_yaml_path(repository_name);
         safe_write_file(
             &index_yaml_path,
             serde_yaml::to_string(&IndexRecord {
@@ -205,5 +212,12 @@ impl App {
         }
 
         Ok(uses)
+    }
+
+    fn get_index_yaml_path(&self, repository_name: &RepositoryName) -> PathBuf {
+        match repository_name {
+            RepositoryName::Default => self.assets_dir.join("index.yaml"),
+            RepositoryName::Named(s) => self.assets_dir.join(format!("index-{}.json", s)),
+        }
     }
 }
