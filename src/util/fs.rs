@@ -124,7 +124,7 @@ mod tests {
         let error = result.expect_err("must be an error");
         let (message, path) = match error {
             Error::Reportable { message, info } => match info {
-                ErrorInfo::YamlError { path, .. } => (message, path),
+                ErrorInfo::Yaml { path, .. } => (message, path),
                 _ => panic!(),
             },
             _ => panic!(),
