@@ -90,13 +90,7 @@ pub enum Command {
     },
 
     #[command(name = "scratch", about = "(Experimental)")]
-    Scratch {
-        #[arg(help = "Output path", value_parser = parse_absolute_path)]
-        index_json_path1: PathBuf,
-
-        #[arg(help = "Output path", value_parser = parse_absolute_path)]
-        index_json_path2: PathBuf,
-    },
+    Scratch,
 
     #[command(name = "shell", about = "Start shell for current Python environment")]
     Shell {

@@ -21,11 +21,7 @@ fn make_repository(
     })
 }
 
-pub async fn do_scratch<P, Q>(app: &App, _index_json_path1: P, index_json_path2: Q) -> Result<()>
-where
-    P: AsRef<Path>,
-    Q: AsRef<Path>,
-{
+pub async fn do_scratch(app: &App) -> Result<()> {
     let s = read_to_string(app.dir.join("repositories.yaml"))?;
     let doc = serde_yaml::from_str::<RepositoriesRecord>(&s)?;
     let all_repositories = doc
@@ -38,26 +34,19 @@ where
         .filter(|x| x.1)
         .map(|x| (x.0, x.2))
         .collect::<Vec<_>>();
-    for rec in enabled_repositories {
-        println!("name={}", rec.0);
-        test_repository(&None, &index_json_path2, rec.1.as_ref()).await?;
+    for (repository_name, repository) in enabled_repositories {
+        let index_json_path = app.get_index_json_path(&repository_name);
+        let current_last_modified = app.read_index_last_modified(&repository_name)?;
+        if let Some(new_last_modified) = test_repository(
+            &current_last_modified,
+            &index_json_path,
+            repository.as_ref(),
+        )
+        .await?
+        {
+            app.write_index_last_modified(&repository_name, &new_last_modified)?;
+        }
     }
-    /*
-    let github_last_modified = app.read_index_last_modified()?;
-    let github_repository = GitHubRepository::new(RELEASES_URL)?;
-    let result =
-        test_repository(&github_last_modified, &index_json_path1, github_repository).await?;
-    if let Some(last_modified) = result {
-        app.write_index_last_modified(&last_modified)?;
-    }
-
-    let local_repository = LocalRepository::new("");
-    let local_last_modified = Some(to_last_modified(
-        &(UNIX_EPOCH + Duration::from_nanos(1680139858761270900)),
-    )?);
-    let result = test_repository(&local_last_modified, &index_json_path2, local_repository).await?;
-    println!("result={:?}", result);
-     */
     Ok(())
 }
 
@@ -73,7 +62,7 @@ where
     if let Some(mut response) = response_opt {
         let indicator = Indicator::new(response.content_length())?;
         let mut stream = response.bytes_stream()?;
-        let mut file = safe_create_file(index_json_path, false)?;
+        let mut file = safe_create_file(index_json_path, true)?;
         let mut downloaded = 0;
         indicator.set_message("Fetching index");
         while let Some(item) = stream.next().await {

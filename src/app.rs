@@ -64,6 +64,13 @@ impl App {
         Ok(())
     }
 
+    pub fn get_index_json_path(&self, repository_name: &RepositoryName) -> PathBuf {
+        match repository_name {
+            RepositoryName::Default => self.assets_dir.join("index.json"),
+            RepositoryName::Named(s) => self.assets_dir.join(format!("index-{}.json", s)),
+        }
+    }
+
     pub fn make_asset_path(&self, asset: &Asset) -> PathBuf {
         self.assets_dir.join(&asset.name)
     }
@@ -217,7 +224,7 @@ impl App {
     fn get_index_yaml_path(&self, repository_name: &RepositoryName) -> PathBuf {
         match repository_name {
             RepositoryName::Default => self.assets_dir.join("index.yaml"),
-            RepositoryName::Named(s) => self.assets_dir.join(format!("index-{}.json", s)),
+            RepositoryName::Named(s) => self.assets_dir.join(format!("index-{}.yaml", s)),
         }
     }
 }

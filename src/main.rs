@@ -62,10 +62,7 @@ async fn main_inner() -> Result<()> {
         Command::Init => do_init(&app).await?,
         Command::List => do_list(&app).await?,
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
-        Command::Scratch {
-            index_json_path1,
-            index_json_path2,
-        } => do_scratch(&app, &index_json_path1, &index_json_path2).await?,
+        Command::Scratch => do_scratch(&app).await?,
         Command::Shell { env_name } => do_shell(&app, env_name.as_ref())?,
         Command::Use { env_name } => do_use(&app, &env_name)?,
         Command::Wrap {
