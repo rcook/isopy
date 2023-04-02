@@ -4,8 +4,6 @@ use crate::util::{safe_create_file, ContentLength, Indicator};
 use std::io::Write;
 use std::path::Path;
 
-pub const ISOPY_USER_AGENT: &'static str = "isopy";
-
 pub async fn download_stream<P>(
     label: &str,
     response: &mut Box<dyn Response>,

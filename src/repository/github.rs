@@ -1,7 +1,7 @@
 use super::{Repository, Response, Stream};
 use crate::object_model::{Asset, LastModified};
 use crate::result::{Error, Result};
-use crate::util::{dir_url, ContentLength, ISOPY_USER_AGENT};
+use crate::util::{dir_url, ContentLength};
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures_util::stream::Stream as FuturesStream;
@@ -9,6 +9,8 @@ use futures_util::StreamExt;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, IntoUrl, Response as ReqwestResponse, StatusCode, Url};
 use std::pin::Pin;
+
+pub const ISOPY_USER_AGENT: &'static str = "isopy";
 
 type PinnedStream = Pin<Box<dyn FuturesStream<Item = reqwest::Result<Bytes>> + Send>>;
 
