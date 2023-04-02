@@ -57,28 +57,35 @@ impl Repository for GitHubRepository {
                 .to_str()?,
         );
 
-        let index_request = self.client.get(self.url.clone());
+        let index_request = self
+            .client
+            .get(self.url.clone())
+            .header(USER_AGENT, ISOPY_USER_AGENT);
         let index_response = index_request.send().await?;
         Ok(Some(Box::new(GitHubResponse::new(
-            new_last_modified,
+            Some(new_last_modified),
             index_response,
         ))))
     }
 
     async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
-        println!("{}: {}", asset.name, asset.url);
-        todo!()
+        let request = self
+            .client
+            .get(asset.url.clone())
+            .header(USER_AGENT, ISOPY_USER_AGENT);
+        let response = request.send().await?;
+        Ok(Box::new(GitHubResponse::new(None, response)))
     }
 }
 
 struct GitHubResponse {
-    last_modified: LastModified,
+    last_modified: Option<LastModified>,
     content_length: Option<ContentLength>,
     response: Option<ReqwestResponse>,
 }
 
 impl GitHubResponse {
-    fn new(last_modified: LastModified, response: ReqwestResponse) -> Self {
+    fn new(last_modified: Option<LastModified>, response: ReqwestResponse) -> Self {
         let content_length = response.content_length();
         Self {
             last_modified: last_modified,
@@ -89,7 +96,7 @@ impl GitHubResponse {
 }
 
 impl Response for GitHubResponse {
-    fn last_modified(&self) -> &LastModified {
+    fn last_modified(&self) -> &Option<LastModified> {
         &self.last_modified
     }
 

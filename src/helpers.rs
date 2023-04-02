@@ -1,8 +1,7 @@
 use crate::app::App;
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
 use crate::result::{fatal, user, Result};
-use crate::util::{download_file, validate_sha256_checksum};
-use reqwest::Client;
+use crate::util::{download_the_next_generation, validate_sha256_checksum};
 use std::fs::remove_file;
 use std::path::PathBuf;
 
@@ -39,6 +38,11 @@ pub fn get_asset<'a>(
 }
 
 pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
+    let repositories = app.read_repositories()?;
+    let repository = repositories
+        .first()
+        .ok_or(user("No asset repositories are configured"))?;
+
     let asset_path = app.make_asset_path(asset);
     if asset_path.exists() {
         return Err(user(format!(
@@ -47,8 +51,8 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
         )));
     }
 
-    let client = Client::builder().build()?;
-    download_file(&client, asset.url.clone(), &asset_path, true).await?;
+    let mut response = repository.repository.get_asset(&asset).await?;
+    download_the_next_generation("asset", &mut response, &asset_path).await?;
 
     let is_valid = validate_sha256_checksum(&asset_path, &asset.tag)?;
     if !is_valid {

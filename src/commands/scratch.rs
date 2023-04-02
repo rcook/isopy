@@ -47,7 +47,13 @@ where
     let response_opt = repository.get_latest_index(last_modified).await?;
     if let Some(mut response) = response_opt {
         download_the_next_generation("index", &mut response, index_json_path).await?;
-        Ok(Some(response.last_modified().clone()))
+        Ok(Some(
+            response
+                .last_modified()
+                .as_ref()
+                .expect("must be present")
+                .clone(),
+        ))
     } else {
         Ok(None)
     }

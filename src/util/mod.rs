@@ -8,7 +8,7 @@ mod types;
 mod unpack_file;
 mod url;
 
-pub use self::download_file::{download_file, download_the_next_generation, ISOPY_USER_AGENT};
+pub use self::download_file::{download_the_next_generation, ISOPY_USER_AGENT};
 pub use self::fs::{is_already_exists, safe_create_file, safe_write_file};
 pub use self::indicator::Indicator;
 pub use self::sha256sums::validate_sha256_checksum;

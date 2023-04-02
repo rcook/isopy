@@ -23,7 +23,9 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
     {
         let index_json_path = app.get_index_json_path(&repository.name);
         download_the_next_generation("index", &mut response, index_json_path).await?;
-        app.write_index_last_modified(&repository.name, &response.last_modified())?;
+        if let Some(last_modified) = response.last_modified() {
+            app.write_index_last_modified(&repository.name, last_modified)?;
+        }
     }
 
     Ok(())

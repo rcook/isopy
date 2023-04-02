@@ -42,7 +42,7 @@ impl Repository for LocalRepository {
         let new_last_modified = to_last_modified(&modified)?;
         let content_length = m.len();
         Ok(Some(Box::new(LocalResponse::new(
-            new_last_modified,
+            Some(new_last_modified),
             content_length,
             index_json_path,
         ))))
@@ -54,7 +54,7 @@ impl Repository for LocalRepository {
         let last_modified = to_last_modified(&m.modified()?)?;
         let content_length = m.len();
         Ok(Box::new(LocalResponse::new(
-            last_modified,
+            Some(last_modified),
             content_length,
             asset_path,
         )))
@@ -62,13 +62,13 @@ impl Repository for LocalRepository {
 }
 
 struct LocalResponse {
-    last_modified: LastModified,
+    last_modified: Option<LastModified>,
     content_length: ContentLength,
     path: PathBuf,
 }
 
 impl LocalResponse {
-    fn new<P>(last_modified: LastModified, content_length: ContentLength, path: P) -> Self
+    fn new<P>(last_modified: Option<LastModified>, content_length: ContentLength, path: P) -> Self
     where
         P: Into<PathBuf>,
     {
@@ -81,7 +81,7 @@ impl LocalResponse {
 }
 
 impl Response for LocalResponse {
-    fn last_modified(&self) -> &LastModified {
+    fn last_modified(&self) -> &Option<LastModified> {
         &self.last_modified
     }
 

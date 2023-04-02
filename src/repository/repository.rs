@@ -15,7 +15,7 @@ pub trait Repository {
 }
 
 pub trait Response {
-    fn last_modified(&self) -> &LastModified;
+    fn last_modified(&self) -> &Option<LastModified>;
     fn content_length(&self) -> Option<ContentLength>;
     fn bytes_stream(&mut self) -> Result<Box<dyn Stream>>;
 }
