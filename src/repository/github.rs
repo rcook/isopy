@@ -1,5 +1,5 @@
 use super::{Repository, Response, Stream};
-use crate::object_model::LastModified;
+use crate::object_model::{Asset, LastModified};
 use crate::result::{Error, Result};
 use crate::util::{dir_url, ContentLength, ISOPY_USER_AGENT};
 use async_trait::async_trait;
@@ -63,6 +63,11 @@ impl Repository for GitHubRepository {
             new_last_modified,
             index_response,
         ))))
+    }
+
+    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
+        println!("{}: {}", asset.name, asset.url);
+        todo!()
     }
 }
 

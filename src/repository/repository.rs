@@ -1,4 +1,4 @@
-use crate::object_model::LastModified;
+use crate::object_model::{Asset, LastModified};
 use crate::result::Result;
 use crate::util::ContentLength;
 use async_trait::async_trait;
@@ -10,6 +10,8 @@ pub trait Repository {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>>;
+
+    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>>;
 }
 
 pub trait Response {

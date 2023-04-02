@@ -1,9 +1,11 @@
+use crate::constants::RELEASES_URL;
 use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, RepositoryName};
 use crate::result::Result;
 use crate::serialization::{
-    AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, UseRecord,
+    AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, RepositoriesRecord,
+    RepositoryRecord, UseRecord,
 };
-use crate::util::{osstr_to_str, path_to_str, safe_write_file};
+use crate::util::{dir_url, osstr_to_str, path_to_str, safe_write_file};
 use md5::compute;
 use std::fs::{read_dir, read_to_string};
 use std::path::{Path, PathBuf};
@@ -31,6 +33,35 @@ impl App {
             named_envs_dir: named_envs_dir,
             anonymous_envs_dir: anonymous_envs_dir,
             uses_dir: uses_dir,
+        }
+    }
+
+    pub fn read_repositories(&self) -> Result<RepositoriesRecord> {
+        let repositories_yaml_path = self.assets_dir.join("repositories.yaml");
+        if repositories_yaml_path.is_file() {
+            let s = read_to_string(repositories_yaml_path)?;
+            Ok(serde_yaml::from_str::<RepositoriesRecord>(&s)?)
+        } else {
+            let repositories_record = RepositoriesRecord {
+                repositories: vec![
+                    RepositoryRecord::GitHub {
+                        name: RepositoryName::parse("default").expect("must parse"),
+                        url: dir_url(RELEASES_URL)?,
+                        enabled: true,
+                    },
+                    RepositoryRecord::Local {
+                        name: RepositoryName::parse("example").expect("must parse"),
+                        dir: PathBuf::from("/path/to/local/repository"),
+                        enabled: false,
+                    },
+                ],
+            };
+            safe_write_file(
+                repositories_yaml_path,
+                serde_yaml::to_string(&repositories_record)?,
+                false,
+            )?;
+            Ok(repositories_record)
         }
     }
 

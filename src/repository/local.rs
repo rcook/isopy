@@ -1,5 +1,5 @@
 use super::{Repository, Response, Stream};
-use crate::object_model::LastModified;
+use crate::object_model::{Asset, LastModified};
 use crate::result::{Error, Result};
 use crate::util::{to_last_modified, to_system_time, ContentLength};
 use async_trait::async_trait;
@@ -46,6 +46,18 @@ impl Repository for LocalRepository {
             content_length,
             index_json_path,
         ))))
+    }
+
+    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
+        let asset_path = self.dir.join("assets").join(&asset.name);
+        let m = metadata(&asset_path)?;
+        let last_modified = to_last_modified(&m.modified()?)?;
+        let content_length = m.len();
+        Ok(Box::new(LocalResponse::new(
+            last_modified,
+            content_length,
+            asset_path,
+        )))
     }
 }
 
