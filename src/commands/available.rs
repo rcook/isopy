@@ -1,15 +1,10 @@
 use crate::app::App;
+use crate::constants::{LATEST_RELEASE_URL, RELEASES_URL};
 use crate::object_model::{AssetFilter, LastModified};
 use crate::result::Result;
 use crate::util::{download_file, ISOPY_USER_AGENT};
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode};
-
-const LATEST_RELEASE_URL: &'static str =
-    "https://api.github.com/repos/indygreg/python-build-standalone/releases/latest";
-
-const RELEASES_URL: &'static str =
-    "https://api.github.com/repos/indygreg/python-build-standalone/releases";
 
 pub async fn do_available(app: &App) -> Result<()> {
     let index_json_path = app.assets_dir.join("index.json");

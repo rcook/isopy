@@ -1,26 +1,48 @@
 use crate::app::App;
-use crate::object_model::LastModified;
+use crate::object_model::{LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
-use crate::util::{safe_create_file, to_last_modified, ContentLength, Indicator};
+use crate::serialization::{RepositoriesRecord, RepositoryRecord};
+use crate::util::{safe_create_file, ContentLength, Indicator};
+use std::fs::read_to_string;
 use std::io::Write;
 use std::path::Path;
-use std::time::{Duration, UNIX_EPOCH};
 
-const RELEASES_URL: &'static str =
-    "https://api.github.com/repos/indygreg/python-build-standalone/releases";
+fn make_repository(
+    record: RepositoryRecord,
+) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
+    Ok(match record {
+        RepositoryRecord::GitHub { name, url, enabled } => {
+            (name, enabled, Box::new(GitHubRepository::new(url.clone())?))
+        }
+        RepositoryRecord::Local { name, dir, enabled } => {
+            (name, enabled, Box::new(LocalRepository::new(dir)))
+        }
+    })
+}
 
-pub async fn do_scratch<P, Q, R>(
-    app: &App,
-    local_repository_dir: P,
-    index_json_path1: Q,
-    index_json_path2: R,
-) -> Result<()>
+pub async fn do_scratch<P, Q>(app: &App, _index_json_path1: P, index_json_path2: Q) -> Result<()>
 where
     P: AsRef<Path>,
     Q: AsRef<Path>,
-    R: AsRef<Path>,
 {
+    let s = read_to_string(app.dir.join("repositories.yaml"))?;
+    let doc = serde_yaml::from_str::<RepositoriesRecord>(&s)?;
+    let all_repositories = doc
+        .repositories
+        .into_iter()
+        .map(make_repository)
+        .collect::<Result<Vec<_>>>()?;
+    let enabled_repositories = all_repositories
+        .into_iter()
+        .filter(|x| x.1)
+        .map(|x| (x.0, x.2))
+        .collect::<Vec<_>>();
+    for rec in enabled_repositories {
+        println!("name={}", rec.0);
+        test_repository(&None, &index_json_path2, rec.1.as_ref()).await?;
+    }
+    /*
     let github_last_modified = app.read_index_last_modified()?;
     let github_repository = GitHubRepository::new(RELEASES_URL)?;
     let result =
@@ -29,19 +51,20 @@ where
         app.write_index_last_modified(&last_modified)?;
     }
 
-    let local_repository = LocalRepository::new(local_repository_dir.as_ref());
+    let local_repository = LocalRepository::new("");
     let local_last_modified = Some(to_last_modified(
         &(UNIX_EPOCH + Duration::from_nanos(1680139858761270900)),
     )?);
     let result = test_repository(&local_last_modified, &index_json_path2, local_repository).await?;
     println!("result={:?}", result);
+     */
     Ok(())
 }
 
 async fn test_repository<P>(
     last_modified: &Option<LastModified>,
     index_json_path: P,
-    repository: impl Repository,
+    repository: &dyn Repository,
 ) -> Result<Option<LastModified>>
 where
     P: AsRef<Path>,

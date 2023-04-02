@@ -1,6 +1,7 @@
 mod app;
 mod cli;
 mod commands;
+mod constants;
 mod env_info;
 mod helpers;
 mod object_model;
@@ -14,8 +15,8 @@ mod util;
 use crate::app::App;
 use crate::cli::{Args, Command};
 use crate::commands::{
-    do_available, do_create, do_download, do_downloaded, do_exec, do_info, do_init, do_list,
-    do_new, do_scratch, do_shell, do_use, do_wrap,
+    do_available, do_create, do_download, do_downloaded, do_exec, do_generate_repositories_yaml,
+    do_info, do_init, do_list, do_new, do_scratch, do_shell, do_use, do_wrap,
 };
 use crate::result::{could_not_get_isopy_dir, Error, Result};
 use clap::Parser;
@@ -54,23 +55,17 @@ async fn main_inner() -> Result<()> {
             program,
             args,
         } => do_exec(&app, env_name.as_ref(), &program, args)?,
+        Command::GenerateRepositoriesYaml {
+            local_repository_dir,
+        } => do_generate_repositories_yaml(&app, local_repository_dir)?,
         Command::Info => do_info(&app)?,
         Command::Init => do_init(&app).await?,
         Command::List => do_list(&app).await?,
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
         Command::Scratch {
-            local_repository_dir,
             index_json_path1,
             index_json_path2,
-        } => {
-            do_scratch(
-                &app,
-                &local_repository_dir,
-                &index_json_path1,
-                &index_json_path2,
-            )
-            .await?
-        }
+        } => do_scratch(&app, &index_json_path1, &index_json_path2).await?,
         Command::Shell { env_name } => do_shell(&app, env_name.as_ref())?,
         Command::Use { env_name } => do_use(&app, &env_name)?,
         Command::Wrap {

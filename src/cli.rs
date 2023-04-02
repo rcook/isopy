@@ -12,7 +12,7 @@ use std::result::Result;
     version
 )]
 pub struct Args {
-    #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_path)]
+    #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]
     pub dir: Option<PathBuf>,
     #[command(subcommand)]
     pub command: Command,
@@ -60,6 +60,12 @@ pub enum Command {
         args: Vec<String>,
     },
 
+    #[command(name = "generate-repositories-yaml", about = "(Experimental)")]
+    GenerateRepositoriesYaml {
+        #[arg(help = "Root directory for local repository", value_parser = parse_absolute_path)]
+        local_repository_dir: PathBuf,
+    },
+
     #[command(
         name = "info",
         about = "Execute command in shell for current Python environment"
@@ -83,15 +89,12 @@ pub enum Command {
         tag: Option<Tag>,
     },
 
-    #[command(name = "scratch", about = "Experimental")]
+    #[command(name = "scratch", about = "(Experimental)")]
     Scratch {
-        #[arg(help = "Root directory for local repository")]
-        local_repository_dir: PathBuf,
-
-        #[arg(help = "Output path")]
+        #[arg(help = "Output path", value_parser = parse_absolute_path)]
         index_json_path1: PathBuf,
 
-        #[arg(help = "Output path")]
+        #[arg(help = "Output path", value_parser = parse_absolute_path)]
         index_json_path2: PathBuf,
     },
 
@@ -112,16 +115,16 @@ pub enum Command {
 
     #[command(name = "wrap", about = "Generate wrapper script for Python script")]
     Wrap {
-        #[arg(help = "Wrapper path", value_parser = parse_path)]
+        #[arg(help = "Wrapper path", value_parser = parse_absolute_path)]
         wrapper_path: PathBuf,
-        #[arg(help = "Script path", value_parser = parse_path)]
+        #[arg(help = "Script path", value_parser = parse_absolute_path)]
         script_path: PathBuf,
-        #[arg(help = "Base directory", value_parser = parse_path)]
+        #[arg(help = "Base directory", value_parser = parse_absolute_path)]
         base_dir: PathBuf,
     },
 }
 
-fn parse_path(s: &str) -> Result<PathBuf, String> {
+fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
     PathBuf::from(s)
         .absolutize()
         .map_err(|_| String::from("invalid path"))
