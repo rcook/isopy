@@ -3,7 +3,6 @@ use super::{
 };
 use std::iter::Iterator;
 
-#[allow(unused)]
 pub struct AssetFilter {
     pub archive_type: Option<ArchiveType>,
     pub family: Option<Family>,
@@ -36,7 +35,6 @@ impl AssetFilter {
         }
     }
 
-    #[allow(unused)]
     #[cfg(target_os = "linux")]
     pub fn default_for_platform() -> Self {
         Self {
@@ -54,7 +52,6 @@ impl AssetFilter {
         }
     }
 
-    #[allow(unused)]
     #[cfg(target_os = "macos")]
     pub fn default_for_platform() -> Self {
         Self {
@@ -72,7 +69,6 @@ impl AssetFilter {
         }
     }
 
-    #[allow(unused)]
     #[cfg(target_os = "windows")]
     pub fn default_for_platform() -> Self {
         Self {
@@ -90,7 +86,6 @@ impl AssetFilter {
         }
     }
 
-    #[allow(unused)]
     pub fn filter<'a, A>(&self, assets: A) -> Vec<&'a Asset>
     where
         A: IntoIterator<Item = &'a Asset>,
