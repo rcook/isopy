@@ -1,7 +1,7 @@
 use crate::app::App;
 use crate::object_model::AssetFilter;
 use crate::result::{user, Result};
-use crate::util::download_the_next_generation;
+use crate::util::download_stream;
 
 pub async fn do_available(app: &App) -> Result<()> {
     update_index_if_necessary(app).await?;
@@ -22,7 +22,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
         .await?
     {
         let index_json_path = app.get_index_json_path(&repository.name);
-        download_the_next_generation("index", &mut response, index_json_path).await?;
+        download_stream("index", &mut response, index_json_path).await?;
         if let Some(last_modified) = response.last_modified() {
             app.write_index_last_modified(&repository.name, last_modified)?;
         }

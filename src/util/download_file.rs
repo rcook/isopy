@@ -6,7 +6,7 @@ use std::path::Path;
 
 pub const ISOPY_USER_AGENT: &'static str = "isopy";
 
-pub async fn download_the_next_generation<P>(
+pub async fn download_stream<P>(
     label: &str,
     response: &mut Box<dyn Response>,
     output_path: P,

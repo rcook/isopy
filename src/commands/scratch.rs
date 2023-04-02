@@ -3,7 +3,7 @@ use crate::helpers::get_asset;
 use crate::object_model::{LastModified, Tag, Version};
 use crate::repository::Repository as RepositoryTrait;
 use crate::result::Result;
-use crate::util::download_the_next_generation;
+use crate::util::download_stream;
 use std::path::Path;
 
 pub async fn do_scratch(app: &App) -> Result<()> {
@@ -31,7 +31,7 @@ pub async fn do_scratch(app: &App) -> Result<()> {
     )?;
     for repository in &repositories {
         let mut response = repository.repository.get_asset(&asset).await?;
-        download_the_next_generation("asset", &mut response, "foo.tar.gz").await?;
+        download_stream("asset", &mut response, "foo.tar.gz").await?;
     }
     Ok(())
 }
@@ -46,7 +46,7 @@ where
 {
     let response_opt = repository.get_latest_index(last_modified).await?;
     if let Some(mut response) = response_opt {
-        download_the_next_generation("index", &mut response, index_json_path).await?;
+        download_stream("index", &mut response, index_json_path).await?;
         Ok(Some(
             response
                 .last_modified()

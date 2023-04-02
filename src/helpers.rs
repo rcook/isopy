@@ -1,7 +1,7 @@
 use crate::app::App;
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
 use crate::result::{fatal, user, Result};
-use crate::util::{download_the_next_generation, validate_sha256_checksum};
+use crate::util::{download_stream, validate_sha256_checksum};
 use std::fs::remove_file;
 use std::path::PathBuf;
 
@@ -52,7 +52,7 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
     }
 
     let mut response = repository.repository.get_asset(&asset).await?;
-    download_the_next_generation("asset", &mut response, &asset_path).await?;
+    download_stream("asset", &mut response, &asset_path).await?;
 
     let is_valid = validate_sha256_checksum(&asset_path, &asset.tag)?;
     if !is_valid {
