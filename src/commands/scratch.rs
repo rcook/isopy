@@ -8,7 +8,7 @@ use std::path::Path;
 use std::time::{Duration, UNIX_EPOCH};
 
 const RELEASES_URL: &'static str =
-    "https://api.github.com/repos/indygreg/python-build-standalone/releases/";
+    "https://api.github.com/repos/indygreg/python-build-standalone/releases";
 
 pub async fn do_scratch<P, Q, R>(
     app: &App,

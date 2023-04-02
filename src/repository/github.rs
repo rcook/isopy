@@ -1,8 +1,7 @@
 use super::{Repository, Response, Stream};
 use crate::object_model::LastModified;
 use crate::result::{Error, Result};
-use crate::util::ContentLength;
-use crate::util::ISOPY_USER_AGENT;
+use crate::util::{dir_url, ContentLength, ISOPY_USER_AGENT};
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures_util::stream::Stream as FuturesStream;
@@ -24,7 +23,7 @@ impl GitHubRepository {
         U: IntoUrl,
     {
         Ok(Self {
-            url: url.into_url()?,
+            url: dir_url(url)?,
             client: Client::new(),
         })
     }

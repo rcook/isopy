@@ -6,6 +6,7 @@ mod str;
 mod time;
 mod types;
 mod unpack_file;
+mod url;
 
 pub use self::download_file::{download_file, ISOPY_USER_AGENT};
 pub use self::fs::{is_already_exists, safe_create_file, safe_write_file};
@@ -15,3 +16,4 @@ pub use self::str::{osstr_to_str, osstring_to_string, path_to_str};
 pub use self::time::{to_last_modified, to_system_time};
 pub use self::types::ContentLength;
 pub use self::unpack_file::unpack_file;
+pub use self::url::{dir_url, file_url};
