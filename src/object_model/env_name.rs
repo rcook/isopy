@@ -9,7 +9,6 @@ lazy_static! {
 pub struct EnvName(String);
 
 impl EnvName {
-    #[allow(unused)]
     pub fn parse(s: &str) -> Option<Self> {
         match ENV_NAME_REGEX.is_match(s) {
             true => Some(Self(String::from(s))),

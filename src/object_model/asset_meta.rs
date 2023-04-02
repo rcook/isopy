@@ -15,7 +15,6 @@ pub struct AssetMeta {
     pub parsed_tag: Tag,
 }
 
-#[allow(unused)]
 impl AssetMeta {
     pub fn definitely_not_an_asset_name(s: &str) -> bool {
         if "libuuid-1.0.3.tar.gz" == s {

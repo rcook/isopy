@@ -36,7 +36,6 @@ lazy_static! {
     };
 }
 
-#[allow(unused)]
 pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
     let mut system = System::new();
     let pid = get_pid()?;

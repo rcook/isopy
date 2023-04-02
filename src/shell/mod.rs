@@ -1,4 +1,5 @@
 mod command;
+#[cfg(target_os = "windows")]
 mod proc;
 #[cfg(target_os = "windows")]
 mod windows;

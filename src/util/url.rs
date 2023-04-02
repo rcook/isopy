@@ -9,7 +9,6 @@ where
     helper(url, false)
 }
 
-#[allow(unused)]
 pub fn dir_url<U>(url: U) -> Result<Url>
 where
     U: IntoUrl,

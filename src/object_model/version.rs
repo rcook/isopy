@@ -7,7 +7,6 @@ pub struct Version {
 }
 
 impl Version {
-    #[allow(unused)]
     pub fn new(major: i32, minor: i32, build: i32) -> Self {
         Self {
             major: major,

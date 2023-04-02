@@ -93,7 +93,6 @@ where
     Url::parse(&s).map_err(Error::custom)
 }
 
-#[allow(unused)]
 pub fn serialize_url<S>(x: &Url, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,

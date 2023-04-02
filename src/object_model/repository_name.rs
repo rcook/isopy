@@ -14,7 +14,6 @@ pub enum RepositoryName {
 }
 
 impl RepositoryName {
-    #[allow(unused)]
     pub fn parse(s: &str) -> Option<Self> {
         if s.eq_ignore_ascii_case(DEFAULT_REPOSITORY_NAME) {
             Some(Self::Default)
