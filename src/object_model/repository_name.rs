@@ -5,26 +5,38 @@ lazy_static! {
     static ref REPOSITORY_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
 }
 
+const DEFAULT_REPOSITORY_NAME: &'static str = "default";
+
 #[derive(Clone, Debug, PartialEq)]
-pub struct RepositoryName(String);
+pub enum RepositoryName {
+    Default,
+    Named(String),
+}
 
 impl RepositoryName {
     #[allow(unused)]
     pub fn parse(s: &str) -> Option<Self> {
-        match REPOSITORY_NAME_REGEX.is_match(s) {
-            true => Some(Self(String::from(s))),
-            false => None,
+        if s.eq_ignore_ascii_case(DEFAULT_REPOSITORY_NAME) {
+            Some(Self::Default)
+        } else {
+            match REPOSITORY_NAME_REGEX.is_match(s) {
+                true => Some(Self::Named(String::from(s))),
+                false => None,
+            }
         }
     }
 
     pub fn as_str(&self) -> &str {
-        &self.0
+        match self {
+            Self::Default => DEFAULT_REPOSITORY_NAME,
+            Self::Named(s) => &s,
+        }
     }
 }
 
 impl std::fmt::Display for RepositoryName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "{}", self.as_str())
     }
 }
 
@@ -37,8 +49,10 @@ mod tests {
     #[case(None, "")]
     #[case(None, " ")]
     #[case(None, " foo ")]
-    #[case(Some(RepositoryName(String::from("foo"))), "foo")]
-    #[case(Some(RepositoryName(String::from("foo-_"))), "foo-_")]
+    #[case(Some(RepositoryName::Named(String::from("foo"))), "foo")]
+    #[case(Some(RepositoryName::Named(String::from("foo-_"))), "foo-_")]
+    #[case(Some(RepositoryName::Default), "DEFAULT")]
+    #[case(Some(RepositoryName::Default), "default")]
     fn test_basics(#[case] expected_result: Option<RepositoryName>, #[case] input: String) {
         assert_eq!(expected_result, RepositoryName::parse(&input))
     }
