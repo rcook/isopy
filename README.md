@@ -7,9 +7,6 @@ downloaded from [Python Standalone Builds][python-build-standalone-releases]
 
 Released under [MIT License](LICENSE)
 
-* [Cookbook](COOKBOOK.md)
-* [Concepts](CONCEPTS.md)
-
 ## Installation
 
 See [GitHub Pages documentation][github-pages] for installation instructions.

@@ -16,7 +16,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 & ([ScriptBlock]::Create((iwr -useb https://raw.githubusercontent.com/rcook/isopy/main/setup/setup.ps1)))
 ```
 
-_[Usage](usage.md) \| [Developers][readme]_
+_[Usage](usage.md) \| [Concepts](concepts.md) \| [Cookbook](cookbook.md) \| [Developers][readme]_
 
 [issues]: https://github.com/rcook/isopy/issues
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
