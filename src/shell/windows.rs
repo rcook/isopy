@@ -1,5 +1,5 @@
 use super::proc::{get_parent_pid, get_pid, get_process_from_pid};
-use crate::error::{fatal, Result};
+use crate::result::{fatal, Result};
 use lazy_static::lazy_static;
 use same_file::is_same_file;
 use std::env::var;
