@@ -1,6 +1,6 @@
 use crate::constants::RELEASES_URL;
 use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, RepositoryName};
-use crate::repository::{GitHubRepository, LocalRepository, Repository as RepositoryTrait};
+use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
 use crate::serialization::{
     AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, RepositoriesRecord,
@@ -13,9 +13,9 @@ use md5::compute;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 
-pub struct Repository {
+pub struct RepositoryInfo {
     pub name: RepositoryName,
-    pub repository: Box<dyn RepositoryTrait>,
+    pub repository: Box<dyn Repository>,
 }
 
 #[derive(Debug)]
@@ -44,7 +44,7 @@ impl App {
         }
     }
 
-    pub fn read_repositories(&self) -> Result<Vec<Repository>> {
+    pub fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {
         let repositories_yaml_path = self.assets_dir.join("repositories.yaml");
         let repositories_record = if repositories_yaml_path.is_file() {
             read_yaml_file::<RepositoriesRecord, _>(repositories_yaml_path)?
@@ -79,7 +79,7 @@ impl App {
         let enabled_repositories = all_repositories
             .into_iter()
             .filter(|x| x.1)
-            .map(|x| Repository {
+            .map(|x| RepositoryInfo {
                 name: x.0,
                 repository: x.2,
             })
@@ -271,7 +271,7 @@ impl App {
 
     fn make_repository(
         record: RepositoryRecord,
-    ) -> Result<(RepositoryName, bool, Box<dyn RepositoryTrait>)> {
+    ) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
         Ok(match record {
             RepositoryRecord::GitHub { name, url, enabled } => {
                 (name, enabled, Box::new(GitHubRepository::new(url.clone())?))
