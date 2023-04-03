@@ -1,15 +1,17 @@
 use crate::object_model::EnvName;
 use crate::object_model::{Tag, Version};
 use clap::{Parser, Subcommand};
+use git_version::git_version;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use std::result::Result;
 
 #[derive(Parser, Debug)]
 #[command(
-    about = "Isolated Python Tool Rust Edition!",
-    after_help = "https://rcook.github.io/isopy/\nhttps://github.com/rcook/isopyrs\nhttps://github.com/rcook/isopy",
-    version
+    name = env!("CARGO_PKG_NAME"),
+    about = format!("{} {}", env!("CARGO_PKG_DESCRIPTION"), git_version!()),
+    after_help = format!("{}\nhttps://github.com/rcook/isopyrs\nhttps://github.com/rcook/isopy", env!["CARGO_PKG_HOMEPAGE"]),
+    version = git_version!()
 )]
 pub struct Args {
     #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]
