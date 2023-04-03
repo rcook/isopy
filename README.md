@@ -14,7 +14,9 @@ instructions.
 
 ## Development
 
-isopy is written in [Rust][rust], built using [Cargo][cargo-book] installed via [rustup][rustup] and distributed via [GitHub][releases]. It's based on an original reference implementation in [Python](py).
+isopy is written in [Rust][rust], built using [Cargo][cargo-book] installed via [rustup]
+[rustup] and distributed via [GitHub][releases]. It's based on an original
+[reference implementation in Python](py).
 
 ## Making an isopy environment available on shell startup
 
