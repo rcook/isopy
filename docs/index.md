@@ -12,4 +12,4 @@ _[Usage](usage.md) \| [Concepts](concepts.md) \| [Cookbook](cookbook.md) \| [Dev
 [issues]: https://github.com/rcook/isopy/issues
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
 [readme]: https://github.com/rcook/isopy/blob/main/README.md
-[releases]: https://github.com/rcook/isopyrs/releases
+[releases]: https://github.com/rcook/isopy/releases
