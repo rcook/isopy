@@ -1,6 +1,6 @@
 # Concepts
 
-isopy/isopyrs manages isolated Python environments. This document
+isopy manages isolated Python environments. This document
 describes the core concepts underlying its operation.
 
 ## Index

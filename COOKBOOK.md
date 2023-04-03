@@ -3,7 +3,7 @@
 ## "What versions of Python are availabe?"
 
 ```bash
-isopyrs available
+isopy available
 ```
 
 ## "I'd like to set up my current project to use Python 3.11.1"
@@ -12,18 +12,18 @@ isopyrs available
 cd /path/to/project
 
 # Create an .isopy.yaml configuration file
-isopyrs new 3.11.1 -t 20230116
+isopy new 3.11.1 -t 20230116
 
 # Create the environment based on this configuration
-isopyrs init
+isopy init
 
 # Start a shell
-isopyrs shell
+isopy shell
 ```
 
 ## "Show version of Python in my environment"
 
 ```bash
 cd /path/to/project
-isopyrs exec python3 --version
+isopy exec python3 --version
 ```

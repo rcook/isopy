@@ -1,10 +1,10 @@
 [package]
 authors = ["Richard Cook"]
-description = "Isolated Python Tool Rust Edition!"
+description = "Isolated Python Tool"
 edition = "2021"
 homepage = "https://rcook.github.io/isopy/"
 license = "MIT"
-name = "isopyrs"
+name = "isopy"
 version = "0.0.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

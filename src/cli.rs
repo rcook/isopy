@@ -10,7 +10,7 @@ use std::result::Result;
 #[command(
     name = env!("CARGO_PKG_NAME"),
     about = format!("{} {}", env!("CARGO_PKG_DESCRIPTION"), git_version!()),
-    after_help = format!("{}\nhttps://github.com/rcook/isopyrs\nhttps://github.com/rcook/isopy", env!["CARGO_PKG_HOMEPAGE"]),
+    after_help = format!("{}\nhttps://github.com/rcook/isopy", env!["CARGO_PKG_HOMEPAGE"]),
     version = git_version!()
 )]
 pub struct Args {

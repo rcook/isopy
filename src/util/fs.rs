@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn test_file_does_not_exist() -> Result<()> {
-        let temp_dir = TempDir::new("isopyrs-test")?;
+        let temp_dir = TempDir::new("isopy-test")?;
         let does_not_exist_path = temp_dir.path().join("does-not-exist");
 
         let result = read_yaml_file::<i32, _>(&does_not_exist_path);
