@@ -3,10 +3,20 @@
 isopy manages isolated Python environments. This document
 describes the core concepts underlying its operation.
 
+## Repository
+
+isopy comes with one preconfigured repository, namely
+[Python Standalone Builds][python-standalone-builds]. This is a source
+of asset metadata (index) and the assets themselves. Alternative
+repositories will eventually be configurable to allow local mirroring
+or caching of downloads from the Python Standalone Builds as well as
+for air-gapped use of the tool.
+
 ## Index
 
 The index is release and asset information downloaded from the
-[Python Standalone Builds][python-standalone-builds] project on GitHub.
+[Python Standalone Builds][python-standalone-builds] project on GitHub
+or another repository.
 
 ## Named environment
 
