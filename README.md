@@ -9,11 +9,12 @@ Released under [MIT License](LICENSE)
 
 ## Installation
 
-See [GitHub Pages documentation][github-pages] for installation instructions.
+See [GitHub Pages documentation][github-pages] for installation and usage
+instructions.
 
 ## Development
 
-isopy is built using [Cargo][cargo-book] installed via [rustup][rustup].
+isopy is written in [Rust][rust], built using [Cargo][cargo-book] installed via [rustup][rustup] and distributed via [GitHub][releases].
 
 ## Making an isopy environment available on shell startup
 
@@ -78,6 +79,8 @@ This tool is similar in philosophy to the following projects:
 [pyenv-win]: https://github.com/pyenv-win/pyenv-win
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
 [rbenv]: https://github.com/rbenv/rbenv
+[releases]: https://github.com/rcook/isopyrs/releases
 [ruby-build]: https://github.com/rbenv/ruby-build
+[rust]: https://www.rust-lang.org/
 [rustup]: https://rustup.rs/
 [usage]: https://rcook.github.io/isopy/usage
