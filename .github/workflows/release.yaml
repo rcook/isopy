@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - run: git fetch --tags origin
+      - run: git fetch --force --tags origin
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           # (required)
