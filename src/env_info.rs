@@ -1,4 +1,4 @@
-use crate::app::App;
+use crate::app::{App, PROJECT_CONFIG_FILE_NAME};
 use crate::object_model::EnvName;
 use crate::result::{user, Result};
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
@@ -41,7 +41,7 @@ fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
         return Ok(None);
     }
 
-    let anonymous_env_dir = app.anonymous_env_dir(&project_config_path)?;
+    let anonymous_env_dir = app.anonymous_env_dir(&PROJECT_CONFIG_FILE_NAME)?;
     let anonymous_env_config_path = anonymous_env_dir.join("env.yaml");
     if !anonymous_env_config_path.is_file() {
         return Ok(None);
