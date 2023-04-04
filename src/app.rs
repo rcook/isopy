@@ -3,8 +3,8 @@ use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, RepositoryNam
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
 use crate::serialization::{
-    AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, RepositoriesRecord,
-    RepositoryRecord, UseRecord,
+    AnonymousEnvRecord, IndexRecord, NamedEnvRecord, PackageRecord, ProjectRecord,
+    RepositoriesRecord, RepositoryRecord, UseRecord,
 };
 use crate::util::{
     dir_url, osstr_to_str, path_to_str, read_json_file, read_yaml_file, safe_write_file,
@@ -12,6 +12,8 @@ use crate::util::{
 use md5::compute;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
+
+pub const PROJECT_CONFIG_FILE_NAME: &'static str = ".python-version.yaml";
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,
@@ -267,6 +269,16 @@ impl App {
         }
 
         Ok(uses)
+    }
+
+    pub fn get_project_config_path(&self) -> PathBuf {
+        self.cwd.join(PROJECT_CONFIG_FILE_NAME)
+    }
+
+    pub fn read_project_config(&self) -> Result<ProjectRecord> {
+        let project_config_path = self.get_project_config_path();
+        let project_record = read_yaml_file::<ProjectRecord, _>(&project_config_path)?;
+        Ok(project_record)
     }
 
     fn make_repository(

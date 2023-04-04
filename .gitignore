@@ -1,2 +1,4 @@
-/.isopy.yaml
+/.python-version.yaml
 /target
+__pycache__/
+*.pyc

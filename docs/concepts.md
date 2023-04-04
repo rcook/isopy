@@ -33,12 +33,12 @@ tree. These environments are intended to be associated with a single
 directory tree which would typically be a single Python project. Like
 named environments, they are an isolated Python runtime environment
 consisting of an interpreter and site packages. These are typically
-marked by the presence of an `.isopy.yaml` file.
+marked by the presence of an `.python-version` file.
 
 ## Uses
 
 Think of these as symlinks for environments. With these you can
 associate an environment with a given directory without the need for an
-intrusive `.isopy.yaml` file.
+intrusive `.python-version` file.
 
 [python-standalone-builds]: https://github.com/indygreg/python-build-standalone/releases

@@ -6,7 +6,7 @@ use crate::serialization::ProjectRecord;
 use crate::util::{is_already_exists, safe_write_file};
 
 pub fn do_new(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let project_config_path = app.cwd.join(".isopy.yaml");
+    let project_config_path = app.get_project_config_path();
     let project_record = ProjectRecord {
         python_version: version.clone(),
         tag: tag.clone(),

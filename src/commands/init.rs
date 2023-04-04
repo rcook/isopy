@@ -1,13 +1,12 @@
-use crate::app::App;
+use crate::app::{App, PROJECT_CONFIG_FILE_NAME};
 use crate::helpers::{download_asset, get_asset};
 use crate::result::Result;
-use crate::serialization::{AnonymousEnvRecord, ProjectRecord};
-use crate::util::{read_yaml_file, safe_write_file, unpack_file};
+use crate::serialization::AnonymousEnvRecord;
+use crate::util::{safe_write_file, unpack_file};
 use std::path::PathBuf;
 
 pub async fn do_init(app: &App) -> Result<()> {
-    let project_config_path = app.cwd.join(".isopy.yaml");
-    let project_record = read_yaml_file::<ProjectRecord, _>(&project_config_path)?;
+    let project_record = app.read_project_config()?;
 
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, &project_record.python_version, &project_record.tag)?;
@@ -17,8 +16,10 @@ pub async fn do_init(app: &App) -> Result<()> {
         asset_path = download_asset(app, asset).await?;
     }
 
-    let anonymous_env_dir = app.anonymous_env_dir(&project_config_path)?;
+    let anonymous_env_dir = app.anonymous_env_dir(&PROJECT_CONFIG_FILE_NAME)?;
     unpack_file(&asset_path, &anonymous_env_dir)?;
+
+    let project_config_path = app.get_project_config_path();
 
     safe_write_file(
         anonymous_env_dir.join("env.yaml"),

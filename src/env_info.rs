@@ -36,7 +36,7 @@ fn get_use_env_info(app: &App) -> Result<Option<EnvInfo>> {
 }
 
 fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
-    let project_config_path = app.cwd.join(".isopy.yaml");
+    let project_config_path = app.get_project_config_path();
     if !project_config_path.is_file() {
         return Ok(None);
     }
