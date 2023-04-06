@@ -3,11 +3,9 @@
   "files.exclude": {
     "**/.vscode/": true,
     "**/target/": true,
+    "py/": true,
   },
   "rust-analyzer.linkedProjects": [
     "/Cargo.toml",
-    "/Cargo.toml",
-    "/Cargo.toml",
-    "/Cargo.toml"
   ]
 }
