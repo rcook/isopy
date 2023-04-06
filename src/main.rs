@@ -82,8 +82,8 @@ async fn main() {
             red_ln!("{}", message);
             exitcode::USAGE
         }
-        Err(Error::User(msg)) => {
-            red_ln!("{}", msg);
+        Err(Error::User { message }) => {
+            red_ln!("{}", message);
             exitcode::USAGE
         }
         Err(e) => {

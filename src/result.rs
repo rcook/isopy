@@ -4,10 +4,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    User(String),
+    User { message: String },
     Reportable { message: String, info: ErrorInfo },
-    Fatal(String),
-    Other(Box<dyn std::error::Error>),
+    Fatal { message: String },
+    Other { inner: Box<dyn std::error::Error> },
 }
 
 #[derive(Debug)]
@@ -36,15 +36,21 @@ where
     E: std::error::Error + 'static,
 {
     fn from(e: E) -> Self {
-        Self::Other(Box::new(e))
+        other(Box::new(e))
     }
 }
 
-pub fn user<M>(msg: M) -> Error
+pub fn other(inner: Box<dyn std::error::Error>) -> Error {
+    Error::Other { inner: inner }
+}
+
+pub fn user<M>(message: M) -> Error
 where
     M: Into<String>,
 {
-    Error::User(msg.into())
+    Error::User {
+        message: message.into(),
+    }
 }
 
 pub fn could_not_infer_isopy_dir() -> Error {
@@ -86,11 +92,13 @@ where
     }
 }
 
-pub fn fatal<M>(msg: M) -> Error
+pub fn fatal<M>(message: M) -> Error
 where
     M: Into<String>,
 {
-    Error::Fatal(msg.into())
+    Error::Fatal {
+        message: message.into(),
+    }
 }
 
 /// Attach file path to error

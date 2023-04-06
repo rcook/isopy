@@ -1,6 +1,6 @@
 use super::{Repository, Response, Stream};
 use crate::object_model::{Asset, LastModified};
-use crate::result::{Error, Result};
+use crate::result::{fatal, Result};
 use crate::util::{dir_url, ContentLength};
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -110,7 +110,7 @@ impl Response for GitHubResponse {
         let response = self
             .response
             .take()
-            .ok_or(Error::Fatal(String::from("Response already consumed")))?;
+            .ok_or(fatal(String::from("Response already consumed")))?;
         let stream = response.bytes_stream();
         Ok(Box::new(GitHubStream::new(Box::pin(stream))))
     }
