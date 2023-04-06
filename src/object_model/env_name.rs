@@ -9,9 +9,25 @@ lazy_static! {
 pub struct EnvName(String);
 
 impl EnvName {
-    pub fn parse(s: &str) -> Option<Self> {
-        match ENV_NAME_REGEX.is_match(s) {
-            true => Some(Self(String::from(s))),
+    pub fn sanitize(s: &str) -> Self {
+        let mut s1 = String::with_capacity(s.len());
+        for c in s.chars() {
+            if char::is_alphanumeric(c) {
+                s1.push(c)
+            } else {
+                s1.push('-')
+            }
+        }
+        Self::parse(s1).expect("must be a valid environment name")
+    }
+
+    pub fn parse<S>(s: S) -> Option<Self>
+    where
+        S: Into<String>,
+    {
+        let s1 = s.into();
+        match ENV_NAME_REGEX.is_match(&s1) {
+            true => Some(Self(s1)),
             false => None,
         }
     }

@@ -2,7 +2,7 @@ use crate::app::App;
 use crate::object_model::EnvName;
 use crate::result::{user, Result};
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
-use crate::util::read_yaml_file;
+use crate::util::{path_to_str, read_yaml_file};
 use std::path::PathBuf;
 
 pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
@@ -45,7 +45,7 @@ fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
                 let anonymous_env_record =
                     read_yaml_file::<AnonymousEnvRecord, _>(&anonymous_env_config_path)?;
                 Some(EnvInfo {
-                    env_name: EnvName::parse("ANONYMOUS").expect("Must be a valid environment"),
+                    env_name: EnvName::sanitize(path_to_str(&project.config_path)?),
                     full_python_dir: anonymous_env_dir.join(anonymous_env_record.python_dir),
                 })
             } else {
