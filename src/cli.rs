@@ -14,7 +14,7 @@ use std::result::Result;
     version = git_version!()
 )]
 pub struct Args {
-    #[arg(help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]
+    #[arg(global = true, help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]
     pub dir: Option<PathBuf>,
     #[command(subcommand)]
     pub command: Command,
