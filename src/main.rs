@@ -17,6 +17,7 @@ use crate::commands::{
     do_available, do_create, do_download, do_downloaded, do_exec, do_generate_repositories_yaml,
     do_info, do_init, do_list, do_new, do_scratch, do_shell, do_use, do_wrap,
 };
+use crate::constants::{GENERAL_ERROR, OK, USAGE};
 use crate::result::{could_not_infer_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
@@ -77,18 +78,18 @@ async fn main_inner() -> Result<()> {
 #[tokio::main]
 async fn main() {
     exit(match main_inner().await {
-        Ok(_) => exitcode::OK,
+        Ok(_) => OK,
         Err(Error::User { message }) => {
             red_ln!("{}", message);
-            exitcode::USAGE
+            USAGE
         }
         Err(Error::Reportable { message, .. }) => {
             red_ln!("{}", message);
-            exitcode::USAGE
+            GENERAL_ERROR
         }
         Err(e) => {
             red_ln!("Unhandled error: {:#?}", e);
-            exitcode::USAGE
+            GENERAL_ERROR
         }
     })
 }
