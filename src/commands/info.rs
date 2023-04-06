@@ -11,15 +11,17 @@ pub fn do_info(app: &App) -> Result<()> {
                 "Project configuration file: {}",
                 project.config_path.display()
             );
-            println!("python_version: {}", project.python_version);
+            println!("Python version: {}", project.python_version);
             println!(
-                "tag: {}",
+                "Build tag: {}",
                 project
                     .tag
                     .as_ref()
                     .map(Tag::to_string)
                     .unwrap_or(String::from("(none)"))
-            )
+            );
+            let anonymous_env_dir = app.anonymous_env_dir(&project.config_path)?;
+            println!("Environment directory: {}", anonymous_env_dir.display());
         }
         None => {}
     }
