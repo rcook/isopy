@@ -24,16 +24,16 @@ A named environment is an isolated Python runtime environment
 (interpreter plus site packages) that is not tied to a specific project
 or directory. It has a name and you can use it anywhere.
 
-## Anonymous environment
+## Project environment
 
-An anonymous environment has no name (obviously!) and is tied to a
-particular directory on your file system so that you can open a shell or
-run Python scripts in that environment from anywhere in that directory
-tree. These environments are intended to be associated with a single
-directory tree which would typically be a single Python project. Like
-named environments, they are an isolated Python runtime environment
-consisting of an interpreter and site packages. These are typically
-marked by the presence of an `.python-version` file.
+A project environment has no name and is tied to a particular directory
+on your file system so that you can open a shell or run Python scripts
+in that environment from anywhere in that directory tree. These
+environments are intended to be associated with a single directory tree
+which would typically be a single Python project. Like named environments,
+they are an isolated Python runtime environment consisting of an
+interpreter and site packages. These are typically marked by the presence
+of an `.python-version` file.
 
 ## Uses
 

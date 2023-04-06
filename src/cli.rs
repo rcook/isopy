@@ -78,7 +78,7 @@ pub enum Command {
 
     #[command(
         name = "list",
-        about = "List named and anonymous Python environments and uses"
+        about = "List named and project Python environments and uses"
     )]
     List,
 

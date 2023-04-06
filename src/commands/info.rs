@@ -20,8 +20,8 @@ pub fn do_info(app: &App) -> Result<()> {
                     .map(Tag::to_string)
                     .unwrap_or(String::from("(none)"))
             );
-            let anonymous_env_dir = app.anonymous_env_dir(&project.config_path)?;
-            println!("Environment directory: {}", anonymous_env_dir.display());
+            let dir = app.project_environment_dir(&project.config_path)?;
+            println!("Environment directory: {}", dir.display());
         }
         None => {}
     }

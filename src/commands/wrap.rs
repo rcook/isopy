@@ -1,5 +1,5 @@
 use crate::app::App;
-use crate::object_model::{get_env_info, Environment};
+use crate::object_model::Environment;
 use crate::result::Result;
 use crate::util::safe_write_file;
 use serde::Serialize;
@@ -40,7 +40,7 @@ pub fn do_wrap(
     script_path: &PathBuf,
     base_dir: &PathBuf,
 ) -> Result<()> {
-    let environment = get_env_info(app, None)?;
+    let environment = Environment::infer(app, None)?;
 
     let mut template = TinyTemplate::new();
     template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;

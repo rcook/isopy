@@ -3,15 +3,15 @@ use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-pub fn deserialize_env_name<'de, D>(deserializer: D) -> Result<EnvironmentName, D::Error>
+pub fn deserialize_environment_name<'de, D>(deserializer: D) -> Result<EnvironmentName, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    EnvironmentName::parse(&s).ok_or(Error::custom("failed to parsed environment name"))
+    EnvironmentName::parse(&s).ok_or(Error::custom("failed to parse environment name"))
 }
 
-pub fn serialize_env_name<S>(x: &EnvironmentName, s: S) -> Result<S::Ok, S::Error>
+pub fn serialize_environment_name<S>(x: &EnvironmentName, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

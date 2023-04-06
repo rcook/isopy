@@ -1,4 +1,4 @@
-use super::helpers::{deserialize_env_name, serialize_env_name};
+use super::helpers::{deserialize_environment_name, serialize_environment_name};
 use crate::object_model::EnvironmentName;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -9,8 +9,8 @@ pub struct UseRecord {
     pub dir: PathBuf,
     #[serde(
         rename = "env",
-        deserialize_with = "deserialize_env_name",
-        serialize_with = "serialize_env_name"
+        deserialize_with = "deserialize_environment_name",
+        serialize_with = "serialize_environment_name"
     )]
-    pub env_name: EnvironmentName,
+    pub environment_name: EnvironmentName,
 }
