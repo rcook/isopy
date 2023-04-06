@@ -42,6 +42,13 @@ where
     Ok(())
 }
 
+pub fn open_file<P>(path: P) -> Result<File>
+where
+    P: AsRef<Path>,
+{
+    Ok(File::open(&path).map_err(|e| translate_io_error(e, &path))?)
+}
+
 pub fn read_text_file<P>(path: P) -> Result<String>
 where
     P: AsRef<Path>,
