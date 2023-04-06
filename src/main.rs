@@ -78,11 +78,11 @@ async fn main_inner() -> Result<()> {
 async fn main() {
     exit(match main_inner().await {
         Ok(_) => exitcode::OK,
-        Err(Error::Reportable { message, .. }) => {
+        Err(Error::User { message }) => {
             red_ln!("{}", message);
             exitcode::USAGE
         }
-        Err(Error::User { message }) => {
+        Err(Error::Reportable { message, .. }) => {
             red_ln!("{}", message);
             exitcode::USAGE
         }
