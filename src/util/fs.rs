@@ -1,9 +1,7 @@
-use crate::result::{
-    translate_io_error, translate_json_error, translate_yaml_error, Error, Result,
-};
+use crate::result::{translate_io_error, translate_json_error, translate_yaml_error, Result};
 use serde::de::DeserializeOwned;
 use std::fs::{create_dir_all, read_to_string, write, File, OpenOptions};
-use std::io::{ErrorKind as IOErrorKind, Write};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 pub fn safe_create_file<P>(path: P, overwrite: bool) -> Result<File>
@@ -18,7 +16,10 @@ where
         options.create_new(true);
     }
 
-    Ok(options.open(path)?)
+    let file = options
+        .open(&path)
+        .map_err(|e| translate_io_error(e, &path))?;
+    Ok(file)
 }
 
 pub fn safe_write_file<P, C>(path: P, contents: C, overwrite: bool) -> Result<()>
@@ -56,19 +57,6 @@ where
 {
     let json = read_to_string(&path).map_err(|e| translate_io_error(e, &path))?;
     read_yaml_helper(&json, path)
-}
-
-pub fn is_already_exists(error: &Error) -> bool {
-    match error {
-        Error::Other(e) => {
-            if let Some(io_error) = e.downcast_ref::<std::io::Error>() {
-                io_error.kind() == IOErrorKind::AlreadyExists
-            } else {
-                false
-            }
-        }
-        _ => false,
-    }
 }
 
 fn read_json_helper<T, P>(json: &str, path: P) -> Result<T>
