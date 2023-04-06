@@ -7,12 +7,6 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct RepositoriesRecord {
-    #[serde(rename = "repositories")]
-    pub repositories: Vec<RepositoryRecord>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum RepositoryRecord {
     #[serde(rename = "github")]
