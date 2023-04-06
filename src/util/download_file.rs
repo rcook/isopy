@@ -12,7 +12,6 @@ pub async fn download_stream<P>(
 where
     P: AsRef<Path>,
 {
-    println!("DOWNLOAD THAT SHIT!");
     let indicator = Indicator::new(response.content_length())?;
     let mut stream = response.bytes_stream()?;
     let mut file = safe_create_file(output_path, true)?;
