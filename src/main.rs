@@ -38,17 +38,17 @@ async fn run() -> Result<()> {
     match args.command {
         Command::Available => do_available(&app).await?,
         Command::Create {
-            env_name,
+            environment_name,
             version,
             tag,
-        } => do_create(&app, &env_name, &version, &tag).await?,
+        } => do_create(&app, &environment_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&app, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&app)?,
         Command::Exec {
-            env_name,
+            environment_name,
             program,
             args,
-        } => do_exec(&app, env_name.as_ref(), &program, args)?,
+        } => do_exec(&app, environment_name.as_ref(), &program, args)?,
         Command::GenerateRepositoriesYaml {
             local_repository_dir,
         } => do_generate_repositories_yaml(&app, local_repository_dir)?,
@@ -57,8 +57,8 @@ async fn run() -> Result<()> {
         Command::List => do_list(&app).await?,
         Command::New { version, tag } => do_new(&app, &version, &tag)?,
         Command::Scratch => do_scratch(&app).await?,
-        Command::Shell { env_name } => do_shell(&app, env_name.as_ref())?,
-        Command::Use { env_name } => do_use(&app, &env_name)?,
+        Command::Shell { environment_name } => do_shell(&app, environment_name.as_ref())?,
+        Command::Use { environment_name } => do_use(&app, &environment_name)?,
         Command::Wrap {
             wrapper_path,
             script_path,
