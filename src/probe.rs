@@ -23,12 +23,17 @@ where
     P: Into<PathBuf>,
 {
     let mut dir = start_dir.into();
+    let mut n = 0;
     loop {
         let project_config_path = make_project_config_path(&dir);
         if project_config_path.is_file() {
             return Ok(Some(project_config_path));
         }
         if !dir.pop() {
+            return Ok(None);
+        }
+        n += 1;
+        if n > 5 {
             return Ok(None);
         }
     }
