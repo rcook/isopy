@@ -1,5 +1,6 @@
 use crate::constants::RELEASES_URL;
-use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, RepositoryName};
+use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, Project, RepositoryName};
+use crate::probe::find_project_config_path;
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
 use crate::serialization::{
@@ -12,8 +13,6 @@ use crate::util::{
 use md5::compute;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
-
-pub const PROJECT_CONFIG_FILE_NAME: &'static str = ".python-version.yaml";
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,
@@ -271,14 +270,21 @@ impl App {
         Ok(uses)
     }
 
-    pub fn get_project_config_path(&self) -> PathBuf {
-        self.cwd.join(PROJECT_CONFIG_FILE_NAME)
-    }
-
-    pub fn read_project_config(&self) -> Result<ProjectRecord> {
-        let project_config_path = self.get_project_config_path();
-        let project_record = read_yaml_file::<ProjectRecord, _>(&project_config_path)?;
-        Ok(project_record)
+    pub fn read_project<P>(&self, start_dir: P) -> Result<Option<Project>>
+    where
+        P: Into<PathBuf>,
+    {
+        Ok(match find_project_config_path(start_dir)? {
+            None => None,
+            Some(p) => {
+                let project_record = read_yaml_file::<ProjectRecord, _>(&p)?;
+                Some(Project {
+                    config_path: p,
+                    python_version: project_record.python_version,
+                    tag: project_record.tag,
+                })
+            }
+        })
     }
 
     fn make_repository(

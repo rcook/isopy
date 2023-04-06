@@ -5,6 +5,7 @@ mod constants;
 mod env_info;
 mod helpers;
 mod object_model;
+mod probe;
 mod repository;
 mod result;
 mod serialization;
@@ -18,21 +19,15 @@ use crate::commands::{
     do_info, do_init, do_list, do_new, do_scratch, do_shell, do_use, do_wrap,
 };
 use crate::constants::{GENERAL_ERROR, OK, USAGE};
+use crate::probe::default_isopy_dir;
 use crate::result::{could_not_infer_isopy_dir, Error, Result};
 use clap::Parser;
 use colour::red_ln;
 use std::env::current_dir;
-use std::path::PathBuf;
 use std::process::exit;
 use tokio;
 
-fn default_isopy_dir() -> Option<PathBuf> {
-    let home_dir = home::home_dir()?;
-    let isopy_dir = home_dir.join(".isopy");
-    Some(isopy_dir)
-}
-
-async fn main_inner() -> Result<()> {
+async fn run() -> Result<()> {
     let cwd = current_dir()?;
     let args = Args::parse();
     let dir = args
@@ -77,7 +72,7 @@ async fn main_inner() -> Result<()> {
 
 #[tokio::main]
 async fn main() {
-    exit(match main_inner().await {
+    exit(match run().await {
         Ok(_) => OK,
         Err(Error::User { message }) => {
             red_ln!("{}", message);

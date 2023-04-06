@@ -1,4 +1,4 @@
-use crate::app::{App, PROJECT_CONFIG_FILE_NAME};
+use crate::app::App;
 use crate::object_model::EnvName;
 use crate::result::{user, Result};
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
@@ -36,22 +36,23 @@ fn get_use_env_info(app: &App) -> Result<Option<EnvInfo>> {
 }
 
 fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
-    let project_config_path = app.get_project_config_path();
-    if !project_config_path.is_file() {
-        return Ok(None);
-    }
-
-    let anonymous_env_dir = app.anonymous_env_dir(&PROJECT_CONFIG_FILE_NAME)?;
-    let anonymous_env_config_path = anonymous_env_dir.join("env.yaml");
-    if !anonymous_env_config_path.is_file() {
-        return Ok(None);
-    }
-
-    let anonymous_env_record = read_yaml_file::<AnonymousEnvRecord, _>(&anonymous_env_config_path)?;
-    return Ok(Some(EnvInfo {
-        env_name: EnvName::parse("ANONYMOUS").expect("Must be a valid environment"),
-        full_python_dir: anonymous_env_dir.join(anonymous_env_record.python_dir),
-    }));
+    Ok(match app.read_project(&app.cwd)? {
+        None => None,
+        Some(project) => {
+            let anonymous_env_dir = app.anonymous_env_dir(&project.config_path)?;
+            let anonymous_env_config_path = anonymous_env_dir.join("env.yaml");
+            if anonymous_env_config_path.is_file() {
+                let anonymous_env_record =
+                    read_yaml_file::<AnonymousEnvRecord, _>(&anonymous_env_config_path)?;
+                Some(EnvInfo {
+                    env_name: EnvName::parse("ANONYMOUS").expect("Must be a valid environment"),
+                    full_python_dir: anonymous_env_dir.join(anonymous_env_record.python_dir),
+                })
+            } else {
+                None
+            }
+        }
+    })
 }
 
 pub fn get_env_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<EnvInfo> {
