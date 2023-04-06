@@ -42,6 +42,9 @@ impl AssetFilter {
             family: Some(Family::CPython),
             version: None,
             tag: None,
+            #[cfg(target_arch = "aarch64")]
+            arch: Some(Arch::AArch64),
+            #[cfg(target_arch = "x86_64")]
             arch: Some(Arch::X86_64),
             platform: Some(Platform::Unknown),
             os: Some(OS::Linux),
@@ -59,6 +62,9 @@ impl AssetFilter {
             family: Some(Family::CPython),
             version: None,
             tag: None,
+            #[cfg(target_arch = "aarch64")]
+            arch: Some(Arch::AArch64),
+            #[cfg(target_arch = "x86_64")]
             arch: Some(Arch::X86_64),
             platform: Some(Platform::Apple),
             os: Some(OS::Darwin),
@@ -76,6 +82,9 @@ impl AssetFilter {
             family: Some(Family::CPython),
             version: None,
             tag: None,
+            #[cfg(target_arch = "aarch64")]
+            arch: Some(Arch::AArch64),
+            #[cfg(target_arch = "x86_64")]
             arch: Some(Arch::X86_64),
             platform: Some(Platform::PC),
             os: Some(OS::Windows),
