@@ -30,15 +30,23 @@ where
     let mut dir = PathBuf::new();
     dir.push(&path);
     dir.pop();
-    create_dir_all(&dir)?;
+    create_dir_all(&dir).map_err(|e| translate_io_error(e, &dir))?;
 
     if overwrite {
-        write(path, contents)?;
+        write(&path, contents).map_err(|e| translate_io_error(e, &path))?;
     } else {
-        let mut file = safe_create_file(path, overwrite)?;
-        file.write_all(contents.as_ref())?;
+        let mut file = safe_create_file(&path, overwrite)?;
+        file.write_all(contents.as_ref())
+            .map_err(|e| translate_io_error(e, &path))?;
     }
     Ok(())
+}
+
+pub fn read_text_file<P>(path: P) -> Result<String>
+where
+    P: AsRef<Path>,
+{
+    Ok(read_to_string(&path).map_err(|e| translate_io_error(e, &path))?)
 }
 
 pub fn read_json_file<T, P>(path: P) -> Result<T>
@@ -46,8 +54,8 @@ where
     P: AsRef<Path>,
     T: DeserializeOwned,
 {
-    let json = read_to_string(&path).map_err(|e| translate_io_error(e, &path))?;
-    read_json_helper(&json, path)
+    let json = read_text_file(&path)?;
+    read_json_helper(&json, &path)
 }
 
 pub fn read_yaml_file<T, P>(path: P) -> Result<T>
@@ -55,8 +63,8 @@ where
     P: AsRef<Path>,
     T: DeserializeOwned,
 {
-    let json = read_to_string(&path).map_err(|e| translate_io_error(e, &path))?;
-    read_yaml_helper(&json, path)
+    let yaml = read_text_file(&path)?;
+    read_yaml_helper(&yaml, &path)
 }
 
 fn read_json_helper<T, P>(json: &str, path: P) -> Result<T>
