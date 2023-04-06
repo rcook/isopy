@@ -1,5 +1,4 @@
-use crate::object_model::EnvName;
-use crate::object_model::{Tag, Version};
+use crate::object_model::{EnvironmentName, Tag, Version};
 use clap::{Parser, Subcommand};
 use git_version::git_version;
 use path_absolutize::Absolutize;
@@ -31,7 +30,7 @@ pub enum Command {
     #[command(name = "create", about = "Create named Python environment")]
     Create {
         #[arg(help = "Environment name", value_parser = parse_env_name)]
-        env_name: EnvName,
+        env_name: EnvironmentName,
         #[arg(help = "Python version", value_parser = parse_version)]
         version: Version,
         #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
@@ -52,7 +51,7 @@ pub enum Command {
     #[command(name = "exec", about = "List downloaded Python package")]
     Exec {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
-        env_name: Option<EnvName>,
+        env_name: Option<EnvironmentName>,
 
         #[arg(help = "Program to run in environment")]
         program: String,
@@ -97,7 +96,7 @@ pub enum Command {
     #[command(name = "shell", about = "Start shell for current Python environment")]
     Shell {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_env_name)]
-        env_name: Option<EnvName>,
+        env_name: Option<EnvironmentName>,
     },
 
     #[command(
@@ -106,7 +105,7 @@ pub enum Command {
     )]
     Use {
         #[arg(help = "Environment name", value_parser = parse_env_name)]
-        env_name: EnvName,
+        env_name: EnvironmentName,
     },
 
     #[command(name = "wrap", about = "Generate wrapper script for Python script")]
@@ -127,8 +126,8 @@ fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
         .map(|x| x.to_path_buf())
 }
 
-fn parse_env_name(s: &str) -> Result<EnvName, String> {
-    EnvName::parse(s).ok_or(String::from("invalid env name"))
+fn parse_env_name(s: &str) -> Result<EnvironmentName, String> {
+    EnvironmentName::parse(s).ok_or(String::from("invalid env name"))
 }
 
 fn parse_version(s: &str) -> Result<Version, String> {

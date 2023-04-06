@@ -1,12 +1,11 @@
 use crate::app::App;
-use crate::env_info::get_env_info;
-use crate::object_model::EnvName;
+use crate::object_model::{get_env_info, EnvironmentName};
 use crate::result::Result;
 use crate::shell::Command;
 
 pub fn do_exec(
     app: &App,
-    env_name_opt: Option<&EnvName>,
+    env_name_opt: Option<&EnvironmentName>,
     program: &String,
     args: Vec<String>,
 ) -> Result<()> {

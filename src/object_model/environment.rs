@@ -1,19 +1,17 @@
 use crate::app::App;
-use crate::object_model::EnvName;
+use crate::object_model::EnvironmentName;
 use crate::result::{user, Result};
 use crate::serialization::{AnonymousEnvRecord, NamedEnvRecord, UseRecord};
 use crate::util::{path_to_str, read_yaml_file};
 use std::path::PathBuf;
 
-pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
-
 #[derive(Debug)]
-pub struct EnvInfo {
-    pub env_name: EnvName,
+pub struct Environment {
+    pub name: EnvironmentName,
     pub full_python_dir: PathBuf,
 }
 
-fn get_use_env_info(app: &App) -> Result<Option<EnvInfo>> {
+fn get_use_env_info(app: &App) -> Result<Option<Environment>> {
     let use_dir = app.use_dir(&app.cwd)?;
     let use_config_path = use_dir.join("use.yaml");
     if !use_config_path.is_file() {
@@ -27,15 +25,15 @@ fn get_use_env_info(app: &App) -> Result<Option<EnvInfo>> {
     }
 
     let named_env_record = read_yaml_file::<NamedEnvRecord, _>(&named_env_config_path)?;
-    return Ok(Some(EnvInfo {
-        env_name: named_env_record.name.clone(),
+    return Ok(Some(Environment {
+        name: named_env_record.name.clone(),
         full_python_dir: app
             .named_env_dir(&named_env_record.name)
             .join(named_env_record.python_dir),
     }));
 }
 
-fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
+fn get_project_env_info(app: &App) -> Result<Option<Environment>> {
     Ok(match app.read_project(&app.cwd)? {
         None => None,
         Some(project) => {
@@ -44,8 +42,8 @@ fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
             if anonymous_env_config_path.is_file() {
                 let anonymous_env_record =
                     read_yaml_file::<AnonymousEnvRecord, _>(&anonymous_env_config_path)?;
-                Some(EnvInfo {
-                    env_name: EnvName::sanitize(path_to_str(&project.config_path)?),
+                Some(Environment {
+                    name: EnvironmentName::sanitize(path_to_str(&project.config_path)?),
                     full_python_dir: anonymous_env_dir.join(anonymous_env_record.python_dir),
                 })
             } else {
@@ -55,12 +53,12 @@ fn get_project_env_info(app: &App) -> Result<Option<EnvInfo>> {
     })
 }
 
-pub fn get_env_info(app: &App, env_name_opt: Option<&EnvName>) -> Result<EnvInfo> {
+pub fn get_env_info(app: &App, env_name_opt: Option<&EnvironmentName>) -> Result<Environment> {
     if let Some(env_name) = env_name_opt {
         match app.read_named_env(env_name)? {
             Some(env_record) => {
-                return Ok(EnvInfo {
-                    env_name: env_record.name,
+                return Ok(Environment {
+                    name: env_record.name,
                     full_python_dir: app.named_env_dir(env_name).join(env_record.python_dir),
                 })
             }

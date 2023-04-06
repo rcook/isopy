@@ -1,9 +1,11 @@
-use crate::env_info::{EnvInfo, ISOPY_ENV_NAME};
+use crate::object_model::Environment;
 use crate::result::Result;
 use crate::util::path_to_str;
 use std::env::{set_var, var};
 use std::ffi::OsString;
 use std::process::ExitStatus;
+
+pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
 
 pub struct Command {
     program: Option<OsString>,
@@ -37,14 +39,14 @@ impl Command {
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    pub fn exec(&self, env_info: &EnvInfo) -> Result<ExitStatus> {
+    pub fn exec(&self, environment: &Environment) -> Result<ExitStatus> {
         use exec::execvp;
         use std::iter::once;
 
-        set_var(ISOPY_ENV_NAME, env_info.env_name.as_str());
+        set_var(ISOPY_ENV_NAME, environment.name.as_str());
 
         let mut new_path = String::new();
-        let python_bin_dir = env_info.full_python_dir.join("bin");
+        let python_bin_dir = environment.full_python_dir.join("bin");
         new_path.push_str(path_to_str(&python_bin_dir)?);
         new_path.push(':');
         new_path.push_str(&var("PATH")?);
@@ -64,18 +66,18 @@ impl Command {
     }
 
     #[cfg(any(target_os = "windows"))]
-    pub fn exec(&self, env_info: &EnvInfo) -> Result<ExitStatus> {
+    pub fn exec(&self, environment: &Environment) -> Result<ExitStatus> {
         use crate::shell::{get_windows_shell_info, WindowsShellKind};
         use std::process::Command;
 
         let windows_shell_info = get_windows_shell_info()?;
 
-        set_var(ISOPY_ENV_NAME, env_info.env_name.as_str());
+        set_var(ISOPY_ENV_NAME, environment.name.as_str());
 
         let mut new_path = String::new();
-        new_path.push_str(path_to_str(&env_info.full_python_dir)?);
+        new_path.push_str(path_to_str(&environment.full_python_dir)?);
         new_path.push(';');
-        let python_scripts_dir = env_info.full_python_dir.join("Scripts");
+        let python_scripts_dir = environment.full_python_dir.join("Scripts");
         new_path.push_str(path_to_str(&python_scripts_dir)?);
         new_path.push(';');
         new_path.push_str(&var("PATH")?);

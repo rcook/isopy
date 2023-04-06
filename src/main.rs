@@ -2,7 +2,6 @@ mod app;
 mod cli;
 mod commands;
 mod constants;
-mod env_info;
 mod helpers;
 mod object_model;
 mod probe;

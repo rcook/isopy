@@ -2,13 +2,13 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref ENV_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
+    static ref ENVIRONMENT_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct EnvName(String);
+pub struct EnvironmentName(String);
 
-impl EnvName {
+impl EnvironmentName {
     pub fn sanitize(s: &str) -> Self {
         let mut s1 = String::with_capacity(s.len());
         for c in s.chars() {
@@ -26,7 +26,7 @@ impl EnvName {
         S: Into<String>,
     {
         let s1 = s.into();
-        match ENV_NAME_REGEX.is_match(&s1) {
+        match ENVIRONMENT_NAME_REGEX.is_match(&s1) {
             true => Some(Self(s1)),
             false => None,
         }
@@ -37,7 +37,7 @@ impl EnvName {
     }
 }
 
-impl std::fmt::Display for EnvName {
+impl std::fmt::Display for EnvironmentName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
@@ -45,16 +45,16 @@ impl std::fmt::Display for EnvName {
 
 #[cfg(test)]
 mod tests {
-    use super::EnvName;
+    use super::EnvironmentName;
     use rstest::rstest;
 
     #[rstest]
     #[case(None, "")]
     #[case(None, " ")]
     #[case(None, " foo ")]
-    #[case(Some(EnvName(String::from("foo"))), "foo")]
-    #[case(Some(EnvName(String::from("foo-_"))), "foo-_")]
-    fn test_basics(#[case] expected_result: Option<EnvName>, #[case] input: String) {
-        assert_eq!(expected_result, EnvName::parse(&input))
+    #[case(Some(EnvironmentName(String::from("foo"))), "foo")]
+    #[case(Some(EnvironmentName(String::from("foo-_"))), "foo-_")]
+    fn test_basics(#[case] expected_result: Option<EnvironmentName>, #[case] input: String) {
+        assert_eq!(expected_result, EnvironmentName::parse(&input))
     }
 }

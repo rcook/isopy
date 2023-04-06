@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::helpers::get_asset;
-use crate::object_model::{EnvName, Tag, Version};
+use crate::object_model::{EnvironmentName, Tag, Version};
 use crate::result::Result;
 use crate::serialization::NamedEnvRecord;
 use crate::util::{safe_write_file, unpack_file};
@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 pub async fn do_create(
     app: &App,
-    env_name: &EnvName,
+    env_name: &EnvironmentName,
     version: &Version,
     tag: &Option<Tag>,
 ) -> Result<()> {

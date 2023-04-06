@@ -1,17 +1,17 @@
-use crate::object_model::{EnvName, LastModified, RepositoryName, Tag, Version};
+use crate::object_model::{EnvironmentName, LastModified, RepositoryName, Tag, Version};
 use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-pub fn deserialize_env_name<'de, D>(deserializer: D) -> Result<EnvName, D::Error>
+pub fn deserialize_env_name<'de, D>(deserializer: D) -> Result<EnvironmentName, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    EnvName::parse(&s).ok_or(Error::custom("failed to parsed environment name"))
+    EnvironmentName::parse(&s).ok_or(Error::custom("failed to parsed environment name"))
 }
 
-pub fn serialize_env_name<S>(x: &EnvName, s: S) -> Result<S::Ok, S::Error>
+pub fn serialize_env_name<S>(x: &EnvironmentName, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

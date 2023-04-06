@@ -1,5 +1,7 @@
 use crate::constants::RELEASES_URL;
-use crate::object_model::{Asset, AssetMeta, EnvName, LastModified, Project, RepositoryName};
+use crate::object_model::{
+    Asset, AssetMeta, EnvironmentName, LastModified, Project, RepositoryName,
+};
 use crate::probe::find_project_config_path;
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
@@ -149,14 +151,14 @@ impl App {
         Ok(assets)
     }
 
-    pub fn named_env_dir(&self, env_name: &EnvName) -> PathBuf {
+    pub fn named_env_dir(&self, env_name: &EnvironmentName) -> PathBuf {
         self.named_envs_dir.join(env_name.as_str())
     }
 
     pub fn read_named_envs(&self) -> Result<Vec<NamedEnvRecord>> {
         let mut named_envs = Vec::new();
         for d in read_dir(&self.named_envs_dir)? {
-            let env_name = match EnvName::parse(osstr_to_str(&d?.file_name())?) {
+            let env_name = match EnvironmentName::parse(osstr_to_str(&d?.file_name())?) {
                 Some(x) => x,
                 None => continue,
             };
@@ -172,7 +174,7 @@ impl App {
         Ok(named_envs)
     }
 
-    pub fn read_named_env(&self, env_name: &EnvName) -> Result<Option<NamedEnvRecord>> {
+    pub fn read_named_env(&self, env_name: &EnvironmentName) -> Result<Option<NamedEnvRecord>> {
         let named_env_config_path = self.named_env_dir(env_name).join("env.yaml");
         if !named_env_config_path.is_file() {
             return Ok(None);

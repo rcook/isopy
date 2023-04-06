@@ -2,7 +2,7 @@ use super::helpers::{
     deserialize_env_name, deserialize_tag, deserialize_version, serialize_env_name, serialize_tag,
     serialize_version,
 };
-use crate::object_model::{EnvName, Tag, Version};
+use crate::object_model::{EnvironmentName, Tag, Version};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -13,7 +13,7 @@ pub struct NamedEnvRecord {
         deserialize_with = "deserialize_env_name",
         serialize_with = "serialize_env_name"
     )]
-    pub name: EnvName,
+    pub name: EnvironmentName,
     #[serde(rename = "python_dir")]
     pub python_dir: PathBuf,
     #[serde(

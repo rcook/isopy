@@ -1,5 +1,5 @@
 use crate::app::App;
-use crate::env_info::{get_env_info, EnvInfo};
+use crate::object_model::{get_env_info, Environment};
 use crate::result::Result;
 use crate::util::safe_write_file;
 use serde::Serialize;
@@ -40,7 +40,7 @@ pub fn do_wrap(
     script_path: &PathBuf,
     base_dir: &PathBuf,
 ) -> Result<()> {
-    let env_info = get_env_info(app, None)?;
+    let environment = get_env_info(app, None)?;
 
     let mut template = TinyTemplate::new();
     template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;
@@ -50,7 +50,7 @@ pub fn do_wrap(
         template.render(
             "WRAPPER",
             &Context {
-                path_env: make_path_env(&env_info),
+                path_env: make_path_env(&environment),
                 base_dir: base_dir.to_path_buf(),
                 python_executable_name: PathBuf::from(PYTHON_EXECUTABLE_NAME),
                 script_path: script_path.to_path_buf(),
@@ -65,19 +65,19 @@ pub fn do_wrap(
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-fn make_path_env(env_info: &EnvInfo) -> String {
+fn make_path_env(environment: &Environment) -> String {
     format!(
         "PATH={}:$PATH",
-        env_info.full_python_dir.join("bin").display()
+        environment.full_python_dir.join("bin").display()
     )
 }
 
 #[cfg(target_os = "windows")]
-fn make_path_env(env_info: &EnvInfo) -> String {
+fn make_path_env(environment: &Environment) -> String {
     format!(
         "PATH={};{};%PATH%",
-        env_info.full_python_dir.display(),
-        env_info.full_python_dir.join("Scripts").display()
+        environment.full_python_dir.display(),
+        environment.full_python_dir.join("Scripts").display()
     )
 }
 
