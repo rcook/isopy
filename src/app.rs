@@ -38,12 +38,12 @@ impl App {
         let project_environments_dir = dir.join("hashed");
         let uses_dir = dir.join("uses");
         Self {
-            cwd: cwd,
-            dir: dir,
-            assets_dir: assets_dir,
-            named_environments_dir: named_environments_dir,
-            project_environments_dir: project_environments_dir,
-            uses_dir: uses_dir,
+            cwd,
+            dir,
+            assets_dir,
+            named_environments_dir,
+            project_environments_dir,
+            uses_dir,
         }
     }
 
@@ -109,7 +109,7 @@ impl App {
     ) -> Result<()> {
         let index_yaml_path = self.get_index_yaml_path(repository_name);
         safe_write_file(
-            &index_yaml_path,
+            index_yaml_path,
             serde_yaml::to_string(&IndexRecord {
                 last_modified: last_modified.clone(),
             })?,
@@ -143,7 +143,7 @@ impl App {
                         tag: package_record.tag.clone(),
                         url: asset_record.url,
                         size: asset_record.size,
-                        meta: meta,
+                        meta,
                     });
                 }
             }
@@ -194,7 +194,7 @@ impl App {
     {
         let digest = compute(path_to_str(config_path.as_ref())?);
         let hex_digest = format!("{:x}", digest);
-        Ok(self.project_environments_dir.join(&hex_digest))
+        Ok(self.project_environments_dir.join(hex_digest))
     }
 
     pub fn read_project_environment<S>(
@@ -225,7 +225,7 @@ impl App {
                 let file_name = d?.file_name();
                 let hex_digest = osstr_to_str(&file_name)?;
 
-                let rec = match self.read_project_environment(&hex_digest)? {
+                let rec = match self.read_project_environment(hex_digest)? {
                     Some(x) => x,
                     None => continue,
                 };
@@ -243,7 +243,7 @@ impl App {
     {
         let digest = compute(path_to_str(dir.as_ref())?);
         let hex_digest = format!("{:x}", digest);
-        Ok(self.uses_dir.join(&hex_digest))
+        Ok(self.uses_dir.join(hex_digest))
     }
 
     pub fn read_use<S>(&self, hex_digest: S) -> Result<Option<UseRecord>>
@@ -266,7 +266,7 @@ impl App {
                 let file_name = d?.file_name();
                 let hex_digest = osstr_to_str(&file_name)?;
 
-                let rec = match self.read_use(&hex_digest)? {
+                let rec = match self.read_use(hex_digest)? {
                     Some(x) => x,
                     None => continue,
                 };
@@ -300,7 +300,7 @@ impl App {
     ) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
         Ok(match record {
             RepositoryRecord::GitHub { name, url, enabled } => {
-                (name, enabled, Box::new(GitHubRepository::new(url.clone())?))
+                (name, enabled, Box::new(GitHubRepository::new(url)?))
             }
             RepositoryRecord::Local { name, dir, enabled } => {
                 (name, enabled, Box::new(LocalRepository::new(dir)))

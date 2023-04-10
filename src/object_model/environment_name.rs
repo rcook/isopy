@@ -55,6 +55,6 @@ mod tests {
     #[case(Some(EnvironmentName(String::from("foo"))), "foo")]
     #[case(Some(EnvironmentName(String::from("foo-_"))), "foo-_")]
     fn test_basics(#[case] expected_result: Option<EnvironmentName>, #[case] input: String) {
-        assert_eq!(expected_result, EnvironmentName::parse(&input))
+        assert_eq!(expected_result, EnvironmentName::parse(input))
     }
 }

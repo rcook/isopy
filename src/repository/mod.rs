@@ -1,7 +1,7 @@
 mod github;
 mod local;
-mod repository;
+mod traits;
 
 pub use self::github::GitHubRepository;
 pub use self::local::LocalRepository;
-pub use self::repository::{Repository, Response, Stream};
+pub use self::traits::{Repository, Response, Stream};

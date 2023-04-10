@@ -24,7 +24,6 @@ use clap::Parser;
 use colour::red_ln;
 use std::env::current_dir;
 use std::process::exit;
-use tokio;
 
 async fn run() -> Result<()> {
     let cwd = current_dir()?;
@@ -32,7 +31,7 @@ async fn run() -> Result<()> {
     let dir = args
         .dir
         .or_else(default_isopy_dir)
-        .ok_or_else(|| could_not_infer_isopy_dir())?;
+        .ok_or_else(could_not_infer_isopy_dir)?;
     let app = App::new(cwd, dir);
 
     match args.command {

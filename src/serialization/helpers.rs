@@ -8,7 +8,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    EnvironmentName::parse(&s).ok_or(Error::custom("failed to parse environment name"))
+    EnvironmentName::parse(s).ok_or(Error::custom("failed to parse environment name"))
 }
 
 pub fn serialize_environment_name<S>(x: &EnvironmentName, s: S) -> Result<S::Ok, S::Error>
@@ -30,7 +30,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    Ok(LastModified::parse(&s))
+    Ok(LastModified::parse(s))
 }
 
 pub fn deserialize_repository_name<'de, D>(deserializer: D) -> Result<RepositoryName, D::Error>
@@ -53,7 +53,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    Ok(Tag::parse(&s))
+    Ok(Tag::parse(s))
 }
 
 pub fn serialize_tag<S>(x: &Tag, s: S) -> Result<S::Ok, S::Error>
@@ -105,7 +105,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    Version::parse(&s).ok_or(Error::custom("Failed to parse version"))
+    Version::parse(s).ok_or(Error::custom("Failed to parse version"))
 }
 
 pub fn serialize_version<S>(x: &Version, s: S) -> Result<S::Ok, S::Error>

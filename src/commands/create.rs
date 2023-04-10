@@ -16,8 +16,8 @@ pub async fn do_create(
     let asset = get_asset(&assets, version, tag)?;
 
     let archive_path = app.assets_dir.join(&asset.name);
-    let dir = app.named_environment_dir(&environment_name);
-    unpack_file(&archive_path, &dir)?;
+    let dir = app.named_environment_dir(environment_name);
+    unpack_file(archive_path, &dir)?;
 
     safe_write_file(
         dir.join("env.yaml"),

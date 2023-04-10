@@ -2,9 +2,9 @@
 pub enum Subflavour {
     Debug,
     NoOpt,
-    PGOLTO,
-    PGO,
-    LTO,
+    PgoLto,
+    Pgo,
+    Lto,
     Shared,
     Static,
 }
@@ -17,9 +17,9 @@ impl Subflavour {
         Some(match s.as_ref() {
             "debug" => Self::Debug,
             "noopt" => Self::NoOpt,
-            "pgo+lto" => Self::PGOLTO,
-            "pgo" => Self::PGO,
-            "lto" => Self::LTO,
+            "pgo+lto" => Self::PgoLto,
+            "pgo" => Self::Pgo,
+            "lto" => Self::Lto,
             "shared" => Self::Shared,
             "static" => Self::Static,
             _ => return None,

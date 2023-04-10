@@ -19,9 +19,7 @@ impl Indicator {
             )?
             .progress_chars("##-"),
         );
-        Ok(Self {
-            progress_bar: progress_bar,
-        })
+        Ok(Self { progress_bar })
     }
 
     pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {

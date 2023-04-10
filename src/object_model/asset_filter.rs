@@ -48,7 +48,7 @@ impl AssetFilter {
             arch: Some(Arch::X86_64),
             platform: Some(Platform::Unknown),
             os: Some(OS::Linux),
-            flavour: Some(Flavour::GNU),
+            flavour: Some(Flavour::Gnu),
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
@@ -86,9 +86,9 @@ impl AssetFilter {
             arch: Some(Arch::AArch64),
             #[cfg(target_arch = "x86_64")]
             arch: Some(Arch::X86_64),
-            platform: Some(Platform::PC),
+            platform: Some(Platform::Pc),
             os: Some(OS::Windows),
-            flavour: Some(Flavour::MSVC),
+            flavour: Some(Flavour::Msvc),
             subflavour0: Some(Subflavour::Shared),
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
@@ -197,7 +197,7 @@ impl AssetFilter {
             true
         }
 
-        assets.into_iter().filter(|x| predicate(self, &x)).collect()
+        assets.into_iter().filter(|x| predicate(self, x)).collect()
     }
 }
 

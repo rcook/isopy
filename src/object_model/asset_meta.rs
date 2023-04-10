@@ -17,9 +17,7 @@ pub struct AssetMeta {
 
 impl AssetMeta {
     pub fn definitely_not_an_asset_name(s: &str) -> bool {
-        if "libuuid-1.0.3.tar.gz" == s {
-            true
-        } else if "SHA256SUMS" == s {
+        if "libuuid-1.0.3.tar.gz" == s || "SHA256SUMS" == s {
             true
         } else {
             s.ends_with(".sha256")
@@ -28,7 +26,7 @@ impl AssetMeta {
 
     pub fn parse(s: &str) -> Option<Self> {
         fn parse_version_and_tag_opt(s: &str) -> Option<(Version, Option<Tag>)> {
-            let parts = s.split("+").collect::<Vec<_>>();
+            let parts = s.split('+').collect::<Vec<_>>();
             let (version_str, tag) = match parts.len() {
                 1 => (parts[0], None),
                 2 => (parts[0], Some(Tag::parse(parts[1]))),
@@ -41,7 +39,7 @@ impl AssetMeta {
 
         let (archive_type, base_name) = ArchiveType::parse(s)?;
 
-        let mut iter = base_name.split("-").into_iter();
+        let mut iter = base_name.split('-');
 
         let family = Family::parse(iter.next()?)?;
         let (version, mut tag_opt) = parse_version_and_tag_opt(iter.next()?)?;
@@ -101,12 +99,12 @@ impl AssetMeta {
         }
 
         Some(Self {
-            archive_type: archive_type,
-            family: family,
-            version: version,
-            arch: arch,
-            platform: platform,
-            os: os,
+            archive_type,
+            family,
+            version,
+            arch,
+            platform,
+            os,
             flavour: flavour_opt,
             subflavour0: subflavour0_opt,
             subflavour1: subflavour1_opt,
@@ -190,5 +188,17 @@ mod tests {
     )]
     fn test_parse(#[case] expected_result: AssetMeta, #[case] input: &str) {
         assert_eq!(Some(expected_result), AssetMeta::parse(input))
+    }
+
+    #[rstest]
+    #[case(true, "libuuid-1.0.3.tar.gz")]
+    #[case(true, "SHA256SUMS")]
+    #[case(true, "foo.sha256")]
+    #[case(false, "foo")]
+    fn test_definitely_not_an_asset_name(#[case] expected_result: bool, #[case] input: &str) {
+        assert_eq!(
+            expected_result,
+            AssetMeta::definitely_not_an_asset_name(input)
+        )
     }
 }

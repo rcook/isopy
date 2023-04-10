@@ -46,14 +46,14 @@ pub fn open_file<P>(path: P) -> Result<File>
 where
     P: AsRef<Path>,
 {
-    Ok(File::open(&path).map_err(|e| translate_io_error(e, &path))?)
+    File::open(&path).map_err(|e| translate_io_error(e, &path))
 }
 
 pub fn read_text_file<P>(path: P) -> Result<String>
 where
     P: AsRef<Path>,
 {
-    Ok(read_to_string(&path).map_err(|e| translate_io_error(e, &path))?)
+    read_to_string(&path).map_err(|e| translate_io_error(e, &path))
 }
 
 pub fn read_json_file<T, P>(path: P) -> Result<T>
@@ -79,7 +79,7 @@ where
     P: AsRef<Path>,
     T: DeserializeOwned,
 {
-    Ok(serde_json::from_str::<T>(&json).map_err(|e| translate_json_error(e, &path))?)
+    serde_json::from_str::<T>(json).map_err(|e| translate_json_error(e, &path))
 }
 
 fn read_yaml_helper<T, P>(json: &str, path: P) -> Result<T>
@@ -87,7 +87,7 @@ where
     P: AsRef<Path>,
     T: DeserializeOwned,
 {
-    Ok(serde_yaml::from_str::<T>(&json).map_err(|e| translate_yaml_error(e, &path))?)
+    serde_yaml::from_str::<T>(json).map_err(|e| translate_yaml_error(e, &path))
 }
 
 #[cfg(test)]
@@ -106,10 +106,10 @@ mod tests {
 
         let error = result.expect_err("must be an error");
         let (message, path) = match error {
-            Error::Reportable { message, info } => match info {
-                ErrorInfo::FileNotFound { path, .. } => (message, path),
-                _ => panic!(),
-            },
+            Error::Reportable {
+                message,
+                info: ErrorInfo::FileNotFound { path, .. },
+            } => (message, path),
             _ => panic!(),
         };
         assert!(message.contains(does_not_exist_path.to_str().expect("must succeed")));
@@ -126,10 +126,10 @@ mod tests {
 
         let error = result.expect_err("must be an error");
         let (message, path) = match error {
-            Error::Reportable { message, info } => match info {
-                ErrorInfo::Yaml { path, .. } => (message, path),
-                _ => panic!(),
-            },
+            Error::Reportable {
+                message,
+                info: ErrorInfo::Yaml { path, .. },
+            } => (message, path),
             _ => panic!(),
         };
         assert!(message.contains(p.to_str().expect("must succeed")));

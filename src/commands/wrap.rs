@@ -7,13 +7,13 @@ use std::path::{Path, PathBuf};
 use tinytemplate::TinyTemplate;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-const PYTHON_EXECUTABLE_NAME: &'static str = "python3";
+const PYTHON_EXECUTABLE_NAME: &str = "python3";
 
 #[cfg(target_os = "windows")]
 const PYTHON_EXECUTABLE_NAME: &'static str = "python";
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-const WRAPPER_TEMPLATE: &'static str = r#"#!/bin/bash
+const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
 set -euo pipefail
 {path_env} \
 PYTHONPATH={base_dir} \
@@ -37,8 +37,8 @@ struct Context {
 pub fn do_wrap(
     app: &App,
     wrapper_path: &PathBuf,
-    script_path: &PathBuf,
-    base_dir: &PathBuf,
+    script_path: &Path,
+    base_dir: &Path,
 ) -> Result<()> {
     let environment = Environment::infer(app, None)?;
 

@@ -41,7 +41,7 @@ where
 }
 
 pub fn other(inner: Box<dyn std::error::Error>) -> Error {
-    Error::Other { inner: inner }
+    Error::Other { inner }
 }
 
 pub fn user<M>(message: M) -> Error
@@ -70,10 +70,7 @@ where
     let m = format!("File {} already exists", p.display());
     Error::Reportable {
         message: m,
-        info: ErrorInfo::FileAlreadyExists {
-            path: p,
-            inner: inner,
-        },
+        info: ErrorInfo::FileAlreadyExists { path: p, inner },
     }
 }
 
@@ -85,10 +82,7 @@ where
     let m = format!("Could not find file {}", p.display());
     Error::Reportable {
         message: m,
-        info: ErrorInfo::FileNotFound {
-            path: p,
-            inner: inner,
-        },
+        info: ErrorInfo::FileNotFound { path: p, inner },
     }
 }
 
@@ -121,7 +115,7 @@ where
     P: AsRef<Path>,
 {
     let p = PathBuf::from(path.as_ref());
-    let m = format!("{} in {}", e.to_string(), p.display());
+    let m = format!("{} in {}", e, p.display());
     Error::Reportable {
         message: m,
         info: crate::result::ErrorInfo::Json {
@@ -137,7 +131,7 @@ where
     P: AsRef<Path>,
 {
     let p = PathBuf::from(path.as_ref());
-    let m = format!("{} in {}", e.to_string(), p.display());
+    let m = format!("{} in {}", e, p.display());
     Error::Reportable {
         message: m,
         info: crate::result::ErrorInfo::Yaml {

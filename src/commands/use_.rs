@@ -8,7 +8,7 @@ use md5::compute;
 pub fn do_use(app: &App, environment_name: &EnvironmentName) -> Result<()> {
     let hex_digest = format!("{:x}", compute(path_to_str(&app.cwd)?));
 
-    let use_yaml_path = app.uses_dir.join(&hex_digest).join("use.yaml");
+    let use_yaml_path = app.uses_dir.join(hex_digest).join("use.yaml");
     if use_yaml_path.is_file() {
         return Err(user(format!(
             "Use is already configured for directory {}",

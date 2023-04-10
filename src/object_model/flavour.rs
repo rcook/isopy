@@ -1,8 +1,8 @@
 #[derive(Debug, PartialEq)]
 pub enum Flavour {
-    GNU,
-    MSVC,
-    MUSL,
+    Gnu,
+    Msvc,
+    Musl,
 }
 
 impl Flavour {
@@ -11,9 +11,9 @@ impl Flavour {
         S: AsRef<str>,
     {
         Some(match s.as_ref() {
-            "gnu" => Self::GNU,
-            "msvc" => Self::MSVC,
-            "musl" => Self::MUSL,
+            "gnu" => Self::Gnu,
+            "msvc" => Self::Msvc,
+            "musl" => Self::Musl,
             _ => return None,
         })
     }
