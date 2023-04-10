@@ -1,8 +1,6 @@
-use crate::constants::RELEASES_URL;
 use crate::object_model::{
     Asset, AssetMeta, EnvironmentName, LastModified, Project, RepositoryName,
 };
-use crate::probe::find_project_config_path;
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::result::Result;
 use crate::serialization::{
@@ -10,7 +8,8 @@ use crate::serialization::{
     RepositoriesRecord, RepositoryRecord, UseRecord,
 };
 use crate::util::{
-    dir_url, osstr_to_str, path_to_str, read_json_file, read_yaml_file, safe_write_file,
+    dir_url, find_project_config_path, osstr_to_str, path_to_str, read_json_file, read_yaml_file,
+    safe_write_file, RELEASES_URL,
 };
 use md5::compute;
 use std::fs::read_dir;

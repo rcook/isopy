@@ -1,10 +1,8 @@
 use crate::app::App;
-use crate::helpers::get_asset;
 use crate::object_model::{Tag, Version};
-use crate::probe::make_project_config_path;
 use crate::result::Result;
 use crate::serialization::ProjectRecord;
-use crate::util::safe_write_file;
+use crate::util::{get_asset, make_project_config_path, safe_write_file};
 
 pub fn do_new(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
     let project_config_path = make_project_config_path(&app.cwd);
