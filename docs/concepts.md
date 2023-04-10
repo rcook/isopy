@@ -33,12 +33,12 @@ environments are intended to be associated with a single directory tree
 which would typically be a single Python project. Like named environments,
 they are an isolated Python runtime environment consisting of an
 interpreter and site packages. These are typically marked by the presence
-of an `.python-version` file.
+of an `.python-version.yaml` file.
 
 ## Uses
 
 Think of these as symlinks for environments. With these you can
 associate an environment with a given directory without the need for an
-intrusive `.python-version` file.
+intrusive `.python-version.yaml` file.
 
 [python-standalone-builds]: https://github.com/indygreg/python-build-standalone/releases
