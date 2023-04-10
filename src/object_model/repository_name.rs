@@ -5,7 +5,7 @@ lazy_static! {
     static ref REPOSITORY_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
 }
 
-const DEFAULT_REPOSITORY_NAME: &'static str = "default";
+const DEFAULT_REPOSITORY_NAME: &str = "default";
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum RepositoryName {
@@ -28,7 +28,7 @@ impl RepositoryName {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => DEFAULT_REPOSITORY_NAME,
-            Self::Named(s) => &s,
+            Self::Named(s) => s,
         }
     }
 }

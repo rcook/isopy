@@ -30,7 +30,7 @@ pub async fn do_scratch(app: &App) -> Result<()> {
         &Some(Tag::parse("20230116")),
     )?;
     for repository in &repositories {
-        let mut response = repository.repository.get_asset(&asset).await?;
+        let mut response = repository.repository.get_asset(asset).await?;
         download_stream("asset", &mut response, "foo.tar.gz").await?;
     }
     Ok(())

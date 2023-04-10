@@ -10,7 +10,7 @@ use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, IntoUrl, Response as ReqwestResponse, StatusCode, Url};
 use std::pin::Pin;
 
-pub const ISOPY_USER_AGENT: &'static str = "isopy";
+pub const ISOPY_USER_AGENT: &str = "isopy";
 
 type PinnedStream = Pin<Box<dyn FuturesStream<Item = reqwest::Result<Bytes>> + Send>>;
 
@@ -90,8 +90,8 @@ impl GitHubResponse {
     fn new(last_modified: Option<LastModified>, response: ReqwestResponse) -> Self {
         let content_length = response.content_length();
         Self {
-            last_modified: last_modified,
-            content_length: content_length,
+            last_modified,
+            content_length,
             response: Some(response),
         }
     }
@@ -122,7 +122,7 @@ struct GitHubStream {
 
 impl GitHubStream {
     fn new(stream: PinnedStream) -> Self {
-        Self { stream: stream }
+        Self { stream }
     }
 }
 

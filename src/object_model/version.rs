@@ -9,9 +9,9 @@ pub struct Version {
 impl Version {
     pub fn new(major: i32, minor: i32, build: i32) -> Self {
         Self {
-            major: major,
-            minor: minor,
-            build: build,
+            major,
+            minor,
+            build,
             value: format!("{}.{}.{}", major, minor, build),
         }
     }
@@ -20,7 +20,7 @@ impl Version {
     where
         S: AsRef<str>,
     {
-        let parts = s.as_ref().split(".").collect::<Vec<_>>();
+        let parts = s.as_ref().split('.').collect::<Vec<_>>();
         if parts.len() != 3 {
             return None;
         }

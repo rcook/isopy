@@ -5,7 +5,7 @@ use std::env::{set_var, var};
 use std::ffi::OsString;
 use std::process::ExitStatus;
 
-pub const ISOPY_ENV_NAME: &'static str = "ISOPY_ENV";
+pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";
 
 pub struct Command {
     program: Option<OsString>,

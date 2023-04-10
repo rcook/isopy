@@ -21,7 +21,7 @@ async fn init_project(app: &App, project: &Project) -> Result<()> {
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, &project.python_version, &project.tag)?;
 
-    let mut asset_path = app.make_asset_path(&asset);
+    let mut asset_path = app.make_asset_path(asset);
     if !asset_path.is_file() {
         asset_path = download_asset(app, asset).await?;
     }

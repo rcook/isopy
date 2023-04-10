@@ -1,4 +1,4 @@
-pub const RELEASES_URL: &'static str =
+pub const RELEASES_URL: &str =
     "https://api.github.com/repos/indygreg/python-build-standalone/releases";
 
 pub type ExitCode = i32;

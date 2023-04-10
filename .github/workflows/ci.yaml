@@ -41,3 +41,7 @@ jobs:
         run: cargo build --verbose --release --target ${{ matrix.target }}
       - name: Run tests (release)
         run: cargo test --verbose --release --target ${{ matrix.target }}
+      - name: Run Clippy
+        run: cargo clippy --target ${{ matrix.target }}
+      - name: Run fmt
+        run: cargo fmt --check

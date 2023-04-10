@@ -54,12 +54,12 @@ impl Environment {
         }
 
         let rec = read_yaml_file::<NamedEnvironmentRecord, _>(&config_path)?;
-        return Ok(Some(Environment {
+        Ok(Some(Environment {
             name: rec.name.clone(),
             full_python_dir: app
                 .named_environment_dir(&rec.name)
                 .join(rec.python_dir_rel),
-        }));
+        }))
     }
 
     fn try_project(app: &App) -> Result<Option<Environment>> {

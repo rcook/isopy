@@ -1,9 +1,9 @@
 use crate::result::Result;
 use std::path::PathBuf;
 
-pub const ISOPY_DIR_NAME: &'static str = ".isopy";
+pub const ISOPY_DIR_NAME: &str = ".isopy";
 
-pub const PROJECT_CONFIG_FILE_NAME: &'static str = ".python-version.yaml";
+pub const PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
 
 pub fn default_isopy_dir() -> Option<PathBuf> {
     let home_dir = home::home_dir()?;

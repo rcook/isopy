@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum Platform {
-    PC,
+    Pc,
     Apple,
     Unknown,
 }
@@ -11,7 +11,7 @@ impl Platform {
         S: AsRef<str>,
     {
         Some(match s.as_ref() {
-            "pc" => Self::PC,
+            "pc" => Self::Pc,
             "apple" => Self::Apple,
             "unknown" => Self::Unknown,
             _ => return None,

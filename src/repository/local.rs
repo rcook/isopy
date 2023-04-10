@@ -73,8 +73,8 @@ impl LocalResponse {
         P: Into<PathBuf>,
     {
         Self {
-            last_modified: last_modified,
-            content_length: content_length,
+            last_modified,
+            content_length,
             path: path.into(),
         }
     }
@@ -101,7 +101,7 @@ struct LocalStream {
 
 impl LocalStream {
     fn new(file: File) -> Self {
-        Self { file: file }
+        Self { file }
     }
 }
 

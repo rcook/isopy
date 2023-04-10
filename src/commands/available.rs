@@ -33,7 +33,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
 
 fn show_available_downloads(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
-    for asset in AssetFilter::default_for_platform().filter(assets.iter().map(|x| x).into_iter()) {
+    for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
         println!("{}", asset.name)
     }
     Ok(())
