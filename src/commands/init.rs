@@ -1,10 +1,10 @@
 use crate::app::App;
-use crate::helpers::{download_asset, get_asset};
 use crate::object_model::Project;
-use crate::probe::PROJECT_CONFIG_FILE_NAME;
 use crate::result::{user, Result};
 use crate::serialization::ProjectEnvironmentRecord;
-use crate::util::{safe_write_file, unpack_file};
+use crate::util::{
+    download_asset, get_asset, safe_write_file, unpack_file, PROJECT_CONFIG_FILE_NAME,
+};
 use std::path::PathBuf;
 
 pub async fn do_init(app: &App) -> Result<()> {
