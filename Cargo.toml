@@ -37,7 +37,7 @@ sysinfo = "0.28.4"
 tar = "0.4.38"
 tempdir = "0.3.7"
 tinytemplate = "1.2.1"
-tokio = { version = "1.26.0", features = ["full"] }
+tokio = { version = "1.27.0", features = ["full"] }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
 exec = "0.3.1"
