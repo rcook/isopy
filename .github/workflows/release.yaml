@@ -16,49 +16,55 @@ jobs:
   release:
     strategy:
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+        target:
+          - aarch64-apple-darwin
+          - x86_64-apple-darwin
+          - x86_64-pc-windows-msvc
+          - x86_64-unknown-linux-gnu
         include:
-          - os: macos-latest
-            target_triplet: x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+            host_os: macos-latest
             executable_ext:
             archive_ext: .tar.gz
-          - os: ubuntu-latest
-            target_triplet: x86_64-unknown-linux-gnu
+          - target: x86_64-apple-darwin
+            host_os: macos-latest
             executable_ext:
             archive_ext: .tar.gz
-          - os: windows-latest
-            target_triplet: x86_64-pc-windows-msvc
+          - target: x86_64-pc-windows-msvc
+            host_os: windows-latest
             executable_ext: .exe
             archive_ext: .zip
-    runs-on: ${{ matrix.os }}
+          - target: x86_64-unknown-linux-gnu
+            host_os: ubuntu-latest
+            executable_ext:
+            archive_ext: .tar.gz
+    runs-on: ${{ matrix.host_os }}
     steps:
       - name: Set variables (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target_triplet }}${{ matrix.archive_ext }}" >> $env:GITHUB_ENV
+        if: ${{ matrix.host_os == 'windows-latest' }}
+        run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $env:GITHUB_ENV
       - name: Set variables (Linux/macOS)
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target_triplet }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
+        if: ${{ matrix.host_os != 'windows-latest' }}
+        run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
 
-      - name: Check out code
+      - name: Check out
         uses: actions/checkout@v3
 
       - name: Set up Rust
         uses: ATiltedTree/setup-rust@v1
         with:
           rust-version: stable
+          targets: ${{ matrix.target }}
 
       - name: Build
-        run: cargo build --release --target ${{ matrix.target_triplet }}
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Create archive (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: Compress-Archive -DestinationPath ${{ env.archive_file_name }} -LiteralPath target\${{ matrix.target_triplet }}\release\${{ env.project}}${{ matrix.executable_ext }}
+        if: ${{ matrix.host_os == 'windows-latest' }}
+        run: Compress-Archive -DestinationPath ${{ env.archive_file_name }} -LiteralPath target\${{ matrix.target }}\release\${{ env.project}}${{ matrix.executable_ext }}
       - name: Create archive (Linux/macOS)
-        if: ${{ matrix.os != 'windows-latest' }}
-        run: tar -C target/${{ matrix.target_triplet }}/release -czf ${{ env.archive_file_name }} ${{ env.project}}${{ matrix.executable_ext }}
+        if: ${{ matrix.host_os != 'windows-latest' }}
+        run: tar -C target/${{ matrix.target }}/release -czf ${{ env.archive_file_name }} ${{ env.project}}${{ matrix.executable_ext }}
 
       - name: Create release
         id: create_release
