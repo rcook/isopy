@@ -1,50 +1,80 @@
 name: Release
 
-permissions:
-  contents: write
+env:
+  CARGO_TERM_COLOR: always
+  project: isopy
 
 on:
   push:
     tags:
-      - v[0-9]+.*
+      - v*.*.*
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: taiki-e/create-gh-release-action@v1
-        #with:
-        # (optional)
-        #changelog: CHANGELOG.md
-        env:
-          # (required)
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  upload-assets:
+  release:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
           - macos-latest
+          - ubuntu-latest
           - windows-latest
+        include:
+          - os: macos-latest
+            target_triplet: x86_64-apple-darwin
+            executable_ext:
+            archive_ext: .tar.gz
+          - os: ubuntu-latest
+            target_triplet: x86_64-unknown-linux-gnu
+            executable_ext:
+            archive_ext: .tar.gz
+          - os: windows-latest
+            target_triplet: x86_64-pc-windows-msvc
+            executable_ext: .exe
+            archive_ext: .zip
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - run: git fetch --force --tags origin
-      - run: git describe
-      - uses: taiki-e/upload-rust-binary-action@v1
+      - name: Set variables (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target_triplet }}${{ matrix.archive_ext }}" >> $env:GITHUB_ENV
+      - name: Set variables (Linux/macOS)
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target_triplet }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: ATiltedTree/setup-rust@v1
         with:
-          # (required)
-          bin: isopy
-          # (optional) On which platform to distribute the `.tar.gz` file.
-          # [default value: unix]
-          # [possible values: all, unix, windows, none]
-          tar: unix
-          # (optional) On which platform to distribute the `.zip` file.
-          # [default value: windows]
-          # [possible values: all, unix, windows, none]
-          zip: windows
+          rust-version: stable
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target_triplet }}
+
+      - name: Create archive (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: Compress-Archive -DestinationPath ${{ env.archive_file_name }} -LiteralPath target\${{ matrix.target_triplet }}\release\${{ env.project}}${{ matrix.executable_ext }}
+      - name: Create archive (Linux/macOS)
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: tar -C target/${{ matrix.target_triplet }}/release -czf ${{ env.archive_file_name }} ${{ env.project}}${{ matrix.executable_ext }}
+
+      - name: Create release
+        id: create_release
+        uses: joutvhu/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: ${{ env.project }} release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
         env:
-          # (required)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload executable
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.archive_file_name }}
+          asset_name: ${{ env.archive_file_name }}
+          asset_content_type: application/octet-stream
