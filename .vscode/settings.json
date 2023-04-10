@@ -5,7 +5,4 @@
     "**/target/": true,
     "py/": true,
   },
-  "rust-analyzer.linkedProjects": [
-    "/Cargo.toml",
-  ]
 }
