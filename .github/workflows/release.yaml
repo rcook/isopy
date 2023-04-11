@@ -1,11 +1,10 @@
 name: Release
 
+env:
+  project: isopy
+
 permissions:
   contents: write
-
-env:
-  CARGO_TERM_COLOR: always
-  project: isopy
 
 on:
   push:
@@ -20,7 +19,7 @@ jobs:
           - aarch64-apple-darwin
           - x86_64-apple-darwin
           - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
         include:
           - target: aarch64-apple-darwin
             host_os: macos-latest
@@ -34,22 +33,28 @@ jobs:
             host_os: windows-latest
             executable_ext: .exe
             archive_ext: .zip
-          - target: x86_64-unknown-linux-gnu
+          - target: x86_64-unknown-linux-musl
             host_os: ubuntu-latest
             executable_ext:
             archive_ext: .tar.gz
     runs-on: ${{ matrix.host_os }}
+    env:
+      cargo: cargo
+      CARGO_TERM_COLOR: always
     steps:
-      - name: Set variables (Windows)
-        if: ${{ matrix.host_os == 'windows-latest' }}
-        run: |
-          echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $env:GITHUB_ENV
-          echo "ISOPY_VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
-      - name: Set variables (Linux/macOS)
-        if: ${{ matrix.host_os != 'windows-latest' }}
+      - name: Set variables
+        shell: bash
         run: |
           echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
           echo "ISOPY_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Install Cross
+        shell: bash
+        run: |
+          cargo install cross
+          echo "cargo=cross" >> $GITHUB_ENV
+          echo "target_flags=--target ${{ matrix.target }}" >> $GITHUB_ENV
+          echo "target_dir=target/${{ matrix.target }}" >> $GITHUB_ENV
 
       - name: Check out
         uses: actions/checkout@v3
@@ -61,14 +66,23 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+        run: ${{ env.cargo }} build --release ${{ env.target_flags }}
 
       - name: Create archive (Windows)
         if: ${{ matrix.host_os == 'windows-latest' }}
-        run: Compress-Archive -DestinationPath ${{ env.archive_file_name }} -LiteralPath target\${{ matrix.target }}\release\${{ env.project}}${{ matrix.executable_ext }}
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -DestinationPath ${{ env.archive_file_name }} `
+            -LiteralPath ${{ env.target_dir }}/release/${{ env.project}}${{ matrix.executable_ext }}
       - name: Create archive (Linux/macOS)
         if: ${{ matrix.host_os != 'windows-latest' }}
-        run: tar -C target/${{ matrix.target }}/release -czf ${{ env.archive_file_name }} ${{ env.project}}${{ matrix.executable_ext }}
+        shell: bash
+        run: |
+          tar \
+            -C ${{ env.target_dir }}/release \
+            -czf \
+            ${{ env.archive_file_name }} ${{ env.project}}${{ matrix.executable_ext }}
 
       - name: Create release
         id: create_release
