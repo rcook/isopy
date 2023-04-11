@@ -1,7 +1,6 @@
 name: CI
 
 env:
-  CARGO_TERM_COLOR: always
   project: isopy
 
 on:
@@ -12,7 +11,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: 0 0 * * SUN
+    - cron: 0 5 * * *
 
 jobs:
   ci:
@@ -30,18 +29,31 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             host_os: ubuntu-latest
     runs-on: ${{ matrix.host_os }}
+    env:
+      cargo: cargo
+      CARGO_TERM_COLOR: always
     steps:
+      - name: Set variables
+        shell: bash
+        run: echo "target_flags=--target ${{ matrix.target }}" >> $GITHUB_ENV
+
       - name: Check out
         uses: actions/checkout@v3
+
       - name: Build (debug)
-        run: cargo build --verbose --target ${{ matrix.target }}
+        run: ${{ env.cargo }} build --verbose ${{ env.target_flags }}
+
       - name: Run tests (debug)
-        run: cargo test --verbose --target ${{ matrix.target }}
+        run: ${{ env.cargo }} test --verbose ${{ env.target_flags }}
+
       - name: Build (release)
-        run: cargo build --verbose --release --target ${{ matrix.target }}
+        run: ${{ env.cargo }} build --verbose --release ${{ env.target_flags }}
+
       - name: Run tests (release)
-        run: cargo test --verbose --release --target ${{ matrix.target }}
+        run: ${{ env.cargo }} test --verbose --release ${{ env.target_flags }}
+
       - name: Run Clippy
-        run: cargo clippy --target ${{ matrix.target }}
+        run: ${{ env.cargo }} clippy ${{ env.target_flags }}
+
       - name: Run fmt
-        run: cargo fmt --check
+        run: ${{ env.cargo }} fmt --check
