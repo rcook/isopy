@@ -8,10 +8,9 @@ use crate::serialization::{
     RepositoriesRecord, RepositoryRecord, UseRecord,
 };
 use crate::util::{
-    dir_url, find_project_config_path, osstr_to_str, path_to_str, read_json_file, read_yaml_file,
-    safe_write_file, RELEASES_URL,
+    dir_url, find_project_config_path, osstr_to_str, read_json_file, read_yaml_file,
+    safe_write_file, HexDigest, RELEASES_URL,
 };
-use md5::compute;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 
@@ -25,9 +24,9 @@ pub struct App {
     pub cwd: PathBuf,
     pub dir: PathBuf,
     pub assets_dir: PathBuf,
-    pub named_environments_dir: PathBuf,
-    pub project_environments_dir: PathBuf,
-    pub uses_dir: PathBuf,
+    named_environments_dir: PathBuf,
+    project_environments_dir: PathBuf,
+    uses_dir: PathBuf,
 }
 
 impl App {
@@ -191,9 +190,8 @@ impl App {
     where
         P: AsRef<Path>,
     {
-        let digest = compute(path_to_str(config_path.as_ref())?);
-        let hex_digest = format!("{:x}", digest);
-        Ok(self.project_environments_dir.join(hex_digest))
+        let hex_digest = HexDigest::from_path(config_path)?;
+        Ok(self.project_environments_dir.join(hex_digest.as_str()))
     }
 
     pub fn read_project_environment<S>(
@@ -240,9 +238,8 @@ impl App {
     where
         P: AsRef<Path>,
     {
-        let digest = compute(path_to_str(dir.as_ref())?);
-        let hex_digest = format!("{:x}", digest);
-        Ok(self.uses_dir.join(hex_digest))
+        let hex_digest = HexDigest::from_path(dir)?;
+        Ok(self.uses_dir.join(hex_digest.as_str()))
     }
 
     pub fn read_use<S>(&self, hex_digest: S) -> Result<Option<UseRecord>>
