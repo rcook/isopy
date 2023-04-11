@@ -43,9 +43,11 @@ jobs:
       - name: Set variables (Windows)
         if: ${{ matrix.host_os == 'windows-latest' }}
         run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $env:GITHUB_ENV
+        run: echo "ISOPY_VERSION=${{ github.ref_name }}-$(git describe)" >> $env:GITHUB_ENV
       - name: Set variables (Linux/macOS)
         if: ${{ matrix.host_os != 'windows-latest' }}
         run: echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
+        run: echo "ISOPY_VERSION=${{ github.ref_name }}-$(git describe)" >> $GITHUB_ENV
 
       - name: Check out
         uses: actions/checkout@v3
