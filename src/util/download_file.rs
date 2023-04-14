@@ -42,7 +42,7 @@ where
     while let Some(item) = stream.next().await {
         let chunk = item?;
         downloaded += chunk.len() as ContentLength;
-        file.write(&chunk)?;
+        file.write_all(&chunk)?;
         indicator.set_position(downloaded);
     }
     indicator.set_message(format!("Finished fetching {}", label));
