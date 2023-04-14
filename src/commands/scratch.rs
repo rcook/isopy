@@ -22,8 +22,8 @@
 use crate::app::App;
 use crate::object_model::{LastModified, Tag, Version};
 use crate::repository::Repository as RepositoryTrait;
-use crate::result::Result;
 use crate::util::{download_stream, get_asset};
+use anyhow::Result;
 use std::path::Path;
 
 pub async fn do_scratch(app: &App) -> Result<()> {

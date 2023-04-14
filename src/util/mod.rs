@@ -32,7 +32,7 @@ mod types;
 mod unpack_file;
 mod url;
 
-pub use self::constants::{GENERAL_ERROR, OK, RELEASES_URL, USAGE};
+pub use self::constants::{ERROR, OK, RELEASES_URL};
 pub use self::download_file::download_stream;
 pub use self::hash::HexDigest;
 pub use self::helpers::{download_asset, get_asset};

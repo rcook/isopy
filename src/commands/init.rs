@@ -21,18 +21,18 @@
 //
 use crate::app::App;
 use crate::object_model::Project;
-use crate::result::{user, Result};
 use crate::serialization::ProjectEnvironmentRecord;
 use crate::util::{download_asset, get_asset, unpack_file, PROJECT_CONFIG_FILE_NAME};
+use anyhow::{bail, Result};
 use std::path::PathBuf;
 use swiss_army_knife::safe_write_file;
 
 pub async fn do_init(app: &App) -> Result<()> {
     match app.read_project(&app.cwd)? {
-        None => Err(user(format!(
+        None => bail!(
             "Could not find project configuration file {}",
             PROJECT_CONFIG_FILE_NAME
-        ))),
+        ),
         Some(project) => Ok(init_project(app, &project).await?),
     }
 }

@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::result::Result;
+use anyhow::Result;
 
 pub async fn do_list(app: &App) -> Result<()> {
     let recs = app.read_named_environments()?;

@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::object_model::AssetMeta;
-use crate::result::Result;
+use anyhow::Result;
 use std::fs::read_dir;
 
 pub fn do_downloaded(app: &App) -> Result<()> {

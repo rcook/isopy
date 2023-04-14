@@ -21,8 +21,8 @@
 //
 use super::{Repository, Response, Stream};
 use crate::object_model::{Asset, LastModified};
-use crate::result::{other, Result};
 use crate::util::{to_last_modified, to_system_time, ContentLength};
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
 use std::fs::{metadata, File};
@@ -138,7 +138,7 @@ impl Stream for LocalStream {
             .take(chunk_size as u64)
             .read_to_end(&mut chunk)
         {
-            Err(e) => Some(Err(other(Box::new(e)))),
+            Err(e) => Some(Err(anyhow!(e))),
             Ok(count) => {
                 if count == 0 {
                     None

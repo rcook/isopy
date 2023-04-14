@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::object_model::{EnvironmentName, Tag, Version};
-use crate::result::Result;
 use crate::serialization::NamedEnvironmentRecord;
 use crate::util::{get_asset, unpack_file};
+use anyhow::Result;
 use std::path::PathBuf;
 use swiss_army_knife::safe_write_file;
 

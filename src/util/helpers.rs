@@ -21,8 +21,8 @@
 //
 use crate::app::App;
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
-use crate::result::{fatal, user, Result};
 use crate::util::{download_stream, validate_sha256_checksum};
+use anyhow::{anyhow, bail, Result};
 use std::fs::remove_file;
 use std::path::PathBuf;
 
@@ -37,20 +37,20 @@ pub fn get_asset<'a>(
     let matching_assets = asset_filter.filter(assets.iter());
     match matching_assets.len() {
         1 => return Ok(matching_assets.first().expect("Must exist")),
-        0 => Err(user(format!(
+        0 => bail!(
             "No asset matching version {} and tag {}",
             version,
             tag.as_ref()
                 .map(Tag::to_string)
                 .unwrap_or(String::from("(none)"))
-        ))),
-        _ => Err(user(format!(
+        ),
+        _ => bail!(
             "More than one asset matching version {} and tag {}",
             version,
             tag.as_ref()
                 .map(Tag::to_string)
                 .unwrap_or(String::from("(none)"))
-        ))),
+        ),
     }
 }
 
@@ -58,14 +58,11 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
     let repositories = app.read_repositories()?;
     let repository = repositories
         .first()
-        .ok_or(user("No asset repositories are configured"))?;
+        .ok_or(anyhow!("No asset repositories are configured"))?;
 
     let asset_path = app.make_asset_path(asset);
     if asset_path.exists() {
-        return Err(user(format!(
-            "Asset {} already downloaded",
-            asset_path.display()
-        )));
+        bail!("Asset {} already downloaded", asset_path.display());
     }
 
     let mut response = repository.repository.get_asset(asset).await?;
@@ -74,10 +71,10 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
     let is_valid = validate_sha256_checksum(&asset_path, &asset.tag)?;
     if !is_valid {
         remove_file(&asset_path)?;
-        return Err(fatal(format!(
+        bail!(
             "SHA256 checksum validation failed on {}",
             asset_path.display()
-        )));
+        );
     }
 
     println!(

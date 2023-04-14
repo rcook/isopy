@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::object_model::Environment;
-use crate::result::Result;
 use crate::util::path_to_str;
+use anyhow::Result;
 use std::env::{set_var, var};
 use std::ffi::OsString;
 use std::process::ExitStatus;

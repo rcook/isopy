@@ -21,8 +21,8 @@
 //
 use crate::app::App;
 use crate::object_model::AssetFilter;
-use crate::result::{user, Result};
 use crate::util::download_stream;
+use anyhow::{anyhow, Result};
 
 pub async fn do_available(app: &App) -> Result<()> {
     update_index_if_necessary(app).await?;
@@ -34,7 +34,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
     let repositories = app.read_repositories()?;
     let repository = repositories
         .first()
-        .ok_or(user("No asset repositories are configured"))?;
+        .ok_or(anyhow!("No asset repositories are configured"))?;
 
     let current_last_modified = app.read_index_last_modified(&repository.name)?;
     if let Some(mut response) = repository

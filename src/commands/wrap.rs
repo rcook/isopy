@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::object_model::Environment;
-use crate::result::Result;
+use anyhow::Result;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use swiss_army_knife::safe_write_file;

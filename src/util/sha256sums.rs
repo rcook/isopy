@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::object_model::Tag;
-use crate::result::{fatal, Result};
+use anyhow::{anyhow, Result};
 use hex::decode;
 use include_dir::{include_dir, Dir};
 use sha2::{Digest, Sha256};
@@ -37,11 +37,11 @@ where
     let sha256_file_name = format!("{}.sha256sums", tag.as_str());
     let file = SHA256SUMS_DIR
         .get_file(&sha256_file_name)
-        .ok_or(fatal(format!("Resource {} not found", sha256_file_name)))?;
-    let contents = file.contents_utf8().ok_or(fatal(format!(
+        .ok_or(anyhow!("Resource {} not found", sha256_file_name))?;
+    let contents = file.contents_utf8().ok_or(anyhow!(
         "Resource {} could not be decoded as UTF-8",
         sha256_file_name
-    )))?;
+    ))?;
 
     let mut map = HashMap::new();
     for line in contents.lines() {
@@ -54,9 +54,9 @@ where
     let archive_file_name = archive_path
         .as_ref()
         .file_name()
-        .ok_or(fatal("Could not get file name"))?
+        .ok_or(anyhow!("Could not get file name"))?
         .to_str()
-        .ok_or(fatal("Could not get file name"))?;
+        .ok_or(anyhow!("Could not get file name"))?;
     match map.get(archive_file_name) {
         None => Ok(false),
         Some(expected_hash_str) => {

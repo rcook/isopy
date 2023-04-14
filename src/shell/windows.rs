@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::proc::{get_parent_pid, get_pid, get_process_from_pid};
-use crate::result::{fatal, Result};
+use anyhow::Result;
 use lazy_static::lazy_static;
 use same_file::is_same_file;
 use std::env::var;
@@ -63,7 +63,7 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
     let mut process = get_process_from_pid(&mut system, pid)?;
     loop {
         if process.name().is_empty() {
-            return Err(fatal("Failed to determine parent shell"));
+            bail!("Failed to determine parent shell");
         }
 
         if is_same_file(&*POWERSHELL.path, &process.exe())? {

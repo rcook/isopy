@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::object_model::Tag;
-use crate::result::Result;
+use anyhow::Result;
 
 pub fn do_info(app: &App) -> Result<()> {
     println!("Working directory: {}", app.cwd.display());

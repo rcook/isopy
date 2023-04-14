@@ -19,20 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::result::{fatal, Result};
+use anyhow::{anyhow, Result};
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
 
 pub fn path_to_str(p: &Path) -> Result<&str> {
-    p.to_str().ok_or(fatal("Failed to convert path"))
+    p.to_str().ok_or(anyhow!("Failed to convert path"))
 }
 
 pub fn osstr_to_str(s: &OsStr) -> Result<&str> {
-    s.to_str().ok_or(fatal("Failed to convert OS string"))
+    s.to_str().ok_or(anyhow!("Failed to convert OS string"))
 }
 
 #[allow(unused)]
 pub fn osstring_to_string(s: OsString) -> Result<String> {
     s.into_string()
-        .map_err(|_| fatal("Failed to convert OS string"))
+        .map_err(|_| anyhow!("Failed to convert OS string"))
 }

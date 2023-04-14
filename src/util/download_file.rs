@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repository::Response;
-use crate::result::Result;
 use crate::util::{ContentLength, Indicator};
+use anyhow::Result;
 use std::io::Write;
 use std::path::Path;
 use swiss_army_knife::safe_create_file;

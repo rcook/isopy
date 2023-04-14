@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::object_model::LastModified;
-use crate::result::Result;
+use anyhow::Result;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub fn to_last_modified(time: &SystemTime) -> Result<LastModified> {

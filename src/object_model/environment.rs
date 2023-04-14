@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::object_model::EnvironmentName;
-use crate::result::{user, Result};
 use crate::serialization::{NamedEnvironmentRecord, ProjectEnvironmentRecord, UseRecord};
 use crate::util::path_to_str;
+use anyhow::{bail, Result};
 use std::path::PathBuf;
 use swiss_army_knife::read_yaml_file;
 
@@ -43,7 +43,7 @@ impl Environment {
                         full_python_dir: app.named_environment_dir(n).join(rec.python_dir_rel),
                     })
                 }
-                _ => return Err(user(format!("No environment named {}", n))),
+                _ => bail!("No environment named {}", n),
             };
         }
 
@@ -55,10 +55,10 @@ impl Environment {
             return Ok(environment);
         }
 
-        Err(user(format!(
+        bail!(
             "Couldn't infer environment for directory {}",
             app.cwd.display()
-        )))
+        )
     }
 
     fn try_use(app: &App) -> Result<Option<Environment>> {

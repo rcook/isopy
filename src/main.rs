@@ -24,7 +24,6 @@ mod cli;
 mod commands;
 mod object_model;
 mod repository;
-mod result;
 mod serialization;
 mod shell;
 mod util;
@@ -35,20 +34,19 @@ use crate::commands::{
     do_available, do_create, do_download, do_downloaded, do_exec, do_generate_repositories_yaml,
     do_info, do_init, do_list, do_new, do_scratch, do_shell, do_use, do_wrap,
 };
-use crate::result::{could_not_infer_isopy_dir, Error, Result};
-use crate::util::{default_isopy_dir, GENERAL_ERROR, OK, USAGE};
+use crate::util::{default_isopy_dir, ERROR, OK};
+use anyhow::{anyhow, Result};
 use clap::Parser;
-use colour::red_ln;
+use colored::Colorize;
 use std::env::current_dir;
 use std::process::exit;
 
 async fn run() -> Result<()> {
     let cwd = current_dir()?;
     let args = Args::parse();
-    let dir = args
-        .dir
-        .or_else(default_isopy_dir)
-        .ok_or_else(could_not_infer_isopy_dir)?;
+    let dir = args.dir.or_else(default_isopy_dir).ok_or(anyhow!(
+        "Could not infer isopy cache directory location: please specify using --dir option"
+    ))?;
     let app = App::new(cwd, dir);
 
     match args.command {
@@ -89,17 +87,9 @@ async fn run() -> Result<()> {
 async fn main() {
     exit(match run().await {
         Ok(_) => OK,
-        Err(Error::User { message }) => {
-            red_ln!("{}", message);
-            USAGE
-        }
-        Err(Error::Reportable { message, .. }) => {
-            red_ln!("{}", message);
-            GENERAL_ERROR
-        }
         Err(e) => {
-            red_ln!("Unhandled error: {:#?}", e);
-            GENERAL_ERROR
+            println!("{}", format!("{}", e).bright_red());
+            ERROR
         }
     })
 }

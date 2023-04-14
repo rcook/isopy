@@ -23,12 +23,12 @@ use crate::object_model::{
     Asset, AssetMeta, EnvironmentName, LastModified, Project, RepositoryName,
 };
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
-use crate::result::Result;
 use crate::serialization::{
     IndexRecord, NamedEnvironmentRecord, PackageRecord, ProjectEnvironmentRecord, ProjectRecord,
     RepositoriesRecord, RepositoryRecord, UseRecord,
 };
 use crate::util::{dir_url, find_project_config_path, osstr_to_str, HexDigest, RELEASES_URL};
+use anyhow::Result;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use swiss_army_knife::{read_json_file, read_yaml_file, safe_write_file};

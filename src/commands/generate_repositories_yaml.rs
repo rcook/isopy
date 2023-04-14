@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::object_model::RepositoryName;
-use crate::result::Result;
 use crate::serialization::{RepositoriesRecord, RepositoryRecord};
 use crate::util::{dir_url, RELEASES_URL};
+use anyhow::Result;
 use std::path::{Path, PathBuf};
 use swiss_army_knife::safe_write_file;
 

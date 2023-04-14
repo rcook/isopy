@@ -21,8 +21,8 @@
 //
 use crate::app::App;
 use crate::object_model::{Environment, EnvironmentName};
-use crate::result::Result;
 use crate::shell::Command;
+use anyhow::Result;
 
 pub fn do_exec(
     app: &App,
