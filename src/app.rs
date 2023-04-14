@@ -28,12 +28,10 @@ use crate::serialization::{
     IndexRecord, NamedEnvironmentRecord, PackageRecord, ProjectEnvironmentRecord, ProjectRecord,
     RepositoriesRecord, RepositoryRecord, UseRecord,
 };
-use crate::util::{
-    dir_url, find_project_config_path, osstr_to_str, read_json_file, read_yaml_file,
-    safe_write_file, HexDigest, RELEASES_URL,
-};
+use crate::util::{dir_url, find_project_config_path, osstr_to_str, HexDigest, RELEASES_URL};
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
+use swiss_army_knife::{read_json_file, read_yaml_file, safe_write_file};
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,

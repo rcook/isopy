@@ -23,8 +23,9 @@ use crate::app::App;
 use crate::object_model::RepositoryName;
 use crate::result::Result;
 use crate::serialization::{RepositoriesRecord, RepositoryRecord};
-use crate::util::{dir_url, safe_write_file, RELEASES_URL};
+use crate::util::{dir_url, RELEASES_URL};
 use std::path::{Path, PathBuf};
+use swiss_army_knife::safe_write_file;
 
 pub fn do_generate_repositories_yaml<P>(app: &App, local_repository_dir: P) -> Result<()>
 where

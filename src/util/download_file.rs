@@ -21,9 +21,10 @@
 //
 use crate::repository::Response;
 use crate::result::{translate_io_error, Result};
-use crate::util::{safe_create_file, ContentLength, Indicator};
+use crate::util::{ContentLength, Indicator};
 use std::io::Write;
 use std::path::Path;
+use swiss_army_knife::safe_create_file;
 
 pub async fn download_stream<P>(
     label: &str,

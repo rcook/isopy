@@ -23,8 +23,9 @@ use crate::app::App;
 use crate::object_model::{EnvironmentName, Tag, Version};
 use crate::result::Result;
 use crate::serialization::NamedEnvironmentRecord;
-use crate::util::{get_asset, safe_write_file, unpack_file};
+use crate::util::{get_asset, unpack_file};
 use std::path::PathBuf;
+use swiss_army_knife::safe_write_file;
 
 pub async fn do_create(
     app: &App,

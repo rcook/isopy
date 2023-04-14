@@ -21,7 +21,6 @@
 //
 mod constants;
 mod download_file;
-mod fs;
 mod hash;
 mod helpers;
 mod indicator;
@@ -35,7 +34,6 @@ mod url;
 
 pub use self::constants::{GENERAL_ERROR, OK, RELEASES_URL, USAGE};
 pub use self::download_file::download_stream;
-pub use self::fs::{open_file, read_json_file, read_yaml_file, safe_create_file, safe_write_file};
 pub use self::hash::HexDigest;
 pub use self::helpers::{download_asset, get_asset};
 pub use self::indicator::Indicator;

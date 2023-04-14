@@ -20,10 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::result::{translate_io_error, Result};
-use crate::util::{open_file, ContentLength, Indicator};
+use crate::util::{ContentLength, Indicator};
 use flate2::read::GzDecoder;
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
+use swiss_army_knife::open_file;
 use tar::{Archive, Entry};
 
 pub fn unpack_file<P, Q>(path: P, dir: Q) -> Result<()>

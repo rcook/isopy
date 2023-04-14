@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::object_model::{Environment, EnvironmentName};
 use crate::result::{user, Result};
 use crate::serialization::UseRecord;
-use crate::util::safe_write_file;
+use swiss_army_knife::safe_write_file;
 
 pub fn do_use(app: &App, environment_name: &EnvironmentName) -> Result<()> {
     let use_yaml_path = app.use_dir(&app.cwd)?.join("use.yaml");
