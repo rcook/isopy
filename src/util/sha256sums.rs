@@ -20,13 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::object_model::Tag;
-use crate::result::{fatal, translate_io_error, Result};
+use crate::result::{fatal, Result};
 use hex::decode;
 use include_dir::{include_dir, Dir};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
-use std::fs::read;
 use std::path::Path;
+use swiss_army_knife::read_bytes;
 
 static SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
 
@@ -62,7 +62,7 @@ where
         Some(expected_hash_str) => {
             let expected_hash = decode(expected_hash_str)?;
             let mut hasher = Sha256::new();
-            hasher.update(read(&archive_path).map_err(|e| translate_io_error(e, &archive_path))?);
+            hasher.update(read_bytes(&archive_path)?);
             let hash = hasher.finalize().to_vec();
             Ok(expected_hash == hash)
         }

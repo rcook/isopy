@@ -19,8 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use std::path::{Path, PathBuf};
-
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
@@ -34,14 +32,6 @@ pub enum Error {
 #[derive(Debug)]
 pub enum ErrorInfo {
     CouldNotInferIsopyDir,
-    FileAlreadyExists {
-        path: PathBuf,
-        inner: Option<std::io::Error>,
-    },
-    FileNotFound {
-        path: PathBuf,
-        inner: Option<std::io::Error>,
-    },
 }
 
 impl<E> From<E> for Error
@@ -75,49 +65,11 @@ pub fn could_not_infer_isopy_dir() -> Error {
     }
 }
 
-pub fn file_already_exists<P>(path: P, inner: Option<std::io::Error>) -> Error
-where
-    P: Into<PathBuf>,
-{
-    let p = path.into();
-    let m = format!("File {} already exists", p.display());
-    Error::Reportable {
-        message: m,
-        info: ErrorInfo::FileAlreadyExists { path: p, inner },
-    }
-}
-
-pub fn file_not_found<P>(path: P, inner: Option<std::io::Error>) -> Error
-where
-    P: Into<PathBuf>,
-{
-    let p = path.into();
-    let m = format!("Could not find file {}", p.display());
-    Error::Reportable {
-        message: m,
-        info: ErrorInfo::FileNotFound { path: p, inner },
-    }
-}
-
 pub fn fatal<M>(message: M) -> Error
 where
     M: Into<String>,
 {
     Error::Fatal {
         message: message.into(),
-    }
-}
-
-/// Attach file path to error
-pub fn translate_io_error<P>(e: std::io::Error, path: P) -> Error
-where
-    P: AsRef<Path>,
-{
-    use std::io::ErrorKind::*;
-
-    match e.kind() {
-        AlreadyExists => file_already_exists(path.as_ref(), Some(e)),
-        NotFound => file_not_found(path.as_ref(), Some(e)),
-        _ => e.into(),
     }
 }

@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repository::Response;
-use crate::result::{translate_io_error, Result};
+use crate::result::Result;
 use crate::util::{ContentLength, Indicator};
 use std::io::Write;
 use std::path::Path;
@@ -42,8 +42,7 @@ where
     while let Some(item) = stream.next().await {
         let chunk = item?;
         downloaded += chunk.len() as ContentLength;
-        file.write(&chunk)
-            .map_err(|e| translate_io_error(e, &output_path))?;
+        file.write(&chunk)?;
         indicator.set_position(downloaded);
     }
     indicator.set_message(format!("Finished fetching {}", label));
