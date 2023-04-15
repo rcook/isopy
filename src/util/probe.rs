@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use swiss_army_knife::find_sentinel_file;
 
 pub const ISOPY_DIR_NAME: &str = ".isopy";
 
@@ -39,23 +39,9 @@ where
     project_dir.into().join(PROJECT_CONFIG_FILE_NAME)
 }
 
-pub fn find_project_config_path<P>(start_dir: P) -> Result<Option<PathBuf>>
+pub fn find_project_config_path<P>(start_dir: P) -> Option<PathBuf>
 where
-    P: Into<PathBuf>,
+    P: AsRef<Path>,
 {
-    let mut dir = start_dir.into();
-    let mut n = 0;
-    loop {
-        let project_config_path = make_project_config_path(&dir);
-        if project_config_path.is_file() {
-            return Ok(Some(project_config_path));
-        }
-        if !dir.pop() {
-            return Ok(None);
-        }
-        n += 1;
-        if n > 5 {
-            return Ok(None);
-        }
-    }
+    find_sentinel_file(PROJECT_CONFIG_FILE_NAME, &start_dir, None)
 }

@@ -32,7 +32,6 @@ use anyhow::Result;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use swiss_army_knife::{read_json_file, read_yaml_file, safe_write_file};
-
 pub struct RepositoryInfo {
     pub name: RepositoryName,
     pub repository: Box<dyn Repository>,
@@ -295,9 +294,9 @@ impl App {
 
     pub fn read_project<P>(&self, start_dir: P) -> Result<Option<Project>>
     where
-        P: Into<PathBuf>,
+        P: AsRef<Path>,
     {
-        Ok(match find_project_config_path(start_dir)? {
+        Ok(match find_project_config_path(start_dir) {
             None => None,
             Some(p) => {
                 let project_record = read_yaml_file::<ProjectRecord, _>(&p)?;
