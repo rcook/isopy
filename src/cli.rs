@@ -21,20 +21,22 @@
 //
 use crate::object_model::{EnvironmentName, Tag, Version};
 use clap::{Parser, Subcommand};
-use default_env::default_env;
-use git_version::git_version;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use std::result::Result;
 
-const ISOPY_VERSION: &str = default_env!("ISOPY_VERSION", git_version!());
+const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
+const PACKAGE_DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
+const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
+const PACKAGE_HOME_PAGE: &str = env!("CARGO_PKG_HOMEPAGE");
+const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("ISOPY_BUILD_VERSION");
 
 #[derive(Parser, Debug)]
 #[command(
-    name = env!("CARGO_PKG_NAME"),
-    about = format!("{} {}", env!("CARGO_PKG_DESCRIPTION"), ISOPY_VERSION),
-    after_help = format!("{}\nhttps://github.com/rcook/isopy", env!["CARGO_PKG_HOMEPAGE"]),
-    version = ISOPY_VERSION
+    name = PACKAGE_NAME,
+    version = PACKAGE_VERSION,
+    about = format!("{} {}", PACKAGE_DESCRIPTION, PACKAGE_VERSION),
+    after_help = format!("{}\nhttps://github.com/rcook/isopy{}", PACKAGE_HOME_PAGE, PACKAGE_BUILD_VERSION.map(|x| format!("\n\n{}", x)).unwrap_or(String::from("")))
 )]
 pub struct Args {
     #[arg(global = true, help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]

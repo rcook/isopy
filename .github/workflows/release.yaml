@@ -45,8 +45,8 @@ jobs:
       - name: Set variables
         shell: bash
         run: |
+          echo "ISOPY_BUILD_VERSION=${{ github.ref_name }}-$(git rev-parse HEAD)" >> $GITHUB_ENV
           echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
-          echo "ISOPY_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Install Cross
         shell: bash
