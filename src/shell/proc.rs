@@ -26,7 +26,7 @@ pub fn get_pid() -> Result<Pid> {
     get_current_pid().or(Err(anyhow!("Failed to get process ID")))
 }
 
-pub fn get_process_from_pid<'a>(system: &'a mut System, pid: Pid) -> Result<&'a Process> {
+pub fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
     if system.refresh_process(pid) {
         system
             .process(pid)

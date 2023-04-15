@@ -31,7 +31,7 @@ use tinytemplate::TinyTemplate;
 const PYTHON_EXECUTABLE_NAME: &str = "python3";
 
 #[cfg(target_os = "windows")]
-const PYTHON_EXECUTABLE_NAME: &'static str = "python";
+const PYTHON_EXECUTABLE_NAME: &str = "python";
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
@@ -41,7 +41,7 @@ PYTHONPATH={base_dir} \
 exec {python_executable_name} {script_path} "$@""#;
 
 #[cfg(target_os = "windows")]
-const WRAPPER_TEMPLATE: &'static str = r#"@echo off
+const WRAPPER_TEMPLATE: &str = r#"@echo off
 setlocal
 {path_env}
 set PYTHONPATH={base_dir}

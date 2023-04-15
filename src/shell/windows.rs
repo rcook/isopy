@@ -66,11 +66,11 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
             bail!("Failed to determine parent shell");
         }
 
-        if is_same_file(&*POWERSHELL.path, &process.exe())? {
+        if is_same_file(POWERSHELL.path, process.exe())? {
             return Ok(&POWERSHELL);
         }
 
-        if is_same_file(&*CMD.path, &process.exe())? {
+        if is_same_file(CMD.path, process.exe())? {
             return Ok(&CMD);
         }
 
