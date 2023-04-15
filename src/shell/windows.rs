@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::proc::{get_parent_pid, get_pid, get_process_from_pid};
-use anyhow::Result;
+use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use same_file::is_same_file;
 use std::env::var;
