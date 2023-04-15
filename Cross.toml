@@ -1,0 +1,4 @@
+[build.env]
+passthrough = [
+    "ISOPY_BUILD_VERSION"
+]

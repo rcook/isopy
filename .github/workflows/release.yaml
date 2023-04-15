@@ -42,12 +42,6 @@ jobs:
       cargo: cargo
       CARGO_TERM_COLOR: always
     steps:
-      - name: Set variables
-        shell: bash
-        run: |
-          echo "ISOPY_BUILD_VERSION=${{ github.ref_name }}-$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
-
       - name: Install Cross
         shell: bash
         run: |
@@ -64,6 +58,12 @@ jobs:
         with:
           rust-version: stable
           targets: ${{ matrix.target }}
+
+      - name: Set variables
+        shell: bash
+        run: |
+          echo "ISOPY_BUILD_VERSION=${{ github.ref_name }}-$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
 
       - name: Build
         run: ${{ env.cargo }} build --release ${{ env.target_flags }}
