@@ -5,7 +5,7 @@ edition = "2021"
 homepage = "https://rcook.github.io/isopy/"
 license = "MIT"
 name = "isopy"
-version = "0.0.0"
+version = "0.0.22"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
