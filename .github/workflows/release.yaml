@@ -26,18 +26,22 @@ jobs:
             host_os: macos-latest
             executable_ext:
             archive_ext: .tar.gz
+            sha256sum: shasum -a 256
           - target: x86_64-apple-darwin
             host_os: macos-latest
             executable_ext:
             archive_ext: .tar.gz
+            sha256sum: shasum -a 256
           - target: x86_64-pc-windows-msvc
             host_os: windows-latest
             executable_ext: .exe
             archive_ext: .zip
+            sha256sum: sha256sum
           - target: x86_64-unknown-linux-musl
             host_os: ubuntu-latest
             executable_ext:
             archive_ext: .tar.gz
+            sha256sum: sha256sum
     runs-on: ${{ matrix.host_os }}
     env:
       cargo: cargo
@@ -94,7 +98,7 @@ jobs:
       - name: Generate checksum
         shell: bash
         run: |
-          sha256sum ${{ env.archive_file_name }} > ${{ env.archive_file_name }}.sha256sum
+          ${{ matrix.sha256sum }} ${{ env.archive_file_name }} > ${{ env.archive_file_name }}.sha256sum
 
       - name: Create release
         id: create_release
