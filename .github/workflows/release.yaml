@@ -1,7 +1,7 @@
 name: Release
 
 env:
-  project: isopy
+  tool_name: isopy
   build_type: release
 
 permissions:
@@ -23,111 +23,35 @@ jobs:
           - x86_64-unknown-linux-musl
         include:
           - target: aarch64-apple-darwin
-            host_os: macos-latest
             executable_ext:
-            archive_ext: .tar.gz
-            sha256sum: shasum -a 256
+            archive_type: .tar.gz
+            build_os: macos-latest
           - target: x86_64-apple-darwin
-            host_os: macos-latest
             executable_ext:
-            archive_ext: .tar.gz
-            sha256sum: shasum -a 256
+            archive_type: .tar.gz
+            build_os: macos-latest
           - target: x86_64-pc-windows-msvc
-            host_os: windows-latest
             executable_ext: .exe
-            archive_ext: .zip
-            sha256sum: sha256sum
+            archive_type: .zip
+            build_os: windows-latest
           - target: x86_64-unknown-linux-musl
-            host_os: ubuntu-latest
             executable_ext:
-            archive_ext: .tar.gz
-            sha256sum: sha256sum
-    runs-on: ${{ matrix.host_os }}
-    env:
-      cargo: cargo
-      CARGO_TERM_COLOR: always
+            archive_type: .tar.gz
+            build_os: ubuntu-latest
+    runs-on: ${{ matrix.build_os }}
+    name: Release Rust Tool
     steps:
-      - name: Install Cross
-        shell: bash
-        run: |
-          cargo install cross
-          echo "cargo=cross" >> $GITHUB_ENV
-          echo "target_flags=--target ${{ matrix.target }}" >> $GITHUB_ENV
-          echo "output_dir=target/${{ matrix.target }}" >> $GITHUB_ENV
-
       - name: Check out
         uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: ATiltedTree/setup-rust@v1
+      - name: Release Rust Tool
+        id: release_rust_tool
+        uses: rcook/rust-tool-action@v0.0.20
         with:
-          rust-version: stable
-          targets: ${{ matrix.target }}
-
-      - name: Set variables
-        shell: bash
-        run: |
-          echo "ISOPY_BUILD_VERSION=${{ github.ref_name }}-$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo "archive_file_name=${{ env.project }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.archive_ext }}" >> $GITHUB_ENV
-
-      - name: Build
-        shell: bash
-        run: |
-          ${{ env.cargo }} build --release ${{ env.target_flags }}
-
-      - name: Create archive
-        shell: bash
-        run: |
-          if [ '${{ matrix.archive_ext }}' == '.tar.gz' ]; then
-            tar \
-              -C ${{ env.output_dir }}/${{ env.build_type }} \
-              -czf \
-              ${{ env.archive_file_name }} ${{ env.project }}${{ matrix.executable_ext }}
-          elif [ '${{ matrix.archive_ext }}' == '.zip' ]; then
-            (cd ${{ env.output_dir }}/${{ env.build_type }} && 7z \
-              a \
-              -tzip \
-              ${{ env.archive_file_name }} \
-              ${{ env.project }}${{ matrix.executable_ext }})
-            mv ${{ env.output_dir }}/${{ env.build_type }}/${{ env.archive_file_name }} .
-          else
-            echo 'Unsupported archive extension ${{ matrix.archive_ext }}'
-            exit 1
-          fi
-
-      - name: Generate checksum
-        shell: bash
-        run: |
-          ${{ matrix.sha256sum }} ${{ env.archive_file_name }} > ${{ env.archive_file_name }}.sha256sum
-
-      - name: Create release
-        id: create_release
-        uses: joutvhu/create-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          body: ${{ env.project }} release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload archive
-        uses: actions/upload-release-asset@v1.0.1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.archive_file_name }}
-          asset_name: ${{ env.archive_file_name }}
-          asset_content_type: application/octet-stream
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload checksum
-        uses: actions/upload-release-asset@v1.0.1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.archive_file_name }}.sha256sum
-          asset_name: ${{ env.archive_file_name }}.sha256sum
-          asset_content_type: text/plain
+          tool_name: ${{ env.tool_name }}
+          target: ${{ matrix.target }}
+          executable_ext: ${{ matrix.executable_ext }}
+          archive_type: ${{ matrix.archive_type }}
+          build_type: ${{ env.build_type }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
