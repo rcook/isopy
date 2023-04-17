@@ -46,7 +46,7 @@ jobs:
 
       - name: Release Rust Tool
         id: release_rust_tool
-        uses: rcook/rust-tool-action@v0.0.24
+        uses: rcook/rust-tool-action@v0.0.23
         with:
           tool_name: ${{ env.tool_name }}
           target: ${{ matrix.target }}
