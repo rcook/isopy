@@ -837,6 +837,7 @@ dependencies = [
  "home",
  "include_dir",
  "indicatif",
+ "joatmon",
  "lazy_static",
  "md5",
  "openssl-sys",
@@ -850,7 +851,6 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "sha2",
- "swiss-army-knife",
  "sysinfo",
  "tar",
  "tempdir",
@@ -863,6 +863,23 @@ name = "itoa"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
+
+[[package]]
+name = "joatmon"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52fd441024997d8b84d1c8c865f756300b908cc5eca5ac5f4ff5266c6e42c9e8"
+dependencies = [
+ "anyhow",
+ "colored",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tempdir",
+ "thiserror",
+ "toml",
+ "toml_edit",
+]
 
 [[package]]
 name = "js-sys"
@@ -1575,21 +1592,6 @@ name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
-
-[[package]]
-name = "swiss-army-knife"
-version = "0.0.0"
-source = "git+https://github.com/rcook/swiss-army-knife-rs?tag=v0.0.3#86f627756747ba2321e583e84d0bc88aab638d6e"
-dependencies = [
- "anyhow",
- "colored",
- "serde",
- "serde_json",
- "serde_yaml",
- "tempdir",
- "thiserror",
- "toml",
-]
 
 [[package]]
 name = "syn"
