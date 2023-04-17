@@ -24,8 +24,8 @@ use crate::object_model::RepositoryName;
 use crate::serialization::{RepositoriesRecord, RepositoryRecord};
 use crate::util::{dir_url, RELEASES_URL};
 use anyhow::Result;
+use joatmon::safe_write_file;
 use std::path::{Path, PathBuf};
-use swiss_army_knife::safe_write_file;
 
 pub fn do_generate_repositories_yaml<P>(app: &App, local_repository_dir: P) -> Result<()>
 where

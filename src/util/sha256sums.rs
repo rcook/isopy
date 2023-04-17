@@ -23,10 +23,10 @@ use crate::object_model::Tag;
 use anyhow::{anyhow, Result};
 use hex::decode;
 use include_dir::{include_dir, Dir};
+use joatmon::read_bytes;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::path::Path;
-use swiss_army_knife::read_bytes;
 
 static SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
 

@@ -22,9 +22,9 @@
 use crate::repository::Response;
 use crate::util::{ContentLength, Indicator};
 use anyhow::Result;
+use joatmon::safe_create_file;
 use std::io::Write;
 use std::path::Path;
-use swiss_army_knife::safe_create_file;
 
 pub async fn download_stream<P>(
     label: &str,

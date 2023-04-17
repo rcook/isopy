@@ -22,9 +22,9 @@
 use crate::app::App;
 use crate::object_model::Environment;
 use anyhow::Result;
+use joatmon::safe_write_file;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
-use swiss_army_knife::safe_write_file;
 use tinytemplate::TinyTemplate;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]

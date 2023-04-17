@@ -29,9 +29,9 @@ use crate::serialization::{
 };
 use crate::util::{dir_url, find_project_config_path, osstr_to_str, HexDigest, RELEASES_URL};
 use anyhow::Result;
+use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
-use swiss_army_knife::{read_json_file, read_yaml_file, safe_write_file};
 pub struct RepositoryInfo {
     pub name: RepositoryName,
     pub repository: Box<dyn Repository>,

@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use joatmon::find_sentinel_file;
 use std::path::{Path, PathBuf};
-use swiss_army_knife::find_sentinel_file;
 
 pub const ISOPY_DIR_NAME: &str = ".isopy";
 

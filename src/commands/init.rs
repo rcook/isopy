@@ -24,8 +24,8 @@ use crate::object_model::Project;
 use crate::serialization::ProjectEnvironmentRecord;
 use crate::util::{download_asset, get_asset, unpack_file, PROJECT_CONFIG_FILE_NAME};
 use anyhow::{bail, Result};
+use joatmon::safe_write_file;
 use std::path::PathBuf;
-use swiss_army_knife::safe_write_file;
 
 pub async fn do_init(app: &App) -> Result<()> {
     match app.read_project(&app.cwd)? {

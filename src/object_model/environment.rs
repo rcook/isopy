@@ -24,8 +24,8 @@ use crate::object_model::EnvironmentName;
 use crate::serialization::{NamedEnvironmentRecord, ProjectEnvironmentRecord, UseRecord};
 use crate::util::path_to_str;
 use anyhow::{bail, Result};
+use joatmon::read_yaml_file;
 use std::path::PathBuf;
-use swiss_army_knife::read_yaml_file;
 
 #[derive(Debug)]
 pub struct Environment {
