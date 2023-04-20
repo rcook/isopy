@@ -1,7 +1,7 @@
 # isopy
 
-![Release](https://github.com/rcook/isopy/actions/workflows/release.yaml/badge.svg)
 ![CI](https://github.com/rcook/isopy/actions/workflows/ci.yaml/badge.svg)
+![Release](https://github.com/rcook/isopy/actions/workflows/release.yaml/badge.svg)
 
 [GitHub Pages documentation][github-pages] including [usage][usage]
 
