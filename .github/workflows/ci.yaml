@@ -1,8 +1,5 @@
 name: CI
 
-env:
-  project: isopy
-
 on:
   push:
     branches:
@@ -29,31 +26,8 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             host_os: ubuntu-latest
     runs-on: ${{ matrix.host_os }}
-    env:
-      cargo: cargo
-      CARGO_TERM_COLOR: always
     steps:
-      - name: Set variables
-        shell: bash
-        run: echo "target_flags=--target ${{ matrix.target }}" >> $GITHUB_ENV
-
-      - name: Check out
-        uses: actions/checkout@v3
-
-      - name: Build (debug)
-        run: ${{ env.cargo }} build --verbose ${{ env.target_flags }}
-
-      - name: Run tests (debug)
-        run: ${{ env.cargo }} test --verbose ${{ env.target_flags }}
-
-      - name: Build (release)
-        run: ${{ env.cargo }} build --verbose --release ${{ env.target_flags }}
-
-      - name: Run tests (release)
-        run: ${{ env.cargo }} test --verbose --release ${{ env.target_flags }}
-
-      - name: Run Clippy
-        run: ${{ env.cargo }} clippy ${{ env.target_flags }}
-
-      - name: Run fmt
-        run: ${{ env.cargo }} fmt --check
+      - name: Build and test Rust package
+        uses: rcook/rust-package-action@v0.0.2
+        with:
+          target: ${{ matrix.target }}
