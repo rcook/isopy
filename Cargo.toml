@@ -13,7 +13,7 @@ version = "0.0.30"
 anyhow = "1.0.70"
 async-trait = "0.1.68"
 bytes = "1.4.0"
-clap = { version = "4.1.13", features = ["derive"] }
+clap = { version = "4.2.4", features = ["derive"] }
 colored = "2.0.0"
 flate2 = "1.0.25"
 futures-util = "0.3.28"
@@ -21,16 +21,16 @@ hex = "0.4.3"
 home = "0.5.4"
 include_dir = "0.7.3"
 indicatif = "0.17.3"
-joatmon = "0.0.11"
+joatmon = "0.0.18"
 lazy_static = "1.4.0"
 md5 = "0.7.0"
 path-absolutize = "3.0.14"
-regex = "1.7.3"
+regex = "1.8.1"
 reqwest = { version = "0.11.16", features = ["stream"] }
 rstest = "0.17.0"
 same-file = "1.0.6"
-serde = { version = "1.0.159", features = ["derive"] }
-serde_yaml = "0.9.19"
+serde = { version = "1.0.160", features = ["derive"] }
+serde_yaml = "0.9.21"
 sha2 = "0.10.6"
 sysinfo = "0.28.4"
 tar = "0.4.38"
@@ -41,7 +41,7 @@ tokio = { version = "1.27.0", features = ["full"] }
 exec = "0.3.1"
 
 [target."cfg(target_os = \"linux\")".dependencies]
-openssl-sys = { version = "0.9.84", features = ["vendored"] }
+openssl-sys = { version = "0.9.86", features = ["vendored"] }
 
 [profile.release]
 codegen-units = 1
