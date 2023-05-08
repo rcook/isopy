@@ -32,7 +32,7 @@ same-file = "1.0.6"
 serde = { version = "1.0.160", features = ["derive"] }
 serde_yaml = "0.9.21"
 sha2 = "0.10.6"
-sysinfo = "0.28.4"
+sysinfo = "0.29.0"
 tar = "0.4.38"
 tinytemplate = "1.2.1"
 tokio = { version = "1.28.0", features = ["full"] }
