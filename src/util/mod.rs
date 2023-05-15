@@ -25,7 +25,9 @@ mod hash;
 mod helpers;
 mod indicator;
 mod probe;
+mod repo;
 mod sha256sums;
+mod show;
 mod str;
 mod time;
 mod types;
@@ -40,7 +42,9 @@ pub use self::indicator::Indicator;
 pub use self::probe::{
     default_isopy_dir, find_project_config_path, make_project_config_path, PROJECT_CONFIG_FILE_NAME,
 };
+pub use self::repo::find_dir_info;
 pub use self::sha256sums::validate_sha256_checksum;
+pub use self::show::{print, print_dir_info, print_env, print_link, print_manifest, print_title};
 pub use self::str::{osstr_to_str, osstring_to_string, path_to_str};
 pub use self::time::{to_last_modified, to_system_time};
 pub use self::types::ContentLength;

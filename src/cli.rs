@@ -21,6 +21,7 @@
 //
 use crate::object_model::{EnvironmentName, Tag, Version};
 use clap::{Parser, Subcommand};
+use joat_repo::MetaId;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use std::result::Result;
@@ -40,7 +41,9 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
 )]
 pub struct Args {
     #[arg(global = true, help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]
-    pub dir: Option<PathBuf>,
+    pub cache_dir: Option<PathBuf>,
+    #[arg(global = true, help = "Path to working directory", short = 'c', long = "cwd", value_parser = parse_absolute_path)]
+    pub cwd: Option<PathBuf>,
     #[command(subcommand)]
     pub command: Command,
 }
@@ -53,16 +56,6 @@ pub enum Command {
     )]
     Available,
 
-    #[command(name = "create", about = "Create named Python environment")]
-    Create {
-        #[arg(help = "Environment name", value_parser = parse_environment_name)]
-        environment_name: EnvironmentName,
-        #[arg(help = "Python version", value_parser = parse_version)]
-        version: Version,
-        #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
-        tag: Option<Tag>,
-    },
-
     #[command(name = "download", about = "Download Python package")]
     Download {
         #[arg(help = "Python version", value_parser = parse_version)]
@@ -74,7 +67,10 @@ pub enum Command {
     #[command(name = "downloaded", about = "List downloaded Python package")]
     Downloaded,
 
-    #[command(name = "exec", about = "List downloaded Python package")]
+    #[command(
+        name = "exec",
+        about = "Execute command in shell for current Python environment"
+    )]
     Exec {
         #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_environment_name)]
         environment_name: Option<EnvironmentName>,
@@ -87,20 +83,28 @@ pub enum Command {
         args: Vec<String>,
     },
 
-    #[command(name = "generate-repositories-yaml", about = "(Experimental)")]
-    GenerateRepositoriesYaml {
-        #[arg(help = "Root directory for local repository", value_parser = parse_absolute_path)]
-        local_repository_dir: PathBuf,
-    },
-
     #[command(
         name = "info",
-        about = "Execute command in shell for current Python environment"
+        about = "Show information for current Python environment"
     )]
     Info,
 
     #[command(name = "init", about = "Initialize current Python environment")]
-    Init,
+    Init {
+        #[arg(help = "Python version", value_parser = parse_version)]
+        version: Option<Version>,
+        #[arg(help = "Build tag", value_parser = parse_tag)]
+        tag: Option<Tag>,
+    },
+
+    #[command(
+        name = "link",
+        about = "Use specified named Python environment for current directory"
+    )]
+    Link {
+        #[arg(help = "Meta ID", value_parser = parse_meta_id)]
+        meta_id: MetaId,
+    },
 
     #[command(
         name = "list",
@@ -108,31 +112,8 @@ pub enum Command {
     )]
     List,
 
-    #[command(name = "new", about = "New project Python environment")]
-    New {
-        #[arg(help = "Python version", value_parser = parse_version)]
-        version: Version,
-        #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
-        tag: Option<Tag>,
-    },
-
-    #[command(name = "scratch", about = "(Experimental)")]
-    Scratch,
-
     #[command(name = "shell", about = "Start shell for current Python environment")]
-    Shell {
-        #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_environment_name)]
-        environment_name: Option<EnvironmentName>,
-    },
-
-    #[command(
-        name = "use",
-        about = "Use specified named Python environment for current directory"
-    )]
-    Use {
-        #[arg(help = "Environment name", value_parser = parse_environment_name)]
-        environment_name: EnvironmentName,
-    },
+    Shell,
 
     #[command(name = "wrap", about = "Generate wrapper script for Python script")]
     Wrap {
@@ -162,4 +143,8 @@ fn parse_version(s: &str) -> Result<Version, String> {
 
 fn parse_tag(s: &str) -> Result<Tag, String> {
     Ok(Tag::parse(s))
+}
+
+fn parse_meta_id(s: &str) -> Result<MetaId, String> {
+    MetaId::parse(s).ok_or(String::from("invalid meta ID"))
 }

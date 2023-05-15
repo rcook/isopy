@@ -20,31 +20,23 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod available;
-mod create;
 mod download;
 mod downloaded;
 mod exec;
-mod generate_repositories_yaml;
 mod info;
 mod init;
+mod link;
 mod list;
-mod new;
-mod scratch;
 mod shell;
-mod use_;
 mod wrap;
 
 pub use self::available::do_available;
-pub use self::create::do_create;
 pub use self::download::do_download;
 pub use self::downloaded::do_downloaded;
 pub use self::exec::do_exec;
-pub use self::generate_repositories_yaml::do_generate_repositories_yaml;
 pub use self::info::do_info;
 pub use self::init::do_init;
+pub use self::link::do_link;
 pub use self::list::do_list;
-pub use self::new::do_new;
-pub use self::scratch::do_scratch;
 pub use self::shell::do_shell;
-pub use self::use_::do_use;
 pub use self::wrap::do_wrap;

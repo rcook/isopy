@@ -19,35 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::object_model::RepositoryName;
-use crate::serialization::{RepositoriesRecord, RepositoryRecord};
-use crate::util::{dir_url, RELEASES_URL};
 use anyhow::Result;
-use joatmon::safe_write_file;
-use std::path::{Path, PathBuf};
+use joat_repo::{DirInfo, Link, Repo};
+use std::collections::HashMap;
+use std::path::Path;
 
-pub fn do_generate_repositories_yaml<P>(app: &App, local_repository_dir: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
-    safe_write_file(
-        app.dir.join("repositories.yaml"),
-        serde_yaml::to_string(&RepositoriesRecord {
-            repositories: vec![
-                RepositoryRecord::GitHub {
-                    name: RepositoryName::parse("default").expect("must parse"),
-                    url: dir_url(RELEASES_URL)?,
-                    enabled: true,
-                },
-                RepositoryRecord::Local {
-                    name: RepositoryName::parse("local").expect("must parse"),
-                    dir: PathBuf::from(local_repository_dir.as_ref()),
-                    enabled: true,
-                },
-            ],
-        })?,
-        false,
-    )?;
-    Ok(())
+fn find_link(repo: &Repo, dir: &Path) -> Result<Option<Link>> {
+    let mut map = repo
+        .list_links()?
+        .into_iter()
+        .map(|x| (x.project_dir().to_path_buf(), x))
+        .collect::<HashMap<_, _>>();
+
+    let mut d = dir;
+    loop {
+        if let Some(link) = map.remove(d) {
+            return Ok(Some(link));
+        }
+
+        if let Some(p) = d.parent() {
+            d = p;
+        } else {
+            return Ok(None);
+        }
+    }
+}
+
+pub fn find_dir_info(repo: &Repo, cwd: &Path) -> Result<Option<DirInfo>> {
+    let Some(link) = find_link(repo, cwd)? else {
+        return Ok(None)
+    };
+
+    let Some(dir_info) = repo.get(link.project_dir())? else {
+        return Ok(None)
+    };
+
+    Ok(Some(dir_info))
 }

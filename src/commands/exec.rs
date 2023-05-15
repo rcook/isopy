@@ -30,6 +30,8 @@ pub fn do_exec(
     program: &String,
     args: Vec<String>,
 ) -> Result<()> {
+    todo!();
+    /*
     let mut command = Command::new(program);
     for arg in args {
         command.arg(arg);
@@ -38,4 +40,5 @@ pub fn do_exec(
     let environment = Environment::infer(app, environment_name)?;
     command.exec(&environment)?;
     Ok(())
+    */
 }

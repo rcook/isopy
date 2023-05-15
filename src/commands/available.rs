@@ -36,6 +36,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
         .first()
         .ok_or(anyhow!("No asset repositories are configured"))?;
 
+    /*
     let current_last_modified = app.read_index_last_modified(&repository.name)?;
     if let Some(mut response) = repository
         .repository
@@ -48,6 +49,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
             app.write_index_last_modified(&repository.name, last_modified)?;
         }
     }
+    */
 
     Ok(())
 }

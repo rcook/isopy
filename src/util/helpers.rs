@@ -21,33 +21,34 @@
 //
 use crate::app::App;
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
+use crate::python_info::PythonInfo;
 use crate::util::{download_stream, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
 use std::fs::remove_file;
 use std::path::PathBuf;
 
-pub fn get_asset<'a>(
-    assets: &'a [Asset],
-    version: &Version,
-    tag: &Option<Tag>,
-) -> Result<&'a Asset> {
+pub fn get_asset<'a>(assets: &'a [Asset], python_info: &PythonInfo) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
-    asset_filter.version = Some(version.clone());
-    asset_filter.tag = tag.clone();
+    asset_filter.version = Some(python_info.version.clone());
+    asset_filter.tag = python_info.tag.clone();
     let matching_assets = asset_filter.filter(assets.iter());
     match matching_assets.len() {
         1 => return Ok(matching_assets.first().expect("Must exist")),
         0 => bail!(
             "No asset matching version {} and tag {}",
-            version,
-            tag.as_ref()
+            python_info.version,
+            python_info
+                .tag
+                .as_ref()
                 .map(Tag::to_string)
                 .unwrap_or(String::from("(none)"))
         ),
         _ => bail!(
             "More than one asset matching version {} and tag {}",
-            version,
-            tag.as_ref()
+            python_info.version,
+            python_info
+                .tag
+                .as_ref()
                 .map(Tag::to_string)
                 .unwrap_or(String::from("(none)"))
         ),

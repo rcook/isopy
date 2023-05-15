@@ -20,29 +20,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::object_model::{Tag, Version};
-use crate::serialization::ProjectRecord;
-use crate::util::{get_asset, make_project_config_path};
-use anyhow::Result;
-use joatmon::safe_write_file;
+use crate::util::print_dir_info;
+use anyhow::{bail, Result};
+use joat_repo::MetaId;
 
-pub fn do_new(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let project_config_path = make_project_config_path(&app.cwd);
-    let project_record = ProjectRecord {
-        python_version: version.clone(),
-        tag: tag.clone(),
+pub fn do_link(app: &App, meta_id: &MetaId) -> Result<()> {
+    let Some(dir_info) = app.repo.link(meta_id, &app.cwd)? else {
+        bail!("could not create link");
     };
 
-    // Make sure there's exactly one asset matching this Python version and tag
-    let assets = app.read_assets()?;
-    _ = get_asset(&assets, &project_record.python_version, &project_record.tag)?;
-
-    let s = serde_yaml::to_string(&project_record)?;
-    safe_write_file(&project_config_path, s, false)?;
-    println!(
-        "Wrote project configuration file to {}",
-        project_config_path.display()
-    );
+    print_dir_info(&dir_info);
 
     Ok(())
 }

@@ -21,12 +21,17 @@
 //
 use crate::app::App;
 use crate::object_model::{Tag, Version};
+use crate::python_info::PythonInfo;
 use crate::util::{download_asset, get_asset};
 use anyhow::Result;
 
 pub async fn do_download(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
     let assets = app.read_assets()?;
-    let asset = get_asset(&assets, version, tag)?;
+    let python_info = PythonInfo {
+        version: version.clone(),
+        tag: tag.clone(),
+    };
+    let asset = get_asset(&assets, &python_info)?;
     download_asset(app, asset).await?;
     Ok(())
 }

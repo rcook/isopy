@@ -19,30 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::object_model::{Environment, EnvironmentName};
-use crate::serialization::UseRecord;
-use anyhow::{bail, Result};
-use joatmon::safe_write_file;
+use crate::object_model::{Tag, Version};
 
-pub fn do_use(app: &App, environment_name: &EnvironmentName) -> Result<()> {
-    let use_yaml_path = app.use_dir(&app.cwd)?.join("use.yaml");
-    if use_yaml_path.is_file() {
-        bail!(
-            "Use is already configured for directory {}",
-            app.cwd.display()
-        )
+#[derive(Debug)]
+pub struct PythonInfo {
+    pub version: Version,
+    pub tag: Option<Tag>,
+}
+
+impl PythonInfo {
+    pub fn new(version: Option<Version>, tag: Option<Tag>) -> Option<Self> {
+        let Some(temp) = version else {
+            return None
+        };
+
+        Some(Self { version: temp, tag })
     }
-
-    let environment = Environment::infer(app, Some(environment_name))?;
-
-    safe_write_file(
-        use_yaml_path,
-        serde_yaml::to_string(&UseRecord {
-            dir: app.cwd.clone(),
-            environment_name: environment.name,
-        })?,
-        false,
-    )?;
-    Ok(())
 }

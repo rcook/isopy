@@ -61,6 +61,8 @@ pub fn do_wrap(
     script_path: &Path,
     base_dir: &Path,
 ) -> Result<()> {
+    todo!();
+    /*
     let environment = Environment::infer(app, None)?;
 
     let mut template = TinyTemplate::new();
@@ -81,7 +83,7 @@ pub fn do_wrap(
     )?;
 
     set_file_attributes(wrapper_path)?;
-
+    */
     Ok(())
 }
 

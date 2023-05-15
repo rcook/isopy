@@ -22,7 +22,7 @@
 use joatmon::find_sentinel_file;
 use std::path::{Path, PathBuf};
 
-pub const ISOPY_DIR_NAME: &str = ".isopy";
+pub const ISOPY_DIR_NAME: &str = ".isopy2";
 
 pub const PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
 

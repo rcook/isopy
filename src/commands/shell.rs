@@ -21,11 +21,15 @@
 //
 use crate::app::App;
 use crate::object_model::{Environment, EnvironmentName};
+use crate::serialization::ProjectEnvironmentRecord;
 use crate::shell::{Command, ISOPY_ENV_NAME};
+use crate::util::find_dir_info;
+use crate::util::path_to_str;
 use anyhow::{bail, Result};
+use joatmon::read_yaml_file;
 use std::env::{var, VarError};
 
-pub fn do_shell(app: &App, environment_nam: Option<&EnvironmentName>) -> Result<()> {
+pub fn do_shell(app: &App) -> Result<()> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             bail!("You are already in an isopy shell");
@@ -34,7 +38,17 @@ pub fn do_shell(app: &App, environment_nam: Option<&EnvironmentName>) -> Result<
         Err(e) => return Err(e)?,
     }
 
-    let environment = Environment::infer(app, environment_nam)?;
+    let Some(dir_info) = find_dir_info(&app.repo, &app.cwd)? else {
+        bail!("Could not find environment for directory {}", app.cwd.display())
+    };
+
+    let env_path = dir_info.data_dir().join("env.yaml");
+    let rec = read_yaml_file::<ProjectEnvironmentRecord, _>(&env_path)?;
+    let environment = Environment {
+        name: EnvironmentName::sanitize(path_to_str(&env_path)?),
+        full_python_dir: dir_info.data_dir().join(rec.python_dir_rel),
+    };
+
     Command::new_shell().exec(&environment)?;
     Ok(())
 }

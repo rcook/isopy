@@ -19,10 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#![allow(unused)]
 mod app;
 mod cli;
 mod commands;
 mod object_model;
+mod python_info;
 mod repository;
 mod serialization;
 mod shell;
@@ -31,31 +33,37 @@ mod util;
 use crate::app::App;
 use crate::cli::{Args, Command};
 use crate::commands::{
-    do_available, do_create, do_download, do_downloaded, do_exec, do_generate_repositories_yaml,
-    do_info, do_init, do_list, do_new, do_scratch, do_shell, do_use, do_wrap,
+    do_available, do_download, do_downloaded, do_exec, do_info, do_init, do_link, do_list,
+    do_shell, do_wrap,
 };
+use crate::python_info::PythonInfo;
 use crate::util::{default_isopy_dir, ERROR, OK};
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use clap::Parser;
 use colored::Colorize;
+use joat_repo::RepoConfig;
 use std::env::current_dir;
 use std::process::exit;
 
 async fn run() -> Result<()> {
-    let cwd = current_dir()?;
     let args = Args::parse();
-    let dir = args.dir.or_else(default_isopy_dir).ok_or(anyhow!(
-        "Could not infer isopy cache directory location: please specify using --dir option"
-    ))?;
-    let app = App::new(cwd, dir);
 
+    let cwd = match args.cwd {
+        Some(c) => c,
+        None => current_dir()?,
+    };
+
+    let Some(cache_dir) = args.cache_dir.or_else(default_isopy_dir) else {
+        bail!("Could not infer isopy cache directory location: please specify using --dir option")
+    };
+
+    let Some(repo)= RepoConfig::default(&cache_dir, None).repo()? else{
+        bail!("Could not get repository")
+    };
+
+    let app = App::new(cwd, cache_dir, repo);
     match args.command {
         Command::Available => do_available(&app).await?,
-        Command::Create {
-            environment_name,
-            version,
-            tag,
-        } => do_create(&app, &environment_name, &version, &tag).await?,
         Command::Download { version, tag } => do_download(&app, &version, &tag).await?,
         Command::Downloaded => do_downloaded(&app)?,
         Command::Exec {
@@ -63,16 +71,11 @@ async fn run() -> Result<()> {
             program,
             args,
         } => do_exec(&app, environment_name.as_ref(), &program, args)?,
-        Command::GenerateRepositoriesYaml {
-            local_repository_dir,
-        } => do_generate_repositories_yaml(&app, local_repository_dir)?,
         Command::Info => do_info(&app)?,
-        Command::Init => do_init(&app).await?,
+        Command::Init { version, tag } => do_init(&app, PythonInfo::new(version, tag)).await?,
+        Command::Link { meta_id } => do_link(&app, &meta_id)?,
         Command::List => do_list(&app).await?,
-        Command::New { version, tag } => do_new(&app, &version, &tag)?,
-        Command::Scratch => do_scratch(&app).await?,
-        Command::Shell { environment_name } => do_shell(&app, environment_name.as_ref())?,
-        Command::Use { environment_name } => do_use(&app, &environment_name)?,
+        Command::Shell => do_shell(&app)?,
         Command::Wrap {
             wrapper_path,
             script_path,

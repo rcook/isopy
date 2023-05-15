@@ -20,42 +20,33 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::serialization::ProjectEnvironmentRecord;
+use crate::util::{print_env, print_link, print_manifest, print_title};
 use anyhow::Result;
+use joatmon::read_yaml_file;
 
 pub async fn do_list(app: &App) -> Result<()> {
-    let recs = app.read_named_environments()?;
-    if !recs.is_empty() {
-        println!("Named environments:");
-        for rec in recs {
-            println!(
-                "  {}, {}, {}, {}",
-                rec.name,
-                rec.python_dir_rel.display(),
-                rec.python_version,
-                rec.tag
-            );
+    let manifests = app.repo.list_manifests()?;
+    if !manifests.is_empty() {
+        print_title("Manifests");
+        for (idx, manifest) in manifests.iter().enumerate() {
+            println!("  ({}) {}", idx + 1, manifest.meta_id());
+            print_manifest(manifest);
+
+            let env_yaml_path = manifest.data_dir().join("env.yaml");
+            if env_yaml_path.is_file() {
+                let rec = read_yaml_file::<ProjectEnvironmentRecord, _>(env_yaml_path)?;
+                print_env(&rec);
+            }
         }
     }
 
-    let recs = app.read_project_environments()?;
-    if !recs.is_empty() {
-        println!("Project environments:");
-        for rec in recs {
-            println!(
-                "  {}, {}, {}, {}",
-                rec.config_path.display(),
-                rec.python_dir_rel.display(),
-                rec.python_version,
-                rec.tag
-            );
-        }
-    }
-
-    let recs = app.read_uses()?;
-    if !recs.is_empty() {
-        println!("Uses:");
-        for rec in recs {
-            println!("  {}, {}", rec.dir.display(), rec.environment_name);
+    let links = app.repo.list_links()?;
+    if !links.is_empty() {
+        print_title("Links");
+        for (idx, link) in links.iter().enumerate() {
+            println!("  ({}) {} -> {}", idx + 1, link.link_id(), link.meta_id());
+            print_link(link);
         }
     }
 

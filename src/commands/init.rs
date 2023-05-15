@@ -20,39 +20,57 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::object_model::Project;
+use crate::object_model::{Project, Tag, Version};
+use crate::python_info::PythonInfo;
 use crate::serialization::ProjectEnvironmentRecord;
 use crate::util::{download_asset, get_asset, unpack_file, PROJECT_CONFIG_FILE_NAME};
 use anyhow::{bail, Result};
+use joat_repo::DirInfo;
 use joatmon::safe_write_file;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-pub async fn do_init(app: &App) -> Result<()> {
-    match app.read_project(&app.cwd)? {
-        None => bail!(
-            "Could not find project configuration file {}",
-            PROJECT_CONFIG_FILE_NAME
-        ),
-        Some(project) => Ok(init_project(app, &project).await?),
+pub async fn do_init(app: &App, python_info: Option<PythonInfo>) -> Result<()> {
+    if let Some(temp) = python_info {
+        init_project(app, &temp, &app.cwd).await?;
+    } else {
+        let Some(project) = app.read_project(&app.cwd)? else {
+            bail!(
+                "Could not find project configuration file {}",
+                PROJECT_CONFIG_FILE_NAME
+            )
+        };
+        let python_info = PythonInfo {
+            version: project.python_version,
+            tag: project.tag,
+        };
+        init_project(app, &python_info, &project.config_path).await?;
     }
+
+    Ok(())
 }
 
-async fn init_project(app: &App, project: &Project) -> Result<()> {
+async fn init_project(app: &App, python_info: &PythonInfo, config_path: &Path) -> Result<()> {
     let assets = app.read_assets()?;
-    let asset = get_asset(&assets, &project.python_version, &project.tag)?;
+    let asset = get_asset(&assets, python_info)?;
 
     let mut asset_path = app.make_asset_path(asset);
     if !asset_path.is_file() {
         asset_path = download_asset(app, asset).await?;
     }
 
-    let dir = app.project_environment_dir(&project.config_path)?;
-    unpack_file(&asset_path, &dir)?;
+    let Some(dir_info) = app.repo.init(&app.cwd)? else {
+        bail!(
+            "Could not initialize metadirectory for directory {}",
+            app.cwd.display()
+        )
+    };
+
+    unpack_file(&asset_path, dir_info.data_dir())?;
 
     safe_write_file(
-        dir.join("env.yaml"),
+        dir_info.data_dir().join("env.yaml"),
         serde_yaml::to_string(&ProjectEnvironmentRecord {
-            config_path: project.config_path.clone(),
+            config_path: config_path.to_path_buf(),
             python_dir_rel: PathBuf::from("python"),
             python_version: asset.meta.version.clone(),
             tag: asset.tag.clone(),
