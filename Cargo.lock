@@ -834,9 +834,9 @@ checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 
 [[package]]
 name = "joatmon"
-version = "0.0.20"
+version = "0.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c77d2692f24d57ae56d50f542b1f2d5e0c65cb04503f8c9cfb9867d4d2d37e0d"
+checksum = "db3a9799b3f7aae3ee0c862bf9c181137e068c51caac9b2f3c2bd35ba2965053"
 dependencies = [
  "anyhow",
  "rstest",
