@@ -28,12 +28,9 @@ md5 = "0.7.0"
 path-absolutize = "3.1.0"
 regex = "1.8.1"
 reqwest = { version = "0.11.17", features = ["stream"] }
-rstest = "0.17.0"
-same-file = "1.0.6"
 serde = { version = "1.0.163", features = ["derive"] }
 serde_yaml = "0.9.21"
 sha2 = "0.10.6"
-sysinfo = "0.29.0"
 tar = "0.4.38"
 tinytemplate = "1.2.1"
 tokio = { version = "1.28.1", features = ["full"] }
@@ -49,3 +46,6 @@ codegen-units = 1
 lto = true
 opt-level = "z"
 strip = true
+
+[dev-dependencies]
+rstest = "0.17.0"
