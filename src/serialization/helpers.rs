@@ -19,25 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{EnvironmentName, LastModified, RepositoryName, Tag, Version};
+use crate::object_model::{LastModified, RepositoryName, Tag, Version};
 use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
-
-pub fn deserialize_environment_name<'de, D>(deserializer: D) -> Result<EnvironmentName, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s = String::deserialize(deserializer)?;
-    EnvironmentName::parse(s).ok_or(Error::custom("failed to parse environment name"))
-}
-
-pub fn serialize_environment_name<S>(x: &EnvironmentName, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    s.serialize_str(x.as_str())
-}
 
 pub fn serialize_last_modified<S>(x: &LastModified, s: S) -> Result<S::Ok, S::Error>
 where
