@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Result};
+
 #[derive(Debug, PartialEq)]
 pub enum ArchiveType {
     TarGZ,
@@ -26,18 +28,15 @@ pub enum ArchiveType {
 }
 
 impl ArchiveType {
-    pub fn parse<S>(s: S) -> Option<(Self, String)>
-    where
-        S: AsRef<str>,
-    {
-        let s0 = s.as_ref();
+    pub fn parse(s: &str) -> Result<(Self, String)> {
+        let s0 = s;
         for (ext, archive_type) in [(".tar.gz", Self::TarGZ), (".tar.zst", Self::TarZST)] {
             if s0.ends_with(ext) {
                 let ext_len = ext.len();
                 let base_name = &s0[..s0.len() - ext_len];
-                return Some((archive_type, String::from(base_name)));
+                return Ok((archive_type, String::from(base_name)));
             }
         }
-        None
+        bail!("Unsupported archive type \"{}\"", s)
     }
 }

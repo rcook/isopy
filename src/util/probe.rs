@@ -19,12 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::util::{ISOPY_DIR_NAME, PROJECT_CONFIG_FILE_NAME};
 use joatmon::find_sentinel_file;
 use std::path::{Path, PathBuf};
-
-pub const ISOPY_DIR_NAME: &str = ".isopy2";
-
-pub const PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
 
 pub fn default_isopy_dir() -> Option<PathBuf> {
     let home_dir = home::home_dir()?;

@@ -26,7 +26,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectEnvironmentRecord {
-    #[serde(rename = "dir_config_path")]
+    #[serde(rename = "config_path")]
     pub config_path: PathBuf,
     #[serde(rename = "python_dir")]
     pub python_dir_rel: PathBuf,

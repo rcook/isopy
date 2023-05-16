@@ -23,6 +23,10 @@ use crate::app::App;
 use crate::object_model::AssetFilter;
 use crate::util::{download_stream, print};
 use anyhow::{anyhow, Result};
+use chrono::{DateTime, SecondsFormat, Utc};
+use joatmon::safe_back_up;
+use log::info;
+use std::fs::remove_file;
 
 pub async fn do_available(app: &App) -> Result<()> {
     update_index_if_necessary(app).await?;
@@ -36,7 +40,6 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
         .first()
         .ok_or(anyhow!("No asset repositories are configured"))?;
 
-    /*
     let current_last_modified = app.read_index_last_modified(&repository.name)?;
     if let Some(mut response) = repository
         .repository
@@ -44,12 +47,21 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
         .await?
     {
         let index_json_path = app.get_index_json_path(&repository.name);
+        if index_json_path.exists() {
+            let safe_back_up = safe_back_up(&index_json_path)?;
+            info!(
+                "Index file {} backed up to {}",
+                index_json_path.display(),
+                safe_back_up.display()
+            );
+            remove_file(&index_json_path)?;
+        }
+
         download_stream("index", &mut response, index_json_path).await?;
         if let Some(last_modified) = response.last_modified() {
             app.write_index_last_modified(&repository.name, last_modified)?;
         }
     }
-    */
 
     Ok(())
 }

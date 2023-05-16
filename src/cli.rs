@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::object_model::{EnvironmentName, Tag, Version};
-use clap::{Parser, Subcommand};
+use clap::{Args as ClapArgs, Parser, Subcommand};
 use joat_repo::MetaId;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
@@ -40,10 +40,12 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
     after_help = format!("{}\nhttps://github.com/rcook/isopy{}", PACKAGE_HOME_PAGE, PACKAGE_BUILD_VERSION.map(|x| format!("\n\n{}", x)).unwrap_or(String::from("")))
 )]
 pub struct Args {
-    #[arg(global = true, help = "Path to isopy cache directory", short = 'd', long = "dir", value_parser = parse_absolute_path)]
+    #[arg(global = true, help = "Path to isopy cache directory", long = "cache-dir", value_parser = parse_absolute_path)]
     pub cache_dir: Option<PathBuf>,
+
     #[arg(global = true, help = "Path to working directory", short = 'c', long = "cwd", value_parser = parse_absolute_path)]
     pub cwd: Option<PathBuf>,
+
     #[command(subcommand)]
     pub command: Command,
 }
@@ -57,24 +59,13 @@ pub enum Command {
     Available,
 
     #[command(name = "download", about = "Download Python package")]
-    Download {
-        #[arg(help = "Python version", value_parser = parse_version)]
-        version: Version,
-        #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
-        tag: Option<Tag>,
-    },
+    Download(PythonVersion),
 
-    #[command(name = "downloaded", about = "List downloaded Python package")]
+    #[command(name = "downloaded", about = "List downloaded Python packages")]
     Downloaded,
 
-    #[command(
-        name = "exec",
-        about = "Execute command in shell for current Python environment"
-    )]
+    #[command(name = "exec", about = "Execute command in Python environment")]
     Exec {
-        #[arg(help = "Environment name", short = 'e', long = "env", value_parser = parse_environment_name)]
-        environment_name: Option<EnvironmentName>,
-
         #[arg(help = "Program to run in environment")]
         program: String,
 
@@ -84,46 +75,58 @@ pub enum Command {
     },
 
     #[command(
-        name = "info",
-        about = "Show information for current Python environment"
+        name = "gen-config",
+        about = "Generate .python-version.yaml Python configuration file"
     )]
+    GenConfig(PythonVersion),
+
+    #[command(name = "info", about = "Show information")]
     Info,
 
-    #[command(name = "init", about = "Initialize current Python environment")]
-    Init {
-        #[arg(help = "Python version", value_parser = parse_version)]
-        version: Option<Version>,
-        #[arg(help = "Build tag", value_parser = parse_tag)]
-        tag: Option<Tag>,
-    },
+    #[command(name = "init", about = "Create Python environment")]
+    Init(PythonVersion),
+
+    #[command(
+        name = "init-config",
+        about = "Create Python environment from .python-version.yaml configuration file"
+    )]
+    InitConfig,
 
     #[command(
         name = "link",
-        about = "Use specified named Python environment for current directory"
+        about = "Use existing Python environment for current directory"
     )]
     Link {
         #[arg(help = "Meta ID", value_parser = parse_meta_id)]
         meta_id: MetaId,
     },
 
-    #[command(
-        name = "list",
-        about = "List named and project Python environments and uses"
-    )]
+    #[command(name = "list", about = "List Python environments")]
     List,
 
-    #[command(name = "shell", about = "Start shell for current Python environment")]
+    #[command(name = "shell", about = "Start Python environment shell")]
     Shell,
 
     #[command(name = "wrap", about = "Generate wrapper script for Python script")]
     Wrap {
         #[arg(help = "Wrapper path", value_parser = parse_absolute_path)]
         wrapper_path: PathBuf,
+
         #[arg(help = "Script path", value_parser = parse_absolute_path)]
         script_path: PathBuf,
+
         #[arg(help = "Base directory", value_parser = parse_absolute_path)]
         base_dir: PathBuf,
     },
+}
+
+#[derive(ClapArgs, Debug)]
+pub struct PythonVersion {
+    #[arg(help = "Python version", value_parser = parse_version)]
+    pub version: Version,
+
+    #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
+    pub tag: Option<Tag>,
 }
 
 fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
@@ -138,7 +141,7 @@ fn parse_environment_name(s: &str) -> Result<EnvironmentName, String> {
 }
 
 fn parse_version(s: &str) -> Result<Version, String> {
-    Version::parse(s).ok_or(String::from("invalid version"))
+    Version::parse(s).map_err(|_| String::from("invalid version"))
 }
 
 fn parse_tag(s: &str) -> Result<Tag, String> {

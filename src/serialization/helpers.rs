@@ -74,7 +74,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    Ok(Tag::parse(s))
+    Ok(Tag::parse(&s))
 }
 
 pub fn serialize_tag<S>(x: &Tag, s: S) -> Result<S::Ok, S::Error>
@@ -90,7 +90,7 @@ where
 {
     let s_opt: Option<String> = Option::deserialize(deserializer)?;
     if let Some(s) = s_opt {
-        Ok(Some(Tag::parse(s)))
+        Ok(Some(Tag::parse(&s)))
     } else {
         Ok(None)
     }
@@ -126,7 +126,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    Version::parse(s).ok_or(Error::custom("Failed to parse version"))
+    Version::parse(&s).map_err(Error::custom)
 }
 
 pub fn serialize_version<S>(x: &Version, s: S) -> Result<S::Ok, S::Error>

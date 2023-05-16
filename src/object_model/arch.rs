@@ -19,10 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Result};
+
 #[derive(Debug, PartialEq)]
 pub enum Arch {
     AArch64,
     I686,
+    PPC64LE,
     X86_64,
     X86_64V2,
     X86_64V3,
@@ -30,18 +33,16 @@ pub enum Arch {
 }
 
 impl Arch {
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: AsRef<str>,
-    {
-        Some(match s.as_ref() {
+    pub fn parse(s: &str) -> Result<Self> {
+        Ok(match s.as_ref() {
             "aarch64" => Self::AArch64,
             "i686" => Self::I686,
+            "ppc64le" => Self::PPC64LE,
             "x86_64" => Self::X86_64,
             "x86_64_v2" => Self::X86_64V2,
             "x86_64_v3" => Self::X86_64V3,
             "x86_64_v4" => Self::X86_64V4,
-            _ => return None,
+            _ => bail!("Unsupported architecture \"{}\"", s),
         })
     }
 }

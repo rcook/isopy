@@ -23,8 +23,8 @@
 mod app;
 mod cli;
 mod commands;
+mod logging;
 mod object_model;
-mod python_info;
 mod repository;
 mod serialization;
 mod shell;
@@ -33,15 +33,16 @@ mod util;
 use crate::app::App;
 use crate::cli::{Args, Command};
 use crate::commands::{
-    do_available, do_download, do_downloaded, do_exec, do_info, do_init, do_link, do_list,
-    do_shell, do_wrap,
+    do_available, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
+    do_init_config, do_link, do_list, do_shell, do_wrap,
 };
-use crate::python_info::PythonInfo;
+use crate::logging::init_logging;
 use crate::util::{default_isopy_dir, print_error, ERROR, OK};
 use anyhow::{bail, Result};
 use clap::Parser;
 use colored::Colorize;
 use joat_repo::RepoConfig;
+use log::LevelFilter;
 use std::env::current_dir;
 use std::process::exit;
 
@@ -64,15 +65,13 @@ async fn run() -> Result<()> {
     let app = App::new(cwd, cache_dir, repo);
     match args.command {
         Command::Available => do_available(&app).await?,
-        Command::Download { version, tag } => do_download(&app, &version, &tag).await?,
+        Command::Download(python_version) => do_download(&app, &python_version).await?,
         Command::Downloaded => do_downloaded(&app)?,
-        Command::Exec {
-            environment_name,
-            program,
-            args,
-        } => do_exec(&app, environment_name.as_ref(), &program, args)?,
+        Command::Exec { program, args } => do_exec(&app, &program, &args)?,
+        Command::GenConfig(python_version) => do_gen_config(&app, &python_version).await?,
         Command::Info => do_info(&app)?,
-        Command::Init { version, tag } => do_init(&app, PythonInfo::new(version, tag)).await?,
+        Command::Init(python_version) => do_init(&app, &python_version).await?,
+        Command::InitConfig => do_init_config(&app).await?,
         Command::Link { meta_id } => do_link(&app, &meta_id)?,
         Command::List => do_list(&app).await?,
         Command::Shell => do_shell(&app)?,
@@ -88,6 +87,7 @@ async fn run() -> Result<()> {
 
 #[tokio::main]
 async fn main() {
+    init_logging(LevelFilter::Info);
     exit(match run().await {
         Ok(_) => OK,
         Err(e) => {

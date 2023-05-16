@@ -23,11 +23,8 @@
 pub struct Tag(String);
 
 impl Tag {
-    pub fn parse<S>(s: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self(s.into())
+    pub fn parse(s: &str) -> Self {
+        Self(String::from(s))
     }
 
     pub fn as_str(&self) -> &str {

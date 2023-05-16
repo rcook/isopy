@@ -21,12 +21,13 @@
 //
 use super::{Repository, Response, Stream};
 use crate::object_model::{Asset, LastModified};
-use crate::util::{dir_url, ContentLength};
+use crate::util::{dir_url, file_url, ContentLength};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures_util::stream::Stream as FuturesStream;
 use futures_util::StreamExt;
+use log::info;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, IntoUrl, Response as ReqwestResponse, StatusCode, Url};
 use std::pin::Pin;
@@ -37,6 +38,7 @@ type PinnedStream = Pin<Box<dyn FuturesStream<Item = reqwest::Result<Bytes>> + S
 
 pub struct GitHubRepository {
     url: Url,
+    temp: Url,
     client: Client,
 }
 
@@ -45,8 +47,10 @@ impl GitHubRepository {
     where
         U: IntoUrl,
     {
+        let temp = url.into_url()?;
         Ok(Self {
-            url: dir_url(url)?,
+            url: dir_url(temp.clone())?,
+            temp: file_url(temp.clone())?,
             client: Client::new(),
         })
     }
@@ -67,7 +71,13 @@ impl Repository for GitHubRepository {
             head_request = head_request.header(IF_MODIFIED_SINCE, x.as_str());
         }
 
-        let head_response = head_request.send().await?.error_for_status()?;
+        let raw_response = head_request.send().await?;
+        if raw_response.status() == StatusCode::FORBIDDEN {
+            info!("Rate limited");
+            return Ok(None);
+        }
+
+        let head_response = raw_response.error_for_status()?;
         if head_response.status() == StatusCode::NOT_MODIFIED {
             return Ok(None);
         }
@@ -82,7 +92,7 @@ impl Repository for GitHubRepository {
 
         let index_request = self
             .client
-            .get(self.url.clone())
+            .get(self.temp.clone())
             .header(USER_AGENT, ISOPY_USER_AGENT);
         let index_response = index_request.send().await?;
         Ok(Some(Box::new(GitHubResponse::new(

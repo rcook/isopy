@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Result};
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Version {
     major: i32,
@@ -37,20 +39,17 @@ impl Version {
         }
     }
 
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: AsRef<str>,
-    {
-        let parts = s.as_ref().split('.').collect::<Vec<_>>();
+    pub fn parse(s: &str) -> Result<Self> {
+        let parts = s.split('.').collect::<Vec<_>>();
         if parts.len() != 3 {
-            return None;
+            bail!("Invalid version \"{}\"", s)
         }
 
-        let major = parts[0].parse().ok()?;
-        let minor = parts[1].parse().ok()?;
-        let build = parts[2].parse().ok()?;
+        let major = parts[0].parse()?;
+        let minor = parts[1].parse()?;
+        let build = parts[2].parse()?;
 
-        Some(Version::new(major, minor, build))
+        Ok(Version::new(major, minor, build))
     }
 
     pub fn as_str(&self) -> &str {
@@ -61,10 +60,12 @@ impl Version {
 #[cfg(test)]
 mod tests {
     use super::Version;
+    use anyhow::Result;
 
     #[test]
-    fn test_parse() {
-        assert_eq!(Some(Version::new(1, 2, 3)), Version::parse("1.2.3"))
+    fn test_parse() -> Result<()> {
+        assert_eq!(Version::new(1, 2, 3), Version::parse("1.2.3")?);
+        Ok(())
     }
 }
 

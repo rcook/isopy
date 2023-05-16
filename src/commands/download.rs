@@ -20,12 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::cli::PythonVersion;
 use crate::object_model::{Tag, Version};
-use crate::python_info::PythonInfo;
 use crate::util::{download_asset, get_asset};
 use anyhow::Result;
 
-pub async fn do_download(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
+pub async fn do_download(app: &App, python_version: &PythonVersion) -> Result<()> {
+    dbg!(python_version);
+    /*
+    todo!();
     let assets = app.read_assets()?;
     let python_info = PythonInfo {
         version: version.clone(),
@@ -33,5 +36,6 @@ pub async fn do_download(app: &App, version: &Version, tag: &Option<Tag>) -> Res
     };
     let asset = get_asset(&assets, &python_info)?;
     download_asset(app, asset).await?;
+     */
     Ok(())
 }

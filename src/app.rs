@@ -28,7 +28,7 @@ use crate::serialization::{
     RepositoriesRecord, RepositoryRecord,
 };
 use crate::util::{dir_url, find_project_config_path, osstr_to_str, HexDigest, RELEASES_URL};
-use anyhow::Result;
+use anyhow::{bail, Result};
 use joat_repo::{DirInfo, Link, MetaId, Repo};
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::fs::read_dir;
@@ -143,7 +143,7 @@ impl App {
         for package_record in package_records {
             for asset_record in package_record.assets {
                 if !AssetMeta::definitely_not_an_asset_name(&asset_record.name) {
-                    let meta = AssetMeta::parse(&asset_record.name).expect("Should parse");
+                    let meta = AssetMeta::parse(&asset_record.name)?;
                     assets.push(Asset {
                         name: asset_record.name,
                         tag: package_record.tag.clone(),

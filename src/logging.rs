@@ -19,22 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{anyhow, Result};
+use log::{set_logger, set_max_level, Level, LevelFilter, Log, Metadata, Record, SetLoggerError};
 
-#[derive(Debug, PartialEq)]
-pub enum Platform {
-    Pc,
-    Apple,
-    Unknown,
+static LOGGER: SimpleLogger = SimpleLogger;
+
+struct SimpleLogger;
+
+impl Log for SimpleLogger {
+    fn enabled(&self, metadata: &Metadata) -> bool {
+        metadata.level() <= Level::Info
+    }
+
+    fn log(&self, record: &Record) {
+        if self.enabled(record.metadata()) {
+            println!("{} - {}", record.level(), record.args());
+        }
+    }
+
+    fn flush(&self) {}
 }
 
-impl Platform {
-    pub fn parse(s: &str) -> Result<Self> {
-        Ok(match s {
-            "pc" => Self::Pc,
-            "apple" => Self::Apple,
-            "unknown" => Self::Unknown,
-            _ => bail!("Unsupported platform \"{}\"", s),
-        })
-    }
+pub fn init_logging(filter: LevelFilter) -> Result<()> {
+    set_logger(&LOGGER).map_err(|e| anyhow!(e))?;
+    set_max_level(filter);
+    Ok(())
 }

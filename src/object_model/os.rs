@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Result};
+
 #[derive(Debug, PartialEq)]
 pub enum OS {
     Darwin,
@@ -27,15 +29,12 @@ pub enum OS {
 }
 
 impl OS {
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: AsRef<str>,
-    {
-        Some(match s.as_ref() {
+    pub fn parse(s: &str) -> Result<Self> {
+        Ok(match s {
             "darwin" => Self::Darwin,
             "linux" => Self::Linux,
             "windows" => Self::Windows,
-            _ => return None,
+            _ => bail!("Unsupported OS \"{}\"", s),
         })
     }
 }

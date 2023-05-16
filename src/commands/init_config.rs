@@ -19,22 +19,34 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
+use crate::cli::PythonVersion;
+use crate::object_model::{Project, Tag, Version};
+use crate::serialization::{ProjectEnvironmentRecord, ProjectRecord};
+use crate::util::{download_asset, get_asset, init_project, unpack_file, PROJECT_CONFIG_FILE_NAME};
 use anyhow::{bail, Result};
+use joat_repo::DirInfo;
+use joatmon::read_yaml_file;
+use std::path::{Path, PathBuf};
 
-#[derive(Debug, PartialEq)]
-pub enum Platform {
-    Pc,
-    Apple,
-    Unknown,
-}
+pub async fn do_init_config(app: &App) -> Result<()> {
+    let config_path = app.cwd.join(PROJECT_CONFIG_FILE_NAME);
 
-impl Platform {
-    pub fn parse(s: &str) -> Result<Self> {
-        Ok(match s {
-            "pc" => Self::Pc,
-            "apple" => Self::Apple,
-            "unknown" => Self::Unknown,
-            _ => bail!("Unsupported platform \"{}\"", s),
-        })
+    if let Some(dir_info) = app.repo.get(&app.cwd)? {
+        bail!(
+            "Directory {} already has Python environment",
+            app.cwd.display()
+        )
     }
+
+    let rec = read_yaml_file::<ProjectRecord, _>(&config_path)?;
+
+    let python_version = PythonVersion {
+        version: rec.python_version,
+        tag: rec.tag,
+    };
+
+    init_project(app, &python_version, &config_path).await?;
+
+    Ok(())
 }

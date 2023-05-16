@@ -26,11 +26,12 @@ use anyhow::Result;
 use std::fs::read_dir;
 
 pub fn do_downloaded(app: &App) -> Result<()> {
-    for e in read_dir(app.repo.shared_dir())? {
-        let temp = e?;
-        let asset_name = String::from(temp.file_name().to_str().expect("Must be a valid string"));
-        if AssetMeta::parse(&asset_name).is_some() {
-            print(&asset_name)
+    for result in read_dir(app.repo.shared_dir())? {
+        let entry = result?;
+        let file_name = entry.file_name();
+        let asset_name = file_name.to_str().expect("must be valid");
+        if AssetMeta::parse(asset_name).is_ok() {
+            print(asset_name)
         }
     }
     Ok(())

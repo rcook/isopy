@@ -19,20 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{Tag, Version};
+use crate::app::App;
+use crate::cli::PythonVersion;
+use crate::object_model::{Project, Tag, Version};
+use crate::serialization::{ProjectEnvironmentRecord, ProjectRecord};
+use crate::util::{download_asset, get_asset, unpack_file, PROJECT_CONFIG_FILE_NAME};
+use anyhow::{bail, Result};
+use joat_repo::DirInfo;
+use joatmon::safe_write_file;
+use std::path::{Path, PathBuf};
 
-#[derive(Debug)]
-pub struct PythonInfo {
-    pub version: Version,
-    pub tag: Option<Tag>,
-}
+pub async fn do_gen_config(app: &App, python_version: &PythonVersion) -> Result<()> {
+    let config_path = app.cwd.join(PROJECT_CONFIG_FILE_NAME);
 
-impl PythonInfo {
-    pub fn new(version: Option<Version>, tag: Option<Tag>) -> Option<Self> {
-        let Some(temp) = version else {
-            return None
-        };
+    let rec = ProjectRecord {
+        python_version: python_version.version.clone(),
+        tag: python_version.tag.clone(),
+    };
 
-        Some(Self { version: temp, tag })
-    }
+    let yaml_str = serde_yaml::to_string(&rec)?;
+
+    safe_write_file(config_path, yaml_str, false)?;
+
+    Ok(())
 }

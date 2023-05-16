@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, Version, OS};
+use anyhow::{bail, Result};
 
 #[derive(Debug, PartialEq)]
 pub struct AssetMeta {
@@ -45,28 +46,36 @@ impl AssetMeta {
         }
     }
 
-    pub fn parse(s: &str) -> Option<Self> {
-        fn parse_version_and_tag_opt(s: &str) -> Option<(Version, Option<Tag>)> {
+    pub fn parse(s: &str) -> Result<Self> {
+        fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
+            match result {
+                Some(value) => Ok(value),
+                None => bail!("Missing {} from asset name \"{}\"", label, s),
+            }
+        }
+
+        fn parse_version_and_tag_opt(s: &str) -> Result<(Version, Option<Tag>)> {
             let parts = s.split('+').collect::<Vec<_>>();
             let (version_str, tag) = match parts.len() {
                 1 => (parts[0], None),
                 2 => (parts[0], Some(Tag::parse(parts[1]))),
-                _ => return None,
+                _ => bail!("Invalid version/tag \"{}\"", s),
             };
 
             let version = Version::parse(version_str)?;
-            Some((version, tag))
+            Ok((version, tag))
         }
 
         let (archive_type, base_name) = ArchiveType::parse(s)?;
 
         let mut iter = base_name.split('-');
 
-        let family = Family::parse(iter.next()?)?;
-        let (version, mut tag_opt) = parse_version_and_tag_opt(iter.next()?)?;
-        let arch = Arch::parse(iter.next()?)?;
-        let platform = Platform::parse(iter.next()?)?;
-        let os = OS::parse(iter.next()?)?;
+        let family = Family::parse(wrap(s, "family", iter.next())?)?;
+        let (version, mut tag_opt) =
+            parse_version_and_tag_opt(wrap(s, "version/tag", iter.next())?)?;
+        let arch = Arch::parse(wrap(s, "architecture", iter.next())?)?;
+        let platform = Platform::parse(wrap(s, "platform", iter.next())?)?;
+        let os = OS::parse(wrap(s, "OS", iter.next())?)?;
 
         let mut need_flavour = true;
         let mut flavour_opt = None;
@@ -78,7 +87,7 @@ impl AssetMeta {
         let mut variant_opt = None;
         let mut need_tag = tag_opt.is_none();
         while need_flavour || need_subflavour0 || need_subflavour1 || need_variant || need_tag {
-            let temp = iter.next()?;
+            let temp = wrap(s, "flavour/subflavour/variant/tag", iter.next())?;
             if need_flavour {
                 need_flavour = false;
                 flavour_opt = Flavour::parse(temp);
@@ -119,7 +128,7 @@ impl AssetMeta {
             unimplemented!()
         }
 
-        Some(Self {
+        Ok(Self {
             archive_type,
             family,
             version,
@@ -140,6 +149,7 @@ mod tests {
     use super::super::{
         Arch, ArchiveType, AssetMeta, Family, Platform, Subflavour, Tag, Variant, Version, OS,
     };
+    use anyhow::Result;
     use rstest::rstest;
 
     #[rstest]
@@ -155,7 +165,7 @@ mod tests {
             subflavour0: Some(Subflavour::Debug),
             subflavour1: None,
             variant: Some(Variant::Full),
-            parsed_tag: Tag::parse(String::from("20230116"))
+            parsed_tag: Tag::parse("20230116")
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
     )]
@@ -171,7 +181,7 @@ mod tests {
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
-            parsed_tag: Tag::parse(String::from("20230116"))
+            parsed_tag: Tag::parse("20230116")
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
     )]
@@ -187,7 +197,7 @@ mod tests {
             subflavour0: Some(Subflavour::Debug),
             subflavour1: None,
             variant: None,
-            parsed_tag: Tag::parse(String::from("20220220T1113"))
+            parsed_tag: Tag::parse("20220220T1113")
         },
         "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"
     )]
@@ -203,12 +213,13 @@ mod tests {
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
-            parsed_tag: Tag::parse(String::from("20210724T1424"))
+            parsed_tag: Tag::parse("20210724T1424")
         },
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
     )]
-    fn test_parse(#[case] expected_result: AssetMeta, #[case] input: &str) {
-        assert_eq!(Some(expected_result), AssetMeta::parse(input))
+    fn test_parse(#[case] expected_result: AssetMeta, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_result, AssetMeta::parse(input)?);
+        Ok(())
     }
 
     #[rstest]
