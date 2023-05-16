@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::ProjectEnvironmentRecord;
+use crate::serialization::EnvRec;
 use colored::Colorize;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use std::fmt::Display;
@@ -72,12 +72,12 @@ pub fn print_repo(repo: &Repo) {
     print_value("Shared directory", repo.shared_dir().display());
 }
 
-pub fn print_metadir(manifest: &Manifest, env_opt: &Option<ProjectEnvironmentRecord>) {
-    if let Some(env) = env_opt {
-        print_value("Project path", env.config_path.display());
-        print_value("Python version", env.python_version.as_str());
-        print_value("Python build tag", env.tag.as_str());
-        print_value("Python directory", env.python_dir_rel.display());
+pub fn print_metadir(manifest: &Manifest, rec_opt: &Option<EnvRec>) {
+    if let Some(rec) = rec_opt {
+        print_value("Project path", rec.config_path.display());
+        print_value("Python version", rec.version.as_str());
+        print_value("Python build tag", rec.tag.as_str());
+        print_value("Python directory", rec.python_dir_rel.display());
     } else {
         print_value(
             "Original project directory",

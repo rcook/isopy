@@ -19,16 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::deserialize_url;
-use reqwest::Url;
+use super::helpers::deserialize_tag;
+use super::AssetRec;
+use crate::object_model::Tag;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-pub struct AssetRecord {
-    #[serde(rename = "browser_download_url", deserialize_with = "deserialize_url")]
-    pub url: Url,
-    #[serde(rename = "name")]
-    pub name: String,
-    #[serde(rename = "size")]
-    pub size: i64,
+pub struct PackageRec {
+    #[serde(rename = "tag_name", deserialize_with = "deserialize_tag")]
+    pub tag: Tag,
+
+    #[serde(rename = "assets")]
+    pub assets: Vec<AssetRec>,
 }

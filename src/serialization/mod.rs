@@ -19,19 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod asset_record;
+mod asset_rec;
+mod env_rec;
 mod helpers;
-mod index_record;
-mod package_record;
-mod project_environment_record;
-mod project_record;
-mod repositories_record;
-mod repository_record;
+mod index_rec;
+mod package_rec;
+mod python_version_rec;
+mod repositories_rec;
+mod repository_rec;
 
-pub use self::asset_record::AssetRecord;
-pub use self::index_record::IndexRecord;
-pub use self::package_record::PackageRecord;
-pub use self::project_environment_record::ProjectEnvironmentRecord;
-pub use self::project_record::ProjectRecord;
-pub use self::repositories_record::RepositoriesRecord;
-pub use self::repository_record::RepositoryRecord;
+pub use self::asset_rec::AssetRec;
+pub use self::env_rec::EnvRec;
+pub use self::index_rec::IndexRec;
+pub use self::package_rec::PackageRec;
+pub use self::python_version_rec::PythonVersionRec;
+pub use self::repositories_rec::RepositoriesRec;
+pub use self::repository_rec::RepositoryRec;

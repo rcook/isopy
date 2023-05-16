@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::serialization::ProjectEnvironmentRecord;
+use crate::serialization::EnvRec;
 use crate::util::{print, print_link, print_metadir, print_title};
 use anyhow::Result;
 use joatmon::read_yaml_file;
@@ -33,15 +33,13 @@ pub async fn do_list(app: &App) -> Result<()> {
             print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
 
             let env_yaml_path = manifest.data_dir().join("env.yaml");
-            let env_opt = if env_yaml_path.is_file() {
-                Some(read_yaml_file::<ProjectEnvironmentRecord, _>(
-                    env_yaml_path,
-                )?)
+            let rec_opt = if env_yaml_path.is_file() {
+                Some(read_yaml_file::<EnvRec, _>(env_yaml_path)?)
             } else {
                 None
             };
 
-            print_metadir(manifest, &env_opt);
+            print_metadir(manifest, &rec_opt);
         }
     }
 

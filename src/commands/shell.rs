@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::object_model::{Environment, EnvironmentName};
-use crate::serialization::ProjectEnvironmentRecord;
+use crate::serialization::EnvRec;
 use crate::shell::{Command, ISOPY_ENV_NAME};
 use crate::util::find_dir_info;
 use crate::util::path_to_str;
@@ -43,7 +43,7 @@ pub fn do_shell(app: &App) -> Result<()> {
     };
 
     let env_path = dir_info.data_dir().join("env.yaml");
-    let rec = read_yaml_file::<ProjectEnvironmentRecord, _>(&env_path)?;
+    let rec = read_yaml_file::<EnvRec, _>(&env_path)?;
     let environment = Environment {
         name: EnvironmentName::sanitize(path_to_str(&env_path)?),
         full_python_dir: dir_info.data_dir().join(rec.python_dir_rel),

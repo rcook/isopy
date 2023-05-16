@@ -19,27 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::{deserialize_tag, deserialize_version, serialize_tag, serialize_version};
+use super::helpers::{
+    deserialize_tag_opt, deserialize_version, serialize_tag_opt, serialize_version,
+};
 use crate::object_model::{Tag, Version};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct ProjectEnvironmentRecord {
-    #[serde(rename = "config_path")]
-    pub config_path: PathBuf,
-    #[serde(rename = "python_dir")]
-    pub python_dir_rel: PathBuf,
+pub struct PythonVersionRec {
     #[serde(
-        rename = "python_version",
+        rename = "version",
         deserialize_with = "deserialize_version",
         serialize_with = "serialize_version"
     )]
-    pub python_version: Version,
+    pub version: Version,
+
     #[serde(
         rename = "tag",
-        deserialize_with = "deserialize_tag",
-        serialize_with = "serialize_tag"
+        default,
+        //skip_serializing_if = "Option::is_none", // Incompatible with Python isopy!
+        deserialize_with = "deserialize_tag_opt",
+        serialize_with = "serialize_tag_opt"
     )]
-    pub tag: Tag,
+    pub tag: Option<Tag>,
 }

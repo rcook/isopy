@@ -22,7 +22,7 @@
 use crate::object_model::{Asset, AssetMeta, LastModified, Project, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{
-    IndexRecord, PackageRecord, ProjectRecord, RepositoriesRecord, RepositoryRecord,
+    IndexRec, PackageRec, PythonVersionRec, RepositoriesRec, RepositoryRec,
 };
 use crate::util::{dir_url, find_project_config_path, RELEASES_URL};
 use anyhow::Result;
@@ -51,17 +51,17 @@ impl App {
 
     pub fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {
         let repositories_yaml_path = self.repo.shared_dir().join(REPOSITORIES_FILE_NAME);
-        let repositories_record = if repositories_yaml_path.is_file() {
-            read_yaml_file::<RepositoriesRecord, _>(repositories_yaml_path)?
+        let repositories_rec = if repositories_yaml_path.is_file() {
+            read_yaml_file::<RepositoriesRec, _>(repositories_yaml_path)?
         } else {
-            let repositories_record = RepositoriesRecord {
+            let repositories_rec = RepositoriesRec {
                 repositories: vec![
-                    RepositoryRecord::GitHub {
+                    RepositoryRec::GitHub {
                         name: RepositoryName::parse("default").expect("must parse"),
                         url: dir_url(RELEASES_URL)?,
                         enabled: true,
                     },
-                    RepositoryRecord::Local {
+                    RepositoryRec::Local {
                         name: RepositoryName::parse("example").expect("must parse"),
                         dir: PathBuf::from("/path/to/local/repository"),
                         enabled: false,
@@ -70,13 +70,13 @@ impl App {
             };
             safe_write_file(
                 repositories_yaml_path,
-                serde_yaml::to_string(&repositories_record)?,
+                serde_yaml::to_string(&repositories_rec)?,
                 false,
             )?;
-            repositories_record
+            repositories_rec
         };
 
-        let all_repositories = repositories_record
+        let all_repositories = repositories_rec
             .repositories
             .into_iter()
             .map(Self::make_repository)
@@ -98,7 +98,7 @@ impl App {
     ) -> Result<Option<LastModified>> {
         let index_yaml_path = self.get_index_yaml_path(repository_name);
         Ok(if index_yaml_path.is_file() {
-            Some(read_yaml_file::<IndexRecord, _>(&index_yaml_path)?.last_modified)
+            Some(read_yaml_file::<IndexRec, _>(&index_yaml_path)?.last_modified)
         } else {
             None
         })
@@ -112,7 +112,7 @@ impl App {
         let index_yaml_path = self.get_index_yaml_path(repository_name);
         safe_write_file(
             index_yaml_path,
-            serde_yaml::to_string(&IndexRecord {
+            serde_yaml::to_string(&IndexRec {
                 last_modified: last_modified.clone(),
             })?,
             true,
@@ -133,18 +133,18 @@ impl App {
 
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_json_path = self.repo.shared_dir().join(INDEX_FILE_NAME);
-        let package_records = read_json_file::<Vec<PackageRecord>, _>(&index_json_path)?;
+        let package_recs = read_json_file::<Vec<PackageRec>, _>(&index_json_path)?;
 
         let mut assets = Vec::new();
-        for package_record in package_records {
-            for asset_record in package_record.assets {
-                if !AssetMeta::definitely_not_an_asset_name(&asset_record.name) {
-                    let meta = AssetMeta::parse(&asset_record.name)?;
+        for package_rec in package_recs {
+            for asset_rec in package_rec.assets {
+                if !AssetMeta::definitely_not_an_asset_name(&asset_rec.name) {
+                    let meta = AssetMeta::parse(&asset_rec.name)?;
                     assets.push(Asset {
-                        name: asset_record.name,
-                        tag: package_record.tag.clone(),
-                        url: asset_record.url,
-                        size: asset_record.size,
+                        name: asset_rec.name,
+                        tag: package_rec.tag.clone(),
+                        url: asset_rec.url,
+                        size: asset_rec.size,
                         meta,
                     });
                 }
@@ -160,24 +160,22 @@ impl App {
         Ok(match find_project_config_path(start_dir) {
             None => None,
             Some(p) => {
-                let project_record = read_yaml_file::<ProjectRecord, _>(&p)?;
+                let rec = read_yaml_file::<PythonVersionRec, _>(&p)?;
                 Some(Project {
                     config_path: p,
-                    python_version: project_record.python_version,
-                    tag: project_record.tag,
+                    python_version: rec.version,
+                    tag: rec.tag,
                 })
             }
         })
     }
 
-    fn make_repository(
-        record: RepositoryRecord,
-    ) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
-        Ok(match record {
-            RepositoryRecord::GitHub { name, url, enabled } => {
+    fn make_repository(rec: RepositoryRec) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
+        Ok(match rec {
+            RepositoryRec::GitHub { name, url, enabled } => {
                 (name, enabled, Box::new(GitHubRepository::new(url)?))
             }
-            RepositoryRecord::Local { name, dir, enabled } => {
+            RepositoryRec::Local { name, dir, enabled } => {
                 (name, enabled, Box::new(LocalRepository::new(dir)))
             }
         })

@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::cli::PythonVersion;
 use crate::object_model::{Asset, AssetFilter, Tag};
-use crate::serialization::ProjectEnvironmentRecord;
+use crate::serialization::EnvRec;
 use crate::util::{download_stream, print, unpack_file, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
 use joatmon::safe_write_file;
@@ -112,10 +112,10 @@ pub async fn init_project(
 
     safe_write_file(
         dir_info.data_dir().join("env.yaml"),
-        serde_yaml::to_string(&ProjectEnvironmentRecord {
+        serde_yaml::to_string(&EnvRec {
             config_path: config_path.to_path_buf(),
             python_dir_rel: PathBuf::from("python"),
-            python_version: asset.meta.version.clone(),
+            version: asset.meta.version.clone(),
             tag: asset.tag.clone(),
         })?,
         false,

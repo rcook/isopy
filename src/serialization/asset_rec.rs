@@ -19,11 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::RepositoryRecord;
-use serde::{Deserialize, Serialize};
+use super::helpers::deserialize_url;
+use reqwest::Url;
+use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct RepositoriesRecord {
-    #[serde(rename = "repositories")]
-    pub repositories: Vec<RepositoryRecord>,
+#[derive(Debug, Deserialize)]
+pub struct AssetRec {
+    #[serde(rename = "browser_download_url", deserialize_with = "deserialize_url")]
+    pub url: Url,
+
+    #[serde(rename = "name")]
+    pub name: String,
+
+    #[serde(rename = "size")]
+    pub size: i64,
 }

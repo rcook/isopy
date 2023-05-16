@@ -19,16 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::{deserialize_last_modified, serialize_last_modified};
-use crate::object_model::LastModified;
+use super::RepositoryRec;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct IndexRecord {
-    #[serde(
-        rename = "last_modified",
-        deserialize_with = "deserialize_last_modified",
-        serialize_with = "serialize_last_modified"
-    )]
-    pub last_modified: LastModified,
+pub struct RepositoriesRec {
+    #[serde(rename = "repositories")]
+    pub repositories: Vec<RepositoryRec>,
 }
