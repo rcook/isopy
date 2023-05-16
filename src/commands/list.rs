@@ -21,23 +21,27 @@
 //
 use crate::app::App;
 use crate::serialization::ProjectEnvironmentRecord;
-use crate::util::{print, print_env, print_link, print_manifest, print_title};
+use crate::util::{print, print_link, print_metadir, print_title};
 use anyhow::Result;
 use joatmon::read_yaml_file;
 
 pub async fn do_list(app: &App) -> Result<()> {
     let manifests = app.repo.list_manifests()?;
     if !manifests.is_empty() {
-        print_title("Manifests");
+        print_title("Metadirectories");
         for (idx, manifest) in manifests.iter().enumerate() {
             print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
-            print_manifest(manifest);
 
             let env_yaml_path = manifest.data_dir().join("env.yaml");
-            if env_yaml_path.is_file() {
-                let rec = read_yaml_file::<ProjectEnvironmentRecord, _>(env_yaml_path)?;
-                print_env(&rec);
-            }
+            let env_opt = if env_yaml_path.is_file() {
+                Some(read_yaml_file::<ProjectEnvironmentRecord, _>(
+                    env_yaml_path,
+                )?)
+            } else {
+                None
+            };
+
+            print_metadir(manifest, &env_opt);
         }
     }
 

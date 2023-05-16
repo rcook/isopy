@@ -41,8 +41,8 @@ pub use self::probe::{default_isopy_dir, find_project_config_path};
 pub use self::repo::find_dir_info;
 pub use self::sha256sums::validate_sha256_checksum;
 pub use self::show::{
-    print, print_dir_info, print_env, print_error, print_link, print_manifest, print_repo,
-    print_title, print_value,
+    print, print_dir_info, print_error, print_link, print_metadir, print_repo, print_title,
+    print_value,
 };
 pub use self::str::path_to_str;
 pub use self::time::{to_last_modified, to_system_time};

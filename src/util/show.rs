@@ -19,11 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::serialization::ProjectEnvironmentRecord;
 use colored::Colorize;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use std::fmt::Display;
-
-use crate::serialization::ProjectEnvironmentRecord;
 
 pub fn print(s: &str) {
     println!("{}", s.bright_white());
@@ -59,30 +58,10 @@ pub fn print_dir_info(dir_info: &DirInfo) {
     print_value("Project directory", dir_info.project_dir().display());
 }
 
-pub fn print_manifest(manifest: &Manifest) {
-    print_value("Data directory", manifest.data_dir().display());
-    print_value("Manifest path", manifest.manifest_path().display());
-    print_value("Created at", manifest.created_at());
-    print_value(
-        "Original project directory",
-        manifest.original_project_dir().display(),
-    );
-    print_value("Meta ID", manifest.meta_id());
-}
-
 pub fn print_link(link: &Link) {
+    print_value("Project directory", link.project_dir().display());
     print_value("Link path", link.link_path().display());
     print_value("Created at", link.created_at());
-    print_value("Link ID", link.link_id());
-    print_value("Project directory", link.project_dir().display());
-    print_value("Meta ID", link.meta_id());
-}
-
-pub fn print_env(env: &ProjectEnvironmentRecord) {
-    print_value("Project path", env.config_path.display());
-    print_value("Python directory", env.python_dir_rel.display());
-    print_value("Python version", env.python_version.as_str());
-    print_value("Python build tag", env.tag.as_str());
 }
 
 pub fn print_repo(repo: &Repo) {
@@ -91,4 +70,22 @@ pub fn print_repo(repo: &Repo) {
     print_value("Links directory", repo.links_dir().display());
     print_value("Container directory", repo.container_dir().display());
     print_value("Shared directory", repo.shared_dir().display());
+}
+
+pub fn print_metadir(manifest: &Manifest, env_opt: &Option<ProjectEnvironmentRecord>) {
+    if let Some(env) = env_opt {
+        print_value("Project path", env.config_path.display());
+        print_value("Python version", env.python_version.as_str());
+        print_value("Python build tag", env.tag.as_str());
+        print_value("Python directory", env.python_dir_rel.display());
+    } else {
+        print_value(
+            "Original project directory",
+            manifest.original_project_dir().display(),
+        );
+    }
+
+    print_value("Data directory", manifest.data_dir().display());
+    print_value("Manifest path", manifest.manifest_path().display());
+    print_value("Created at", manifest.created_at());
 }
