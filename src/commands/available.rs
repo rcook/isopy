@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::object_model::AssetFilter;
-use crate::util::download_stream;
+use crate::util::{download_stream, print};
 use anyhow::{anyhow, Result};
 
 pub async fn do_available(app: &App) -> Result<()> {
@@ -57,7 +57,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
 fn show_available_downloads(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
-        println!("{}", asset.name)
+        print(&asset.name)
     }
     Ok(())
 }

@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::serialization::ProjectEnvironmentRecord;
-use crate::util::{print_env, print_link, print_manifest, print_title};
+use crate::util::{print, print_env, print_link, print_manifest, print_title};
 use anyhow::Result;
 use joatmon::read_yaml_file;
 
@@ -30,7 +30,7 @@ pub async fn do_list(app: &App) -> Result<()> {
     if !manifests.is_empty() {
         print_title("Manifests");
         for (idx, manifest) in manifests.iter().enumerate() {
-            println!("  ({}) {}", idx + 1, manifest.meta_id());
+            print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
             print_manifest(manifest);
 
             let env_yaml_path = manifest.data_dir().join("env.yaml");
@@ -45,7 +45,12 @@ pub async fn do_list(app: &App) -> Result<()> {
     if !links.is_empty() {
         print_title("Links");
         for (idx, link) in links.iter().enumerate() {
-            println!("  ({}) {} -> {}", idx + 1, link.link_id(), link.meta_id());
+            print(&format!(
+                "  ({}) {} -> {}",
+                idx + 1,
+                link.link_id(),
+                link.meta_id()
+            ));
             print_link(link);
         }
     }

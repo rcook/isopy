@@ -20,16 +20,24 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use colored::Colorize;
-use joat_repo::{DirInfo, Link, Manifest};
+use joat_repo::{DirInfo, Link, Manifest, Repo};
 use std::fmt::Display;
 
 use crate::serialization::ProjectEnvironmentRecord;
+
+pub fn print(s: &str) {
+    println!("{}", s.bright_white());
+}
+
+pub fn print_error(s: &str) {
+    println!("{}", s.bright_red());
+}
 
 pub fn print_title(label: &str) {
     println!("{}", label.cyan());
 }
 
-pub fn print<T>(label: &str, value: T)
+pub fn print_value<T>(label: &str, value: T)
 where
     T: Display,
 {
@@ -37,42 +45,50 @@ where
 }
 
 pub fn print_dir_info(dir_info: &DirInfo) {
-    print("Data directory", dir_info.data_dir().display());
-    print("Manifest path", dir_info.manifest_path().display());
-    print("Data directory created at", dir_info.created_at());
-    print(
+    print_value("Data directory", dir_info.data_dir().display());
+    print_value("Manifest path", dir_info.manifest_path().display());
+    print_value("Data directory created at", dir_info.created_at());
+    print_value(
         "Original project directory",
         dir_info.original_project_dir().display(),
     );
-    print("Meta ID", dir_info.meta_id());
-    print("Link path", dir_info.link_path().display());
-    print("Link created at", dir_info.link_created_at());
-    print("Link ID", dir_info.link_id());
-    print("Project directory", dir_info.project_dir().display());
+    print_value("Meta ID", dir_info.meta_id());
+    print_value("Link path", dir_info.link_path().display());
+    print_value("Link created at", dir_info.link_created_at());
+    print_value("Link ID", dir_info.link_id());
+    print_value("Project directory", dir_info.project_dir().display());
 }
 
 pub fn print_manifest(manifest: &Manifest) {
-    print("Data directory", manifest.data_dir().display());
-    print("Manifest path", manifest.manifest_path().display());
-    print("Created at", manifest.created_at());
-    print(
+    print_value("Data directory", manifest.data_dir().display());
+    print_value("Manifest path", manifest.manifest_path().display());
+    print_value("Created at", manifest.created_at());
+    print_value(
         "Original project directory",
         manifest.original_project_dir().display(),
     );
-    print("Meta ID", manifest.meta_id());
+    print_value("Meta ID", manifest.meta_id());
 }
 
 pub fn print_link(link: &Link) {
-    print("Link path", link.link_path().display());
-    print("Created at", link.created_at());
-    print("Link ID", link.link_id());
-    print("Project directory", link.project_dir().display());
-    print("Meta ID", link.meta_id());
+    print_value("Link path", link.link_path().display());
+    print_value("Created at", link.created_at());
+    print_value("Link ID", link.link_id());
+    print_value("Project directory", link.project_dir().display());
+    print_value("Meta ID", link.meta_id());
 }
 
 pub fn print_env(env: &ProjectEnvironmentRecord) {
-    print("Project path", env.config_path.display());
-    print("Python directory", env.python_dir_rel.display());
-    print("Python version", env.python_version.as_str());
-    print("Python build tag", env.tag.as_str());
+    print_value("Project path", env.config_path.display());
+    print_value("Python directory", env.python_dir_rel.display());
+    print_value("Python version", env.python_version.as_str());
+    print_value("Python build tag", env.tag.as_str());
+}
+
+pub fn print_repo(repo: &Repo) {
+    print_value("Lock file", repo.lock_path().display());
+    print_value("Configuration file", repo.config_path().display());
+    print_value("Links directory", repo.links_dir().display());
+    print_value("Container directory", repo.container_dir().display());
+    print_value("Shared directory", repo.shared_dir().display());
 }

@@ -37,7 +37,7 @@ use crate::commands::{
     do_shell, do_wrap,
 };
 use crate::python_info::PythonInfo;
-use crate::util::{default_isopy_dir, ERROR, OK};
+use crate::util::{default_isopy_dir, print_error, ERROR, OK};
 use anyhow::{bail, Result};
 use clap::Parser;
 use colored::Colorize;
@@ -91,7 +91,7 @@ async fn main() {
     exit(match run().await {
         Ok(_) => OK,
         Err(e) => {
-            println!("{}", format!("{}", e).bright_red());
+            print_error(&format!("{}", e));
             ERROR
         }
     })

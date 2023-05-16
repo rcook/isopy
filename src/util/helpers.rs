@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::object_model::{Asset, AssetFilter, Tag, Version};
 use crate::python_info::PythonInfo;
-use crate::util::{download_stream, validate_sha256_checksum};
+use crate::util::{download_stream, print, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
 use std::fs::remove_file;
 use std::path::PathBuf;
@@ -78,10 +78,10 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
         );
     }
 
-    println!(
+    print(&format!(
         "SHA256 checksum validation succeeded on {}",
         asset_path.display()
-    );
+    ));
 
     Ok(asset_path)
 }

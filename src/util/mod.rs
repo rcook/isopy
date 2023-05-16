@@ -44,7 +44,10 @@ pub use self::probe::{
 };
 pub use self::repo::find_dir_info;
 pub use self::sha256sums::validate_sha256_checksum;
-pub use self::show::{print, print_dir_info, print_env, print_link, print_manifest, print_title};
+pub use self::show::{
+    print, print_dir_info, print_env, print_error, print_link, print_manifest, print_repo,
+    print_title, print_value,
+};
 pub use self::str::{osstr_to_str, osstring_to_string, path_to_str};
 pub use self::time::{to_last_modified, to_system_time};
 pub use self::types::ContentLength;

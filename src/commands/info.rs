@@ -21,16 +21,16 @@
 //
 use crate::app::App;
 use crate::object_model::Tag;
-use crate::util::{find_dir_info, print, print_dir_info, print_title};
+use crate::util::{find_dir_info, print_dir_info, print_repo, print_title, print_value};
 use anyhow::Result;
 
 pub fn do_info(app: &App) -> Result<()> {
     print_title("Current directory");
-    print("Working directory", app.cwd.display());
+    print_value("Working directory", app.cwd.display());
     if let Some(project) = app.read_project(&app.cwd)? {
-        print("Project configuration file", project.config_path.display());
-        print("Python version", project.python_version);
-        print(
+        print_value("Project configuration file", project.config_path.display());
+        print_value("Python version", project.python_version);
+        print_value(
             "Build tag",
             project
                 .tag
@@ -46,11 +46,7 @@ pub fn do_info(app: &App) -> Result<()> {
     }
 
     print_title("Repository information");
-    print("Lock file", app.repo.lock_path().display());
-    print("Configuration file", app.repo.config_path().display());
-    print("Links directory", app.repo.links_dir().display());
-    print("Container directory", app.repo.container_dir().display());
-    print("Shared directory", app.repo.shared_dir().display());
+    print_repo(&app.repo);
 
     Ok(())
 }
