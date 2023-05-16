@@ -23,7 +23,6 @@ use crate::app::App;
 use crate::object_model::AssetFilter;
 use crate::util::{download_stream, print};
 use anyhow::{anyhow, Result};
-use chrono::{DateTime, SecondsFormat, Utc};
 use joatmon::safe_back_up;
 use log::info;
 use std::fs::remove_file;

@@ -21,24 +21,18 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
-use crate::object_model::{Project, Tag, Version};
-use crate::serialization::ProjectEnvironmentRecord;
 use crate::util::init_project;
-use crate::util::{download_asset, get_asset, unpack_file, PROJECT_CONFIG_FILE_NAME};
 use anyhow::{bail, Result};
-use joat_repo::DirInfo;
-use joatmon::safe_write_file;
-use std::path::{Path, PathBuf};
 
 pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<()> {
-    if let Some(dir_info) = app.repo.get(&app.cwd)? {
+    if app.repo.get(&app.cwd)?.is_some() {
         bail!(
             "Directory {} already has Python environment",
             app.cwd.display()
         )
     }
 
-    init_project(app, &python_version, &app.cwd).await?;
+    init_project(app, python_version, &app.cwd).await?;
 
     Ok(())
 }

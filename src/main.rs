@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![allow(unused)]
 mod app;
 mod cli;
 mod commands;
@@ -40,13 +39,14 @@ use crate::logging::init_logging;
 use crate::util::{default_isopy_dir, print_error, ERROR, OK};
 use anyhow::{bail, Result};
 use clap::Parser;
-use colored::Colorize;
 use joat_repo::RepoConfig;
 use log::LevelFilter;
 use std::env::current_dir;
 use std::process::exit;
 
 async fn run() -> Result<()> {
+    init_logging(LevelFilter::Info)?;
+
     let args = Args::parse();
 
     let cwd = match args.cwd {
@@ -62,7 +62,7 @@ async fn run() -> Result<()> {
         bail!("Could not get repository")
     };
 
-    let app = App::new(cwd, cache_dir, repo);
+    let app = App::new(cwd, repo);
     match args.command {
         Command::Available => do_available(&app).await?,
         Command::Download(python_version) => do_download(&app, &python_version).await?,
@@ -87,7 +87,6 @@ async fn run() -> Result<()> {
 
 #[tokio::main]
 async fn main() {
-    init_logging(LevelFilter::Info);
     exit(match run().await {
         Ok(_) => OK,
         Err(e) => {

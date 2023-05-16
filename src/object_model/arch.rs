@@ -34,7 +34,7 @@ pub enum Arch {
 
 impl Arch {
     pub fn parse(s: &str) -> Result<Self> {
-        Ok(match s.as_ref() {
+        Ok(match s {
             "aarch64" => Self::AArch64,
             "i686" => Self::I686,
             "ppc64le" => Self::PPC64LE,

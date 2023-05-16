@@ -29,13 +29,6 @@ pub fn default_isopy_dir() -> Option<PathBuf> {
     Some(isopy_dir)
 }
 
-pub fn make_project_config_path<P>(project_dir: P) -> PathBuf
-where
-    P: Into<PathBuf>,
-{
-    project_dir.into().join(PROJECT_CONFIG_FILE_NAME)
-}
-
 pub fn find_project_config_path<P>(start_dir: P) -> Option<PathBuf>
 where
     P: AsRef<Path>,

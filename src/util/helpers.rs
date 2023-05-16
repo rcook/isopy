@@ -21,13 +21,10 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
-use crate::object_model::{Asset, AssetFilter, Project, Tag, Version};
+use crate::object_model::{Asset, AssetFilter, Tag};
 use crate::serialization::ProjectEnvironmentRecord;
-use crate::util::{
-    download_stream, print, unpack_file, validate_sha256_checksum, PROJECT_CONFIG_FILE_NAME,
-};
+use crate::util::{download_stream, print, unpack_file, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
-use joat_repo::DirInfo;
 use joatmon::safe_write_file;
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};

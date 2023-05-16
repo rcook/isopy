@@ -50,7 +50,7 @@ impl GitHubRepository {
         let temp = url.into_url()?;
         Ok(Self {
             url: dir_url(temp.clone())?,
-            temp: file_url(temp.clone())?,
+            temp: file_url(temp)?,
             client: Client::new(),
         })
     }

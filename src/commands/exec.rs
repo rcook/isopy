@@ -19,12 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#![allow(unused)]
 use crate::app::App;
 use crate::object_model::{Environment, EnvironmentName};
 use crate::shell::Command;
 use anyhow::Result;
 
-pub fn do_exec(app: &App, program: &String, args: &Vec<String>) -> Result<()> {
+pub fn do_exec(app: &App, program: &str, args: &[String]) -> Result<()> {
     todo!();
     /*
     let mut command = Command::new(program);

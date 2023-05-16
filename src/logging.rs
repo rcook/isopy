@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{anyhow, Result};
-use log::{set_logger, set_max_level, Level, LevelFilter, Log, Metadata, Record, SetLoggerError};
+use log::{set_logger, set_max_level, Level, LevelFilter, Log, Metadata, Record};
 
 static LOGGER: SimpleLogger = SimpleLogger;
 

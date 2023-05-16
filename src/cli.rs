@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{EnvironmentName, Tag, Version};
+use crate::object_model::{Tag, Version};
 use clap::{Args as ClapArgs, Parser, Subcommand};
 use joat_repo::MetaId;
 use path_absolutize::Absolutize;
@@ -134,10 +134,6 @@ fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
         .absolutize()
         .map_err(|_| String::from("invalid path"))
         .map(|x| x.to_path_buf())
-}
-
-fn parse_environment_name(s: &str) -> Result<EnvironmentName, String> {
-    EnvironmentName::parse(s).ok_or(String::from("invalid environment name"))
 }
 
 fn parse_version(s: &str) -> Result<Version, String> {

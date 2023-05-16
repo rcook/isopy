@@ -19,19 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{
-    Asset, AssetMeta, EnvironmentName, LastModified, Project, RepositoryName,
-};
+use crate::object_model::{Asset, AssetMeta, LastModified, Project, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{
-    IndexRecord, NamedEnvironmentRecord, PackageRecord, ProjectEnvironmentRecord, ProjectRecord,
-    RepositoriesRecord, RepositoryRecord,
+    IndexRecord, PackageRecord, ProjectRecord, RepositoriesRecord, RepositoryRecord,
 };
-use crate::util::{dir_url, find_project_config_path, osstr_to_str, HexDigest, RELEASES_URL};
-use anyhow::{bail, Result};
-use joat_repo::{DirInfo, Link, MetaId, Repo};
+use crate::util::{dir_url, find_project_config_path, RELEASES_URL};
+use anyhow::Result;
+use joat_repo::Repo;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
-use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 
 const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
@@ -49,7 +45,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(cwd: PathBuf, dir: PathBuf, repo: Repo) -> Self {
+    pub fn new(cwd: PathBuf, repo: Repo) -> Self {
         Self { cwd, repo }
     }
 

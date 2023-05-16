@@ -21,13 +21,10 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
-use crate::object_model::{Project, Tag, Version};
-use crate::serialization::{ProjectEnvironmentRecord, ProjectRecord};
-use crate::util::{download_asset, get_asset, unpack_file, PROJECT_CONFIG_FILE_NAME};
-use anyhow::{bail, Result};
-use joat_repo::DirInfo;
+use crate::serialization::ProjectRecord;
+use crate::util::PROJECT_CONFIG_FILE_NAME;
+use anyhow::Result;
 use joatmon::safe_write_file;
-use std::path::{Path, PathBuf};
 
 pub async fn do_gen_config(app: &App, python_version: &PythonVersion) -> Result<()> {
     let config_path = app.cwd.join(PROJECT_CONFIG_FILE_NAME);

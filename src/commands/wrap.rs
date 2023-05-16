@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#![allow(unused)]
 use crate::app::App;
 use crate::object_model::Environment;
 use anyhow::Result;
@@ -55,12 +56,7 @@ struct Context {
     script_path: PathBuf,
 }
 
-pub fn do_wrap(
-    app: &App,
-    wrapper_path: &PathBuf,
-    script_path: &Path,
-    base_dir: &Path,
-) -> Result<()> {
+pub fn do_wrap(app: &App, wrapper_path: &Path, script_path: &Path, base_dir: &Path) -> Result<()> {
     todo!();
     /*
     let environment = Environment::infer(app, None)?;
@@ -83,8 +79,9 @@ pub fn do_wrap(
     )?;
 
     set_file_attributes(wrapper_path)?;
-    */
+
     Ok(())
+    */
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]

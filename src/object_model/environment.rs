@@ -19,12 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::object_model::EnvironmentName;
-use crate::serialization::{NamedEnvironmentRecord, ProjectEnvironmentRecord, UseRecord};
-use crate::util::path_to_str;
-use anyhow::{bail, Result};
-use joatmon::read_yaml_file;
 use std::path::PathBuf;
 
 #[derive(Debug)]
