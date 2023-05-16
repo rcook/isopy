@@ -829,7 +829,7 @@ dependencies = [
  "include_dir",
  "indicatif",
  "joat-repo",
- "joatmon 0.0.23",
+ "joatmon 0.0.25",
  "lazy_static",
  "md5",
  "openssl-sys",
@@ -889,17 +889,15 @@ dependencies = [
 
 [[package]]
 name = "joatmon"
-version = "0.0.23"
+version = "0.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db3a9799b3f7aae3ee0c862bf9c181137e068c51caac9b2f3c2bd35ba2965053"
+checksum = "01a8b87477b73ab43e556401e9173d1091e476f71383d1cf75289cd4cdf06fd3"
 dependencies = [
  "anyhow",
- "rstest",
+ "chrono",
  "serde",
  "serde_json",
  "serde_yaml",
- "serial_test",
- "tempdir",
  "thiserror",
  "toml",
  "toml_edit",
