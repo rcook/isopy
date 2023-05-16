@@ -1,6 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-this_dir=$(cd $(dirname $0); pwd -P)
-PATH=$HOME/.isopy/envs/isopy/python/bin:$PATH \
-  PYTHONPATH=$this_dir \
-  exec python3 $this_dir/isopy_bin/main.py "$@"

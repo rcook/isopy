@@ -1,9 +1,0 @@
-{
-  "files.eol": "\n",
-  "files.exclude": {
-    ".vscode/": true,
-    "build/": true,
-    "dist/": true,
-    "**/__pycache__": true
-  }
-}
