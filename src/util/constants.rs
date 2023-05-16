@@ -28,6 +28,6 @@ pub const OK: ExitCode = 0;
 
 pub const ERROR: ExitCode = 1;
 
-pub const ISOPY_DIR_NAME: &str = ".isopy2";
+pub const CACHE_DIR_NAME: &str = ".isopy";
 
 pub const PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
