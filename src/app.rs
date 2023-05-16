@@ -19,16 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{Asset, AssetMeta, LastModified, Project, RepositoryName};
+use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
-use crate::serialization::{
-    IndexRec, PackageRec, PythonVersionRec, RepositoriesRec, RepositoryRec,
-};
-use crate::util::{dir_url, find_project_config_path, RELEASES_URL};
+use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
+use crate::util::{dir_url, RELEASES_URL};
 use anyhow::Result;
 use joat_repo::Repo;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
 const INDEX_FILE_NAME: &str = "index.json";
@@ -151,23 +149,6 @@ impl App {
             }
         }
         Ok(assets)
-    }
-
-    pub fn read_project<P>(&self, start_dir: P) -> Result<Option<Project>>
-    where
-        P: AsRef<Path>,
-    {
-        Ok(match find_project_config_path(start_dir) {
-            None => None,
-            Some(p) => {
-                let rec = read_yaml_file::<PythonVersionRec, _>(&p)?;
-                Some(Project {
-                    config_path: p,
-                    python_version: rec.version,
-                    tag: rec.tag,
-                })
-            }
-        })
     }
 
     fn make_repository(rec: RepositoryRec) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {

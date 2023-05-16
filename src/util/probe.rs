@@ -19,19 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::util::{CACHE_DIR_NAME, PROJECT_CONFIG_FILE_NAME};
-use joatmon::find_sentinel_file;
-use std::path::{Path, PathBuf};
+use crate::util::CACHE_DIR_NAME;
+use std::path::PathBuf;
 
 pub fn default_isopy_dir() -> Option<PathBuf> {
     let home_dir = home::home_dir()?;
     let isopy_dir = home_dir.join(CACHE_DIR_NAME);
     Some(isopy_dir)
-}
-
-pub fn find_project_config_path<P>(start_dir: P) -> Option<PathBuf>
-where
-    P: AsRef<Path>,
-{
-    find_sentinel_file(PROJECT_CONFIG_FILE_NAME, &start_dir, None)
 }

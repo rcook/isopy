@@ -43,21 +43,6 @@ where
     println!("  {:30}: {}", label.green(), format!("{}", value).yellow());
 }
 
-pub fn print_dir_info(dir_info: &DirInfo) {
-    print_value("Data directory", dir_info.data_dir().display());
-    print_value("Manifest path", dir_info.manifest_path().display());
-    print_value("Data directory created at", dir_info.created_at());
-    print_value(
-        "Original project directory",
-        dir_info.original_project_dir().display(),
-    );
-    print_value("Meta ID", dir_info.meta_id());
-    print_value("Link path", dir_info.link_path().display());
-    print_value("Link created at", dir_info.link_created_at());
-    print_value("Link ID", dir_info.link_id());
-    print_value("Project directory", dir_info.project_dir().display());
-}
-
 pub fn print_link(link: &Link) {
     print_value("Project directory", link.project_dir().display());
     print_value("Link path", link.link_path().display());
@@ -88,4 +73,26 @@ pub fn print_metadir(manifest: &Manifest, rec_opt: &Option<EnvRec>) {
     print_value("Data directory", manifest.data_dir().display());
     print_value("Manifest path", manifest.manifest_path().display());
     print_value("Created at", manifest.created_at());
+}
+
+pub fn print_dir_info(dir_info: &DirInfo, rec_opt: &Option<EnvRec>) {
+    if let Some(rec) = rec_opt {
+        print_value("Project path", rec.config_path.display());
+        print_value("Python version", rec.version.as_str());
+        print_value("Python build tag", rec.tag.as_str());
+        print_value("Python directory", rec.python_dir_rel.display());
+    }
+
+    print_value("Data directory", dir_info.data_dir().display());
+    print_value("Manifest path", dir_info.manifest_path().display());
+    print_value("Data directory created at", dir_info.created_at());
+    print_value(
+        "Original project directory",
+        dir_info.original_project_dir().display(),
+    );
+    print_value("Meta ID", dir_info.meta_id());
+    print_value("Link path", dir_info.link_path().display());
+    print_value("Link created at", dir_info.link_created_at());
+    print_value("Link ID", dir_info.link_id());
+    print_value("Project directory", dir_info.project_dir().display());
 }

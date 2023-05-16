@@ -19,8 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::util::print_dir_info;
+use crate::{app::App, util::show_dir_info};
 use anyhow::{bail, Result};
 use joat_repo::MetaId;
 
@@ -29,7 +28,7 @@ pub fn do_link(app: &App, meta_id: &MetaId) -> Result<()> {
         bail!("could not create link");
     };
 
-    print_dir_info(&dir_info);
+    show_dir_info(&dir_info)?;
 
     Ok(())
 }

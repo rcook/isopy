@@ -23,9 +23,12 @@ use crate::app::App;
 use crate::cli::PythonVersion;
 use crate::object_model::{Asset, AssetFilter, Tag};
 use crate::serialization::EnvRec;
-use crate::util::{download_stream, print, unpack_file, validate_sha256_checksum};
+use crate::util::{
+    download_stream, print, print_dir_info, print_title, unpack_file, validate_sha256_checksum,
+};
 use anyhow::{anyhow, bail, Result};
-use joatmon::safe_write_file;
+use joat_repo::DirInfo;
+use joatmon::{read_yaml_file, safe_write_file};
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};
 
@@ -120,6 +123,21 @@ pub async fn init_project(
         })?,
         false,
     )?;
+
+    Ok(())
+}
+
+pub fn show_dir_info(dir_info: &DirInfo) -> Result<()> {
+    print_title("Environment info");
+
+    let env_yaml_path = dir_info.data_dir().join("env.yaml");
+    let rec_opt = if env_yaml_path.is_file() {
+        Some(read_yaml_file::<EnvRec, _>(env_yaml_path)?)
+    } else {
+        None
+    };
+
+    print_dir_info(dir_info, &rec_opt);
 
     Ok(())
 }
