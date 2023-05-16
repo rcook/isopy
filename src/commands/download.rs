@@ -26,16 +26,8 @@ use crate::util::{download_asset, get_asset};
 use anyhow::Result;
 
 pub async fn do_download(app: &App, python_version: &PythonVersion) -> Result<()> {
-    dbg!(python_version);
-    /*
-    todo!();
     let assets = app.read_assets()?;
-    let python_info = PythonInfo {
-        version: version.clone(),
-        tag: tag.clone(),
-    };
-    let asset = get_asset(&assets, &python_info)?;
+    let asset = get_asset(&assets, &python_version)?;
     download_asset(app, asset).await?;
-     */
     Ok(())
 }
