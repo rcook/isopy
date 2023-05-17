@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod app;
+mod asset;
 mod cli;
 mod commands;
 mod constants;

@@ -19,12 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
+use crate::asset::{download_asset, get_asset};
+use crate::cli::PythonVersion;
+use crate::constants::{
+    ENV_FILE_NAME, INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
+};
 use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
+use crate::serialization::EnvRec;
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
 use crate::util::dir_url;
-use anyhow::Result;
+use crate::util::unpack_file;
+use anyhow::{bail, Result};
 use joat_repo::Repo;
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
 use std::path::PathBuf;
@@ -150,6 +156,38 @@ impl App {
             }
         }
         Ok(assets)
+    }
+
+    pub async fn init_project(&self, python_version: &PythonVersion) -> Result<()> {
+        let assets = self.read_assets()?;
+        let asset = get_asset(&assets, python_version)?;
+
+        let mut asset_path = self.make_asset_path(asset);
+        if !asset_path.is_file() {
+            asset_path = download_asset(self, asset).await?;
+        }
+
+        let Some(dir_info) = self.repo.init(&self.cwd)? else {
+            bail!(
+                "Could not initialize metadirectory for directory {}",
+                self.cwd.display()
+            )
+        };
+
+        unpack_file(&asset_path, dir_info.data_dir())?;
+
+        safe_write_file(
+            dir_info.data_dir().join(ENV_FILE_NAME),
+            serde_yaml::to_string(&EnvRec {
+                config_path: self.cwd.clone(),
+                python_dir_rel: PathBuf::from("python"),
+                version: asset.meta.version.clone(),
+                tag: asset.tag.clone(),
+            })?,
+            false,
+        )?;
+
+        Ok(())
     }
 
     fn make_repository(rec: RepositoryRec) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {

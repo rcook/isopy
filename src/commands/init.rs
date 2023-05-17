@@ -22,7 +22,6 @@
 use crate::app::App;
 use crate::cli::PythonVersion;
 use crate::status::Status;
-use crate::util::init_project;
 use anyhow::{bail, Result};
 
 pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<Status> {
@@ -33,7 +32,7 @@ pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<Status
         )
     }
 
-    init_project(app, python_version, &app.cwd).await?;
+    app.init_project(python_version).await?;
 
     Ok(Status::OK)
 }

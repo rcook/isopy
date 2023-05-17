@@ -20,9 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::asset::{download_asset, get_asset};
 use crate::cli::PythonVersion;
 use crate::status::Status;
-use crate::util::{download_asset, get_asset};
 use anyhow::Result;
 
 pub async fn do_download(app: &App, python_version: &PythonVersion) -> Result<Status> {

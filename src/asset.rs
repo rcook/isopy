@@ -21,15 +21,12 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
-use crate::constants::ENV_FILE_NAME;
 use crate::object_model::{Asset, AssetFilter, Tag};
-use crate::serialization::EnvRec;
-use crate::util::{download_stream, unpack_file, validate_sha256_checksum};
+use crate::util::{download_stream, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
-use joatmon::safe_write_file;
 use log::info;
 use std::fs::remove_file;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
@@ -88,40 +85,4 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
     );
 
     Ok(asset_path)
-}
-
-pub async fn init_project(
-    app: &App,
-    python_version: &PythonVersion,
-    config_path: &Path,
-) -> Result<()> {
-    let assets = app.read_assets()?;
-    let asset = get_asset(&assets, python_version)?;
-
-    let mut asset_path = app.make_asset_path(asset);
-    if !asset_path.is_file() {
-        asset_path = download_asset(app, asset).await?;
-    }
-
-    let Some(dir_info) = app.repo.init(&app.cwd)? else {
-        bail!(
-            "Could not initialize metadirectory for directory {}",
-            app.cwd.display()
-        )
-    };
-
-    unpack_file(&asset_path, dir_info.data_dir())?;
-
-    safe_write_file(
-        dir_info.data_dir().join(ENV_FILE_NAME),
-        serde_yaml::to_string(&EnvRec {
-            config_path: config_path.to_path_buf(),
-            python_dir_rel: PathBuf::from("python"),
-            version: asset.meta.version.clone(),
-            tag: asset.tag.clone(),
-        })?,
-        false,
-    )?;
-
-    Ok(())
 }
