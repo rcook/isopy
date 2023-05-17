@@ -33,6 +33,8 @@ lazy_static! {
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";
 
+pub const EXAMPLE_REPOSITORY_NAME: &str = "example";
+
 pub type ExitCode = i32;
 
 pub const OK: ExitCode = 0;

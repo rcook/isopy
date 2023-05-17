@@ -19,36 +19,48 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{DEFAULT_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
+use crate::constants::{DEFAULT_REPOSITORY_NAME, EXAMPLE_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum RepositoryName {
     Default,
+    Example,
     Named(String),
 }
 
 impl RepositoryName {
     pub fn parse(s: &str) -> Option<Self> {
         if s.eq_ignore_ascii_case(DEFAULT_REPOSITORY_NAME) {
-            Some(Self::Default)
-        } else {
-            match REPOSITORY_NAME_REGEX.is_match(s) {
-                true => Some(Self::Named(String::from(s))),
-                false => None,
-            }
+            return Some(Self::Default);
         }
+
+        if s.eq_ignore_ascii_case(EXAMPLE_REPOSITORY_NAME) {
+            return Some(Self::Example);
+        }
+
+        if REPOSITORY_NAME_REGEX.is_match(s) {
+            return Some(Self::Named(String::from(s)));
+        }
+
+        None
+    }
+
+    pub fn is_default(&self) -> bool {
+        matches!(self, Self::Default)
     }
 
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => DEFAULT_REPOSITORY_NAME,
+            Self::Example => EXAMPLE_REPOSITORY_NAME,
             Self::Named(s) => s,
         }
     }
 }
 
-impl std::fmt::Display for RepositoryName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for RepositoryName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.as_str())
     }
 }
@@ -56,7 +68,30 @@ impl std::fmt::Display for RepositoryName {
 #[cfg(test)]
 mod tests {
     use super::RepositoryName;
+    use crate::constants::REPOSITORY_NAME_REGEX;
     use rstest::rstest;
+
+    #[rstest]
+    #[case("default", RepositoryName::Default)]
+    #[case("example", RepositoryName::Example)]
+    fn special_repository_names(#[case] expected_name: &str, #[case] input: RepositoryName) {
+        let name = input.as_str();
+        assert_eq!(expected_name, name);
+        assert!(REPOSITORY_NAME_REGEX.is_match(name))
+    }
+
+    #[rstest]
+    #[case(true, "default")]
+    #[case(false, "example")]
+    #[case(false, "other")]
+    fn is_default(#[case] expected_is_default: bool, #[case] input: &str) {
+        assert_eq!(
+            expected_is_default,
+            RepositoryName::parse(input)
+                .expect("test: must be valid repository name")
+                .is_default()
+        );
+    }
 
     #[rstest]
     #[case(None, "")]

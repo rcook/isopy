@@ -62,12 +62,12 @@ impl App {
             let repositories_rec = RepositoriesRec {
                 repositories: vec![
                     RepositoryRec::GitHub {
-                        name: RepositoryName::parse("default").expect("must parse"),
+                        name: RepositoryName::Default,
                         url: dir_url(&RELEASES_URL)?,
                         enabled: true,
                     },
                     RepositoryRec::Local {
-                        name: RepositoryName::parse("example").expect("must parse"),
+                        name: RepositoryName::Example,
                         dir: PathBuf::from("/path/to/local/repository"),
                         enabled: false,
                     },
@@ -126,12 +126,14 @@ impl App {
     }
 
     pub fn releases_path(&self, repository_name: &RepositoryName) -> PathBuf {
-        match repository_name {
-            RepositoryName::Default => self.repo.shared_dir().join(RELEASES_FILE_NAME),
-            RepositoryName::Named(s) => {
-                label_file_name(&self.repo.shared_dir().join(RELEASES_FILE_NAME), s)
-                    .expect("must be valid")
-            }
+        if repository_name.is_default() {
+            self.repo.shared_dir().join(RELEASES_FILE_NAME)
+        } else {
+            label_file_name(
+                &self.repo.shared_dir().join(RELEASES_FILE_NAME),
+                repository_name.as_str(),
+            )
+            .expect("must be valid")
         }
     }
 
@@ -217,12 +219,14 @@ impl App {
     }
 
     fn index_path(&self, repository_name: &RepositoryName) -> PathBuf {
-        match repository_name {
-            RepositoryName::Default => self.repo.shared_dir().join(INDEX_FILE_NAME),
-            RepositoryName::Named(s) => {
-                label_file_name(&self.repo.shared_dir().join(INDEX_FILE_NAME), s)
-                    .expect("must be valid")
-            }
+        if repository_name.is_default() {
+            self.repo.shared_dir().join(INDEX_FILE_NAME)
+        } else {
+            label_file_name(
+                &self.repo.shared_dir().join(INDEX_FILE_NAME),
+                repository_name.as_str(),
+            )
+            .expect("must be valid")
         }
     }
 
