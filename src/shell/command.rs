@@ -20,14 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 #![allow(unused)]
-use crate::object_model::Environment;
-use crate::util::path_to_str;
-use anyhow::Result;
-use std::env::{set_var, var};
+use crate::constants::ISOPY_ENV_NAME;
+use anyhow::{anyhow, Result};
+use joat_repo::{LinkId, MetaId};
+use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
+use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
-
-pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";
 
 pub struct Command {
     program: Option<OsString>,
@@ -61,18 +60,17 @@ impl Command {
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    pub fn exec(&self, environment: &Environment) -> Result<ExitStatus> {
+    pub fn exec(
+        &self,
+        link_id: &LinkId,
+        meta_id: &MetaId,
+        python_dir: &Path,
+    ) -> Result<ExitStatus> {
         use exec::execvp;
         use std::iter::once;
 
-        set_var(ISOPY_ENV_NAME, environment.name.as_str());
-
-        let mut new_path = String::new();
-        let python_bin_dir = environment.full_python_dir.join("bin");
-        new_path.push_str(path_to_str(&python_bin_dir)?);
-        new_path.push(':');
-        new_path.push_str(&var("PATH")?);
-        set_var("PATH", new_path);
+        set_var(ISOPY_ENV_NAME, format!("{}-{}", meta_id, link_id));
+        prepend_paths(&[&python_dir.join("bin")])?;
 
         match &self.program {
             Some(program) => {
@@ -80,7 +78,8 @@ impl Command {
                 unreachable!()
             }
             None => {
-                let shell = OsString::from(var("SHELL")?);
+                let shell = var_os("SHELL")
+                    .ok_or(anyhow!("SHELL environment variable is not available"))?;
                 let _ = execvp(&shell, once(&shell).chain(self.args.iter()));
                 unreachable!()
             }
@@ -88,23 +87,19 @@ impl Command {
     }
 
     #[cfg(any(target_os = "windows"))]
-    pub fn exec(&self, environment: &Environment) -> Result<ExitStatus> {
+    pub fn exec2(
+        &self,
+        link_id: &LinkId,
+        meta_id: &MetaId,
+        python_dir: &Path,
+    ) -> Result<ExitStatus> {
         use crate::shell::{get_windows_shell_info, WindowsShellKind};
         use std::process::Command;
 
+        set_var(ISOPY_ENV_NAME, format!("{}-{}", meta_id, link_id));
+        prepend_paths(&[&python_dir, &python_dir.join("Scripts")])?;
+
         let windows_shell_info = get_windows_shell_info()?;
-
-        set_var(ISOPY_ENV_NAME, environment.name.as_str());
-
-        let mut new_path = String::new();
-        new_path.push_str(path_to_str(&environment.full_python_dir)?);
-        new_path.push(';');
-        let python_scripts_dir = environment.full_python_dir.join("Scripts");
-        new_path.push_str(path_to_str(&python_scripts_dir)?);
-        new_path.push(';');
-        new_path.push_str(&var("PATH")?);
-        set_var("PATH", new_path);
-
         let mut command = match &self.program {
             Some(program) => match windows_shell_info.kind {
                 WindowsShellKind::Cmd => {
@@ -140,4 +135,16 @@ impl Command {
 
         Ok(command.status()?)
     }
+}
+
+fn prepend_paths(paths: &[&Path]) -> Result<()> {
+    let mut new_paths = paths.to_vec();
+    let mut existing_paths = Vec::new();
+    if let Some(path) = var_os("PATH") {
+        existing_paths = split_paths(&path).collect();
+        new_paths.extend(existing_paths.iter().map(PathBuf::as_path));
+    }
+
+    set_var("PATH", join_paths(new_paths)?);
+    Ok(())
 }

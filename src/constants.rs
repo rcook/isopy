@@ -39,3 +39,5 @@ pub const RELEASES_FILE_NAME: &str = "releases.json";
 pub const INDEX_FILE_NAME: &str = "index.yaml";
 
 pub const ENV_FILE_NAME: &str = "env.yaml";
+
+pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";

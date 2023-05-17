@@ -21,7 +21,6 @@
 //
 #![allow(unused)]
 use crate::app::App;
-use crate::object_model::Environment;
 use crate::status::Status;
 use anyhow::Result;
 use joatmon::safe_write_file;
@@ -90,6 +89,7 @@ pub fn do_wrap(
     */
 }
 
+/*
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn make_path_env(environment: &Environment) -> String {
     format!(
@@ -106,6 +106,7 @@ fn make_path_env(environment: &Environment) -> String {
         environment.full_python_dir.join("Scripts").display()
     )
 }
+*/
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn set_file_attributes<P>(wrapper_path: P) -> Result<()>

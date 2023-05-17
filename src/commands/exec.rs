@@ -21,7 +21,6 @@
 //
 #![allow(unused)]
 use crate::app::App;
-use crate::object_model::{Environment, EnvironmentName};
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::Result;
