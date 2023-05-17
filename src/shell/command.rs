@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ISOPY_ENV_NAME;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use joat_repo::{LinkId, MetaId};
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
@@ -67,6 +67,7 @@ impl Command {
         meta_id: &MetaId,
         python_dir: &Path,
     ) -> Result<ExitStatus> {
+        use anyhow::anyhow;
         use exec::execvp;
         use std::iter::once;
 
@@ -88,7 +89,7 @@ impl Command {
     }
 
     #[cfg(any(target_os = "windows"))]
-    pub fn exec2(
+    pub fn exec(
         &self,
         link_id: &LinkId,
         meta_id: &MetaId,
