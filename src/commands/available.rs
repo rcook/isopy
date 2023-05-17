@@ -41,9 +41,9 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
 
     let index_json_path = app.get_index_json_path(&repository.name);
     let current_last_modified = if index_json_path.is_file() {
-        None
-    } else {
         app.read_index_last_modified(&repository.name)?
+    } else {
+        None
     };
 
     if let Some(mut response) = repository
