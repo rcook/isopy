@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::status::Status;
-use crate::util::show_dir_info;
+use crate::util::print_dir_info_and_env;
 use anyhow::{bail, Result};
 use joat_repo::MetaId;
 
@@ -30,7 +30,7 @@ pub fn do_link(app: &App, meta_id: &MetaId) -> Result<Status> {
         bail!("could not create link");
     };
 
-    show_dir_info(&dir_info)?;
+    print_dir_info_and_env(&dir_info)?;
 
     Ok(Status::OK)
 }

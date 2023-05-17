@@ -23,23 +23,13 @@ use crate::app::App;
 use crate::cli::PythonVersion;
 use crate::object_model::{Asset, AssetFilter, Tag};
 use crate::serialization::EnvRec;
-use crate::util::{
-    download_stream, print, print_dir_info, print_title, unpack_file, validate_sha256_checksum,
-};
+use crate::util::{download_stream, unpack_file, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
-use joat_repo::DirInfo;
-use joatmon::{read_yaml_file, safe_write_file};
+use joatmon::safe_write_file;
+use log::info;
 use std::ffi::OsString;
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};
-
-pub fn reset_terminal() {
-    #[cfg(windows)]
-    {
-        use colored::control::set_virtual_terminal;
-        set_virtual_terminal(true).expect("set_virtual_terminal failed");
-    }
-}
 
 pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
@@ -92,10 +82,10 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
         );
     }
 
-    print(&format!(
+    info!(
         "SHA256 checksum validation succeeded on {}",
         asset_path.display()
-    ));
+    );
 
     Ok(asset_path)
 }
@@ -132,21 +122,6 @@ pub async fn init_project(
         })?,
         false,
     )?;
-
-    Ok(())
-}
-
-pub fn show_dir_info(dir_info: &DirInfo) -> Result<()> {
-    print_title("Environment info");
-
-    let env_yaml_path = dir_info.data_dir().join("env.yaml");
-    let rec_opt = if env_yaml_path.is_file() {
-        Some(read_yaml_file::<EnvRec, _>(env_yaml_path)?)
-    } else {
-        None
-    };
-
-    print_dir_info(dir_info, &rec_opt);
 
     Ok(())
 }

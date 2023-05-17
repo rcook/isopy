@@ -25,25 +25,23 @@ mod indicator;
 mod probe;
 mod repo;
 mod sha256sums;
-mod show;
 mod str;
 mod types;
+mod ui;
 mod unpack_file;
 mod url;
 
 pub use self::download_file::download_stream;
-pub use self::helpers::{
-    download_asset, get_asset, init_project, label_file_name, reset_terminal, show_dir_info,
-};
+pub use self::helpers::{download_asset, get_asset, init_project, label_file_name};
 pub use self::indicator::Indicator;
 pub use self::probe::default_isopy_dir;
 pub use self::repo::find_dir_info;
 pub use self::sha256sums::validate_sha256_checksum;
-pub use self::show::{
-    print, print_dir_info, print_error, print_link, print_metadir, print_repo, print_title,
-    print_value,
-};
 pub use self::str::path_to_str;
 pub use self::types::ContentLength;
+pub use self::ui::{
+    print, print_dir_info, print_dir_info_and_env, print_error, print_link, print_metadir,
+    print_repo, print_title, print_value, reset_terminal,
+};
 pub use self::unpack_file::unpack_file;
 pub use self::url::{dir_url, file_url};

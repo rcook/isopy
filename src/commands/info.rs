@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::status::Status;
-use crate::util::{find_dir_info, print_repo, print_title, print_value, show_dir_info};
+use crate::util::{find_dir_info, print_dir_info_and_env, print_repo, print_title, print_value};
 use anyhow::Result;
 
 pub fn do_info(app: &App) -> Result<Status> {
@@ -29,7 +29,7 @@ pub fn do_info(app: &App) -> Result<Status> {
     print_value("Working directory", app.cwd.display());
 
     if let Some(dir_info) = find_dir_info(&app.repo, &app.cwd)? {
-        show_dir_info(&dir_info)?;
+        print_dir_info_and_env(&dir_info)?;
     }
 
     print_title("Repository information");

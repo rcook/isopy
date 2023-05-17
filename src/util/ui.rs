@@ -20,9 +20,19 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::serialization::EnvRec;
+use anyhow::Result;
 use colored::Colorize;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
+use joatmon::read_yaml_file;
 use std::fmt::Display;
+
+pub fn reset_terminal() {
+    #[cfg(windows)]
+    {
+        use colored::control::set_virtual_terminal;
+        set_virtual_terminal(true).expect("set_virtual_terminal failed");
+    }
+}
 
 pub fn print(s: &str) {
     println!("{}", s.bright_white());
@@ -95,4 +105,19 @@ pub fn print_dir_info(dir_info: &DirInfo, rec_opt: &Option<EnvRec>) {
     print_value("Link created at", dir_info.link_created_at());
     print_value("Link ID", dir_info.link_id());
     print_value("Project directory", dir_info.project_dir().display());
+}
+
+pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
+    print_title("Environment info");
+
+    let env_yaml_path = dir_info.data_dir().join("env.yaml");
+    let rec_opt = if env_yaml_path.is_file() {
+        Some(read_yaml_file::<EnvRec, _>(env_yaml_path)?)
+    } else {
+        None
+    };
+
+    print_dir_info(dir_info, &rec_opt);
+
+    Ok(())
 }
