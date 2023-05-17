@@ -26,29 +26,36 @@ use crate::commands::{
     do_available, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
     do_init_config, do_link, do_list, do_shell, do_wrap,
 };
+use crate::constants::CACHE_DIR_NAME;
 use crate::logging::init_logging;
 use crate::status::Status;
 use crate::ui::reset_terminal;
-use crate::util::default_isopy_dir;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;
 use log::LevelFilter;
 use std::env::current_dir;
+use std::path::PathBuf;
 
-pub async fn run() -> Result<Status> {
+fn set_up() -> Result<()> {
     init_backtrace();
     reset_terminal();
     init_logging(LevelFilter::Info)?;
+    Ok(())
+}
+
+fn default_cache_dir() -> Option<PathBuf> {
+    let home_dir = home::home_dir()?;
+    let isopy_dir = home_dir.join(CACHE_DIR_NAME);
+    Some(isopy_dir)
+}
+
+pub async fn run() -> Result<Status> {
+    set_up()?;
 
     let args = Args::parse();
 
-    let cwd = match args.cwd {
-        Some(c) => c,
-        None => current_dir()?,
-    };
-
-    let Some(cache_dir) = args.cache_dir.or_else(default_isopy_dir) else {
+    let Some(cache_dir) = args.cache_dir.or_else(default_cache_dir) else {
         bail!("Could not infer isopy cache directory location: please specify using --dir option")
     };
 
@@ -56,8 +63,17 @@ pub async fn run() -> Result<Status> {
         bail!("Could not get repository")
     };
 
+    let cwd = match args.cwd {
+        Some(c) => c,
+        None => current_dir()?,
+    };
+
     let app = App::new(cwd, repo);
-    match args.command {
+    do_it(app, args.command).await
+}
+
+async fn do_it(app: App, command: Command) -> Result<Status> {
+    match command {
         Command::Available => do_available(&app).await,
         Command::Download(python_version) => do_download(&app, &python_version).await,
         Command::Downloaded => do_downloaded(&app),

@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod download_file;
-mod probe;
 mod repo;
 mod sha256sums;
 mod str;
@@ -29,7 +28,6 @@ mod unpack_file;
 mod url;
 
 pub use self::download_file::download_stream;
-pub use self::probe::default_isopy_dir;
 pub use self::repo::find_dir_info;
 pub use self::sha256sums::validate_sha256_checksum;
 pub use self::str::path_to_str;
