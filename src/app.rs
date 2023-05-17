@@ -28,7 +28,7 @@ use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::EnvRec;
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::util::dir_url;
+use crate::url::dir_url;
 use crate::util::unpack_file;
 use anyhow::{bail, Result};
 use joat_repo::Repo;
@@ -63,7 +63,7 @@ impl App {
                 repositories: vec![
                     RepositoryRec::GitHub {
                         name: RepositoryName::parse("default").expect("must parse"),
-                        url: dir_url(RELEASES_URL)?,
+                        url: dir_url(&RELEASES_URL)?,
                         enabled: true,
                     },
                     RepositoryRec::Local {
@@ -208,7 +208,7 @@ impl App {
     fn make_repository(rec: RepositoryRec) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
         Ok(match rec {
             RepositoryRec::GitHub { name, url, enabled } => {
-                (name, enabled, Box::new(GitHubRepository::new(url)?))
+                (name, enabled, Box::new(GitHubRepository::new(&url)?))
             }
             RepositoryRec::Local { name, dir, enabled } => {
                 (name, enabled, Box::new(LocalRepository::new(dir)))

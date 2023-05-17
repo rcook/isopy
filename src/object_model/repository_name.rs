@@ -19,14 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use lazy_static::lazy_static;
-use regex::Regex;
-
-lazy_static! {
-    static ref REPOSITORY_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
-}
-
-const DEFAULT_REPOSITORY_NAME: &str = "default";
+use crate::constants::{DEFAULT_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum RepositoryName {

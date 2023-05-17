@@ -20,8 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::{Repository, Response, Stream};
+use crate::constants::ISOPY_USER_AGENT;
 use crate::object_model::{Asset, LastModified};
-use crate::util::{dir_url, file_url, ContentLength};
+use crate::url::{dir_url, file_url};
+use crate::util::ContentLength;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -29,28 +31,22 @@ use futures_util::stream::Stream as FuturesStream;
 use futures_util::StreamExt;
 use log::info;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
-use reqwest::{Client, IntoUrl, Response as ReqwestResponse, StatusCode, Url};
+use reqwest::{Client, Response as ReqwestResponse, StatusCode, Url};
 use std::pin::Pin;
-
-pub const ISOPY_USER_AGENT: &str = "isopy";
 
 type PinnedStream = Pin<Box<dyn FuturesStream<Item = reqwest::Result<Bytes>> + Send>>;
 
 pub struct GitHubRepository {
-    url: Url,
-    temp: Url,
+    base_url: Url,
+    index_url: Url,
     client: Client,
 }
 
 impl GitHubRepository {
-    pub fn new<U>(url: U) -> Result<Self>
-    where
-        U: IntoUrl,
-    {
-        let temp = url.into_url()?;
+    pub fn new(url: &Url) -> Result<Self> {
         Ok(Self {
-            url: dir_url(temp.clone())?,
-            temp: file_url(temp)?,
+            base_url: dir_url(url)?,
+            index_url: file_url(url)?,
             client: Client::new(),
         })
     }
@@ -62,10 +58,9 @@ impl Repository for GitHubRepository {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>> {
-        let latest_url = self.url.join("latest")?;
         let mut head_request = self
             .client
-            .head(latest_url.clone())
+            .head(self.base_url.join("latest")?)
             .header(USER_AGENT, ISOPY_USER_AGENT);
         if let Some(x) = last_modified {
             head_request = head_request.header(IF_MODIFIED_SINCE, x.as_str());
@@ -92,7 +87,7 @@ impl Repository for GitHubRepository {
 
         let index_request = self
             .client
-            .get(self.temp.clone())
+            .get(self.index_url.clone())
             .header(USER_AGENT, ISOPY_USER_AGENT);
         let index_response = index_request.send().await?;
         Ok(Some(Box::new(GitHubResponse::new(

@@ -33,6 +33,7 @@ mod serialization;
 mod shell;
 mod status;
 mod ui;
+mod url;
 mod util;
 
 #[tokio::main]
