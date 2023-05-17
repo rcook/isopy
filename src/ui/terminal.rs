@@ -19,10 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub fn reset_terminal() {
+use anyhow::Result;
+
+pub fn reset_terminal() -> Result<()> {
+    #[cfg(not(windows))]
+    {
+        Ok(())
+    }
     #[cfg(windows)]
     {
-        use colored::control::set_virtual_terminal;
-        set_virtual_terminal(true).expect("set_virtual_terminal failed");
+        Ok(colored::control::set_virtual_terminal(true)?)
     }
 }

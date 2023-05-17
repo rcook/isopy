@@ -33,18 +33,9 @@ pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Res
     asset_filter.version = Some(python_version.version.clone());
     asset_filter.tag = python_version.tag.clone();
     let matching_assets = asset_filter.filter(assets.iter());
-    match matching_assets.len() {
-        1 => return Ok(matching_assets.first().expect("Must exist")),
-        0 => bail!(
-            "No asset matching version {} and tag {}",
-            python_version.version,
-            python_version
-                .tag
-                .as_ref()
-                .map(Tag::to_string)
-                .unwrap_or(String::from("(none)"))
-        ),
-        _ => bail!(
+
+    if matching_assets.len() > 1 {
+        bail!(
             "More than one asset matching version {} and tag {}",
             python_version.version,
             python_version
@@ -52,8 +43,22 @@ pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Res
                 .as_ref()
                 .map(Tag::to_string)
                 .unwrap_or(String::from("(none)"))
-        ),
+        )
     }
+
+    if let Some(asset) = matching_assets.first() {
+        return Ok(asset);
+    }
+
+    bail!(
+        "No asset matching version {} and tag {}",
+        python_version.version,
+        python_version
+            .tag
+            .as_ref()
+            .map(Tag::to_string)
+            .unwrap_or(String::from("(none)"))
+    );
 }
 
 pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {

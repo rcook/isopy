@@ -253,42 +253,42 @@ mod tests {
         let a0 = Asset {
             name: String::from(""),
             tag: Tag::parse("tag"),
-            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
                 "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst",
             )
-            .expect("Should parse"),
+            .expect("test: must be valid asset name"),
         };
         let a1 = Asset {
             name: String::from(""),
             tag: Tag::parse("tag"),
-            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
                 "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz",
             )
-            .expect("Should parse"),
+            .expect("test: must be valid asset name"),
         };
         let a2 = Asset {
             name: String::from(""),
             tag: Tag::parse("tag"),
-            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
                 "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst",
             )
-            .expect("Should parse"),
+            .expect("test: must be valid asset name"),
         };
         let a3 = Asset {
             name: String::from(""),
             tag: Tag::parse("20210724T1424"),
-            url: Url::parse("https://httpbin.org").expect("Must parse"),
+            url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
                 "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
             )
-            .expect("Should parse"),
+            .expect("test: must be valid asset name"),
         };
         (a0, a1, a2, a3)
     }

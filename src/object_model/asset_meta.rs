@@ -88,6 +88,7 @@ impl AssetMeta {
         let mut need_tag = tag_opt.is_none();
         while need_flavour || need_subflavour0 || need_subflavour1 || need_variant || need_tag {
             let temp = wrap(s, "flavour/subflavour/variant/tag", iter.next())?;
+
             if need_flavour {
                 need_flavour = false;
                 flavour_opt = Flavour::parse(temp);
@@ -95,6 +96,7 @@ impl AssetMeta {
                     continue;
                 }
             }
+
             if need_subflavour0 {
                 need_subflavour0 = false;
                 subflavour0_opt = Subflavour::parse(temp);
@@ -102,6 +104,7 @@ impl AssetMeta {
                     continue;
                 }
             }
+
             if need_subflavour1 {
                 need_subflavour1 = false;
                 subflavour1_opt = Subflavour::parse(temp);
@@ -109,6 +112,7 @@ impl AssetMeta {
                     continue;
                 }
             }
+
             if need_variant {
                 need_variant = false;
                 variant_opt = Variant::parse(temp);
@@ -116,17 +120,18 @@ impl AssetMeta {
                     continue;
                 }
             }
+
             if need_tag {
                 need_tag = false;
                 tag_opt = Some(Tag::parse(temp));
                 continue;
             }
-            unimplemented!()
+
+            unreachable!()
         }
 
-        if iter.next().is_some() {
-            unimplemented!()
-        }
+        let tag = tag_opt.expect("tag must be present");
+        assert!(iter.next().is_none());
 
         Ok(Self {
             archive_type,
@@ -139,7 +144,7 @@ impl AssetMeta {
             subflavour0: subflavour0_opt,
             subflavour1: subflavour1_opt,
             variant: variant_opt,
-            parsed_tag: tag_opt.expect("Must be present"),
+            parsed_tag: tag,
         })
     }
 }
@@ -205,7 +210,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: Version::parse("3.9.6").expect("Should parse"),
+            version: Version::parse("3.9.6").expect("test: should be valid version"),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,

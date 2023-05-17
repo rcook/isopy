@@ -30,10 +30,13 @@ pub fn do_downloaded(app: &App) -> Result<Status> {
     for result in read_dir(app.repo.shared_dir())? {
         let entry = result?;
         let file_name = entry.file_name();
-        let asset_name = file_name.to_str().expect("must be valid");
-        if AssetMeta::parse(asset_name).is_ok() {
-            print(asset_name)
+
+        if let Some(asset_name) = file_name.to_str() {
+            if AssetMeta::parse(asset_name).is_ok() {
+                print(asset_name)
+            }
         }
     }
+
     Ok(Status::OK)
 }
