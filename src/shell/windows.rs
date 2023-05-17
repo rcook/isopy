@@ -41,7 +41,7 @@ pub enum WindowsShellKind {
 
 lazy_static! {
     static ref POWERSHELL_PATH: PathBuf =
-        PathBuf::from(var("WINDIR").expect("WINDIR must be defined"))
+        PathBuf::from(var("WINDIR").expect("lazy_static: WINDIR must be defined"))
             .join("System32")
             .join("WindowsPowerShell")
             .join("v1.0")
@@ -50,7 +50,8 @@ lazy_static! {
         path: &POWERSHELL_PATH,
         kind: WindowsShellKind::PowerShell
     };
-    static ref CMD_PATH: PathBuf = PathBuf::from(var("ComSpec").expect("ComSpec must be defined"));
+    static ref CMD_PATH: PathBuf =
+        PathBuf::from(var("ComSpec").expect("lazy_static: ComSpec must be defined"));
     static ref CMD: WindowsShellInfo = WindowsShellInfo {
         path: &CMD_PATH,
         kind: WindowsShellKind::Cmd
@@ -76,5 +77,30 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
 
         let parent_pid = get_parent_pid(process)?;
         process = get_process_from_pid(&mut system, parent_pid)?;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{CMD, CMD_PATH, POWERSHELL, POWERSHELL_PATH};
+
+    #[test]
+    fn cmd() {
+        _ = format!("{:?}", CMD);
+    }
+
+    #[test]
+    fn cmd_path() {
+        _ = format!("{:?}", CMD_PATH);
+    }
+
+    #[test]
+    fn powershell() {
+        _ = format!("{:?}", POWERSHELL);
+    }
+
+    #[test]
+    fn powershell_path() {
+        _ = format!("{:?}", POWERSHELL_PATH);
     }
 }

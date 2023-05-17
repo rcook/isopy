@@ -26,8 +26,9 @@ use reqwest::Url;
 lazy_static! {
     pub static ref RELEASES_URL: Url =
         Url::parse("https://api.github.com/repos/indygreg/python-build-standalone/releases")
-            .expect("must succeed");
-    pub static ref REPOSITORY_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
+            .expect("lazy_static: URL must be valid");
+    pub static ref REPOSITORY_NAME_REGEX: Regex =
+        Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
 }
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";
@@ -53,3 +54,18 @@ pub const ENV_FILE_NAME: &str = "env.yaml";
 pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";
 
 pub const ISOPY_USER_AGENT: &str = "isopy";
+
+#[cfg(test)]
+mod tests {
+    use super::{RELEASES_URL, REPOSITORY_NAME_REGEX};
+
+    #[test]
+    fn releases_url() {
+        _ = format!("{}", RELEASES_URL.as_str());
+    }
+
+    #[test]
+    fn repository_name_regex() {
+        _ = format!("{}", REPOSITORY_NAME_REGEX.as_str());
+    }
+}
