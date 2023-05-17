@@ -22,13 +22,14 @@
 use super::{Repository, Response, Stream};
 use crate::constants::RELEASES_FILE_NAME;
 use crate::object_model::{Asset, LastModified};
-use crate::util::{to_last_modified, to_system_time, ContentLength};
+use crate::util::ContentLength;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
 use std::fs::{metadata, File};
 use std::io::Read;
 use std::path::PathBuf;
+use std::time::SystemTime;
 
 pub struct LocalRepository {
     dir: PathBuf,
@@ -56,12 +57,12 @@ impl Repository for LocalRepository {
         let modified = m.modified()?;
 
         if let Some(l) = last_modified {
-            if modified <= to_system_time(l)? {
+            if modified <= SystemTime::try_from(l)? {
                 return Ok(None);
             }
         }
 
-        let new_last_modified = to_last_modified(&modified)?;
+        let new_last_modified = LastModified::try_from(&modified)?;
         let content_length = m.len();
         Ok(Some(Box::new(LocalResponse::new(
             Some(new_last_modified),
@@ -73,7 +74,7 @@ impl Repository for LocalRepository {
     async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
         let asset_path = self.dir.join("assets").join(&asset.name);
         let m = metadata(&asset_path)?;
-        let last_modified = to_last_modified(&m.modified()?)?;
+        let last_modified = LastModified::try_from(&m.modified()?)?;
         let content_length = m.len();
         Ok(Box::new(LocalResponse::new(
             Some(last_modified),

@@ -27,7 +27,6 @@ mod repo;
 mod sha256sums;
 mod show;
 mod str;
-mod time;
 mod types;
 mod unpack_file;
 mod url;
@@ -45,7 +44,6 @@ pub use self::show::{
     print_value,
 };
 pub use self::str::path_to_str;
-pub use self::time::{to_last_modified, to_system_time};
 pub use self::types::ContentLength;
 pub use self::unpack_file::unpack_file;
 pub use self::url::{dir_url, file_url};

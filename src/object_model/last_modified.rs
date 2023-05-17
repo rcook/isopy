@@ -19,6 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::Error as AnyhowError;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
 #[derive(Clone, Debug)]
 pub struct LastModified(String);
 
@@ -35,8 +40,26 @@ impl LastModified {
     }
 }
 
-impl std::fmt::Display for LastModified {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for LastModified {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
+    }
+}
+
+impl TryFrom<&SystemTime> for LastModified {
+    type Error = AnyhowError;
+
+    fn try_from(value: &SystemTime) -> StdResult<Self, Self::Error> {
+        let nanos = value.duration_since(UNIX_EPOCH)?.as_nanos();
+        Ok(LastModified::parse(format!("{}", nanos)))
+    }
+}
+
+impl TryFrom<&LastModified> for SystemTime {
+    type Error = AnyhowError;
+
+    fn try_from(value: &LastModified) -> StdResult<Self, Self::Error> {
+        let nanos = str::parse::<u64>(value.as_str())?;
+        Ok(UNIX_EPOCH + Duration::from_nanos(nanos))
     }
 }
