@@ -26,7 +26,6 @@ use crate::serialization::EnvRec;
 use crate::shell::{Command, ISOPY_ENV_NAME};
 use crate::status::Status;
 use crate::util::find_dir_info;
-use crate::util::path_to_str;
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
@@ -44,13 +43,21 @@ pub fn do_shell(app: &App) -> Result<Status> {
         bail!("Could not find environment for directory {}", app.cwd.display())
     };
 
-    let env_path = dir_info.data_dir().join(ENV_FILE_NAME);
+    let data_dir = dir_info.data_dir();
+
+    let env_name = data_dir
+        .to_str()
+        .map(|s| EnvironmentName::sanitize(s))
+        .unwrap_or_else(EnvironmentName::random);
+
+    let env_path = data_dir.join(ENV_FILE_NAME);
     let rec = read_yaml_file::<EnvRec, _>(&env_path)?;
-    let environment = Environment {
-        name: EnvironmentName::sanitize(path_to_str(&env_path)?),
-        full_python_dir: dir_info.data_dir().join(rec.python_dir_rel),
+
+    let env = Environment {
+        name: env_name,
+        full_python_dir: data_dir.join(rec.python_dir_rel),
     };
 
-    Command::new_shell().exec(&environment)?;
+    Command::new_shell().exec(&env)?;
     Ok(Status::OK)
 }

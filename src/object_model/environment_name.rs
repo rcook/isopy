@@ -21,6 +21,8 @@
 //
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use uuid::Uuid;
 
 lazy_static! {
     static ref ENVIRONMENT_NAME_REGEX: Regex = Regex::new("^[A-Za-z0-9-_]+$").unwrap();
@@ -30,6 +32,18 @@ lazy_static! {
 pub struct EnvironmentName(String);
 
 impl EnvironmentName {
+    pub fn parse(s: &str) -> Option<Self> {
+        match ENVIRONMENT_NAME_REGEX.is_match(s) {
+            true => Some(Self(String::from(s))),
+            false => None,
+        }
+    }
+
+    pub fn random() -> Self {
+        let name = format!("env-{}", Uuid::new_v4());
+        Self::parse(&name).expect("must be valid")
+    }
+
     pub fn sanitize(s: &str) -> Self {
         let mut s1 = String::with_capacity(s.len());
         for c in s.chars() {
@@ -39,18 +53,8 @@ impl EnvironmentName {
                 s1.push('-')
             }
         }
-        Self::parse(s1).expect("must be a valid environment name")
-    }
 
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: Into<String>,
-    {
-        let s1 = s.into();
-        match ENVIRONMENT_NAME_REGEX.is_match(&s1) {
-            true => Some(Self(s1)),
-            false => None,
-        }
+        Self::parse(&s1).expect("must be valid")
     }
 
     pub fn as_str(&self) -> &str {
@@ -58,8 +62,8 @@ impl EnvironmentName {
     }
 }
 
-impl std::fmt::Display for EnvironmentName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for EnvironmentName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
     }
 }
@@ -75,7 +79,7 @@ mod tests {
     #[case(None, " foo ")]
     #[case(Some(EnvironmentName(String::from("foo"))), "foo")]
     #[case(Some(EnvironmentName(String::from("foo-_"))), "foo-_")]
-    fn test_basics(#[case] expected_result: Option<EnvironmentName>, #[case] input: String) {
+    fn test_basics(#[case] expected_result: Option<EnvironmentName>, #[case] input: &str) {
         assert_eq!(expected_result, EnvironmentName::parse(input))
     }
 }
