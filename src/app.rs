@@ -23,10 +23,10 @@ use crate::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSI
 use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::util::{dir_url, label_file_name};
+use crate::util::dir_url;
 use anyhow::Result;
 use joat_repo::Repo;
-use joatmon::{read_json_file, read_yaml_file, safe_write_file};
+use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
 use std::path::PathBuf;
 
 pub struct RepositoryInfo {

@@ -32,7 +32,7 @@ mod unpack_file;
 mod url;
 
 pub use self::download_file::download_stream;
-pub use self::helpers::{download_asset, get_asset, init_project, label_file_name};
+pub use self::helpers::{download_asset, get_asset, init_project};
 pub use self::indicator::Indicator;
 pub use self::probe::default_isopy_dir;
 pub use self::repo::find_dir_info;
