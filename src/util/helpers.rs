@@ -29,6 +29,7 @@ use crate::util::{
 use anyhow::{anyhow, bail, Result};
 use joat_repo::DirInfo;
 use joatmon::{read_yaml_file, safe_write_file};
+use std::ffi::OsString;
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};
 
@@ -148,4 +149,40 @@ pub fn show_dir_info(dir_info: &DirInfo) -> Result<()> {
     print_dir_info(dir_info, &rec_opt);
 
     Ok(())
+}
+
+pub fn label_file_name(path: &Path, label: &str) -> Option<PathBuf> {
+    let mut file_name = OsString::new();
+
+    if let Some(s) = path.file_stem() {
+        file_name.push(s);
+    } else {
+        return None;
+    }
+
+    file_name.push("-");
+    file_name.push(label);
+
+    if let Some(s) = path.extension() {
+        file_name.push(".");
+        file_name.push(s)
+    }
+
+    Some(path.with_file_name(file_name))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::label_file_name;
+    use rstest::rstest;
+    use std::path::PathBuf;
+
+    #[rstest]
+    #[case(Some(PathBuf::from("/aaa/bbb/ccc-ddd.txt")), "/aaa/bbb/ccc.txt", "ddd")]
+    #[case(Some(PathBuf::from("/aaa/bbb/ccc-ddd")), "/aaa/bbb/ccc", "ddd")]
+    #[case(Some(PathBuf::from("ccc-ddd.txt")), "ccc.txt", "ddd")]
+    #[case(Some(PathBuf::from("ccc-ddd")), "ccc", "ddd")]
+    fn basics(#[case] expected_path: Option<PathBuf>, #[case] path: PathBuf, #[case] label: &str) {
+        assert_eq!(expected_path, label_file_name(&path, label))
+    }
 }

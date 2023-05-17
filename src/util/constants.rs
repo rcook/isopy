@@ -35,3 +35,5 @@ pub const PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
 pub const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
 
 pub const INDEX_FILE_NAME: &str = "releases.json";
+
+pub const INDEX_YAML_FILE_NAME: &str = "index.yaml";

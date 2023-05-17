@@ -22,7 +22,10 @@
 use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::util::{dir_url, INDEX_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
+use crate::util::{
+    dir_url, label_file_name, INDEX_FILE_NAME, INDEX_YAML_FILE_NAME, RELEASES_URL,
+    REPOSITORIES_FILE_NAME,
+};
 use anyhow::Result;
 use joat_repo::Repo;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
@@ -118,7 +121,10 @@ impl App {
     pub fn get_index_json_path(&self, repository_name: &RepositoryName) -> PathBuf {
         match repository_name {
             RepositoryName::Default => self.repo.shared_dir().join(INDEX_FILE_NAME),
-            RepositoryName::Named(s) => self.repo.shared_dir().join(format!("index-{}.json", s)),
+            RepositoryName::Named(s) => {
+                label_file_name(&self.repo.shared_dir().join(INDEX_FILE_NAME), s)
+                    .expect("must be valid")
+            }
         }
     }
 
@@ -161,8 +167,11 @@ impl App {
 
     fn get_index_yaml_path(&self, repository_name: &RepositoryName) -> PathBuf {
         match repository_name {
-            RepositoryName::Default => self.repo.shared_dir().join("index.yaml"),
-            RepositoryName::Named(s) => self.repo.shared_dir().join(format!("index-{}.yaml", s)),
+            RepositoryName::Default => self.repo.shared_dir().join(INDEX_YAML_FILE_NAME),
+            RepositoryName::Named(s) => {
+                label_file_name(&self.repo.shared_dir().join(INDEX_YAML_FILE_NAME), s)
+                    .expect("must be valid")
+            }
         }
     }
 }
