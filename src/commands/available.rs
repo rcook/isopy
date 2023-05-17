@@ -22,7 +22,8 @@
 use crate::app::App;
 use crate::object_model::AssetFilter;
 use crate::status::Status;
-use crate::util::{download_stream, print};
+use crate::ui::print;
+use crate::util::download_stream;
 use anyhow::{anyhow, Result};
 use joatmon::safe_back_up;
 use log::info;

@@ -19,22 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::Status;
-use crate::ui::{print_dir_info_and_env, print_repo, print_title, print_value};
-use crate::util::find_dir_info;
-use anyhow::Result;
-
-pub fn do_info(app: &App) -> Result<Status> {
-    print_title("Current directory");
-    print_value("Working directory", app.cwd.display());
-
-    if let Some(dir_info) = find_dir_info(&app.repo, &app.cwd)? {
-        print_dir_info_and_env(&dir_info)?;
+pub fn reset_terminal() {
+    #[cfg(windows)]
+    {
+        use colored::control::set_virtual_terminal;
+        set_virtual_terminal(true).expect("set_virtual_terminal failed");
     }
-
-    print_title("Repository information");
-    print_repo(&app.repo);
-
-    Ok(Status::OK)
 }

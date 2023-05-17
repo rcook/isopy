@@ -29,6 +29,7 @@ mod repository;
 mod serialization;
 mod shell;
 mod status;
+mod ui;
 mod util;
 
 use crate::app::App;
@@ -40,7 +41,8 @@ use crate::commands::{
 use crate::constants::{ERROR, OK};
 use crate::logging::init_logging;
 use crate::status::Status;
-use crate::util::{default_isopy_dir, print_error, reset_terminal};
+use crate::ui::{print_error, reset_terminal};
+use crate::util::default_isopy_dir;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;

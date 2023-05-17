@@ -20,7 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repository::Response;
-use crate::util::{ContentLength, Indicator};
+use crate::ui::Indicator;
+use crate::util::ContentLength;
 use anyhow::Result;
 use joatmon::safe_create_file;
 use std::io::Write;

@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::util::{ContentLength, Indicator};
+use crate::ui::Indicator;
+use crate::util::ContentLength;
 use anyhow::Result;
 use flate2::read::GzDecoder;
 use joatmon::open_file;

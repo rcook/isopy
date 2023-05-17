@@ -26,14 +26,6 @@ use joat_repo::{DirInfo, Link, Manifest, Repo};
 use joatmon::read_yaml_file;
 use std::fmt::Display;
 
-pub fn reset_terminal() {
-    #[cfg(windows)]
-    {
-        use colored::control::set_virtual_terminal;
-        set_virtual_terminal(true).expect("set_virtual_terminal failed");
-    }
-}
-
 pub fn print(s: &str) {
     println!("{}", s.bright_white());
 }
