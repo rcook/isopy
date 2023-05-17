@@ -21,13 +21,13 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
+use crate::constants::PYTHON_VERSION_FILE_NAME;
 use crate::serialization::PythonVersionRec;
-use crate::util::PROJECT_CONFIG_FILE_NAME;
 use anyhow::Result;
 use joatmon::safe_write_file;
 
 pub async fn do_gen_config(app: &App, python_version: &PythonVersion) -> Result<()> {
-    let config_path = app.cwd.join(PROJECT_CONFIG_FILE_NAME);
+    let config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
 
     let rec = PythonVersionRec {
         version: python_version.version.clone(),

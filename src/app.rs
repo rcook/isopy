@@ -19,13 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
 use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::util::{
-    dir_url, label_file_name, INDEX_FILE_NAME, INDEX_YAML_FILE_NAME, RELEASES_URL,
-    REPOSITORIES_FILE_NAME,
-};
+use crate::util::{dir_url, label_file_name};
 use anyhow::Result;
 use joat_repo::Repo;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
@@ -94,9 +92,9 @@ impl App {
         &self,
         repository_name: &RepositoryName,
     ) -> Result<Option<LastModified>> {
-        let index_yaml_path = self.get_index_yaml_path(repository_name);
-        Ok(if index_yaml_path.is_file() {
-            Some(read_yaml_file::<IndexRec, _>(&index_yaml_path)?.last_modified)
+        let index_path = self.index_path(repository_name);
+        Ok(if index_path.is_file() {
+            Some(read_yaml_file::<IndexRec, _>(&index_path)?.last_modified)
         } else {
             None
         })
@@ -107,7 +105,7 @@ impl App {
         repository_name: &RepositoryName,
         last_modified: &LastModified,
     ) -> Result<()> {
-        let index_yaml_path = self.get_index_yaml_path(repository_name);
+        let index_yaml_path = self.index_path(repository_name);
         safe_write_file(
             index_yaml_path,
             serde_yaml::to_string(&IndexRec {
@@ -118,11 +116,11 @@ impl App {
         Ok(())
     }
 
-    pub fn get_index_json_path(&self, repository_name: &RepositoryName) -> PathBuf {
+    pub fn releases_path(&self, repository_name: &RepositoryName) -> PathBuf {
         match repository_name {
-            RepositoryName::Default => self.repo.shared_dir().join(INDEX_FILE_NAME),
+            RepositoryName::Default => self.repo.shared_dir().join(RELEASES_FILE_NAME),
             RepositoryName::Named(s) => {
-                label_file_name(&self.repo.shared_dir().join(INDEX_FILE_NAME), s)
+                label_file_name(&self.repo.shared_dir().join(RELEASES_FILE_NAME), s)
                     .expect("must be valid")
             }
         }
@@ -133,7 +131,7 @@ impl App {
     }
 
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
-        let index_json_path = self.repo.shared_dir().join(INDEX_FILE_NAME);
+        let index_json_path = self.repo.shared_dir().join(RELEASES_FILE_NAME);
         let package_recs = read_json_file::<Vec<PackageRec>, _>(&index_json_path)?;
 
         let mut assets = Vec::new();
@@ -165,11 +163,11 @@ impl App {
         })
     }
 
-    fn get_index_yaml_path(&self, repository_name: &RepositoryName) -> PathBuf {
+    fn index_path(&self, repository_name: &RepositoryName) -> PathBuf {
         match repository_name {
-            RepositoryName::Default => self.repo.shared_dir().join(INDEX_YAML_FILE_NAME),
+            RepositoryName::Default => self.repo.shared_dir().join(INDEX_FILE_NAME),
             RepositoryName::Named(s) => {
-                label_file_name(&self.repo.shared_dir().join(INDEX_YAML_FILE_NAME), s)
+                label_file_name(&self.repo.shared_dir().join(INDEX_FILE_NAME), s)
                     .expect("must be valid")
             }
         }

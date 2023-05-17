@@ -22,6 +22,7 @@
 mod app;
 mod cli;
 mod commands;
+mod constants;
 mod logging;
 mod object_model;
 mod repository;
@@ -35,8 +36,9 @@ use crate::commands::{
     do_available, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
     do_init_config, do_link, do_list, do_shell, do_wrap,
 };
+use crate::constants::{ERROR, OK};
 use crate::logging::init_logging;
-use crate::util::{default_isopy_dir, print_error, reset_terminal, ERROR, OK};
+use crate::util::{default_isopy_dir, print_error, reset_terminal};
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;

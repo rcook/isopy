@@ -20,8 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::{Repository, Response, Stream};
+use crate::constants::RELEASES_FILE_NAME;
 use crate::object_model::{Asset, LastModified};
-use crate::util::{to_last_modified, to_system_time, ContentLength, INDEX_FILE_NAME};
+use crate::util::{to_last_modified, to_system_time, ContentLength};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -48,7 +49,7 @@ impl Repository for LocalRepository {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>> {
-        let index_json_path = self.dir.join("assets").join(INDEX_FILE_NAME);
+        let index_json_path = self.dir.join("assets").join(RELEASES_FILE_NAME);
 
         let m = metadata(&index_json_path)?;
 

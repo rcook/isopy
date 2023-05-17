@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::util::CACHE_DIR_NAME;
+use crate::constants::CACHE_DIR_NAME;
 use std::path::PathBuf;
 
 pub fn default_isopy_dir() -> Option<PathBuf> {

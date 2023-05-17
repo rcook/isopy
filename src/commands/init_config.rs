@@ -21,13 +21,14 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
+use crate::constants::PYTHON_VERSION_FILE_NAME;
 use crate::serialization::PythonVersionRec;
-use crate::util::{init_project, PROJECT_CONFIG_FILE_NAME};
+use crate::util::init_project;
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 
 pub async fn do_init_config(app: &App) -> Result<()> {
-    let config_path = app.cwd.join(PROJECT_CONFIG_FILE_NAME);
+    let config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
 
     if app.repo.get(&app.cwd)?.is_some() {
         bail!(
