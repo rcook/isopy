@@ -938,7 +938,6 @@ dependencies = [
  "tar",
  "tinytemplate",
  "tokio",
- "uuid",
 ]
 
 [[package]]
