@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use std::env::{set_var, var, VarError};
-
 #[cfg(debug_assertions)]
 pub fn init_backtrace() {
+    use std::env::{set_var, var, VarError};
+
     const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
     if let Err(VarError::NotPresent) = var(RUST_BACKTRACE_ENV_NAME) {
