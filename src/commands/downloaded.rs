@@ -21,11 +21,12 @@
 //
 use crate::app::App;
 use crate::object_model::AssetMeta;
+use crate::status::Status;
 use crate::util::print;
 use anyhow::Result;
 use std::fs::read_dir;
 
-pub fn do_downloaded(app: &App) -> Result<()> {
+pub fn do_downloaded(app: &App) -> Result<Status> {
     for result in read_dir(app.repo.shared_dir())? {
         let entry = result?;
         let file_name = entry.file_name();
@@ -34,5 +35,5 @@ pub fn do_downloaded(app: &App) -> Result<()> {
             print(asset_name)
         }
     }
-    Ok(())
+    Ok(Status::OK)
 }

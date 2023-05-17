@@ -21,12 +21,13 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
+use crate::status::Status;
 use crate::util::{download_asset, get_asset};
 use anyhow::Result;
 
-pub async fn do_download(app: &App, python_version: &PythonVersion) -> Result<()> {
+pub async fn do_download(app: &App, python_version: &PythonVersion) -> Result<Status> {
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, python_version)?;
     download_asset(app, asset).await?;
-    Ok(())
+    Ok(Status::OK)
 }

@@ -22,6 +22,7 @@
 #![allow(unused)]
 use crate::app::App;
 use crate::object_model::Environment;
+use crate::status::Status;
 use anyhow::Result;
 use joatmon::safe_write_file;
 use serde::Serialize;
@@ -56,7 +57,12 @@ struct Context {
     script_path: PathBuf,
 }
 
-pub fn do_wrap(app: &App, wrapper_path: &Path, script_path: &Path, base_dir: &Path) -> Result<()> {
+pub fn do_wrap(
+    app: &App,
+    wrapper_path: &Path,
+    script_path: &Path,
+    base_dir: &Path,
+) -> Result<Status> {
     todo!();
     /*
     let environment = Environment::infer(app, None)?;

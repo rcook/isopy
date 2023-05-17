@@ -28,6 +28,7 @@ mod object_model;
 mod repository;
 mod serialization;
 mod shell;
+mod status;
 mod util;
 
 use crate::app::App;
@@ -38,6 +39,7 @@ use crate::commands::{
 };
 use crate::constants::{ERROR, OK};
 use crate::logging::init_logging;
+use crate::status::Status;
 use crate::util::{default_isopy_dir, print_error, reset_terminal};
 use anyhow::{bail, Result};
 use clap::Parser;
@@ -60,7 +62,20 @@ fn init_backtrace() {
 #[cfg(not(debug_assertions))]
 fn init_backtrace() {}
 
-async fn run() -> Result<()> {
+#[tokio::main]
+async fn main() {
+    init_backtrace();
+    reset_terminal();
+    exit(match run().await {
+        Ok(_) => OK,
+        Err(e) => {
+            print_error(&format!("{}", e));
+            ERROR
+        }
+    })
+}
+
+async fn run() -> Result<Status> {
     init_logging(LevelFilter::Info)?;
 
     let args = Args::parse();
@@ -80,36 +95,21 @@ async fn run() -> Result<()> {
 
     let app = App::new(cwd, repo);
     match args.command {
-        Command::Available => do_available(&app).await?,
-        Command::Download(python_version) => do_download(&app, &python_version).await?,
-        Command::Downloaded => do_downloaded(&app)?,
-        Command::Exec { program, args } => do_exec(&app, &program, &args)?,
-        Command::GenConfig(python_version) => do_gen_config(&app, &python_version).await?,
-        Command::Info => do_info(&app)?,
-        Command::Init(python_version) => do_init(&app, &python_version).await?,
-        Command::InitConfig => do_init_config(&app).await?,
-        Command::Link { meta_id } => do_link(&app, &meta_id)?,
-        Command::List => do_list(&app).await?,
-        Command::Shell => do_shell(&app)?,
+        Command::Available => do_available(&app).await,
+        Command::Download(python_version) => do_download(&app, &python_version).await,
+        Command::Downloaded => do_downloaded(&app),
+        Command::Exec { program, args } => do_exec(&app, &program, &args),
+        Command::GenConfig(python_version) => do_gen_config(&app, &python_version).await,
+        Command::Info => do_info(&app),
+        Command::Init(python_version) => do_init(&app, &python_version).await,
+        Command::InitConfig => do_init_config(&app).await,
+        Command::Link { meta_id } => do_link(&app, &meta_id),
+        Command::List => do_list(&app).await,
+        Command::Shell => do_shell(&app),
         Command::Wrap {
             wrapper_path,
             script_path,
             base_dir,
-        } => do_wrap(&app, &wrapper_path, &script_path, &base_dir)?,
+        } => do_wrap(&app, &wrapper_path, &script_path, &base_dir),
     }
-
-    Ok(())
-}
-
-#[tokio::main]
-async fn main() {
-    init_backtrace();
-    reset_terminal();
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
-        }
-    })
 }

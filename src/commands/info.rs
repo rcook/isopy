@@ -20,10 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::status::Status;
 use crate::util::{find_dir_info, print_repo, print_title, print_value, show_dir_info};
 use anyhow::Result;
 
-pub fn do_info(app: &App) -> Result<()> {
+pub fn do_info(app: &App) -> Result<Status> {
     print_title("Current directory");
     print_value("Working directory", app.cwd.display());
 
@@ -34,5 +35,5 @@ pub fn do_info(app: &App) -> Result<()> {
     print_title("Repository information");
     print_repo(&app.repo);
 
-    Ok(())
+    Ok(Status::OK)
 }

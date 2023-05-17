@@ -23,13 +23,14 @@ use crate::app::App;
 use crate::object_model::{Environment, EnvironmentName};
 use crate::serialization::EnvRec;
 use crate::shell::{Command, ISOPY_ENV_NAME};
+use crate::status::Status;
 use crate::util::find_dir_info;
 use crate::util::path_to_str;
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
 
-pub fn do_shell(app: &App) -> Result<()> {
+pub fn do_shell(app: &App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             bail!("You are already in an isopy shell");
@@ -50,5 +51,5 @@ pub fn do_shell(app: &App) -> Result<()> {
     };
 
     Command::new_shell().exec(&environment)?;
-    Ok(())
+    Ok(Status::OK)
 }

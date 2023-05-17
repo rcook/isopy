@@ -21,10 +21,11 @@
 //
 use crate::app::App;
 use crate::cli::PythonVersion;
+use crate::status::Status;
 use crate::util::init_project;
 use anyhow::{bail, Result};
 
-pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<()> {
+pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         bail!(
             "Directory {} already has Python environment",
@@ -34,5 +35,5 @@ pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<()> {
 
     init_project(app, python_version, &app.cwd).await?;
 
-    Ok(())
+    Ok(Status::OK)
 }

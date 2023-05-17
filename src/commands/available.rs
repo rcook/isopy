@@ -21,16 +21,17 @@
 //
 use crate::app::App;
 use crate::object_model::AssetFilter;
+use crate::status::Status;
 use crate::util::{download_stream, print};
 use anyhow::{anyhow, Result};
 use joatmon::safe_back_up;
 use log::info;
 use std::fs::remove_file;
 
-pub async fn do_available(app: &App) -> Result<()> {
+pub async fn do_available(app: &App) -> Result<Status> {
     update_index_if_necessary(app).await?;
     show_available_downloads(app)?;
-    Ok(())
+    Ok(Status::OK)
 }
 
 async fn update_index_if_necessary(app: &App) -> Result<()> {

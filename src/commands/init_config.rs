@@ -19,15 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::cli::PythonVersion;
 use crate::constants::PYTHON_VERSION_FILE_NAME;
 use crate::serialization::PythonVersionRec;
 use crate::util::init_project;
+use crate::{app::App, status::Status};
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 
-pub async fn do_init_config(app: &App) -> Result<()> {
+pub async fn do_init_config(app: &App) -> Result<Status> {
     let config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
 
     if app.repo.get(&app.cwd)?.is_some() {
@@ -46,5 +46,5 @@ pub async fn do_init_config(app: &App) -> Result<()> {
 
     init_project(app, &python_version, &config_path).await?;
 
-    Ok(())
+    Ok(Status::OK)
 }
