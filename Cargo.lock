@@ -921,7 +921,7 @@ dependencies = [
  "include_dir",
  "indicatif",
  "joat-repo",
- "joatmon 0.0.25",
+ "joatmon 0.0.26",
  "lazy_static",
  "log",
  "md5",
@@ -984,9 +984,9 @@ dependencies = [
 
 [[package]]
 name = "joatmon"
-version = "0.0.25"
+version = "0.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01a8b87477b73ab43e556401e9173d1091e476f71383d1cf75289cd4cdf06fd3"
+checksum = "d9715c8296046fa5362111b169d9472b409d0ea45743ce73dc2f1e34a87356b8"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1435,9 +1435,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.11.17"
+version = "0.11.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13293b639a097af28fc8a90f22add145a9c954e49d77da06263d58cf44d5fb91"
+checksum = "cde824a14b7c14f85caff81225f411faacc04a2013f41670f41443742b1c1c55"
 dependencies = [
  "base64",
  "bytes",
