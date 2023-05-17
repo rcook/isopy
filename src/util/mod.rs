@@ -33,7 +33,10 @@ mod types;
 mod unpack_file;
 mod url;
 
-pub use self::constants::{CACHE_DIR_NAME, ERROR, OK, PROJECT_CONFIG_FILE_NAME, RELEASES_URL};
+pub use self::constants::{
+    CACHE_DIR_NAME, ERROR, INDEX_FILE_NAME, OK, PROJECT_CONFIG_FILE_NAME, RELEASES_URL,
+    REPOSITORIES_FILE_NAME,
+};
 pub use self::download_file::download_stream;
 pub use self::helpers::{download_asset, get_asset, init_project, reset_terminal, show_dir_info};
 pub use self::indicator::Indicator;

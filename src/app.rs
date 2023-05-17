@@ -22,14 +22,11 @@
 use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::util::{dir_url, RELEASES_URL};
+use crate::util::{dir_url, INDEX_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
 use anyhow::Result;
 use joat_repo::Repo;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::path::PathBuf;
-
-const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
-const INDEX_FILE_NAME: &str = "index.json";
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,

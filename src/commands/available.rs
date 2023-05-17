@@ -47,11 +47,11 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
     {
         let index_json_path = app.get_index_json_path(&repository.name);
         if index_json_path.exists() {
-            let safe_back_up = safe_back_up(&index_json_path)?;
+            let safe_back_up_path = safe_back_up(&index_json_path)?;
             info!(
                 "Index file {} backed up to {}",
                 index_json_path.display(),
-                safe_back_up.display()
+                safe_back_up_path.display()
             );
             remove_file(&index_json_path)?;
         }
