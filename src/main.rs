@@ -36,13 +36,27 @@ use crate::commands::{
     do_init_config, do_link, do_list, do_shell, do_wrap,
 };
 use crate::logging::init_logging;
-use crate::util::{default_isopy_dir, print_error, ERROR, OK};
+use crate::util::{default_isopy_dir, print_error, reset_terminal, ERROR, OK};
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;
 use log::LevelFilter;
-use std::env::current_dir;
+use std::env::{current_dir, set_var, var, VarError};
 use std::process::exit;
+
+#[cfg(debug_assertions)]
+fn init_backtrace() {
+    const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
+
+    if let Err(VarError::NotPresent) = var(RUST_BACKTRACE_ENV_NAME) {
+        set_var(RUST_BACKTRACE_ENV_NAME, "1")
+    }
+
+    color_backtrace::install();
+}
+
+#[cfg(not(debug_assertions))]
+fn init_backtrace() {}
 
 async fn run() -> Result<()> {
     init_logging(LevelFilter::Info)?;
@@ -87,6 +101,8 @@ async fn run() -> Result<()> {
 
 #[tokio::main]
 async fn main() {
+    init_backtrace();
+    reset_terminal();
     exit(match run().await {
         Ok(_) => OK,
         Err(e) => {

@@ -32,6 +32,14 @@ use joatmon::{read_yaml_file, safe_write_file};
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};
 
+pub fn reset_terminal() {
+    #[cfg(windows)]
+    {
+        use colored::control::set_virtual_terminal;
+        set_virtual_terminal(true).expect("set_virtual_terminal failed");
+    }
+}
+
 pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(python_version.version.clone());
