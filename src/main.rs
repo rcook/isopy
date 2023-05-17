@@ -21,6 +21,7 @@
 //
 mod app;
 mod asset;
+mod backtrace;
 mod cli;
 mod commands;
 mod constants;
@@ -34,6 +35,7 @@ mod ui;
 mod util;
 
 use crate::app::App;
+use crate::backtrace::init_backtrace;
 use crate::cli::{Args, Command};
 use crate::commands::{
     do_available, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
@@ -48,22 +50,8 @@ use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;
 use log::LevelFilter;
-use std::env::{current_dir, set_var, var, VarError};
+use std::env::current_dir;
 use std::process::exit;
-
-#[cfg(debug_assertions)]
-fn init_backtrace() {
-    const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
-
-    if let Err(VarError::NotPresent) = var(RUST_BACKTRACE_ENV_NAME) {
-        set_var(RUST_BACKTRACE_ENV_NAME, "1")
-    }
-
-    color_backtrace::install();
-}
-
-#[cfg(not(debug_assertions))]
-fn init_backtrace() {}
 
 #[tokio::main]
 async fn main() {
