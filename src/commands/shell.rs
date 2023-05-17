@@ -25,7 +25,6 @@ use crate::constants::ISOPY_ENV_NAME;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
-use crate::util::find_dir_info;
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
@@ -39,7 +38,7 @@ pub fn do_shell(app: &App) -> Result<Status> {
         Err(e) => return Err(e)?,
     }
 
-    let Some(dir_info) = find_dir_info(&app.repo, &app.cwd)? else {
+    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
         bail!("Could not find environment for directory {}", app.cwd.display())
     };
 

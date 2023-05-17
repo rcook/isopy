@@ -20,14 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod download_file;
-mod repo;
 mod sha256sums;
 mod types;
 mod unpack_file;
 mod url;
 
 pub use self::download_file::download_stream;
-pub use self::repo::find_dir_info;
 pub use self::sha256sums::validate_sha256_checksum;
 pub use self::types::ContentLength;
 pub use self::unpack_file::unpack_file;

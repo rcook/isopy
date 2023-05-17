@@ -32,7 +32,10 @@ use crate::util::dir_url;
 use crate::util::unpack_file;
 use anyhow::{bail, Result};
 use joat_repo::Repo;
+use joat_repo::{DirInfo, Link};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
+use std::collections::HashMap;
+use std::path::Path;
 use std::path::PathBuf;
 
 pub struct RepositoryInfo {
@@ -190,6 +193,18 @@ impl App {
         Ok(())
     }
 
+    pub fn find_dir_info(&self, cwd: &Path) -> Result<Option<DirInfo>> {
+        let Some(link) = self.find_link(cwd)? else {
+            return Ok(None)
+        };
+
+        let Some(dir_info) = self.repo.get(link.project_dir())? else {
+            return Ok(None)
+        };
+
+        Ok(Some(dir_info))
+    }
+
     fn make_repository(rec: RepositoryRec) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
         Ok(match rec {
             RepositoryRec::GitHub { name, url, enabled } => {
@@ -207,6 +222,28 @@ impl App {
             RepositoryName::Named(s) => {
                 label_file_name(&self.repo.shared_dir().join(INDEX_FILE_NAME), s)
                     .expect("must be valid")
+            }
+        }
+    }
+
+    fn find_link(&self, dir: &Path) -> Result<Option<Link>> {
+        let mut map = self
+            .repo
+            .list_links()?
+            .into_iter()
+            .map(|x| (x.project_dir().to_path_buf(), x))
+            .collect::<HashMap<_, _>>();
+
+        let mut d = dir;
+        loop {
+            if let Some(link) = map.remove(d) {
+                return Ok(Some(link));
+            }
+
+            if let Some(p) = d.parent() {
+                d = p;
+            } else {
+                return Ok(None);
             }
         }
     }
