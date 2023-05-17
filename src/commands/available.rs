@@ -39,13 +39,18 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
         .first()
         .ok_or(anyhow!("No asset repositories are configured"))?;
 
-    let current_last_modified = app.read_index_last_modified(&repository.name)?;
+    let index_json_path = app.get_index_json_path(&repository.name);
+    let current_last_modified = if index_json_path.is_file() {
+        None
+    } else {
+        app.read_index_last_modified(&repository.name)?
+    };
+
     if let Some(mut response) = repository
         .repository
         .get_latest_index(&current_last_modified)
         .await?
     {
-        let index_json_path = app.get_index_json_path(&repository.name);
         if index_json_path.exists() {
             let safe_back_up_path = safe_back_up(&index_json_path)?;
             info!(
