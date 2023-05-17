@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![allow(unused)]
 use crate::constants::ISOPY_ENV_NAME;
 use anyhow::{anyhow, Result};
 use joat_repo::{LinkId, MetaId};
@@ -34,6 +33,7 @@ pub struct Command {
 }
 
 impl Command {
+    #[allow(unused)]
     pub fn new<S>(program: S) -> Self
     where
         S: Into<OsString>,
@@ -51,6 +51,7 @@ impl Command {
         }
     }
 
+    #[allow(unused)]
     pub fn arg<S>(&mut self, arg: S) -> &mut Self
     where
         S: Into<OsString>,
@@ -146,5 +147,6 @@ fn prepend_paths(paths: &[&Path]) -> Result<()> {
     }
 
     set_var("PATH", join_paths(new_paths)?);
+    drop(existing_paths);
     Ok(())
 }
