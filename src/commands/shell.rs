@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::constants::ENV_FILE_NAME;
 use crate::object_model::{Environment, EnvironmentName};
 use crate::serialization::EnvRec;
 use crate::shell::{Command, ISOPY_ENV_NAME};
@@ -43,7 +44,7 @@ pub fn do_shell(app: &App) -> Result<Status> {
         bail!("Could not find environment for directory {}", app.cwd.display())
     };
 
-    let env_path = dir_info.data_dir().join("env.yaml");
+    let env_path = dir_info.data_dir().join(ENV_FILE_NAME);
     let rec = read_yaml_file::<EnvRec, _>(&env_path)?;
     let environment = Environment {
         name: EnvironmentName::sanitize(path_to_str(&env_path)?),
