@@ -20,8 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::object_model::{Tag, Version};
-use clap::{Args as ClapArgs, Parser, Subcommand};
+use clap::{Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
+use log::LevelFilter;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use std::result::Result;
@@ -45,6 +46,15 @@ pub struct Args {
 
     #[arg(global = true, help = "Path to working directory", short = 'c', long = "cwd", value_parser = parse_absolute_path)]
     pub cwd: Option<PathBuf>,
+
+    #[arg(
+        global = true,
+        help = "Logging level",
+        short = 'l',
+        long = "level",
+        default_value = "info"
+    )]
+    pub log_level: Option<LogLevel>,
 
     #[command(subcommand)]
     pub command: Command,
@@ -137,6 +147,29 @@ pub struct PythonVersion {
 
     #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
     pub tag: Option<Tag>,
+}
+
+#[derive(Clone, Debug, ValueEnum)]
+pub enum LogLevel {
+    Off,
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Trace,
+}
+
+impl From<LogLevel> for LevelFilter {
+    fn from(val: LogLevel) -> Self {
+        match val {
+            LogLevel::Off => LevelFilter::Off,
+            LogLevel::Error => LevelFilter::Error,
+            LogLevel::Warn => LevelFilter::Warn,
+            LogLevel::Info => LevelFilter::Info,
+            LogLevel::Debug => LevelFilter::Debug,
+            LogLevel::Trace => LevelFilter::Trace,
+        }
+    }
 }
 
 fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {

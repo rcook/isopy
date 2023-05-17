@@ -20,28 +20,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{anyhow, Result};
-use log::{set_logger, set_max_level, Level, LevelFilter, Log, Metadata, Record};
+use log::{set_logger, set_max_level, LevelFilter, Log, Metadata, Record};
 
 static LOGGER: SimpleLogger = SimpleLogger;
 
 struct SimpleLogger;
 
 impl Log for SimpleLogger {
-    fn enabled(&self, metadata: &Metadata) -> bool {
-        metadata.level() <= Level::Info
+    fn enabled(&self, _metadata: &Metadata) -> bool {
+        true
     }
 
     fn log(&self, record: &Record) {
-        if self.enabled(record.metadata()) {
-            println!("{} - {}", record.level(), record.args());
-        }
+        println!("{} - {}", record.level(), record.args());
     }
 
     fn flush(&self) {}
 }
 
-pub fn init_logging(filter: LevelFilter) -> Result<()> {
+pub fn init_logging(level_filter: LevelFilter) -> Result<()> {
     set_logger(&LOGGER).map_err(|e| anyhow!(e))?;
-    set_max_level(filter);
+    set_max_level(level_filter);
     Ok(())
 }

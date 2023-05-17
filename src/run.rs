@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::backtrace::init_backtrace;
-use crate::cli::{Args, Command};
+use crate::cli::{Args, Command, LogLevel};
 use crate::commands::{
     do_available, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
     do_init_config, do_link, do_list, do_shell, do_wrap,
@@ -33,14 +33,17 @@ use crate::ui::reset_terminal;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;
-use log::LevelFilter;
+use log::{set_max_level, LevelFilter};
 use std::env::current_dir;
 use std::path::PathBuf;
 
 fn set_up() -> Result<()> {
     init_backtrace();
     reset_terminal();
-    init_logging(LevelFilter::Info)?;
+
+    // Allow all log messages through during startup
+    init_logging(LevelFilter::Trace)?;
+
     Ok(())
 }
 
@@ -54,6 +57,8 @@ pub async fn run() -> Result<Status> {
     set_up()?;
 
     let args = Args::parse();
+
+    set_max_level(args.log_level.unwrap_or(LogLevel::Info).into());
 
     let Some(cache_dir) = args.cache_dir.or_else(default_cache_dir) else {
         bail!("Could not infer isopy cache directory location: please specify using --dir option")
