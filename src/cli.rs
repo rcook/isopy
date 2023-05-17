@@ -78,7 +78,17 @@ pub enum Command {
         name = "gen-config",
         about = "Generate .python-version.yaml Python configuration file"
     )]
-    GenConfig(PythonVersion),
+    GenConfig {
+        #[clap(flatten)]
+        python_version: PythonVersion,
+
+        #[arg(
+            short = 'f',
+            long = "force",
+            help = "Force overwrite of .python-version.yaml file"
+        )]
+        force: bool,
+    },
 
     #[command(name = "info", about = "Show information")]
     Info,
