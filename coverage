@@ -1,0 +1,28 @@
+#!/bin/bash
+set -euo pipefail
+
+project_dir=$(cd $(dirname $0); pwd -P)
+target_dir=$project_dir/target
+coverage_dir=$target_dir/coverage
+coverage_path=$coverage_dir/data/cargo-test-%p-%m.profraw
+
+cd $project_dir
+
+rustup component add llvm-tools-preview
+
+rm -rf $coverage_dir
+mkdir -p $coverage_dir
+
+CARGO_INCREMENTAL=0 \
+  RUSTFLAGS='-Cinstrument-coverage' \
+  LLVM_PROFILE_FILE=$coverage_path \
+  cargo test
+
+grcov \
+  . \
+  -s . \
+  --binary-path $target_dir/x86_64-unknown-linux-gnu/debug \
+  -t html \
+  --branch \
+  --ignore-not-existing \
+  -o $coverage_dir/html
