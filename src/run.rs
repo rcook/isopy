@@ -56,8 +56,6 @@ fn default_cache_dir() -> Option<PathBuf> {
 pub async fn run() -> Result<Status> {
     set_up()?;
 
-    println!("url={}", crate::constants::RELEASES_URL.as_str());
-
     let args = Args::parse();
 
     set_max_level(args.log_level.unwrap_or(LogLevel::Info).into());
