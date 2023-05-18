@@ -57,7 +57,7 @@ impl FromStr for AssetMeta {
         fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
             match result {
                 Some(value) => Ok(value),
-                None => bail!("Missing {} from asset name \"{}\"", label, s),
+                None => bail!("missing {} from asset name \"{}\"", label, s),
             }
         }
 
