@@ -12,18 +12,8 @@ isopy available
 cd /path/to/project
 
 # Create an .isopy.yaml configuration file
-isopy new 3.11.1 -t 20230116
-
-# Create the environment based on this configuration
-isopy init
+isopy init 3.11.1 -t 20230116
 
 # Start a shell
 isopy shell
-```
-
-## "Show version of Python in my environment"
-
-```bash
-cd /path/to/project
-isopy exec python3 --version
 ```
