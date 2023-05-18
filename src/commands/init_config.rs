@@ -26,7 +26,7 @@ use crate::{app::App, status::Status};
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 
-pub async fn do_init_config(app: &App) -> Result<Status> {
+pub async fn do_init_config(app: App) -> Result<Status> {
     let config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
 
     if app.repo.get(&app.cwd)?.is_some() {

@@ -29,9 +29,9 @@ use joatmon::safe_back_up;
 use log::info;
 use std::fs::remove_file;
 
-pub async fn do_available(app: &App) -> Result<Status> {
-    update_index_if_necessary(app).await?;
-    show_available_downloads(app)?;
+pub async fn do_available(app: App) -> Result<Status> {
+    update_index_if_necessary(&app).await?;
+    show_available_downloads(&app)?;
     Ok(Status::OK)
 }
 

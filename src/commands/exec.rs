@@ -25,7 +25,7 @@ use crate::shell::Command;
 use crate::status::Status;
 use anyhow::Result;
 
-pub fn do_exec(app: &App, program: &str, args: &[String]) -> Result<Status> {
+pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
     todo!();
     /*
     let mut command = Command::new(program);

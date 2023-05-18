@@ -57,7 +57,7 @@ struct Context {
 }
 
 pub fn do_wrap(
-    app: &App,
+    app: App,
     wrapper_path: &Path,
     script_path: &Path,
     base_dir: &Path,

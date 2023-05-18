@@ -29,7 +29,7 @@ use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
 
-pub fn do_shell(app: &App) -> Result<Status> {
+pub fn do_shell(app: App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             bail!("You are already in an isopy shell");
@@ -45,6 +45,9 @@ pub fn do_shell(app: &App) -> Result<Status> {
     let data_dir = dir_info.data_dir();
     let rec = read_yaml_file::<EnvRec, _>(&data_dir.join(ENV_FILE_NAME))?;
     let python_dir = data_dir.join(rec.python_dir_rel);
+
+    // Explicitly drop app so that repository is unlocked in shell
+    drop(app);
 
     Command::new_shell().exec(dir_info.link_id(), dir_info.meta_id(), &python_dir)?;
     Ok(Status::OK)

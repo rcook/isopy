@@ -28,7 +28,7 @@ use anyhow::Result;
 use joatmon::safe_write_file;
 
 pub async fn do_gen_config(
-    app: &App,
+    app: App,
     python_version: &PythonVersion,
     force: bool,
 ) -> Result<Status> {

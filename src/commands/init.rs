@@ -24,7 +24,7 @@ use crate::cli::PythonVersion;
 use crate::status::Status;
 use anyhow::{bail, Result};
 
-pub async fn do_init(app: &App, python_version: &PythonVersion) -> Result<Status> {
+pub async fn do_init(app: App, python_version: &PythonVersion) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         bail!(
             "Directory {} already has Python environment",

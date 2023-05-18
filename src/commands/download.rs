@@ -25,9 +25,9 @@ use crate::cli::PythonVersion;
 use crate::status::Status;
 use anyhow::Result;
 
-pub async fn do_download(app: &App, python_version: &PythonVersion) -> Result<Status> {
+pub async fn do_download(app: App, python_version: &PythonVersion) -> Result<Status> {
     let assets = app.read_assets()?;
     let asset = get_asset(&assets, python_version)?;
-    download_asset(app, asset).await?;
+    download_asset(&app, asset).await?;
     Ok(Status::OK)
 }

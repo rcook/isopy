@@ -27,7 +27,7 @@ use crate::ui::{print, print_link, print_metadir, print_title};
 use anyhow::Result;
 use joatmon::read_yaml_file;
 
-pub async fn do_list(app: &App) -> Result<Status> {
+pub async fn do_list(app: App) -> Result<Status> {
     let manifests = app.repo.list_manifests()?;
     if !manifests.is_empty() {
         print_title("Metadirectories");
