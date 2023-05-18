@@ -63,11 +63,11 @@ mod tests {
 
     #[test]
     fn releases_url() {
-        _ = format!("{}", RELEASES_URL.as_str());
+        _ = RELEASES_URL.as_str().to_string();
     }
 
     #[test]
     fn repository_name_regex() {
-        _ = format!("{}", REPOSITORY_NAME_REGEX.as_str());
+        _ = REPOSITORY_NAME_REGEX.as_str().to_string();
     }
 }

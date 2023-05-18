@@ -39,7 +39,7 @@ use std::path::PathBuf;
 
 fn set_up() -> Result<()> {
     init_backtrace();
-    reset_terminal()?;
+    reset_terminal();
 
     // Allow all log messages through during startup
     init_logging(LevelFilter::Trace)?;

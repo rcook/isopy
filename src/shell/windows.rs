@@ -86,21 +86,21 @@ mod tests {
 
     #[test]
     fn cmd() {
-        _ = format!("{:?}", CMD);
+        _ = format!("{}", CMD.path.display());
     }
 
     #[test]
     fn cmd_path() {
-        _ = format!("{:?}", CMD_PATH);
+        _ = format!("{}", CMD_PATH.as_path().display());
     }
 
     #[test]
     fn powershell() {
-        _ = format!("{:?}", POWERSHELL);
+        _ = format!("{}", POWERSHELL.path.display())
     }
 
     #[test]
     fn powershell_path() {
-        _ = format!("{:?}", POWERSHELL_PATH);
+        _ = format!("{}", POWERSHELL_PATH.as_path().display());
     }
 }

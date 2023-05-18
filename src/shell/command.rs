@@ -99,7 +99,7 @@ impl Command {
         use std::process::Command;
 
         set_var(ISOPY_ENV_NAME, format!("{}-{}", meta_id, link_id));
-        prepend_paths(&[&python_dir, &python_dir.join("Scripts")])?;
+        prepend_paths(&[python_dir, &python_dir.join("Scripts")])?;
 
         let windows_shell_info = get_windows_shell_info()?;
         let mut command = match &self.program {
