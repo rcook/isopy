@@ -1,6 +1,5 @@
 ## `link` command
 
-> **Work in progress**: Many of the commands have crappy names.
-> If you can do better, please [file an issue][issues].
+Associates an existing Python environment with an additional directory.
 
 [issues]: https://github.com/rcook/isopy/issues

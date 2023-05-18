@@ -1,6 +1,6 @@
 ## `info` command
 
-> **Work in progress**: Many of the commands have crappy names.
-> If you can do better, please [file an issue][issues].
+Shows information about the current environment as well as isopy
+cache directory.
 
 [issues]: https://github.com/rcook/isopy/issues

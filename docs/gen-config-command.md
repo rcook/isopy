@@ -1,6 +1,5 @@
 ## `gen-config` command
 
-> **Work in progress**: Many of the commands have crappy names.
-> If you can do better, please [file an issue][issues].
+Generates a `.python-version.yaml` configuration file.
 
 [issues]: https://github.com/rcook/isopy/issues

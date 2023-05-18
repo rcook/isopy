@@ -1,6 +1,6 @@
 ## `init` command
 
-> **Work in progress**: Many of the commands have crappy names.
-> If you can do better, please [file an issue][issues].
+Initializes a new Python environment using the Python version and
+optional build tag.
 
 [issues]: https://github.com/rcook/isopy/issues
