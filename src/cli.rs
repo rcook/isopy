@@ -189,5 +189,5 @@ fn parse_tag(s: &str) -> Result<Tag, String> {
 }
 
 fn parse_meta_id(s: &str) -> Result<MetaId, String> {
-    MetaId::parse(s).ok_or(String::from("invalid meta ID"))
+    s.parse::<MetaId>().map_err(|_|String::from("invalid meta ID"))
 }

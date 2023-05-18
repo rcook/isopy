@@ -930,9 +930,9 @@ checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
 
 [[package]]
 name = "joat-repo"
-version = "0.0.3"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d55b6ad5a8608635de8280be98f407f4a891e018bd2ecaef4a323514f196d8cd"
+checksum = "704a818f04f01dce853db8075392a8477f93761d7490fa8f7e50978ef2b8c445"
 dependencies = [
  "anyhow",
  "chrono",
