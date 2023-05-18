@@ -36,7 +36,7 @@ pub async fn do_init_config(app: App) -> Result<Status> {
         )
     }
 
-    let rec = read_yaml_file::<PythonVersionRec, _>(&config_path)?;
+    let rec = read_yaml_file::<PythonVersionRec>(&config_path)?;
 
     let python_version = PythonVersion {
         version: rec.version,

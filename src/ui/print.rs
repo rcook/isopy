@@ -105,7 +105,7 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
 
     let env_yaml_path = dir_info.data_dir().join(ENV_FILE_NAME);
     let rec_opt = if env_yaml_path.is_file() {
-        Some(read_yaml_file::<EnvRec, _>(env_yaml_path)?)
+        Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
     } else {
         None
     };

@@ -36,7 +36,7 @@ pub async fn do_list(app: App) -> Result<Status> {
 
             let env_yaml_path = manifest.data_dir().join(ENV_FILE_NAME);
             let rec_opt = if env_yaml_path.is_file() {
-                Some(read_yaml_file::<EnvRec, _>(env_yaml_path)?)
+                Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
             } else {
                 None
             };

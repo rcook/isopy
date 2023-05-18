@@ -57,7 +57,7 @@ impl App {
     pub fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {
         let repositories_yaml_path = self.repo.shared_dir().join(REPOSITORIES_FILE_NAME);
         let repositories_rec = if repositories_yaml_path.is_file() {
-            read_yaml_file::<RepositoriesRec, _>(repositories_yaml_path)?
+            read_yaml_file::<RepositoriesRec>(&repositories_yaml_path)?
         } else {
             let repositories_rec = RepositoriesRec {
                 repositories: vec![
@@ -74,7 +74,7 @@ impl App {
                 ],
             };
             safe_write_file(
-                repositories_yaml_path,
+                &repositories_yaml_path,
                 serde_yaml::to_string(&repositories_rec)?,
                 false,
             )?;
@@ -103,7 +103,7 @@ impl App {
     ) -> Result<Option<LastModified>> {
         let index_path = self.index_path(repository_name);
         Ok(if index_path.is_file() {
-            Some(read_yaml_file::<IndexRec, _>(&index_path)?.last_modified)
+            Some(read_yaml_file::<IndexRec>(&index_path)?.last_modified)
         } else {
             None
         })
@@ -116,7 +116,7 @@ impl App {
     ) -> Result<()> {
         let index_yaml_path = self.index_path(repository_name);
         safe_write_file(
-            index_yaml_path,
+            &index_yaml_path,
             serde_yaml::to_string(&IndexRec {
                 last_modified: last_modified.clone(),
             })?,
@@ -143,7 +143,7 @@ impl App {
 
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_json_path = self.repo.shared_dir().join(RELEASES_FILE_NAME);
-        let package_recs = read_json_file::<Vec<PackageRec>, _>(&index_json_path)?;
+        let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
 
         let mut assets = Vec::new();
         for package_rec in package_recs {
@@ -182,7 +182,7 @@ impl App {
         unpack_file(&asset_path, dir_info.data_dir())?;
 
         safe_write_file(
-            dir_info.data_dir().join(ENV_FILE_NAME),
+            &dir_info.data_dir().join(ENV_FILE_NAME),
             serde_yaml::to_string(&EnvRec {
                 config_path: self.cwd.clone(),
                 python_dir_rel: PathBuf::from("python"),

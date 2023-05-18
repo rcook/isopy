@@ -41,7 +41,7 @@ pub async fn do_gen_config(
 
     let yaml_str = serde_yaml::to_string(&rec)?;
 
-    safe_write_file(config_path, yaml_str, force)?;
+    safe_write_file(&config_path, yaml_str, force)?;
 
     Ok(Status::OK)
 }

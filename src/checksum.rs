@@ -30,10 +30,7 @@ use std::path::Path;
 
 static SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
 
-pub fn validate_sha256_checksum<P>(archive_path: P, tag: &Tag) -> Result<bool>
-where
-    P: AsRef<Path>,
-{
+pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> {
     let sha256_file_name = format!("{}.sha256sums", tag.as_str());
     let file = SHA256SUMS_DIR
         .get_file(&sha256_file_name)
@@ -52,7 +49,6 @@ where
     }
 
     let archive_file_name = archive_path
-        .as_ref()
         .file_name()
         .ok_or(anyhow!("Could not get file name"))?
         .to_str()
@@ -62,7 +58,7 @@ where
         Some(expected_hash_str) => {
             let expected_hash = decode(expected_hash_str)?;
             let mut hasher = Sha256::new();
-            hasher.update(read_bytes(&archive_path)?);
+            hasher.update(read_bytes(archive_path)?);
             let hash = hasher.finalize().to_vec();
             Ok(expected_hash == hash)
         }
