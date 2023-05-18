@@ -34,12 +34,9 @@ pub struct Command {
 
 impl Command {
     #[allow(unused)]
-    pub fn new<S>(program: S) -> Self
-    where
-        S: Into<OsString>,
-    {
+    pub fn new(program: OsString) -> Self {
         Self {
-            program: Some(program.into()),
+            program: Some(program),
             args: Vec::new(),
         }
     }
@@ -52,11 +49,8 @@ impl Command {
     }
 
     #[allow(unused)]
-    pub fn arg<S>(&mut self, arg: S) -> &mut Self
-    where
-        S: Into<OsString>,
-    {
-        self.args.push(arg.into());
+    pub fn arg(&mut self, arg: OsString) -> &mut Self {
+        self.args.push(arg);
         self
     }
 

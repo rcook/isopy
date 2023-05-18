@@ -109,23 +109,17 @@ fn make_path_env(environment: &Environment) -> String {
 */
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-fn set_file_attributes<P>(wrapper_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
     use std::fs::{metadata, set_permissions};
     use std::os::unix::fs::PermissionsExt;
 
-    let mut permissions = metadata(&wrapper_path)?.permissions();
+    let mut permissions = metadata(wrapper_path)?.permissions();
     permissions.set_mode(permissions.mode() | 0o100);
-    set_permissions(&wrapper_path, permissions)?;
+    set_permissions(wrapper_path, permissions)?;
     Ok(())
 }
 
 #[cfg(target_os = "windows")]
-fn set_file_attributes<P>(_wrapper_path: P) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+fn set_file_attributes(_wrapper_path: &Path) -> Result<()> {
     Ok(())
 }

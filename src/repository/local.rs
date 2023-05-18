@@ -36,11 +36,8 @@ pub struct LocalRepository {
 }
 
 impl LocalRepository {
-    pub fn new<P>(dir: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        Self { dir: dir.into() }
+    pub fn new(dir: PathBuf) -> Self {
+        Self { dir }
     }
 }
 
@@ -91,14 +88,15 @@ struct LocalResponse {
 }
 
 impl LocalResponse {
-    fn new<P>(last_modified: Option<LastModified>, content_length: ContentLength, path: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
+    fn new(
+        last_modified: Option<LastModified>,
+        content_length: ContentLength,
+        path: PathBuf,
+    ) -> Self {
         Self {
             last_modified,
             content_length,
-            path: path.into(),
+            path,
         }
     }
 }
