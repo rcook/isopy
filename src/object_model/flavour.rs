@@ -19,6 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Error};
+use std::str::FromStr;
+
 #[derive(Debug, PartialEq)]
 pub enum Flavour {
     Gnu,
@@ -26,16 +29,36 @@ pub enum Flavour {
     Musl,
 }
 
-impl Flavour {
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: AsRef<str>,
-    {
-        Some(match s.as_ref() {
+impl FromStr for Flavour {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
             "gnu" => Self::Gnu,
             "msvc" => Self::Msvc,
             "musl" => Self::Musl,
-            _ => return None,
+            _ => bail!("unsupported flavour \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Flavour;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Flavour::Gnu, "gnu")]
+    #[case(Flavour::Msvc, "msvc")]
+    #[case(Flavour::Musl, "musl")]
+    fn parse_basics(#[case] expected_flavour: Flavour, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_flavour, input.parse::<Flavour>()?);
+        Ok(())
+    }
+
+    #[test]
+    fn parse_error() {
+        assert!("".parse::<Flavour>().is_err());
     }
 }

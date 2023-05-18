@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{bail, Error};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub enum OS {
@@ -28,13 +29,31 @@ pub enum OS {
     Windows,
 }
 
-impl OS {
-    pub fn parse(s: &str) -> Result<Self> {
+impl FromStr for OS {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
             "darwin" => Self::Darwin,
             "linux" => Self::Linux,
             "windows" => Self::Windows,
-            _ => bail!("Unsupported OS \"{}\"", s),
+            _ => bail!("unsupported OS \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::OS;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(OS::Darwin, "darwin")]
+    #[case(OS::Linux, "linux")]
+    #[case(OS::Windows, "windows")]
+    fn parse_basics(#[case] expected_os: OS, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_os, input.parse::<OS>()?);
+        Ok(())
     }
 }

@@ -20,7 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{DEFAULT_REPOSITORY_NAME, EXAMPLE_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
+use anyhow::{bail, Error};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::str::FromStr;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum RepositoryName {
@@ -30,22 +32,6 @@ pub enum RepositoryName {
 }
 
 impl RepositoryName {
-    pub fn parse(s: &str) -> Option<Self> {
-        if s.eq_ignore_ascii_case(DEFAULT_REPOSITORY_NAME) {
-            return Some(Self::Default);
-        }
-
-        if s.eq_ignore_ascii_case(EXAMPLE_REPOSITORY_NAME) {
-            return Some(Self::Example);
-        }
-
-        if REPOSITORY_NAME_REGEX.is_match(s) {
-            return Some(Self::Named(String::from(s)));
-        }
-
-        None
-    }
-
     pub fn is_default(&self) -> bool {
         matches!(self, Self::Default)
     }
@@ -59,6 +45,26 @@ impl RepositoryName {
     }
 }
 
+impl FromStr for RepositoryName {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.eq_ignore_ascii_case(DEFAULT_REPOSITORY_NAME) {
+            return Ok(Self::Default);
+        }
+
+        if s.eq_ignore_ascii_case(EXAMPLE_REPOSITORY_NAME) {
+            return Ok(Self::Example);
+        }
+
+        if REPOSITORY_NAME_REGEX.is_match(s) {
+            return Ok(Self::Named(String::from(s)));
+        }
+
+        bail!("invalid repository name \"{}\"", s)
+    }
+}
+
 impl Display for RepositoryName {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.as_str())
@@ -69,6 +75,7 @@ impl Display for RepositoryName {
 mod tests {
     use super::RepositoryName;
     use crate::constants::REPOSITORY_NAME_REGEX;
+    use anyhow::Result;
     use rstest::rstest;
 
     #[rstest]
@@ -84,24 +91,29 @@ mod tests {
     #[case(true, "default")]
     #[case(false, "example")]
     #[case(false, "other")]
-    fn is_default(#[case] expected_is_default: bool, #[case] input: &str) {
+    fn is_default(#[case] expected_is_default: bool, #[case] input: &str) -> Result<()> {
         assert_eq!(
             expected_is_default,
-            RepositoryName::parse(input)
-                .expect("test: must be valid repository name")
-                .is_default()
+            input.parse::<RepositoryName>()?.is_default()
         );
+        Ok(())
     }
 
     #[rstest]
-    #[case(None, "")]
-    #[case(None, " ")]
-    #[case(None, " foo ")]
-    #[case(Some(RepositoryName::Named(String::from("foo"))), "foo")]
-    #[case(Some(RepositoryName::Named(String::from("foo-_"))), "foo-_")]
-    #[case(Some(RepositoryName::Default), "DEFAULT")]
-    #[case(Some(RepositoryName::Default), "default")]
-    fn test_basics(#[case] expected_result: Option<RepositoryName>, #[case] input: String) {
-        assert_eq!(expected_result, RepositoryName::parse(&input))
+    #[case(RepositoryName::Named(String::from("foo")), "foo")]
+    #[case(RepositoryName::Named(String::from("foo-_")), "foo-_")]
+    #[case(RepositoryName::Default, "DEFAULT")]
+    #[case(RepositoryName::Default, "default")]
+    fn parse_basics(#[case] expected_result: RepositoryName, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_result, input.parse::<RepositoryName>()?);
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case(" ")]
+    #[case(" foo ")]
+    fn parse_errors(#[case] input: &str) {
+        assert!(input.parse::<RepositoryName>().is_err())
     }
 }

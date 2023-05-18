@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{bail, Error};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub enum Arch {
@@ -32,8 +33,10 @@ pub enum Arch {
     X86_64V4,
 }
 
-impl Arch {
-    pub fn parse(s: &str) -> Result<Self> {
+impl FromStr for Arch {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Ok(match s {
             "aarch64" => Self::AArch64,
             "i686" => Self::I686,
@@ -42,7 +45,32 @@ impl Arch {
             "x86_64_v2" => Self::X86_64V2,
             "x86_64_v3" => Self::X86_64V3,
             "x86_64_v4" => Self::X86_64V4,
-            _ => bail!("Unsupported architecture \"{}\"", s),
+            _ => bail!("unsupported architecture \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Arch;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Arch::AArch64, "aarch64")]
+    #[case(Arch::I686, "i686")]
+    #[case(Arch::PPC64LE, "ppc64le")]
+    #[case(Arch::X86_64, "x86_64")]
+    #[case(Arch::X86_64V2, "x86_64_v2")]
+    #[case(Arch::X86_64V3, "x86_64_v3")]
+    #[case(Arch::X86_64V4, "x86_64_v4")]
+    fn parse_basics(#[case] expected_arch: Arch, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_arch, input.parse::<Arch>()?);
+        Ok(())
+    }
+
+    #[test]
+    fn parse_error() {
+        assert!("garbage".parse::<Arch>().is_err());
     }
 }

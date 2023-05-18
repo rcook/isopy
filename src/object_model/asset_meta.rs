@@ -1,3 +1,5 @@
+use crate::object_model::archive_type::ArchiveTypeBaseName;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -58,24 +60,27 @@ impl AssetMeta {
             let parts = s.split('+').collect::<Vec<_>>();
             let (version_str, tag) = match parts.len() {
                 1 => (parts[0], None),
-                2 => (parts[0], Some(Tag::parse(parts[1]))),
-                _ => bail!("Invalid version/tag \"{}\"", s),
+                2 => (parts[0], Some(parts[1].parse::<Tag>()?)),
+                _ => bail!("invalid version/tag \"{}\"", s),
             };
 
-            let version = Version::parse(version_str)?;
+            let version = version_str.parse::<Version>()?;
             Ok((version, tag))
         }
 
-        let (archive_type, base_name) = ArchiveType::parse(s)?;
+        let ArchiveTypeBaseName {
+            archive_type,
+            base_name,
+        } = s.parse::<ArchiveTypeBaseName>()?;
 
         let mut iter = base_name.split('-');
 
-        let family = Family::parse(wrap(s, "family", iter.next())?)?;
+        let family = wrap(s, "family", iter.next())?.parse::<Family>()?;
         let (version, mut tag_opt) =
             parse_version_and_tag_opt(wrap(s, "version/tag", iter.next())?)?;
-        let arch = Arch::parse(wrap(s, "architecture", iter.next())?)?;
-        let platform = Platform::parse(wrap(s, "platform", iter.next())?)?;
-        let os = OS::parse(wrap(s, "OS", iter.next())?)?;
+        let arch = wrap(s, "architecture", iter.next())?.parse::<Arch>()?;
+        let platform = wrap(s, "platform", iter.next())?.parse::<Platform>()?;
+        let os = wrap(s, "OS", iter.next())?.parse::<OS>()?;
 
         let mut need_flavour = true;
         let mut flavour_opt = None;
@@ -91,7 +96,7 @@ impl AssetMeta {
 
             if need_flavour {
                 need_flavour = false;
-                flavour_opt = Flavour::parse(temp);
+                flavour_opt = temp.parse::<Flavour>().ok();
                 if flavour_opt.is_some() {
                     continue;
                 }
@@ -99,7 +104,7 @@ impl AssetMeta {
 
             if need_subflavour0 {
                 need_subflavour0 = false;
-                subflavour0_opt = Subflavour::parse(temp);
+                subflavour0_opt = temp.parse::<Subflavour>().ok();
                 if subflavour0_opt.is_some() {
                     continue;
                 }
@@ -107,7 +112,7 @@ impl AssetMeta {
 
             if need_subflavour1 {
                 need_subflavour1 = false;
-                subflavour1_opt = Subflavour::parse(temp);
+                subflavour1_opt = temp.parse::<Subflavour>().ok();
                 if subflavour1_opt.is_some() {
                     continue;
                 }
@@ -115,7 +120,7 @@ impl AssetMeta {
 
             if need_variant {
                 need_variant = false;
-                variant_opt = Variant::parse(temp);
+                variant_opt = temp.parse::<Variant>().ok();
                 if variant_opt.is_some() {
                     continue;
                 }
@@ -123,7 +128,7 @@ impl AssetMeta {
 
             if need_tag {
                 need_tag = false;
-                tag_opt = Some(Tag::parse(temp));
+                tag_opt = temp.parse::<Tag>().ok();
                 continue;
             }
 
@@ -170,7 +175,7 @@ mod tests {
             subflavour0: Some(Subflavour::Debug),
             subflavour1: None,
             variant: Some(Variant::Full),
-            parsed_tag: Tag::parse("20230116")
+            parsed_tag: "20230116".parse::<Tag>().expect("test: must be valid tag")
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
     )]
@@ -186,7 +191,7 @@ mod tests {
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
-            parsed_tag: Tag::parse("20230116")
+            parsed_tag: "20230116".parse::<Tag>().expect("test: must be valid tag")
         },
         "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
     )]
@@ -202,7 +207,7 @@ mod tests {
             subflavour0: Some(Subflavour::Debug),
             subflavour1: None,
             variant: None,
-            parsed_tag: Tag::parse("20220220T1113")
+            parsed_tag: "20220220T1113".parse::<Tag>().expect("test: must be valid tag")
         },
         "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"
     )]
@@ -210,7 +215,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: Version::parse("3.9.6").expect("test: should be valid version"),
+            version: Version::new(3, 9, 6),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -218,7 +223,7 @@ mod tests {
             subflavour0: None,
             subflavour1: None,
             variant: Some(Variant::InstallOnly),
-            parsed_tag: Tag::parse("20210724T1424")
+            parsed_tag: "20210724T1424".parse::<Tag>().expect("test: must be valid tag")
         },
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
     )]

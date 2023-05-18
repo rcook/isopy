@@ -19,7 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{bail, Error};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::str::FromStr;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Version {
@@ -39,21 +41,31 @@ impl Version {
         }
     }
 
-    pub fn parse(s: &str) -> Result<Self> {
+    pub fn as_str(&self) -> &str {
+        &self.value
+    }
+}
+
+impl FromStr for Version {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         let parts = s.split('.').collect::<Vec<_>>();
         if parts.len() != 3 {
-            bail!("Invalid version \"{}\"", s)
+            bail!("invalid version \"{}\"", s)
         }
 
         let major = parts[0].parse()?;
         let minor = parts[1].parse()?;
         let build = parts[2].parse()?;
 
-        Ok(Version::new(major, minor, build))
+        Ok(Self::new(major, minor, build))
     }
+}
 
-    pub fn as_str(&self) -> &str {
-        &self.value
+impl Display for Version {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.build)
     }
 }
 
@@ -64,13 +76,7 @@ mod tests {
 
     #[test]
     fn test_parse() -> Result<()> {
-        assert_eq!(Version::new(1, 2, 3), Version::parse("1.2.3")?);
+        assert_eq!(Version::new(1, 2, 3), "1.2.3".parse::<Version>()?);
         Ok(())
-    }
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.build)
     }
 }

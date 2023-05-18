@@ -77,13 +77,12 @@ impl Repository for GitHubRepository {
             return Ok(None);
         }
 
-        let new_last_modified = LastModified::parse(
-            head_response
-                .headers()
-                .get(LAST_MODIFIED)
-                .expect("Last-Modified header should be present")
-                .to_str()?,
-        );
+        let new_last_modified = head_response
+            .headers()
+            .get(LAST_MODIFIED)
+            .expect("Last-Modified header should be present")
+            .to_str()?
+            .parse::<LastModified>()?;
 
         let index_request = self
             .client

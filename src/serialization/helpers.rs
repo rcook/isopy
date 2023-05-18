@@ -35,16 +35,18 @@ pub fn deserialize_last_modified<'de, D>(deserializer: D) -> Result<LastModified
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    Ok(LastModified::parse(s))
+    String::deserialize(deserializer)?
+        .parse::<LastModified>()
+        .map_err(Error::custom)
 }
 
 pub fn deserialize_repository_name<'de, D>(deserializer: D) -> Result<RepositoryName, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    RepositoryName::parse(&s).ok_or(Error::custom("failed to parse environment name"))
+    String::deserialize(deserializer)?
+        .parse::<RepositoryName>()
+        .map_err(Error::custom)
 }
 
 pub fn serialize_repository_name<S>(x: &RepositoryName, s: S) -> Result<S::Ok, S::Error>
@@ -58,8 +60,9 @@ pub fn deserialize_tag<'de, D>(deserializer: D) -> Result<Tag, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    Ok(Tag::parse(&s))
+    String::deserialize(deserializer)?
+        .parse::<Tag>()
+        .map_err(Error::custom)
 }
 
 pub fn serialize_tag<S>(x: &Tag, s: S) -> Result<S::Ok, S::Error>
@@ -75,7 +78,7 @@ where
 {
     let s_opt: Option<String> = Option::deserialize(deserializer)?;
     if let Some(s) = s_opt {
-        Ok(Some(Tag::parse(&s)))
+        Ok(Some(s.parse::<Tag>().map_err(Error::custom)?))
     } else {
         Ok(None)
     }
@@ -110,8 +113,9 @@ pub fn deserialize_version<'de, D>(deserializer: D) -> Result<Version, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    Version::parse(&s).map_err(Error::custom)
+    String::deserialize(deserializer)?
+        .parse::<Version>()
+        .map_err(Error::custom)
 }
 
 pub fn serialize_version<S>(x: &Version, s: S) -> Result<S::Ok, S::Error>

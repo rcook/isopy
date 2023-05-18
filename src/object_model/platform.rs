@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{bail, Error};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub enum Platform {
@@ -28,13 +29,31 @@ pub enum Platform {
     Unknown,
 }
 
-impl Platform {
-    pub fn parse(s: &str) -> Result<Self> {
+impl FromStr for Platform {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
             "pc" => Self::Pc,
             "apple" => Self::Apple,
             "unknown" => Self::Unknown,
-            _ => bail!("Unsupported platform \"{}\"", s),
+            _ => bail!("unsupported platform \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Platform;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Platform::Pc, "pc")]
+    #[case(Platform::Apple, "apple")]
+    #[case(Platform::Unknown, "unknown")]
+    fn parse_basics(#[case] expected_platform: Platform, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_platform, input.parse::<Platform>()?);
+        Ok(())
     }
 }

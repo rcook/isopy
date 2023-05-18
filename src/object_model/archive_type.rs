@@ -19,7 +19,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{bail, Error};
+use std::str::FromStr;
+
+#[derive(Debug, PartialEq)]
+pub struct ArchiveTypeBaseName {
+    pub archive_type: ArchiveType,
+    pub base_name: String,
+}
+
+impl FromStr for ArchiveTypeBaseName {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        let s0 = s;
+        for (ext, archive_type) in [
+            (".tar.gz", ArchiveType::TarGZ),
+            (".tar.zst", ArchiveType::TarZST),
+        ] {
+            if s0.ends_with(ext) {
+                let ext_len = ext.len();
+                let base_name = &s0[..s0.len() - ext_len];
+                return Ok(Self {
+                    archive_type,
+                    base_name: String::from(base_name),
+                });
+            }
+        }
+
+        bail!("unsupported archive type \"{}\"", s)
+    }
+}
 
 #[derive(Debug, PartialEq)]
 pub enum ArchiveType {
@@ -27,16 +57,27 @@ pub enum ArchiveType {
     TarZST,
 }
 
-impl ArchiveType {
-    pub fn parse(s: &str) -> Result<(Self, String)> {
-        let s0 = s;
-        for (ext, archive_type) in [(".tar.gz", Self::TarGZ), (".tar.zst", Self::TarZST)] {
-            if s0.ends_with(ext) {
-                let ext_len = ext.len();
-                let base_name = &s0[..s0.len() - ext_len];
-                return Ok((archive_type, String::from(base_name)));
-            }
-        }
-        bail!("Unsupported archive type \"{}\"", s)
+#[cfg(test)]
+mod tests {
+    use super::{ArchiveType, ArchiveTypeBaseName};
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(ArchiveType::TarGZ, "", ".tar.gz")]
+    #[case(ArchiveType::TarGZ, "file", "file.tar.gz")]
+    #[case(ArchiveType::TarZST, "", ".tar.zst")]
+    #[case(ArchiveType::TarZST, "file", "file.tar.zst")]
+    fn parse_basics(
+        #[case] expected_archive_type: ArchiveType,
+        #[case] expected_base_name: &str,
+        #[case] input: &str,
+    ) -> Result<()> {
+        let expected_result = ArchiveTypeBaseName {
+            archive_type: expected_archive_type,
+            base_name: String::from(expected_base_name),
+        };
+        assert_eq!(expected_result, input.parse::<ArchiveTypeBaseName>()?);
+        Ok(())
     }
 }

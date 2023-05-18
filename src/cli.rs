@@ -180,11 +180,12 @@ fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
 }
 
 fn parse_version(s: &str) -> Result<Version, String> {
-    Version::parse(s).map_err(|_| String::from("invalid version"))
+    s.parse::<Version>()
+        .map_err(|_| String::from("invalid version"))
 }
 
 fn parse_tag(s: &str) -> Result<Tag, String> {
-    Ok(Tag::parse(s))
+    s.parse::<Tag>().map_err(|_| String::from("invalid tag"))
 }
 
 fn parse_meta_id(s: &str) -> Result<MetaId, String> {

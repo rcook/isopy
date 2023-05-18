@@ -19,6 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Error};
+use std::str::FromStr;
+
 #[derive(Debug, PartialEq)]
 pub enum Subflavour {
     Debug,
@@ -30,12 +33,11 @@ pub enum Subflavour {
     Static,
 }
 
-impl Subflavour {
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: AsRef<str>,
-    {
-        Some(match s.as_ref() {
+impl FromStr for Subflavour {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
             "debug" => Self::Debug,
             "noopt" => Self::NoOpt,
             "pgo+lto" => Self::PgoLto,
@@ -43,7 +45,27 @@ impl Subflavour {
             "lto" => Self::Lto,
             "shared" => Self::Shared,
             "static" => Self::Static,
-            _ => return None,
+            _ => bail!("unsupported subflavour \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Subflavour;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Subflavour::Debug, "debug")]
+    #[case(Subflavour::NoOpt, "noopt")]
+    #[case(Subflavour::PgoLto, "pgo+lto")]
+    #[case(Subflavour::Pgo, "pgo")]
+    #[case(Subflavour::Lto, "lto")]
+    #[case(Subflavour::Shared, "shared")]
+    #[case(Subflavour::Static, "static")]
+    fn parse_basics(#[case] expected_subflavour: Subflavour, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_subflavour, input.parse::<Subflavour>()?);
+        Ok(())
     }
 }

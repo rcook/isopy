@@ -19,18 +19,38 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::{bail, Error};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub enum Family {
     CPython,
 }
 
-impl Family {
-    pub fn parse(s: &str) -> Result<Self> {
+impl FromStr for Family {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         Ok(match s {
             "cpython" => Self::CPython,
-            _ => bail!("Unsupported family \"{}\"", s),
+            _ => bail!("unsupported family \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Family;
+    use anyhow::Result;
+
+    #[test]
+    fn parse_basics() -> Result<()> {
+        assert_eq!(Family::CPython, "cpython".parse::<Family>()?);
+        Ok(())
+    }
+
+    #[test]
+    fn parse_error() {
+        assert!("garbage".parse::<Family>().is_err());
     }
 }

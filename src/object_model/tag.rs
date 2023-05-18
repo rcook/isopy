@@ -19,21 +19,41 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::Error;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::str::FromStr;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Tag(String);
 
 impl Tag {
-    pub fn parse(s: &str) -> Self {
-        Self(String::from(s))
-    }
-
     pub fn as_str(&self) -> &str {
         &self.0
     }
 }
 
-impl std::fmt::Display for Tag {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl FromStr for Tag {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(String::from(s)))
+    }
+}
+
+impl Display for Tag {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Tag;
+    use anyhow::Result;
+
+    #[test]
+    fn basics() -> Result<()> {
+        assert_eq!("foo", "foo".parse::<Tag>()?.as_str());
+        Ok(())
     }
 }

@@ -19,21 +19,38 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{bail, Error};
+use std::str::FromStr;
+
 #[derive(Debug, PartialEq)]
 pub enum Variant {
     InstallOnly,
     Full,
 }
 
-impl Variant {
-    pub fn parse<S>(s: S) -> Option<Self>
-    where
-        S: AsRef<str>,
-    {
-        Some(match s.as_ref() {
+impl FromStr for Variant {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
             "install_only" => Self::InstallOnly,
             "full" => Self::Full,
-            _ => return None,
+            _ => bail!("unsupported variant \"{}\"", s),
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Variant;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Variant::InstallOnly, "install_only")]
+    #[case(Variant::Full, "full")]
+    fn parse_basics(#[case] expected_variant: Variant, #[case] input: &str) -> Result<()> {
+        assert_eq!(expected_variant, input.parse::<Variant>()?);
+        Ok(())
     }
 }

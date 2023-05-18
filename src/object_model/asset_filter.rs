@@ -245,14 +245,18 @@ mod tests {
         assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]));
 
         let mut asset_filter = AssetFilter::all();
-        asset_filter.tag = Some(Tag::parse("20210724T1424"));
+        asset_filter.tag = Some(
+            "20210724T1424"
+                .parse::<Tag>()
+                .expect("test: must be valid tag"),
+        );
         assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
     }
 
     fn make_test_artifacts() -> (Asset, Asset, Asset, Asset) {
         let a0 = Asset {
             name: String::from(""),
-            tag: Tag::parse("tag"),
+            tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
@@ -262,7 +266,7 @@ mod tests {
         };
         let a1 = Asset {
             name: String::from(""),
-            tag: Tag::parse("tag"),
+            tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
@@ -272,7 +276,7 @@ mod tests {
         };
         let a2 = Asset {
             name: String::from(""),
-            tag: Tag::parse("tag"),
+            tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
@@ -282,7 +286,9 @@ mod tests {
         };
         let a3 = Asset {
             name: String::from(""),
-            tag: Tag::parse("20210724T1424"),
+            tag: "20210724T1424"
+                .parse::<Tag>()
+                .expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
             meta: AssetMeta::parse(
