@@ -22,9 +22,11 @@
 mod app;
 mod asset;
 mod backtrace;
+mod checksum;
 mod cli;
 mod commands;
 mod constants;
+mod download;
 mod logging;
 mod object_model;
 mod repository;
@@ -33,8 +35,8 @@ mod serialization;
 mod shell;
 mod status;
 mod ui;
+mod unpack;
 mod url;
-mod util;
 
 #[tokio::main]
 async fn main() {

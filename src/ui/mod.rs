@@ -23,7 +23,7 @@ mod indicator;
 mod print;
 mod terminal;
 
-pub use self::indicator::Indicator;
+pub use self::indicator::{ContentLength, Indicator};
 pub use self::print::{
     print, print_dir_info, print_dir_info_and_env, print_error, print_link, print_metadir,
     print_repo, print_title, print_value,

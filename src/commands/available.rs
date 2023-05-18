@@ -20,10 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::download::download_stream;
 use crate::object_model::AssetFilter;
 use crate::status::Status;
 use crate::ui::print;
-use crate::util::download_stream;
 use anyhow::{anyhow, Result};
 
 pub async fn do_available(app: App) -> Result<Status> {

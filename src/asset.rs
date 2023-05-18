@@ -20,9 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::checksum::validate_sha256_checksum;
 use crate::cli::PythonVersion;
+use crate::download::download_stream;
 use crate::object_model::{Asset, AssetFilter, Tag};
-use crate::util::{download_stream, validate_sha256_checksum};
 use anyhow::{anyhow, bail, Result};
 use log::info;
 use std::fs::remove_file;
