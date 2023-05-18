@@ -22,7 +22,8 @@ use crate::object_model::archive_type::ArchiveTypeBaseName;
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, Version, OS};
-use anyhow::{bail, Result};
+use anyhow::{bail, Error, Result};
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub struct AssetMeta {
@@ -47,8 +48,12 @@ impl AssetMeta {
             s.ends_with(".sha256")
         }
     }
+}
 
-    pub fn parse(s: &str) -> Result<Self> {
+impl FromStr for AssetMeta {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
             match result {
                 Some(value) => Ok(value),
@@ -228,7 +233,7 @@ mod tests {
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
     )]
     fn test_parse(#[case] expected_result: AssetMeta, #[case] input: &str) -> Result<()> {
-        assert_eq!(expected_result, AssetMeta::parse(input)?);
+        assert_eq!(expected_result, input.parse::<AssetMeta>()?);
         Ok(())
     }
 

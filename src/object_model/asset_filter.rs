@@ -259,30 +259,27 @@ mod tests {
             tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
-            meta: AssetMeta::parse(
-                "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst",
-            )
-            .expect("test: must be valid asset name"),
+            meta: "cpython-3.10.9+20230116-aarch64-apple-darwin-debug-full.tar.zst"
+                .parse::<AssetMeta>()
+                .expect("test: must be valid asset name"),
         };
         let a1 = Asset {
             name: String::from(""),
             tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
-            meta: AssetMeta::parse(
-                "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz",
-            )
-            .expect("test: must be valid asset name"),
+            meta: "cpython-3.10.9+20230116-aarch64-apple-darwin-install_only.tar.gz"
+                .parse::<AssetMeta>()
+                .expect("test: must be valid asset name"),
         };
         let a2 = Asset {
             name: String::from(""),
             tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
-            meta: AssetMeta::parse(
-                "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst",
-            )
-            .expect("test: must be valid asset name"),
+            meta: "cpython-3.10.2-aarch64-apple-darwin-debug-20220220T1113.tar.zst"
+                .parse::<AssetMeta>()
+                .expect("test: must be valid asset name"),
         };
         let a3 = Asset {
             name: String::from(""),
@@ -291,10 +288,9 @@ mod tests {
                 .expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
-            meta: AssetMeta::parse(
-                "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz",
-            )
-            .expect("test: must be valid asset name"),
+            meta: "cpython-3.9.6-x86_64-unknown-linux-gnu-install_only-20210724T1424.tar.gz"
+                .parse::<AssetMeta>()
+                .expect("test: must be valid asset name"),
         };
         (a0, a1, a2, a3)
     }

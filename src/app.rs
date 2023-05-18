@@ -149,7 +149,7 @@ impl App {
         for package_rec in package_recs {
             for asset_rec in package_rec.assets {
                 if !AssetMeta::definitely_not_an_asset_name(&asset_rec.name) {
-                    let meta = AssetMeta::parse(&asset_rec.name)?;
+                    let meta = asset_rec.name.parse::<AssetMeta>()?;
                     assets.push(Asset {
                         name: asset_rec.name,
                         tag: package_rec.tag.clone(),

@@ -32,7 +32,7 @@ pub fn do_downloaded(app: App) -> Result<Status> {
         let file_name = entry.file_name();
 
         if let Some(asset_name) = file_name.to_str() {
-            if AssetMeta::parse(asset_name).is_ok() {
+            if asset_name.parse::<AssetMeta>().is_ok() {
                 print(asset_name)
             }
         }
