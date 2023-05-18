@@ -1,5 +1,7 @@
 # Concepts
 
+> **Work in progress**: This document is out of date! It uses old terminology!
+
 isopy manages isolated Python environments. This document
 describes the core concepts underlying its operation.
 
