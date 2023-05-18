@@ -25,9 +25,6 @@ use crate::status::Status;
 use crate::ui::print;
 use crate::util::download_stream;
 use anyhow::{anyhow, Result};
-use joatmon::safe_back_up;
-use log::info;
-use std::fs::remove_file;
 
 pub async fn do_available(app: App) -> Result<Status> {
     update_index_if_necessary(&app).await?;
@@ -53,17 +50,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
         .get_latest_index(&current_last_modified)
         .await?
     {
-        if releases_path.exists() {
-            let safe_back_up_path = safe_back_up(&releases_path)?;
-            info!(
-                "Releases data file {} backed up to {}",
-                releases_path.display(),
-                safe_back_up_path.display()
-            );
-            remove_file(&releases_path)?;
-        }
-
-        download_stream("index", &mut response, releases_path).await?;
+        download_stream("release index", &mut response, &releases_path).await?;
         if let Some(last_modified) = response.last_modified() {
             app.write_index_last_modified(&repository.name, last_modified)?;
         }

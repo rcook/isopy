@@ -23,21 +23,30 @@ use crate::repository::Response;
 use crate::ui::Indicator;
 use crate::util::ContentLength;
 use anyhow::Result;
-use joatmon::safe_create_file;
+use joatmon::{safe_back_up, safe_create_file};
+use log::info;
+use std::fs::remove_file;
 use std::io::Write;
 use std::path::Path;
 
-pub async fn download_stream<P>(
+pub async fn download_stream(
     label: &str,
     response: &mut Box<dyn Response>,
-    output_path: P,
-) -> Result<()>
-where
-    P: AsRef<Path>,
-{
+    output_path: &Path,
+) -> Result<()> {
+    if output_path.exists() {
+        let safe_back_up_path = safe_back_up(output_path)?;
+        info!(
+            "Data file {} backed up to {}",
+            output_path.display(),
+            safe_back_up_path.display()
+        );
+        remove_file(output_path)?;
+    }
+
     let indicator = Indicator::new(response.content_length())?;
     let mut stream = response.bytes_stream()?;
-    let mut file = safe_create_file(&output_path, true)?;
+    let mut file = safe_create_file(output_path, false)?;
     let mut downloaded = 0;
     indicator.set_message(format!("Fetching {}", label));
     while let Some(item) = stream.next().await {
