@@ -21,38 +21,6 @@ isopy is written in [Rust][rust], built using [Cargo][cargo-book] installed via 
 [rustup] and distributed via [GitHub][releases]. It's based on an original
 [reference implementation in Python](py).
 
-## Making an isopy environment available on shell startup
-
-Note that putting the appropriate Python directory at the head of your
-`PATH` is all you really need to do:
-
-Linux/macOS (bash or similar)
-
-```bash
-export PATH=$HOME/.isopy/envs/isopy/python/bin:$PATH
-```
-
-Windows (PowerShell)
-
-```pwsh
-$env:Path = "$env:USERPROFILE\.isopy\envs\isopy\python" + ';' + "$env:USERPROFILE\.isopy\envs\isopy\python\Scripts" + ';' + $env:Path
-```
-
-Windows (Command Script)
-
-```pwsh
-set PATH=%USERPROFILE%\.isopy\envs\isopy\python;%USERPROFILE%\.isopy\envs\isopy\python\Scripts;%PATH%
-```
-
-You can also call out to the `shell` command instead at the end of your
-`.bashrc` or similar shell configuration file:
-
-```bash
-if [ "$ISOPY_ENV" == '' ]; then
-     isopy shell -e isopy
-fi
-```
-
 ## What does this all do?
 
 * Intended to minimally impact your system
