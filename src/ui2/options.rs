@@ -26,8 +26,6 @@ pub struct Options {
     pub logger: Option<LoggerOptions>,
 }
 
-
-
 pub struct LoggerOptions {
     pub level: LevelFilter,
 }
