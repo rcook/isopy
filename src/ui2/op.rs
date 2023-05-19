@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use super::error::Error;
+use super::result::Result;
 use super::state::State;
 use std::borrow::Cow;
 use std::sync::Arc;
@@ -29,28 +31,43 @@ pub struct Op {
 
 #[allow(unused)]
 impl Op {
-    pub fn set_position(&self, pos: u64) {
-        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
-            indicator.set_position(pos);
-        } else {
-            panic!("INDICATOR INVALID")
-        }
+    pub fn set_position(&self, pos: u64) -> Result<()> {
+        let temp = self.state.indicator.borrow();
+
+        let Some(indicator) = temp.as_ref() else {
+            return Err(Error::CannotOverlapOperations);
+        };
+
+        // TBD: Problem: Indicator might belong another operation!
+        indicator.set_position(pos);
+
+        Ok(())
     }
 
-    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
-        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
-            indicator.set_message(msg);
-        } else {
-            panic!("INDICATOR INVALID")
-        }
+    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) -> Result<()> {
+        let temp = self.state.indicator.borrow();
+
+        let Some(indicator) = temp.as_ref() else {
+            return Err(Error::CannotOverlapOperations);
+        };
+
+        // TBD: Problem: Indicator might belong another operation!
+        indicator.set_message(msg);
+
+        Ok(())
     }
 
-    pub fn println(&self, msg: &str) {
-        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
-            indicator.println(msg);
-        } else {
-            panic!("INDICATOR INVALID")
-        }
+    pub fn println(&self, msg: &str) -> Result<()> {
+        let temp = self.state.indicator.borrow();
+
+        let Some(indicator) = temp.as_ref() else {
+            return Err(Error::CannotOverlapOperations);
+        };
+
+        // TBD: Problem: Indicator might belong another operation!
+        indicator.println(msg);
+
+        Ok(())
     }
 
     pub(crate) fn new(state: Arc<State>) -> Self {

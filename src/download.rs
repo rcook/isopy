@@ -49,14 +49,14 @@ pub async fn download_stream(
     let mut stream = response.bytes_stream()?;
     let mut file = safe_create_file(output_path, false)?;
     let mut downloaded = 0;
-    op.set_message(format!("Fetching {}", label));
+    op.set_message(format!("Fetching {}", label))?;
     while let Some(item) = stream.next().await {
         let chunk = item?;
         downloaded += chunk.len() as ContentLength;
         file.write_all(&chunk)?;
-        op.set_position(downloaded);
+        op.set_position(downloaded)?;
     }
-    op.set_message(format!("Finished fetching {}", label));
+    op.set_message(format!("Finished fetching {}", label))?;
     drop(op);
     Ok(())
 }

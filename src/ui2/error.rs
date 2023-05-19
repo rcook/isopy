@@ -27,6 +27,7 @@ pub enum Error {
     CouldNotSetLogger,
     CouldNotConfigureProgressBar,
     CannotUnsetLogger,
+    CannotOverlapOperations,
 }
 
 impl StdError for Error {}
@@ -37,6 +38,7 @@ impl Display for Error {
             Self::CouldNotSetLogger => f.write_str("could not set logger"),
             Self::CouldNotConfigureProgressBar => f.write_str("could not configure progress bar"),
             Self::CannotUnsetLogger => f.write_str("cannot unset logger"),
+            Self::CannotOverlapOperations => f.write_str("cannot overlap operations"),
         }
     }
 }
