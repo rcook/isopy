@@ -38,7 +38,7 @@ impl Indicator {
                     let p = ProgressBar::new(n);
 
                     let progress_style = ProgressStyle::with_template(
-                    "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>3}%  {wide_msg:.yellow}",
+                    "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
                 )
                 .map_err(|_| Error::CouldNotConfigureProgressBar)?;
 
@@ -49,7 +49,7 @@ impl Indicator {
                     let p = ProgressBar::new_spinner();
 
                     let progress_style = ProgressStyle::with_template(
-                    "[{elapsed_precise:.green}]  {spinner:.cyan/blue}        {wide_msg:.yellow}",
+                    "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
                 )
                 .map_err(|_| Error::CouldNotConfigureProgressBar)?;
 
