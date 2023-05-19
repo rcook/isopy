@@ -19,64 +19,61 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::error::Error;
-use super::result::Result;
+use super::indicator::Indicator;
 use super::state::State;
 use std::borrow::Cow;
 use std::sync::Arc;
 
 pub struct Op {
     state: Arc<State>,
+    indicator: Arc<Indicator>,
 }
 
 #[allow(unused)]
 impl Op {
-    pub fn set_position(&self, pos: u64) -> Result<()> {
-        let temp = self.state.indicator.borrow();
-
-        let Some(indicator) = temp.as_ref() else {
-            return Err(Error::CannotOverlapOperations);
-        };
-
-        // TBD: Problem: Indicator might belong to another operation!
-        indicator.set_position(pos);
-
-        Ok(())
+    pub fn set_position(&self, pos: u64) {
+        self.indicator.set_position(pos)
     }
 
-    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) -> Result<()> {
-        let temp = self.state.indicator.borrow();
-
-        let Some(indicator) = temp.as_ref() else {
-            return Err(Error::CannotOverlapOperations);
-        };
-
-        // TBD: Problem: Indicator might belong to another operation!
-        indicator.set_message(msg);
-
-        Ok(())
+    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
+        self.indicator.set_message(msg)
     }
 
-    pub fn println(&self, msg: &str) -> Result<()> {
-        let temp = self.state.indicator.borrow();
-
-        let Some(indicator) = temp.as_ref() else {
-            return Err(Error::CannotOverlapOperations);
-        };
-
-        // TBD: Problem: Indicator might belong to another operation!
-        indicator.println(msg);
-
-        Ok(())
+    pub fn println(&self, msg: &str) {
+        self.indicator.println(msg);
     }
 
-    pub(crate) fn new(state: Arc<State>) -> Self {
-        Self { state }
+    pub(crate) fn new(state: Arc<State>, indicator: Arc<Indicator>) -> Self {
+        Self { state, indicator }
     }
 }
 
 impl Drop for Op {
     fn drop(&mut self) {
-        drop(self.state.indicator.take());
+        // (TIME OF CHECK)
+        match Arc::strong_count(&self.indicator) {
+            2 => {
+                // Indicator is still referenced by "state", so let's drop it
+                // (TIME OF USE)
+                drop(self.state.indicator.take());
+
+                // TBD: There is a TOCTOU bug in this code! Another thread
+                // could've jumped in and replaced self.state.indicator
+                // between the time of check and the time of use (labelled
+                // above). I don't know how much I care about this. This
+                // assert will crash the program if we encounter this
+                // condition. If I feel strongly motivated, I'll stick a
+                // mutex around something.
+                assert_eq!(
+                    1,
+                    Arc::strong_count(&self.indicator),
+                    "there's a data race here which I'll need to think about"
+                );
+            }
+            1 => {
+                // Indicator is only referenced by this struct: do nothing
+            }
+            _ => unreachable!("this should never happen"),
+        }
     }
 }

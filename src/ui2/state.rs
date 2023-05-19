@@ -21,10 +21,11 @@
 //
 use super::indicator::Indicator;
 use std::cell::RefCell;
+use std::sync::Arc;
 
 pub(crate) struct State {
     pub(crate) owns_logger: RefCell<bool>,
-    pub(crate) indicator: RefCell<Option<Indicator>>,
+    pub(crate) indicator: RefCell<Option<Arc<Indicator>>>,
 }
 
 impl State {

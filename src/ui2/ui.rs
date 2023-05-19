@@ -43,8 +43,9 @@ impl Ui {
 
     pub fn operation(&self, len: Option<IndicatorLength>) -> Result<Op> {
         drop(self.state.indicator.take());
-        self.state.indicator.replace(Some(Indicator::new(len)?));
-        Ok(Op::new(Arc::clone(&self.state)))
+        let indicator = Arc::new(Indicator::new(len)?);
+        self.state.indicator.replace(Some(Arc::clone(&indicator)));
+        Ok(Op::new(Arc::clone(&self.state), Arc::clone(&indicator)))
     }
 
     pub(crate) fn set_options(&self, options: &Options) -> Result<()> {
