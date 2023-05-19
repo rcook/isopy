@@ -32,32 +32,23 @@ pub(crate) struct Indicator {
 
 impl Indicator {
     pub(crate) fn new(len: Option<IndicatorLength>) -> Result<Self> {
-        Ok(Self {
-            progress_bar: match len {
-                Some(n) => {
-                    let p = ProgressBar::new(n);
+        let (progress_bar, template) = match len {
+            Some(n) => (
+                ProgressBar::new(n),
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
+            ),
+            None => (
+                ProgressBar::new_spinner(),
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
+            ),
+        };
 
-                    let progress_style = ProgressStyle::with_template(
-                    "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
-                )
-                .map_err(|_| Error::CouldNotConfigureProgressBar)?;
+        progress_bar.set_style(
+            ProgressStyle::with_template(template)
+                .map_err(|_| Error::CouldNotConfigureProgressBar)?,
+        );
 
-                    p.set_style(progress_style);
-                    p
-                }
-                None => {
-                    let p = ProgressBar::new_spinner();
-
-                    let progress_style = ProgressStyle::with_template(
-                    "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
-                )
-                .map_err(|_| Error::CouldNotConfigureProgressBar)?;
-
-                    p.set_style(progress_style);
-                    p
-                }
-            },
-        })
+        Ok(Self { progress_bar })
     }
 
     pub(crate) fn set_position(&self, pos: u64) {
