@@ -160,8 +160,8 @@ pub enum LogLevel {
 }
 
 impl From<LogLevel> for LevelFilter {
-    fn from(val: LogLevel) -> Self {
-        match val {
+    fn from(value: LogLevel) -> Self {
+        match value {
             LogLevel::Off => LevelFilter::Off,
             LogLevel::Error => LevelFilter::Error,
             LogLevel::Warn => LevelFilter::Warn,
@@ -189,5 +189,6 @@ fn parse_tag(s: &str) -> Result<Tag, String> {
 }
 
 fn parse_meta_id(s: &str) -> Result<MetaId, String> {
-    s.parse::<MetaId>().map_err(|_|String::from("invalid meta ID"))
+    s.parse::<MetaId>()
+        .map_err(|_| String::from("invalid meta ID"))
 }
