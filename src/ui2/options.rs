@@ -21,15 +21,12 @@
 //
 use log::LevelFilter;
 
+#[derive(Default)]
 pub struct Options {
     pub logger: Option<LoggerOptions>,
 }
 
-impl Default for Options {
-    fn default() -> Self {
-        Self { logger: None }
-    }
-}
+
 
 pub struct LoggerOptions {
     pub level: LevelFilter,

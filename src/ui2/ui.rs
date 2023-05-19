@@ -56,10 +56,8 @@ impl Ui {
             }
 
             Logger::set_max_level(logger_options.level);
-        } else {
-            if *self.state.owns_logger.borrow() {
-                return Err(Error::CannotUnsetLogger);
-            }
+        } else if *self.state.owns_logger.borrow() {
+            return Err(Error::CannotUnsetLogger);
         }
 
         Ok(())
