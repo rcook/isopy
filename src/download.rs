@@ -20,13 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repository::Response;
-use crate::ui::{ContentLength, Indicator};
+use crate::ui2::begin_operation;
 use anyhow::Result;
 use joatmon::{safe_back_up, safe_create_file};
 use log::info;
 use std::fs::remove_file;
 use std::io::Write;
 use std::path::Path;
+
+pub type ContentLength = u64;
 
 pub async fn download_stream(
     label: &str,
@@ -43,18 +45,18 @@ pub async fn download_stream(
         remove_file(output_path)?;
     }
 
-    let indicator = Indicator::new(response.content_length())?;
+    let op = begin_operation(response.content_length())?;
     let mut stream = response.bytes_stream()?;
     let mut file = safe_create_file(output_path, false)?;
     let mut downloaded = 0;
-    indicator.set_message(format!("Fetching {}", label));
+    op.set_message(format!("Fetching {}", label));
     while let Some(item) = stream.next().await {
         let chunk = item?;
         downloaded += chunk.len() as ContentLength;
         file.write_all(&chunk)?;
-        indicator.set_position(downloaded);
+        op.set_position(downloaded);
     }
-    indicator.set_message(format!("Finished fetching {}", label));
-    indicator.finish();
+    op.set_message(format!("Finished fetching {}", label));
+    drop(op);
     Ok(())
 }

@@ -21,8 +21,8 @@
 //
 use super::{Repository, Response, Stream};
 use crate::constants::ISOPY_USER_AGENT;
+use crate::download::ContentLength;
 use crate::object_model::{Asset, LastModified};
-use crate::ui::ContentLength;
 use crate::url::{dir_url, file_url};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;

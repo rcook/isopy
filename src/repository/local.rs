@@ -21,8 +21,8 @@
 //
 use super::{Repository, Response, Stream};
 use crate::constants::RELEASES_FILE_NAME;
+use crate::download::ContentLength;
 use crate::object_model::{Asset, LastModified};
-use crate::ui::ContentLength;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
