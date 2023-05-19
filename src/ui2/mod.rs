@@ -19,37 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod asset;
-mod backtrace;
-mod checksum;
-mod cli;
-mod commands;
-mod constants;
-mod download;
-mod object_model;
-mod repository;
-mod run;
-mod serialization;
-mod shell;
-mod status;
+mod error;
+mod global;
+mod indicator;
+mod logger;
+mod op;
+mod options;
+mod result;
+mod state;
 mod ui;
-mod ui2;
-mod unpack;
-mod url;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::run::run;
-    use crate::ui::print_error;
-    use std::process::exit;
-
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
-        }
-    })
-}
+pub use self::error::Error;
+pub use self::global::{begin_operation, init_ui, set_ui_options};
+pub use self::indicator::IndicatorLength;
+pub use self::op::Op;
+pub use self::options::{LoggerOptions, Options};
+pub use self::result::Result;
+pub use self::ui::Ui;

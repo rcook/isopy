@@ -19,27 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{anyhow, Result};
-use log::{set_logger, set_max_level, LevelFilter, Log, Metadata, Record};
+use super::error::Error;
+use super::result::Result;
+use super::state::State;
+use log::{LevelFilter, Log, Metadata, Record};
+use std::sync::Arc;
 
-static LOGGER: SimpleLogger = SimpleLogger;
+pub(crate) struct Logger {
+    state: Arc<State>,
+}
 
-struct SimpleLogger;
+impl Logger {
+    pub(crate) fn init(state: Arc<State>) -> Result<()> {
+        let logger = Box::new(Logger { state });
+        log::set_boxed_logger(logger).map_err(|_| Error::CouldNotSetLogger)?;
+        Ok(())
+    }
 
-impl Log for SimpleLogger {
+    pub(crate) fn set_max_level(level: LevelFilter) {
+        log::set_max_level(level);
+    }
+}
+
+impl Log for Logger {
     fn enabled(&self, _metadata: &Metadata) -> bool {
         true
     }
 
-    fn log(&self, record: &Record) {
-        println!("{} - {}", record.level(), record.args());
-    }
-
     fn flush(&self) {}
-}
 
-pub fn init_logging(level_filter: LevelFilter) -> Result<()> {
-    set_logger(&LOGGER).map_err(|e| anyhow!(e))?;
-    set_max_level(level_filter);
-    Ok(())
+    fn log(&self, record: &Record) {
+        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
+            indicator.println(&format!("{} - {}", record.level(), record.args()))
+        } else {
+            println!("{} - {}", record.level(), record.args());
+        }
+    }
 }

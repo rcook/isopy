@@ -19,37 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod asset;
-mod backtrace;
-mod checksum;
-mod cli;
-mod commands;
-mod constants;
-mod download;
-mod object_model;
-mod repository;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod ui;
-mod ui2;
-mod unpack;
-mod url;
+use log::LevelFilter;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::run::run;
-    use crate::ui::print_error;
-    use std::process::exit;
+pub struct Options {
+    pub logger: Option<LoggerOptions>,
+}
 
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
+impl Default for Options {
+    fn default() -> Self {
+        Self { logger: None }
+    }
+}
+
+pub struct LoggerOptions {
+    pub level: LevelFilter,
+}
+
+impl Default for LoggerOptions {
+    fn default() -> Self {
+        Self {
+            level: LevelFilter::Error,
         }
-    })
+    }
 }

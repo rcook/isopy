@@ -27,9 +27,9 @@ use crate::commands::{
     do_init_config, do_link, do_list, do_shell, do_wrap,
 };
 use crate::constants::CACHE_DIR_NAME;
-use crate::logging::init_logging;
 use crate::status::Status;
 use crate::ui::reset_terminal;
+use crate::ui2::{init_ui, LoggerOptions, Options as UiOptions};
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;
@@ -41,8 +41,11 @@ fn set_up() -> Result<()> {
     init_backtrace();
     reset_terminal();
 
-    // Allow all log messages through during startup
-    init_logging(LevelFilter::Trace)?;
+    init_ui(&UiOptions {
+        logger: Some(LoggerOptions {
+            level: LevelFilter::Trace,
+        }),
+    })?;
 
     Ok(())
 }

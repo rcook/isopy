@@ -19,37 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod asset;
-mod backtrace;
-mod checksum;
-mod cli;
-mod commands;
-mod constants;
-mod download;
-mod object_model;
-mod repository;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod ui;
-mod ui2;
-mod unpack;
-mod url;
+use std::error::Error as StdError;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::run::run;
-    use crate::ui::print_error;
-    use std::process::exit;
+#[derive(Debug)]
+pub enum Error {
+    CouldNotSetLogger,
+    CouldNotConfigureProgressBar,
+    CannotUnsetLogger,
+}
 
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
+impl StdError for Error {}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Self::CouldNotSetLogger => f.write_str("could not set logger"),
+            Self::CouldNotConfigureProgressBar => f.write_str("could not configure progress bar"),
+            Self::CannotUnsetLogger => f.write_str("cannot unset logger"),
         }
-    })
+    }
 }

@@ -19,37 +19,47 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod asset;
-mod backtrace;
-mod checksum;
-mod cli;
-mod commands;
-mod constants;
-mod download;
-mod object_model;
-mod repository;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod ui;
-mod ui2;
-mod unpack;
-mod url;
+use super::state::State;
+use std::borrow::Cow;
+use std::sync::Arc;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::run::run;
-    use crate::ui::print_error;
-    use std::process::exit;
+pub struct Op {
+    state: Arc<State>,
+}
 
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
+#[allow(unused)]
+impl Op {
+    pub fn set_position(&self, pos: u64) {
+        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
+            indicator.set_position(pos);
+        } else {
+            panic!("INDICATOR INVALID")
         }
-    })
+    }
+
+    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
+        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
+            indicator.set_message(msg);
+        } else {
+            panic!("INDICATOR INVALID")
+        }
+    }
+
+    pub fn println(&self, msg: &str) {
+        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
+            indicator.println(msg);
+        } else {
+            panic!("INDICATOR INVALID")
+        }
+    }
+
+    pub(crate) fn new(state: Arc<State>) -> Self {
+        Self { state }
+    }
+}
+
+impl Drop for Op {
+    fn drop(&mut self) {
+        drop(self.state.indicator.take());
+    }
 }

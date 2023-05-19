@@ -19,37 +19,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod asset;
-mod backtrace;
-mod checksum;
-mod cli;
-mod commands;
-mod constants;
-mod download;
-mod object_model;
-mod repository;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod ui;
-mod ui2;
-mod unpack;
-mod url;
+use super::indicator::Indicator;
+use std::cell::RefCell;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::run::run;
-    use crate::ui::print_error;
-    use std::process::exit;
-
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
-        }
-    })
+pub(crate) struct State {
+    pub(crate) owns_logger: RefCell<bool>,
+    pub(crate) indicator: RefCell<Option<Indicator>>,
 }
+
+impl State {
+    pub(crate) fn new() -> Self {
+        Self {
+            owns_logger: RefCell::new(false),
+            indicator: RefCell::new(None),
+        }
+    }
+}
+
+unsafe impl Send for State {}
+unsafe impl Sync for State {}

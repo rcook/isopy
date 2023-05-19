@@ -19,37 +19,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod asset;
-mod backtrace;
-mod checksum;
-mod cli;
-mod commands;
-mod constants;
-mod download;
-mod object_model;
-mod repository;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod ui;
-mod ui2;
-mod unpack;
-mod url;
+use super::indicator::IndicatorLength;
+use super::op::Op;
+use super::options::Options;
+use super::result::Result;
+use super::ui::Ui;
+use lazy_static::lazy_static;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::run::run;
-    use crate::ui::print_error;
-    use std::process::exit;
+lazy_static! {
+    static ref GLOBAL_UI: Ui = Ui::new(&Options::default()).expect("lazy_static: global UI object");
+}
 
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{}", e));
-            ERROR
-        }
-    })
+#[allow(unused)]
+pub fn init_ui(options: &Options) -> Result<()> {
+    set_ui_options(options)
+}
+
+#[allow(unused)]
+pub fn set_ui_options(options: &Options) -> Result<()> {
+    GLOBAL_UI.set_options(options)
+}
+
+#[allow(unused)]
+pub fn begin_operation(len: Option<IndicatorLength>) -> Result<Op> {
+    GLOBAL_UI.operation(len)
 }
