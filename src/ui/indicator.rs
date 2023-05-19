@@ -35,12 +35,9 @@ impl Indicator {
             None => ProgressBar::new_spinner(),
             Some(s) => ProgressBar::new(s),
         };
-        progress_bar.set_style(
-            ProgressStyle::with_template(
-                "[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-            )?
-            .progress_chars("##-"),
-        );
+        progress_bar.set_style(ProgressStyle::with_template(
+            "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>3}%  {wide_msg:.yellow}",
+        )?);
         Ok(Self { progress_bar })
     }
 
@@ -53,6 +50,6 @@ impl Indicator {
     }
 
     pub fn finish(&self) {
-        self.progress_bar.finish()
+        self.progress_bar.finish_and_clear()
     }
 }
