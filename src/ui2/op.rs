@@ -38,7 +38,7 @@ impl Op {
             return Err(Error::CannotOverlapOperations);
         };
 
-        // TBD: Problem: Indicator might belong another operation!
+        // TBD: Problem: Indicator might belong to another operation!
         indicator.set_position(pos);
 
         Ok(())
@@ -51,7 +51,7 @@ impl Op {
             return Err(Error::CannotOverlapOperations);
         };
 
-        // TBD: Problem: Indicator might belong another operation!
+        // TBD: Problem: Indicator might belong to another operation!
         indicator.set_message(msg);
 
         Ok(())
@@ -64,7 +64,7 @@ impl Op {
             return Err(Error::CannotOverlapOperations);
         };
 
-        // TBD: Problem: Indicator might belong another operation!
+        // TBD: Problem: Indicator might belong to another operation!
         indicator.println(msg);
 
         Ok(())
