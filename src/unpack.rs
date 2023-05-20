@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::ui2::{begin_operation, OpProgress};
 use anyhow::Result;
 use flate2::read::GzDecoder;
+use joat_logger::{begin_operation, OpProgress};
 use joatmon::open_file;
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};

@@ -34,7 +34,6 @@ mod serialization;
 mod shell;
 mod status;
 mod ui;
-mod ui2;
 mod unpack;
 mod url;
 

@@ -901,6 +901,7 @@ dependencies = [
  "home",
  "include_dir",
  "indicatif",
+ "joat-logger",
  "joat-repo",
  "joatmon",
  "lazy_static",
@@ -928,6 +929,18 @@ name = "itoa"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "453ad9f582a441959e5f0d088b02ce04cfe8d51a8eaf077f12ac6d3e94164ca6"
+
+[[package]]
+name = "joat-logger"
+version = "0.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef347190ceaae392a35965d0b23b99357671c07baba2fa9fb117be7539589464"
+dependencies = [
+ "indicatif",
+ "lazy_static",
+ "log",
+ "uuid",
+]
 
 [[package]]
 name = "joat-repo"

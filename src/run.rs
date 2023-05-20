@@ -29,9 +29,9 @@ use crate::commands::{
 use crate::constants::CACHE_DIR_NAME;
 use crate::status::Status;
 use crate::ui::reset_terminal;
-use crate::ui2::init_ui;
 use anyhow::{bail, Result};
 use clap::Parser;
+use joat_logger::init_ui;
 use joat_repo::RepoConfig;
 use log::{set_max_level, LevelFilter};
 use std::env::current_dir;

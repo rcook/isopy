@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repository::Response;
-use crate::ui2::begin_operation;
 use anyhow::Result;
+use joat_logger::begin_operation;
 use joatmon::{safe_back_up, safe_create_file};
 use log::info;
 use std::fs::remove_file;
