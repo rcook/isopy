@@ -22,8 +22,8 @@
 use crate::app::App;
 use crate::download::download_stream;
 use crate::object_model::AssetFilter;
+use crate::print::print;
 use crate::status::Status;
-use crate::ui::print;
 use anyhow::{anyhow, Result};
 
 pub async fn do_available(app: App) -> Result<Status> {

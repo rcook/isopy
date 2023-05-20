@@ -28,20 +28,21 @@ mod commands;
 mod constants;
 mod download;
 mod object_model;
+mod print;
 mod repository;
 mod run;
 mod serialization;
 mod shell;
 mod status;
-mod ui;
+mod terminal;
 mod unpack;
 mod url;
 
 #[tokio::main]
 async fn main() {
     use crate::constants::{ERROR, OK};
+    use crate::print::print_error;
     use crate::run::run;
-    use crate::ui::print_error;
     use std::process::exit;
 
     exit(match run().await {

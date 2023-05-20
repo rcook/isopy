@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::print::{print_dir_info_and_env, print_repo, print_title, print_value};
 use crate::status::Status;
-use crate::ui::{print_dir_info_and_env, print_repo, print_title, print_value};
 use anyhow::Result;
 
 pub fn do_info(app: App) -> Result<Status> {

@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::print::print_dir_info_and_env;
 use crate::status::Status;
-use crate::ui::print_dir_info_and_env;
 use anyhow::{bail, Result};
 use joat_repo::MetaId;
 

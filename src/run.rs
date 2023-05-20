@@ -28,7 +28,7 @@ use crate::commands::{
 };
 use crate::constants::CACHE_DIR_NAME;
 use crate::status::Status;
-use crate::ui::reset_terminal;
+use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_logger::init_ui;

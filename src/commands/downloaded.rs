@@ -21,8 +21,8 @@
 //
 use crate::app::App;
 use crate::object_model::AssetMeta;
+use crate::print::print;
 use crate::status::Status;
-use crate::ui::print;
 use anyhow::Result;
 use std::fs::read_dir;
 
