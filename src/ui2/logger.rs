@@ -19,10 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::error::Error;
-use super::result::Result;
 use super::state::State;
-use log::{LevelFilter, Log, Metadata, Record};
+use log::{Log, Metadata, Record};
 use std::sync::Arc;
 
 pub(crate) struct Logger {
@@ -30,14 +28,8 @@ pub(crate) struct Logger {
 }
 
 impl Logger {
-    pub(crate) fn init(state: Arc<State>) -> Result<()> {
-        let logger = Box::new(Logger { state });
-        log::set_boxed_logger(logger).map_err(|_| Error::CouldNotSetLogger)?;
-        Ok(())
-    }
-
-    pub(crate) fn set_max_level(level: LevelFilter) {
-        log::set_max_level(level);
+    pub(crate) fn new(state: Arc<State>) -> Self {
+        Self { state }
     }
 }
 
@@ -49,10 +41,7 @@ impl Log for Logger {
     fn flush(&self) {}
 
     fn log(&self, record: &Record) {
-        if let Some(indicator) = self.state.indicator.borrow().as_ref() {
-            indicator.println(&format!("{} - {}", record.level(), record.args()))
-        } else {
-            println!("{} - {}", record.level(), record.args());
-        }
+        self.state
+            .print(&format!("{} - {}", record.level(), record.args()))
     }
 }

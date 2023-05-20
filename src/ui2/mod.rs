@@ -24,15 +24,12 @@ mod global;
 mod indicator;
 mod logger;
 mod op;
-mod options;
 mod result;
 mod state;
 mod ui;
 
 pub use self::error::Error;
-pub use self::global::{begin_operation, init_ui, set_ui_options};
-pub use self::indicator::IndicatorLength;
-pub use self::op::Op;
-pub use self::options::{LoggerOptions, Options};
+pub use self::global::{begin_operation, init_ui};
+pub use self::op::{Op, OpProgress};
 pub use self::result::Result;
 pub use self::ui::Ui;

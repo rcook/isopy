@@ -21,26 +21,29 @@
 //
 use super::indicator::Indicator;
 use super::state::State;
-use std::borrow::Cow;
 use std::sync::Arc;
+
+pub type OpProgress = u64;
 
 pub struct Op {
     state: Arc<State>,
     indicator: Arc<Indicator>,
 }
 
-#[allow(unused)]
 impl Op {
-    pub fn set_position(&self, pos: u64) {
-        self.indicator.set_position(pos)
+    #[allow(unused)]
+    pub fn set_progress(&self, value: OpProgress) {
+        self.indicator.set_progress(value)
     }
 
-    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
-        self.indicator.set_message(msg)
+    #[allow(unused)]
+    pub fn set_message(&self, s: &str) {
+        self.indicator.set_message(s)
     }
 
-    pub fn println(&self, msg: &str) {
-        self.indicator.println(msg);
+    #[allow(unused)]
+    pub fn print(&self, s: &str) {
+        self.indicator.print(s)
     }
 
     pub(crate) fn new(state: Arc<State>, indicator: Arc<Indicator>) -> Self {
@@ -50,30 +53,6 @@ impl Op {
 
 impl Drop for Op {
     fn drop(&mut self) {
-        // (TIME OF CHECK)
-        match Arc::strong_count(&self.indicator) {
-            2 => {
-                // Indicator is still referenced by "state", so let's drop it
-                // (TIME OF USE)
-                drop(self.state.indicator.take());
-
-                // TBD: There is a TOCTOU bug in this code! Another thread
-                // could've jumped in and replaced self.state.indicator
-                // between the time of check and the time of use (labelled
-                // above). I don't know how much I care about this. This
-                // assert will crash the program if we encounter this
-                // condition. If I feel strongly motivated, I'll stick a
-                // mutex around something.
-                assert_eq!(
-                    1,
-                    Arc::strong_count(&self.indicator),
-                    "there's a data race here which I'll need to think about"
-                );
-            }
-            1 => {
-                // Indicator is only referenced by this struct: do nothing
-            }
-            _ => unreachable!("this should never happen"),
-        }
+        self.state.release_indicator(&self.indicator)
     }
 }

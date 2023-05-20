@@ -19,28 +19,32 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::indicator::IndicatorLength;
-use super::op::Op;
-use super::options::Options;
+use super::op::{Op, OpProgress};
 use super::result::Result;
 use super::ui::Ui;
 use lazy_static::lazy_static;
+use std::sync::RwLock;
 
 lazy_static! {
-    static ref GLOBAL_UI: Ui = Ui::new(&Options::default()).expect("lazy_static: global UI object");
+    static ref GLOBAL: RwLock<Option<Ui>> = RwLock::new(None);
 }
 
 #[allow(unused)]
-pub fn init_ui(options: &Options) -> Result<()> {
-    set_ui_options(options)
+pub fn init_ui(enable_logger: bool) -> Result<()> {
+    let mut writer = GLOBAL.write().expect("lock is poisoned");
+    assert!(
+        writer.is_none(),
+        "global UI object has already been initialized"
+    );
+    *writer = Some(Ui::new(enable_logger)?);
+    Ok(())
 }
 
 #[allow(unused)]
-pub fn set_ui_options(options: &Options) -> Result<()> {
-    GLOBAL_UI.set_options(options)
-}
-
-#[allow(unused)]
-pub fn begin_operation(len: Option<IndicatorLength>) -> Result<Op> {
-    GLOBAL_UI.operation(len)
+pub fn begin_operation(len: Option<OpProgress>) -> Result<Op> {
+    let reader = GLOBAL.read().expect("lock is poisoned");
+    reader
+        .as_ref()
+        .expect("global UI object not initialized")
+        .begin_operation(len)
 }

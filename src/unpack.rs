@@ -19,8 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::download::ContentLength;
-use crate::ui2::{begin_operation, IndicatorLength};
+use crate::ui2::{begin_operation, OpProgress};
 use anyhow::Result;
 use flate2::read::GzDecoder;
 use joatmon::open_file;
@@ -48,13 +47,13 @@ pub fn unpack_file(path: &Path, dir: &Path) -> Result<()> {
     let decoder = GzDecoder::new(file);
     let mut archive = Archive::new(decoder);
 
-    let op = begin_operation(Some(size as IndicatorLength))?;
-    op.set_message(format!("Unpacking {}", path.display()));
+    let op = begin_operation(Some(size as OpProgress))?;
+    op.set_message(&format!("Unpacking {}", path.display()));
 
     for (idx, mut entry) in archive.entries()?.filter_map(|e| e.ok()).enumerate() {
         let path = dir.join(entry.path()?);
         unpack_entry(&mut entry, path)?;
-        op.set_position(idx as ContentLength);
+        op.set_progress(idx as OpProgress);
     }
 
     drop(op);

@@ -20,18 +20,18 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::error::Error;
+use super::op::OpProgress;
 use super::result::Result;
 use indicatif::{ProgressBar, ProgressStyle};
-use std::borrow::Cow;
-
-pub type IndicatorLength = u64;
+use uuid::Uuid;
 
 pub(crate) struct Indicator {
+    id: Uuid,
     progress_bar: ProgressBar,
 }
 
 impl Indicator {
-    pub(crate) fn new(len: Option<IndicatorLength>) -> Result<Self> {
+    pub(crate) fn new(len: Option<OpProgress>) -> Result<Self> {
         let (progress_bar, template) = match len {
             Some(n) => (
                 ProgressBar::new(n),
@@ -48,24 +48,25 @@ impl Indicator {
                 .map_err(|_| Error::CouldNotConfigureProgressBar)?,
         );
 
-        Ok(Self { progress_bar })
+        Ok(Self {
+            id: Uuid::new_v4(),
+            progress_bar,
+        })
     }
 
-    pub(crate) fn set_position(&self, pos: u64) {
-        self.progress_bar.set_position(pos);
+    pub(crate) fn id(&self) -> &Uuid {
+        &self.id
     }
 
-    pub(crate) fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
-        self.progress_bar.set_message(msg)
+    pub(crate) fn set_progress(&self, value: OpProgress) {
+        self.progress_bar.set_position(value)
     }
 
-    pub(crate) fn println(&self, msg: &str) {
-        self.progress_bar.println(msg)
+    pub(crate) fn set_message(&self, s: &str) {
+        self.progress_bar.set_message(String::from(s))
     }
-}
 
-impl Drop for Indicator {
-    fn drop(&mut self) {
-        self.progress_bar.finish_and_clear();
+    pub(crate) fn print(&self, s: &str) {
+        self.progress_bar.println(s)
     }
 }

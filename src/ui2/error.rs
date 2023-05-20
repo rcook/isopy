@@ -26,7 +26,6 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 pub enum Error {
     CouldNotSetLogger,
     CouldNotConfigureProgressBar,
-    CannotUnsetLogger,
 }
 
 impl StdError for Error {}
@@ -36,7 +35,6 @@ impl Display for Error {
         match self {
             Self::CouldNotSetLogger => f.write_str("could not set logger"),
             Self::CouldNotConfigureProgressBar => f.write_str("could not configure progress bar"),
-            Self::CannotUnsetLogger => f.write_str("cannot unset logger"),
         }
     }
 }

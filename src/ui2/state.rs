@@ -20,22 +20,43 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::indicator::Indicator;
-use std::cell::RefCell;
-use std::sync::Arc;
+use super::op::OpProgress;
+use super::result::Result;
+use std::sync::{Arc, RwLock};
 
 pub(crate) struct State {
-    pub(crate) owns_logger: RefCell<bool>,
-    pub(crate) indicator: RefCell<Option<Arc<Indicator>>>,
+    indicator: RwLock<Option<Arc<Indicator>>>,
 }
 
 impl State {
     pub(crate) fn new() -> Self {
         Self {
-            owns_logger: RefCell::new(false),
-            indicator: RefCell::new(None),
+            indicator: RwLock::new(None),
+        }
+    }
+
+    pub(crate) fn make_indicator(&self, len: Option<OpProgress>) -> Result<Arc<Indicator>> {
+        let mut writer = self.indicator.write().expect("lock is poisoned");
+        *writer = None;
+        let indicator = Arc::new(Indicator::new(len)?);
+        *writer = Some(Arc::clone(&indicator));
+        Ok(indicator)
+    }
+
+    pub(crate) fn release_indicator(&self, indicator: &Arc<Indicator>) {
+        let mut writer = self.indicator.write().expect("lock is poisoned");
+        if let Some(i) = &*writer {
+            if indicator.id() == i.id() {
+                *writer = None
+            }
+        }
+    }
+
+    pub(crate) fn print(&self, s: &str) {
+        if let Some(i) = &*self.indicator.read().expect("lock is poisoned") {
+            i.print(s)
+        } else {
+            println!("{}", s)
         }
     }
 }
-
-unsafe impl Send for State {}
-unsafe impl Sync for State {}

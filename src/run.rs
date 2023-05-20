@@ -29,7 +29,7 @@ use crate::commands::{
 use crate::constants::CACHE_DIR_NAME;
 use crate::status::Status;
 use crate::ui::reset_terminal;
-use crate::ui2::{init_ui, LoggerOptions, Options as UiOptions};
+use crate::ui2::init_ui;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_repo::RepoConfig;
@@ -40,13 +40,8 @@ use std::path::PathBuf;
 fn set_up() -> Result<()> {
     init_backtrace();
     reset_terminal();
-
-    init_ui(&UiOptions {
-        logger: Some(LoggerOptions {
-            level: LevelFilter::Trace,
-        }),
-    })?;
-
+    init_ui(true)?;
+    set_max_level(LevelFilter::Trace);
     Ok(())
 }
 

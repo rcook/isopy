@@ -20,47 +20,41 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::error::Error;
-use super::indicator::{Indicator, IndicatorLength};
 use super::logger::Logger;
 use super::op::Op;
-use super::options::Options;
+use super::op::OpProgress;
 use super::result::Result;
 use super::state::State;
+use log::set_boxed_logger;
 use std::sync::Arc;
 
 pub struct Ui {
     state: Arc<State>,
 }
 
-#[allow(unused)]
 impl Ui {
-    pub fn new(options: &Options) -> Result<Self> {
+    #[allow(unused)]
+    pub fn new(enable_logger: bool) -> Result<Self> {
         let state = Arc::new(State::new());
-        let this = Self { state };
-        this.set_options(options)?;
-        Ok(this)
-    }
 
-    pub fn operation(&self, len: Option<IndicatorLength>) -> Result<Op> {
-        drop(self.state.indicator.take());
-        let indicator = Arc::new(Indicator::new(len)?);
-        self.state.indicator.replace(Some(Arc::clone(&indicator)));
-        Ok(Op::new(Arc::clone(&self.state), Arc::clone(&indicator)))
-    }
-
-    pub(crate) fn set_options(&self, options: &Options) -> Result<()> {
-        if let Some(logger_options) = &options.logger {
-            let mut owns_logger = self.state.owns_logger.borrow_mut();
-            if !*owns_logger {
-                Logger::init(Arc::clone(&self.state))?;
-                *owns_logger = true;
-            }
-
-            Logger::set_max_level(logger_options.level);
-        } else if *self.state.owns_logger.borrow() {
-            return Err(Error::CannotUnsetLogger);
+        if enable_logger {
+            set_boxed_logger(Box::new(Logger::new(Arc::clone(&state))))
+                .map_err(|_| Error::CouldNotSetLogger)?;
         }
 
-        Ok(())
+        Ok(Self { state })
+    }
+
+    #[allow(unused)]
+    pub fn begin_operation(&self, len: Option<OpProgress>) -> Result<Op> {
+        Ok(Op::new(
+            Arc::clone(&self.state),
+            self.state.make_indicator(len)?,
+        ))
+    }
+
+    #[allow(unused)]
+    pub fn print(&self, msg: &str) {
+        self.state.print(msg)
     }
 }
