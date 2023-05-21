@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ISOPY_ENV_NAME;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use joat_repo::{LinkId, MetaId};
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
@@ -68,18 +68,14 @@ impl Command {
         set_var(ISOPY_ENV_NAME, format!("{meta_id}-{link_id}"));
         prepend_paths(&[&python_dir.join("bin")])?;
 
-        match &self.program {
-            Some(program) => {
-                let _ = execvp(program, once(program).chain(self.args.iter()));
-                unreachable!()
-            }
-            None => {
-                let shell = var_os("SHELL")
-                    .ok_or_else(|| anyhow!("SHELL environment variable is not available"))?;
-                let _ = execvp(&shell, once(&shell).chain(self.args.iter()));
-                unreachable!()
-            }
-        }
+        let p = if let Some(program) = &self.program {
+            program.clone()
+        } else {
+            var_os("SHELL").ok_or_else(|| anyhow!("SHELL environment variable is not available"))?
+        };
+
+        let err = execvp(&p, once(&p).chain(self.args.iter()));
+        bail!(err);
     }
 
     #[cfg(any(target_os = "windows"))]

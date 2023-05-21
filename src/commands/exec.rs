@@ -21,20 +21,32 @@
 //
 #![allow(unused)]
 use crate::app::App;
+use crate::constants::ENV_FILE_NAME;
+use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
-use anyhow::Result;
+use anyhow::{bail, Result};
+use clap::builder::OsStr;
+use joatmon::read_yaml_file;
+use std::ffi::OsString;
 
-pub fn do_exec(app: &App, program: &str, args: &[String]) -> Result<Status> {
-    todo!();
-    /*
-    let mut command = Command::new(program);
+pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
+    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
+        bail!("Could not find environment for directory {}", app.cwd.display())
+    };
+
+    let mut command = Command::new(OsString::from(program));
     for arg in args {
-        command.arg(arg);
+        command.arg(OsString::from(arg));
     }
 
-    let environment = Environment::infer(app, environment_name)?;
-    command.exec(&environment)?;
-    Ok(())
-    */
+    let data_dir = dir_info.data_dir();
+    let rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
+    let python_dir = data_dir.join(rec.python_dir_rel);
+
+    // Explicitly drop app so that repository is unlocked in shell
+    drop(app);
+
+    command.exec(dir_info.link_id(), dir_info.meta_id(), &python_dir)?;
+    Ok(Status::OK)
 }
