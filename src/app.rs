@@ -50,7 +50,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(cwd: PathBuf, repo: Repo) -> Self {
+    pub const fn new(cwd: PathBuf, repo: Repo) -> Self {
         Self { cwd, repo }
     }
 
@@ -63,7 +63,7 @@ impl App {
                 repositories: vec![
                     RepositoryRec::GitHub {
                         name: RepositoryName::Default,
-                        url: dir_url(&RELEASES_URL)?,
+                        url: dir_url(&RELEASES_URL),
                         enabled: true,
                     },
                     RepositoryRec::Local {
@@ -84,8 +84,7 @@ impl App {
         let all_repositories = repositories_rec
             .repositories
             .into_iter()
-            .map(Self::make_repository)
-            .collect::<Result<Vec<_>>>()?;
+            .map(Self::make_repository);
         let enabled_repositories = all_repositories
             .into_iter()
             .filter(|x| x.1)
@@ -207,15 +206,15 @@ impl App {
         Ok(Some(dir_info))
     }
 
-    fn make_repository(rec: RepositoryRec) -> Result<(RepositoryName, bool, Box<dyn Repository>)> {
-        Ok(match rec {
+    fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
+        match rec {
             RepositoryRec::GitHub { name, url, enabled } => {
-                (name, enabled, Box::new(GitHubRepository::new(&url)?))
+                (name, enabled, Box::new(GitHubRepository::new(&url)))
             }
             RepositoryRec::Local { name, dir, enabled } => {
                 (name, enabled, Box::new(LocalRepository::new(dir)))
             }
-        })
+        }
     }
 
     fn index_path(&self, repository_name: &RepositoryName) -> PathBuf {

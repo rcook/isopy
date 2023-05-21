@@ -32,7 +32,7 @@ pub enum RepositoryName {
 }
 
 impl RepositoryName {
-    pub fn is_default(&self) -> bool {
+    pub const fn is_default(&self) -> bool {
         matches!(self, Self::Default)
     }
 
@@ -84,7 +84,7 @@ mod tests {
     fn special_repository_names(#[case] expected_name: &str, #[case] input: RepositoryName) {
         let name = input.as_str();
         assert_eq!(expected_name, name);
-        assert!(REPOSITORY_NAME_REGEX.is_match(name))
+        assert!(REPOSITORY_NAME_REGEX.is_match(name));
     }
 
     #[rstest]
@@ -114,6 +114,6 @@ mod tests {
     #[case(" ")]
     #[case(" foo ")]
     fn parse_errors(#[case] input: &str) {
-        assert!(input.parse::<RepositoryName>().is_err())
+        assert!(input.parse::<RepositoryName>().is_err());
     }
 }

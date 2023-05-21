@@ -42,8 +42,7 @@ pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Res
             python_version
                 .tag
                 .as_ref()
-                .map(Tag::to_string)
-                .unwrap_or(String::from("(none)"))
+                .map_or_else(|| String::from("(none)"), Tag::to_string)
         )
     }
 
@@ -57,8 +56,7 @@ pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Res
         python_version
             .tag
             .as_ref()
-            .map(Tag::to_string)
-            .unwrap_or(String::from("(none)"))
+            .map_or_else(|| String::from("(none)"), Tag::to_string)
     );
 }
 
@@ -66,7 +64,7 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
     let repositories = app.read_repositories()?;
     let repository = repositories
         .first()
-        .ok_or(anyhow!("No asset repositories are configured"))?;
+        .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
 
     let asset_path = app.make_asset_path(asset);
     if asset_path.exists() {

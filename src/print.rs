@@ -43,7 +43,7 @@ pub fn print_value<T>(label: &str, value: T)
 where
     T: Display,
 {
-    println!("  {:30}: {}", label.green(), format!("{}", value).yellow());
+    println!("  {:30}: {}", label.green(), format!("{value}").yellow());
 }
 
 pub fn print_link(link: &Link) {

@@ -26,14 +26,14 @@ use crate::status::Status;
 use anyhow::Result;
 use std::fs::read_dir;
 
-pub fn do_downloaded(app: App) -> Result<Status> {
+pub fn do_downloaded(app: &App) -> Result<Status> {
     for result in read_dir(app.repo.shared_dir())? {
         let entry = result?;
         let file_name = entry.file_name();
 
         if let Some(asset_name) = file_name.to_str() {
             if asset_name.parse::<AssetMeta>().is_ok() {
-                print(asset_name)
+                print(asset_name);
             }
         }
     }

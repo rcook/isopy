@@ -19,20 +19,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use flate2::read::GzDecoder;
 use joat_logger::{begin_operation, OpProgress};
 use joatmon::open_file;
 use std::fs::{create_dir_all, File};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use tar::{Archive, Entry};
 
 pub fn unpack_file(path: &Path, dir: &Path) -> Result<()> {
-    fn unpack_entry(entry: &mut Entry<GzDecoder<File>>, path: PathBuf) -> Result<()> {
-        let mut dir = path.clone();
-        dir.pop();
-        create_dir_all(&dir)?;
-        entry.unpack(&path)?;
+    fn unpack_entry(entry: &mut Entry<GzDecoder<File>>, path: &Path) -> Result<()> {
+        let dir = path
+            .parent()
+            .ok_or_else(|| anyhow!("path {} has no directory", path.display()))?;
+        create_dir_all(dir)?;
+        entry.unpack(path)?;
         Ok(())
     }
 
@@ -50,9 +51,13 @@ pub fn unpack_file(path: &Path, dir: &Path) -> Result<()> {
     let op = begin_operation(Some(size as OpProgress))?;
     op.set_message(&format!("Unpacking {}", path.display()));
 
-    for (idx, mut entry) in archive.entries()?.filter_map(|e| e.ok()).enumerate() {
+    for (idx, mut entry) in archive
+        .entries()?
+        .filter_map(std::result::Result::ok)
+        .enumerate()
+    {
         let path = dir.join(entry.path()?);
-        unpack_entry(&mut entry, path)?;
+        unpack_entry(&mut entry, &path)?;
         op.set_progress(idx as OpProgress);
     }
 

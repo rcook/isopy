@@ -1,10 +1,13 @@
 [package]
 authors = ["Richard Cook"]
+categories = ["development-tools"]
 description = "Isolated Python Tool"
 edition = "2021"
-homepage = "https://rcook.github.io/isopy/"
+homepage = "https://rcook.github.io/isopy"
+keywords = ["general"]
 license = "MIT"
 name = "isopy"
+repository = "https://rcook.github.io/isopy"
 version = "0.1.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

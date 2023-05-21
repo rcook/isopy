@@ -36,7 +36,7 @@ pub struct LocalRepository {
 }
 
 impl LocalRepository {
-    pub fn new(dir: PathBuf) -> Self {
+    pub const fn new(dir: PathBuf) -> Self {
         Self { dir }
     }
 }
@@ -88,7 +88,7 @@ struct LocalResponse {
 }
 
 impl LocalResponse {
-    fn new(
+    const fn new(
         last_modified: Option<LastModified>,
         content_length: ContentLength,
         path: PathBuf,
@@ -121,7 +121,7 @@ struct LocalStream {
 }
 
 impl LocalStream {
-    fn new(file: File) -> Self {
+    const fn new(file: File) -> Self {
         Self { file }
     }
 }

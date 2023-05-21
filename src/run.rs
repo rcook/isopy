@@ -81,24 +81,24 @@ pub async fn run() -> Result<Status> {
 
 async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
-        Command::Available => do_available(app).await,
-        Command::Download(python_version) => do_download(app, &python_version).await,
-        Command::Downloaded => do_downloaded(app),
-        Command::Exec { program, args } => do_exec(app, &program, &args),
+        Command::Available => do_available(&app).await,
+        Command::Download(python_version) => do_download(&app, &python_version).await,
+        Command::Downloaded => do_downloaded(&app),
+        Command::Exec { program, args } => do_exec(&app, &program, &args),
         Command::GenConfig {
             python_version,
             force,
-        } => do_gen_config(app, &python_version, force).await,
-        Command::Info => do_info(app),
+        } => do_gen_config(&app, &python_version, force),
+        Command::Info => do_info(&app),
         Command::Init(python_version) => do_init(app, &python_version).await,
         Command::InitConfig => do_init_config(app).await,
-        Command::Link { meta_id } => do_link(app, &meta_id),
-        Command::List => do_list(app).await,
+        Command::Link { meta_id } => do_link(&app, &meta_id),
+        Command::List => do_list(&app),
         Command::Shell => do_shell(app),
         Command::Wrap {
             wrapper_path,
             script_path,
             base_dir,
-        } => do_wrap(app, &wrapper_path, &script_path, &base_dir),
+        } => do_wrap(&app, &wrapper_path, &script_path, &base_dir),
     }
 }

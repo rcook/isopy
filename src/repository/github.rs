@@ -43,12 +43,12 @@ pub struct GitHubRepository {
 }
 
 impl GitHubRepository {
-    pub fn new(url: &Url) -> Result<Self> {
-        Ok(Self {
-            base_url: dir_url(url)?,
-            index_url: file_url(url)?,
+    pub fn new(url: &Url) -> Self {
+        Self {
+            base_url: dir_url(url),
+            index_url: file_url(url),
             client: Client::new(),
-        })
+        }
     }
 }
 
@@ -135,7 +135,7 @@ impl Response for GitHubResponse {
         let response = self
             .response
             .take()
-            .ok_or(anyhow!("Response already consumed"))?;
+            .ok_or_else(|| anyhow!("Response already consumed"))?;
         let stream = response.bytes_stream();
         Ok(Box::new(GitHubStream::new(Box::pin(stream))))
     }

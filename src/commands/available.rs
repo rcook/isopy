@@ -26,9 +26,9 @@ use crate::print::print;
 use crate::status::Status;
 use anyhow::{anyhow, Result};
 
-pub async fn do_available(app: App) -> Result<Status> {
-    update_index_if_necessary(&app).await?;
-    show_available_downloads(&app)?;
+pub async fn do_available(app: &App) -> Result<Status> {
+    update_index_if_necessary(app).await?;
+    show_available_downloads(app)?;
     Ok(Status::OK)
 }
 
@@ -36,7 +36,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
     let repositories = app.read_repositories()?;
     let repository = repositories
         .first()
-        .ok_or(anyhow!("No asset repositories are configured"))?;
+        .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
 
     let releases_path = app.releases_path(&repository.name);
     let current_last_modified = if releases_path.is_file() {
@@ -62,7 +62,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
 fn show_available_downloads(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
-        print(&asset.name)
+        print(&asset.name);
     }
     Ok(())
 }

@@ -25,8 +25,8 @@ pub fn init_backtrace() {
 
     const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
-    if let Err(VarError::NotPresent) = var(RUST_BACKTRACE_ENV_NAME) {
-        set_var(RUST_BACKTRACE_ENV_NAME, "1")
+    if var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent) {
+        set_var(RUST_BACKTRACE_ENV_NAME, "1");
     }
 
     color_backtrace::install();

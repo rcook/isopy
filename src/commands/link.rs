@@ -25,7 +25,7 @@ use crate::status::Status;
 use anyhow::{bail, Result};
 use joat_repo::MetaId;
 
-pub fn do_link(app: App, meta_id: &MetaId) -> Result<Status> {
+pub fn do_link(app: &App, meta_id: &MetaId) -> Result<Status> {
     let Some(dir_info) = app.repo.link(meta_id, &app.cwd)? else {
         bail!("could not create link");
     };

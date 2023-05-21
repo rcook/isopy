@@ -246,6 +246,6 @@ mod tests {
         assert_eq!(
             expected_result,
             AssetMeta::definitely_not_an_asset_name(input)
-        )
+        );
     }
 }

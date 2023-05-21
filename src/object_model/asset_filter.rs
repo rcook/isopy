@@ -40,7 +40,7 @@ pub struct AssetFilter {
 
 impl AssetFilter {
     #[allow(unused)]
-    pub fn all() -> Self {
+    pub const fn all() -> Self {
         Self {
             archive_type: None,
             family: None,
@@ -57,7 +57,7 @@ impl AssetFilter {
     }
 
     #[cfg(target_os = "linux")]
-    pub fn default_for_platform() -> Self {
+    pub const fn default_for_platform() -> Self {
         Self {
             archive_type: Some(ArchiveType::TarGZ),
             family: Some(Family::CPython),
@@ -77,7 +77,7 @@ impl AssetFilter {
     }
 
     #[cfg(target_os = "macos")]
-    pub fn default_for_platform() -> Self {
+    pub const fn default_for_platform() -> Self {
         Self {
             archive_type: Some(ArchiveType::TarGZ),
             family: Some(Family::CPython),
@@ -97,7 +97,7 @@ impl AssetFilter {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn default_for_platform() -> Self {
+    pub const fn default_for_platform() -> Self {
         Self {
             archive_type: Some(ArchiveType::TarGZ),
             family: Some(Family::CPython),
@@ -124,8 +124,7 @@ impl AssetFilter {
             if !this
                 .archive_type
                 .as_ref()
-                .map(|x| asset.meta.archive_type == *x)
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.archive_type == *x)
             {
                 return false;
             }
@@ -133,8 +132,7 @@ impl AssetFilter {
             if !this
                 .family
                 .as_ref()
-                .map(|x| asset.meta.family == *x)
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.family == *x)
             {
                 return false;
             }
@@ -142,48 +140,35 @@ impl AssetFilter {
             if !this
                 .version
                 .as_ref()
-                .map(|x| asset.meta.version == *x)
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.version == *x)
             {
                 return false;
             }
 
-            if !this.tag.as_ref().map(|x| asset.tag == *x).unwrap_or(true) {
+            if !this.tag.as_ref().map_or(true, |x| asset.tag == *x) {
                 return false;
             }
 
-            if !this
-                .arch
-                .as_ref()
-                .map(|x| asset.meta.arch == *x)
-                .unwrap_or(true)
-            {
+            if !this.arch.as_ref().map_or(true, |x| asset.meta.arch == *x) {
                 return false;
             }
 
             if !this
                 .platform
                 .as_ref()
-                .map(|x| asset.meta.platform == *x)
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.platform == *x)
             {
                 return false;
             }
 
-            if !this
-                .os
-                .as_ref()
-                .map(|x| asset.meta.os == *x)
-                .unwrap_or(true)
-            {
+            if !this.os.as_ref().map_or(true, |x| asset.meta.os == *x) {
                 return false;
             }
 
             if !this
                 .flavour
                 .as_ref()
-                .map(|x| asset.meta.flavour.as_ref() == Some(x))
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.flavour.as_ref() == Some(x))
             {
                 return false;
             }
@@ -191,8 +176,7 @@ impl AssetFilter {
             if !this
                 .subflavour0
                 .as_ref()
-                .map(|x| asset.meta.subflavour0.as_ref() == Some(x))
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.subflavour0.as_ref() == Some(x))
             {
                 return false;
             }
@@ -200,8 +184,7 @@ impl AssetFilter {
             if !this
                 .subflavour1
                 .as_ref()
-                .map(|x| asset.meta.subflavour1.as_ref() == Some(x))
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.subflavour1.as_ref() == Some(x))
             {
                 return false;
             }
@@ -209,8 +192,7 @@ impl AssetFilter {
             if !this
                 .variant
                 .as_ref()
-                .map(|x| asset.meta.variant.as_ref() == Some(x))
-                .unwrap_or(true)
+                .map_or(true, |x| asset.meta.variant.as_ref() == Some(x))
             {
                 return false;
             }
@@ -250,12 +232,12 @@ mod tests {
                 .parse::<Tag>()
                 .expect("test: must be valid tag"),
         );
-        assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]))
+        assert_eq!(vec![&a3], asset_filter.filter(vec![&a0, &a1, &a2, &a3]));
     }
 
     fn make_test_artifacts() -> (Asset, Asset, Asset, Asset) {
         let a0 = Asset {
-            name: String::from(""),
+            name: String::new(),
             tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
@@ -264,7 +246,7 @@ mod tests {
                 .expect("test: must be valid asset name"),
         };
         let a1 = Asset {
-            name: String::from(""),
+            name: String::new(),
             tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
@@ -273,7 +255,7 @@ mod tests {
                 .expect("test: must be valid asset name"),
         };
         let a2 = Asset {
-            name: String::from(""),
+            name: String::new(),
             tag: "tag".parse::<Tag>().expect("test: must be valid tag"),
             url: Url::parse("https://httpbin.org").expect("test: must be valid URL"),
             size: 0,
@@ -282,7 +264,7 @@ mod tests {
                 .expect("test: must be valid asset name"),
         };
         let a3 = Asset {
-            name: String::from(""),
+            name: String::new(),
             tag: "20210724T1424"
                 .parse::<Tag>()
                 .expect("test: must be valid tag"),

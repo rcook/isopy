@@ -27,11 +27,7 @@ use crate::status::Status;
 use anyhow::Result;
 use joatmon::safe_write_file;
 
-pub async fn do_gen_config(
-    app: App,
-    python_version: &PythonVersion,
-    force: bool,
-) -> Result<Status> {
+pub fn do_gen_config(app: &App, python_version: &PythonVersion, force: bool) -> Result<Status> {
     let config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
 
     let rec = PythonVersionRec {

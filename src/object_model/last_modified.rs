@@ -52,7 +52,7 @@ impl TryFrom<&SystemTime> for LastModified {
 
     fn try_from(value: &SystemTime) -> std::result::Result<Self, Self::Error> {
         let nanos = value.duration_since(UNIX_EPOCH)?.as_nanos();
-        nanos.to_string().parse::<LastModified>()
+        nanos.to_string().parse::<Self>()
     }
 }
 
@@ -73,9 +73,9 @@ mod tests {
 
     #[test]
     fn tryfrom_basics() -> Result<()> {
-        let system_time = UNIX_EPOCH + Duration::from_secs(12345678);
+        let system_time = UNIX_EPOCH + Duration::from_secs(12_345_678);
         let last_modified = LastModified::try_from(&system_time)?;
-        assert_eq!("12345678000000000", format!("{}", last_modified));
+        assert_eq!("12345678000000000", format!("{last_modified}"));
         let result = SystemTime::try_from(&last_modified)?;
         assert_eq!(system_time, result);
         Ok(())
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn parse_basics() -> Result<()> {
         let last_modified = "last-modified".parse::<LastModified>()?;
-        assert_eq!("last-modified", format!("{}", last_modified));
+        assert_eq!("last-modified", format!("{last_modified}"));
         Ok(())
     }
 }

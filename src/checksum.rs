@@ -34,11 +34,13 @@ pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> 
     let sha256_file_name = format!("{}.sha256sums", tag.as_str());
     let file = SHA256SUMS_DIR
         .get_file(&sha256_file_name)
-        .ok_or(anyhow!("Resource {} not found", sha256_file_name))?;
-    let contents = file.contents_utf8().ok_or(anyhow!(
-        "Resource {} could not be decoded as UTF-8",
-        sha256_file_name
-    ))?;
+        .ok_or_else(|| anyhow!("Resource {} not found", sha256_file_name))?;
+    let contents = file.contents_utf8().ok_or_else(|| {
+        anyhow!(
+            "Resource {} could not be decoded as UTF-8",
+            sha256_file_name
+        )
+    })?;
 
     let mut map = HashMap::new();
     for line in contents.lines() {
@@ -50,9 +52,9 @@ pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> 
 
     let archive_file_name = archive_path
         .file_name()
-        .ok_or(anyhow!("Could not get file name"))?
+        .ok_or_else(|| anyhow!("Could not get file name"))?
         .to_str()
-        .ok_or(anyhow!("Could not get file name"))?;
+        .ok_or_else(|| anyhow!("Could not get file name"))?;
     match map.get(archive_file_name) {
         None => Ok(false),
         Some(expected_hash_str) => {

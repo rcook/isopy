@@ -19,27 +19,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
 use reqwest::Url;
 
-pub fn file_url(url: &Url) -> Result<Url> {
+pub fn file_url(url: &Url) -> Url {
     helper(url, false)
 }
 
-pub fn dir_url(url: &Url) -> Result<Url> {
+pub fn dir_url(url: &Url) -> Url {
     helper(url, true)
 }
 
-fn helper(url: &Url, add_slash: bool) -> Result<Url> {
+fn helper(url: &Url, add_slash: bool) -> Url {
     let mut s = String::from(url.path().trim_end_matches(&['/']));
     if add_slash {
-        s.push('/')
+        s.push('/');
     }
 
     let mut new_url = url.clone();
     new_url.set_path(&s);
-
-    Ok(new_url)
+    new_url
 }
 
 #[cfg(test)]
@@ -60,10 +58,7 @@ mod tests {
         #[case] expected_output: &str,
         #[case] input: &str,
     ) -> Result<()> {
-        assert_eq!(
-            expected_output,
-            helper(&Url::parse(input)?, false)?.as_str()
-        );
+        assert_eq!(expected_output, helper(&Url::parse(input)?, false).as_str());
         Ok(())
     }
 
@@ -75,7 +70,7 @@ mod tests {
     #[case("https://aaa/bbb/ccc/", "https://aaa/bbb/ccc//")]
     #[case("https://aaa/bbb/ccc/", "https://aaa/bbb/ccc///")]
     fn helper_basics_add_slash(#[case] expected_output: &str, #[case] input: &str) -> Result<()> {
-        assert_eq!(expected_output, helper(&Url::parse(input)?, true)?.as_str());
+        assert_eq!(expected_output, helper(&Url::parse(input)?, true).as_str());
         Ok(())
     }
 }

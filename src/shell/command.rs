@@ -34,14 +34,14 @@ pub struct Command {
 
 impl Command {
     #[allow(unused)]
-    pub fn new(program: OsString) -> Self {
+    pub const fn new(program: OsString) -> Self {
         Self {
             program: Some(program),
             args: Vec::new(),
         }
     }
 
-    pub fn new_shell() -> Self {
+    pub const fn new_shell() -> Self {
         Self {
             program: None,
             args: Vec::new(),
@@ -65,7 +65,7 @@ impl Command {
         use exec::execvp;
         use std::iter::once;
 
-        set_var(ISOPY_ENV_NAME, format!("{}-{}", meta_id, link_id));
+        set_var(ISOPY_ENV_NAME, format!("{meta_id}-{link_id}"));
         prepend_paths(&[&python_dir.join("bin")])?;
 
         match &self.program {
@@ -75,7 +75,7 @@ impl Command {
             }
             None => {
                 let shell = var_os("SHELL")
-                    .ok_or(anyhow!("SHELL environment variable is not available"))?;
+                    .ok_or_else(|| anyhow!("SHELL environment variable is not available"))?;
                 let _ = execvp(&shell, once(&shell).chain(self.args.iter()));
                 unreachable!()
             }

@@ -37,7 +37,7 @@ impl Version {
             major,
             minor,
             build,
-            value: format!("{}.{}.{}", major, minor, build),
+            value: format!("{major}.{minor}.{build}"),
         }
     }
 
