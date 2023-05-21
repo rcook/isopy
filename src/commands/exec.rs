@@ -19,26 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![allow(unused)]
 use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::{bail, Result};
-use clap::builder::OsStr;
 use joatmon::read_yaml_file;
 use std::ffi::OsString;
 
 pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
-    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
-        bail!("Could not find environment for directory {}", app.cwd.display())
-    };
-
     let mut command = Command::new(OsString::from(program));
     for arg in args {
         command.arg(OsString::from(arg));
     }
+
+    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
+        bail!("Could not find environment for directory {}", app.cwd.display())
+    };
 
     let data_dir = dir_info.data_dir();
     let rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;

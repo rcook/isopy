@@ -138,6 +138,9 @@ fn prepend_paths(paths: &[&Path]) -> Result<()> {
     }
 
     set_var("PATH", join_paths(new_paths)?);
+
+    // Prevent false-positive regarding unused variable
     drop(existing_paths);
+
     Ok(())
 }

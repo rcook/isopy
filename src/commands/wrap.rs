@@ -19,12 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![allow(unused)]
 use crate::app::App;
+use crate::constants::ENV_FILE_NAME;
+use crate::serialization::EnvRec;
 use crate::status::Status;
-use anyhow::Result;
-use joatmon::safe_write_file;
+use anyhow::{bail, Result};
+use joatmon::{read_yaml_file, safe_write_file};
 use serde::Serialize;
+use std::env::join_paths;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use tinytemplate::TinyTemplate;
 
@@ -62,19 +65,33 @@ pub fn do_wrap(
     script_path: &Path,
     base_dir: &Path,
 ) -> Result<Status> {
-    todo!();
-    /*
-    let environment = Environment::infer(app, None)?;
+    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
+        bail!("Could not find environment for directory {}", app.cwd.display())
+    };
+
+    let data_dir = dir_info.data_dir();
+    let rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
+    let python_dir = data_dir.join(rec.python_dir_rel);
 
     let mut template = TinyTemplate::new();
     template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    let path_env = make_path_env(&[&python_dir.join("bin")])?;
+
+    #[cfg(any(target_os = "windows"))]
+    let path_env = make_path_env(&[&python_dir, &python_dir.join("Scripts")])?;
+
+    let Some(path_env_str) = path_env.to_str() else {
+        bail!("failed to generate PATH environment variable");
+    };
 
     safe_write_file(
         wrapper_path,
         template.render(
             "WRAPPER",
             &Context {
-                path_env: make_path_env(&environment),
+                path_env: String::from(path_env_str),
                 base_dir: base_dir.to_path_buf(),
                 python_executable_name: PathBuf::from(PYTHON_EXECUTABLE_NAME),
                 script_path: script_path.to_path_buf(),
@@ -85,28 +102,23 @@ pub fn do_wrap(
 
     set_file_attributes(wrapper_path)?;
 
-    Ok(())
-    */
+    Ok(Status::OK)
 }
 
-/*
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-fn make_path_env(environment: &Environment) -> String {
-    format!(
-        "PATH={}:$PATH",
-        environment.full_python_dir.join("bin").display()
-    )
-}
+fn make_path_env(paths: &[&Path]) -> Result<OsString> {
+    let mut new_paths = paths.to_vec();
 
-#[cfg(target_os = "windows")]
-fn make_path_env(environment: &Environment) -> String {
-    format!(
-        "PATH={};{};%PATH%",
-        environment.full_python_dir.display(),
-        environment.full_python_dir.join("Scripts").display()
-    )
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    new_paths.push(Path::new("$PATH"));
+
+    #[cfg(any(target_os = "windows"))]
+    new_paths.push(Path::new("%PATH%"));
+
+    let mut s = OsString::new();
+    s.push("PATH=");
+    s.push(join_paths(new_paths)?);
+    Ok(s)
 }
-*/
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
