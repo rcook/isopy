@@ -944,9 +944,9 @@ dependencies = [
 
 [[package]]
 name = "joat-repo"
-version = "0.0.6"
+version = "0.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "704a818f04f01dce853db8075392a8477f93761d7490fa8f7e50978ef2b8c445"
+checksum = "61ddf39cc715ae9a1f586735296f0afe73b4fcd49ee1bce20a464fbc6185ff01"
 dependencies = [
  "anyhow",
  "chrono",
@@ -962,9 +962,9 @@ dependencies = [
 
 [[package]]
 name = "joatmon"
-version = "0.0.27"
+version = "0.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bf2de764281beb7ecaed1d53eec6ee6c3f45b413c83a8231cb0a3c62d028ab4"
+checksum = "0f0caaee3fb23c12a108f46bb0d707b4762ab2a435dcc3ff8b693704db8b6752"
 dependencies = [
  "anyhow",
  "chrono",
