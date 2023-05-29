@@ -34,10 +34,10 @@
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
 mod app;
+mod args;
 mod asset;
 mod backtrace;
 mod checksum;
-mod cli;
 mod commands;
 mod constants;
 mod download;

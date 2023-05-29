@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::args::PythonVersion;
 use crate::asset::{download_asset, get_asset};
-use crate::cli::PythonVersion;
 use crate::status::Status;
 use anyhow::Result;
 

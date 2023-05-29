@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::args::{Args, Command, LogLevel};
 use crate::backtrace::init_backtrace;
-use crate::cli::{Args, Command, LogLevel};
 use crate::commands::{
     do_available, do_check, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
     do_init_config, do_link, do_list, do_shell, do_wrap,
