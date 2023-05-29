@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod available;
+mod check;
 mod download;
 mod downloaded;
 mod exec;
@@ -33,6 +34,7 @@ mod shell;
 mod wrap;
 
 pub use self::available::do_available;
+pub use self::check::do_check;
 pub use self::download::do_download;
 pub use self::downloaded::do_downloaded;
 pub use self::exec::do_exec;

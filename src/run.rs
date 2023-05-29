@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::backtrace::init_backtrace;
 use crate::cli::{Args, Command, LogLevel};
 use crate::commands::{
-    do_available, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
+    do_available, do_check, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
     do_init_config, do_link, do_list, do_shell, do_wrap,
 };
 use crate::constants::CACHE_DIR_NAME;
@@ -82,6 +82,7 @@ pub async fn run() -> Result<Status> {
 async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Command::Available => do_available(&app).await,
+        Command::Check { clean } => do_check(&app, clean),
         Command::Download(python_version) => do_download(&app, &python_version).await,
         Command::Downloaded => do_downloaded(&app),
         Command::Exec { program, args } => do_exec(app, &program, &args),

@@ -68,6 +68,15 @@ pub enum Command {
     )]
     Available,
 
+    #[command(
+        name = "check",
+        about = "Check integrity of repository and optionally clean up"
+    )]
+    Check {
+        #[arg(long = "clean", default_value = "false", help = "Clean up")]
+        clean: bool,
+    },
+
     #[command(name = "download", about = "Download Python package")]
     Download(PythonVersion),
 
