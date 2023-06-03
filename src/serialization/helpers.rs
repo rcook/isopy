@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::Version;
 use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
@@ -33,22 +32,6 @@ where
 }
 
 pub fn serialize_url<S>(x: &Url, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    s.serialize_str(x.as_str())
-}
-
-pub fn deserialize_version<'de, D>(deserializer: D) -> Result<Version, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    String::deserialize(deserializer)?
-        .parse::<Version>()
-        .map_err(Error::custom)
-}
-
-pub fn serialize_version<S>(x: &Version, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

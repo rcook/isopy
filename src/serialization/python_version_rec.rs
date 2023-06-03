@@ -19,18 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::{deserialize_version, serialize_version};
 use crate::object_model::option_tag;
 use crate::object_model::{Tag, Version};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PythonVersionRec {
-    #[serde(
-        rename = "version",
-        deserialize_with = "deserialize_version",
-        serialize_with = "serialize_version"
-    )]
+    #[serde(rename = "version")]
     pub version: Version,
 
     #[serde(
