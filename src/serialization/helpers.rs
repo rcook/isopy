@@ -19,32 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{Tag, Version};
+use crate::object_model::Version;
 use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
-
-pub fn deserialize_tag_opt<'de, D>(deserializer: D) -> Result<Option<Tag>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s_opt: Option<String> = Option::deserialize(deserializer)?;
-    if let Some(s) = s_opt {
-        Ok(Some(s.parse::<Tag>().map_err(Error::custom)?))
-    } else {
-        Ok(None)
-    }
-}
-
-pub fn serialize_tag_opt<S>(tag: &Option<Tag>, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    if let Some(ref t) = *tag {
-        return s.serialize_str(t.as_str());
-    }
-    s.serialize_none()
-}
 
 pub fn deserialize_url<'de, D>(deserializer: D) -> Result<Url, D::Error>
 where

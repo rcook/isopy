@@ -47,6 +47,7 @@ pub use self::os::OS;
 pub use self::platform::Platform;
 pub use self::repository_name::RepositoryName;
 pub use self::subflavour::Subflavour;
+pub use self::tag::option_tag;
 pub use self::tag::Tag;
 pub use self::variant::Variant;
 pub use self::version::Version;
