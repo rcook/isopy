@@ -19,14 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::deserialize_tag;
 use super::AssetRec;
 use crate::object_model::Tag;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct PackageRec {
-    #[serde(rename = "tag_name", deserialize_with = "deserialize_tag")]
+    #[serde(rename = "tag_name")]
     pub tag: Tag,
 
     #[serde(rename = "assets")]

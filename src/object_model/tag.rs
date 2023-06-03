@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Error;
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
@@ -43,6 +44,26 @@ impl FromStr for Tag {
 impl Display for Tag {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
+    }
+}
+
+impl<'de> Deserialize<'de> for Tag {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+impl Serialize for Tag {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
     }
 }
 

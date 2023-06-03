@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::{deserialize_tag, deserialize_version, serialize_tag, serialize_version};
+use super::helpers::{deserialize_version, serialize_version};
 use crate::object_model::{Tag, Version};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -39,10 +39,6 @@ pub struct EnvRec {
     )]
     pub version: Version,
 
-    #[serde(
-        rename = "tag",
-        deserialize_with = "deserialize_tag",
-        serialize_with = "serialize_tag"
-    )]
+    #[serde(rename = "tag")]
     pub tag: Tag,
 }

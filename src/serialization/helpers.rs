@@ -24,22 +24,6 @@ use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-pub fn deserialize_tag<'de, D>(deserializer: D) -> Result<Tag, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    String::deserialize(deserializer)?
-        .parse::<Tag>()
-        .map_err(Error::custom)
-}
-
-pub fn serialize_tag<S>(x: &Tag, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    s.serialize_str(x.as_str())
-}
-
 pub fn deserialize_tag_opt<'de, D>(deserializer: D) -> Result<Option<Tag>, D::Error>
 where
     D: Deserializer<'de>,
