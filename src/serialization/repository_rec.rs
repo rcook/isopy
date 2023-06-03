@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::{deserialize_url, serialize_url};
+use super::url_serde;
 use crate::object_model::RepositoryName;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -33,11 +33,7 @@ pub enum RepositoryRec {
         #[serde(rename = "name")]
         name: RepositoryName,
 
-        #[serde(
-            rename = "url",
-            deserialize_with = "deserialize_url",
-            serialize_with = "serialize_url"
-        )]
+        #[serde(rename = "url", with = "url_serde")]
         url: Url,
 
         #[serde(rename = "enabled")]

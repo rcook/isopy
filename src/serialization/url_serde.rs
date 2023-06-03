@@ -23,7 +23,7 @@ use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-pub fn deserialize_url<'de, D>(deserializer: D) -> Result<Url, D::Error>
+pub fn deserialize<'de, D>(deserializer: D) -> Result<Url, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -31,7 +31,7 @@ where
     Url::parse(&s).map_err(Error::custom)
 }
 
-pub fn serialize_url<S>(x: &Url, s: S) -> Result<S::Ok, S::Error>
+pub fn serialize<S>(x: &Url, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {

@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::deserialize_url;
+use super::url_serde;
 use reqwest::Url;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct AssetRec {
-    #[serde(rename = "browser_download_url", deserialize_with = "deserialize_url")]
+    #[serde(rename = "browser_download_url", with = "url_serde")]
     pub url: Url,
 
     #[serde(rename = "name")]
