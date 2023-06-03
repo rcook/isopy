@@ -21,6 +21,7 @@
 //
 use crate::constants::{DEFAULT_REPOSITORY_NAME, EXAMPLE_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
 use anyhow::{bail, Error};
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
@@ -68,6 +69,26 @@ impl FromStr for RepositoryName {
 impl Display for RepositoryName {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for RepositoryName {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+impl Serialize for RepositoryName {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
     }
 }
 

@@ -19,26 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{RepositoryName, Tag, Version};
+use crate::object_model::{Tag, Version};
 use reqwest::Url;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
-
-pub fn deserialize_repository_name<'de, D>(deserializer: D) -> Result<RepositoryName, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    String::deserialize(deserializer)?
-        .parse::<RepositoryName>()
-        .map_err(Error::custom)
-}
-
-pub fn serialize_repository_name<S>(x: &RepositoryName, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    s.serialize_str(x.as_str())
-}
 
 pub fn deserialize_tag<'de, D>(deserializer: D) -> Result<Tag, D::Error>
 where

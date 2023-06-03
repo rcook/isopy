@@ -19,9 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::helpers::{
-    deserialize_repository_name, deserialize_url, serialize_repository_name, serialize_url,
-};
+use super::helpers::{deserialize_url, serialize_url};
 use crate::object_model::RepositoryName;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -32,11 +30,7 @@ use std::path::PathBuf;
 pub enum RepositoryRec {
     #[serde(rename = "github")]
     GitHub {
-        #[serde(
-            rename = "name",
-            deserialize_with = "deserialize_repository_name",
-            serialize_with = "serialize_repository_name"
-        )]
+        #[serde(rename = "name")]
         name: RepositoryName,
 
         #[serde(
@@ -51,11 +45,7 @@ pub enum RepositoryRec {
     },
     #[serde(rename = "local")]
     Local {
-        #[serde(
-            rename = "name",
-            deserialize_with = "deserialize_repository_name",
-            serialize_with = "serialize_repository_name"
-        )]
+        #[serde(rename = "name")]
         name: RepositoryName,
 
         #[serde(rename = "dir")]
