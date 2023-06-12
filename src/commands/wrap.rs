@@ -65,7 +65,7 @@ pub fn do_wrap(
     script_path: &Path,
     base_dir: &Path,
 ) -> Result<Status> {
-    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
+    let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
         bail!("Could not find environment for directory {}", app.cwd.display())
     };
 

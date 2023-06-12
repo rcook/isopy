@@ -31,8 +31,7 @@ use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec}
 use crate::unpack::unpack_file;
 use crate::url::dir_url;
 use anyhow::{bail, Result};
-use joat_repo::Repo;
-use joat_repo::{DirInfo, Link};
+use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::path::Path;
@@ -194,7 +193,37 @@ impl App {
         Ok(())
     }
 
-    pub fn find_dir_info(&self, cwd: &Path) -> Result<Option<DirInfo>> {
+    pub fn find_dir_info(&self, cwd: &Path, isopy_env: Option<String>) -> Result<Option<DirInfo>> {
+        if let Some(isopy_env_value) = isopy_env {
+            // THIS IS A TEMPORARY HACK!
+            // joat-repo-rs needs a method to get a DirInfo given a link ID or something
+            fn find_link(repo: &Repo, link_id: &LinkId) -> RepoResult<Option<Link>> {
+                for link in repo.list_links()? {
+                    if link.link_id() == link_id {
+                        return Ok(Some(link));
+                    }
+                }
+
+                Ok(None)
+            }
+
+            let Some((_, link_id_str)) = isopy_env_value.split_once('-') else {
+                return Ok(None)
+            };
+
+            let link_id = link_id_str.parse::<LinkId>()?;
+
+            let Some(link) = find_link(&self.repo, &link_id)? else {
+                return Ok(None)
+            };
+
+            let Some(dir_info) = self.repo.get(link.project_dir())? else {
+                return Ok(None)
+            };
+
+            return Ok(Some(dir_info));
+        }
+
         let Some(link) = self.find_link(cwd)? else {
             return Ok(None)
         };

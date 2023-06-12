@@ -38,7 +38,7 @@ pub fn do_shell(app: App) -> Result<Status> {
         Err(e) => return Err(e)?,
     }
 
-    let Some(dir_info) = app.find_dir_info( &app.cwd)? else {
+    let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
         bail!("Could not find environment for directory {}", app.cwd.display())
     };
 

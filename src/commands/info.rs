@@ -28,7 +28,7 @@ pub fn do_info(app: &App) -> Result<Status> {
     print_title("Current directory");
     print_value("Working directory", app.cwd.display());
 
-    if let Some(dir_info) = app.find_dir_info(&app.cwd)? {
+    if let Some(dir_info) = app.find_dir_info(&app.cwd, None)? {
         print_dir_info_and_env(&dir_info)?;
     }
 

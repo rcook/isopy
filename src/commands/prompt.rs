@@ -29,8 +29,14 @@ use joatmon::read_yaml_file;
 use std::env::{var, VarError};
 
 pub fn do_prompt(app: &App) -> Result<Status> {
+    let isopy_env = match var(ISOPY_ENV_NAME) {
+        Ok(s) => Some(s),
+        Err(VarError::NotPresent) => None,
+        Err(e) => return Err(e)?,
+    };
+
     let env_rec_opt = app
-        .find_dir_info(&app.cwd)?
+        .find_dir_info(&app.cwd, isopy_env.clone())?
         .map(|d| d.data_dir().join(ENV_FILE_NAME))
         .filter(|p| p.is_file())
         .map(|p| read_yaml_file::<EnvRec>(&p))
@@ -38,23 +44,17 @@ pub fn do_prompt(app: &App) -> Result<Status> {
 
     let mut prompt = String::new();
 
-    match var(ISOPY_ENV_NAME) {
-        Ok(_) => {
-            if let Some(env_rec) = env_rec_opt {
-                prompt.push_str(&format!("isopy-shell-python-{}", env_rec.version));
-            } else {
-                prompt.push_str("isopy-shell-unknown-python");
-            }
+    if isopy_env.is_some() {
+        if let Some(env_rec) = env_rec_opt {
+            prompt.push_str(&format!("isopy-shell-python-{}", env_rec.version));
+        } else {
+            prompt.push_str("isopy-shell-unknown-python");
         }
-        Err(VarError::NotPresent) => {
-            if let Some(env_rec) = env_rec_opt {
-                prompt.push_str(&format!(
-                    "Run \"isopy shell\" to use Python {}",
-                    env_rec.version
-                ));
-            }
-        }
-        Err(e) => return Err(e)?,
+    } else if let Some(env_rec) = env_rec_opt {
+        prompt.push_str(&format!(
+            "Run \"isopy shell\" to use Python {}",
+            env_rec.version
+        ));
     }
 
     if !prompt.is_empty() {
