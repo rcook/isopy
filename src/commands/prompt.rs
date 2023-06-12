@@ -28,7 +28,6 @@ use colored::Colorize;
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
 
-
 pub fn do_prompt(app: &App) -> Result<Status> {
     let env_rec_opt = app
         .find_dir_info(&app.cwd)?
@@ -42,10 +41,7 @@ pub fn do_prompt(app: &App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             if let Some(env_rec) = env_rec_opt {
-                prompt.push_str(&format!(
-                    "isopy-shell-python-{}",
-                    env_rec.version
-                ));
+                prompt.push_str(&format!("isopy-shell-python-{}", env_rec.version));
             } else {
                 prompt.push_str("isopy-shell-unknown-python");
             }
@@ -61,7 +57,9 @@ pub fn do_prompt(app: &App) -> Result<Status> {
         Err(e) => return Err(e)?,
     }
 
-    print!("{} ", prompt.bright_magenta());
+    if !prompt.is_empty() {
+        print!("{} ", prompt.bright_magenta());
+    }
 
     Ok(Status::OK)
 }
