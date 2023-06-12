@@ -46,9 +46,9 @@ pub fn do_prompt(app: &App) -> Result<Status> {
 
     if isopy_env.is_some() {
         if let Some(env_rec) = env_rec_opt {
-            prompt.push_str(&format!("isopy-shell-python-{}", env_rec.version));
+            prompt.push_str(&format!("python-{}", env_rec.version));
         } else {
-            prompt.push_str("isopy-shell-unknown-python");
+            prompt.push_str("unknown-python");
         }
     } else if let Some(env_rec) = env_rec_opt {
         prompt.push_str(&format!(
