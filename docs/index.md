@@ -5,7 +5,7 @@ Manages multiple isolated versions of Python obtained from
 
 ## Linux, macOS and Windows
 
-[Download release from GitHub][releases]
+[Download release from GitHub][releases] and add [basic shell integration](shell.md)
 
 _[Usage](usage.md) \| [Concepts](concepts.md) \| [Cookbook](cookbook.md) \| [Developers][readme] \| [Issues][issues]_
 
