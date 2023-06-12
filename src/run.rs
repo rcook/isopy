@@ -24,7 +24,7 @@ use crate::args::{Args, Command, LogLevel};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
     do_available, do_check, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
-    do_init_config, do_link, do_list, do_shell, do_wrap,
+    do_init_config, do_link, do_list, do_prompt, do_shell, do_wrap,
 };
 use crate::constants::CACHE_DIR_NAME;
 use crate::status::Status;
@@ -95,6 +95,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::InitConfig => do_init_config(app).await,
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
+        Command::Prompt => do_prompt(&app),
         Command::Shell => do_shell(app),
         Command::Wrap {
             wrapper_path,

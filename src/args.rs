@@ -133,6 +133,9 @@ pub enum Command {
     #[command(name = "list", about = "List Python environments")]
     List,
 
+    #[command(name = "prompt", about = "Show brief information in prompt")]
+    Prompt,
+
     #[command(name = "shell", about = "Start Python environment shell")]
     Shell,
 
