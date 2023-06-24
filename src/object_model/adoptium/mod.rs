@@ -19,21 +19,36 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod adoptium;
+mod adoptium_jvm_impl;
+mod adoptium_vendor;
+mod architecture;
+mod binary;
+mod heap_size;
+mod image_type;
+mod operating_system;
+mod package;
+mod project;
+mod release;
+mod release_type;
+mod sort_method;
+mod sort_order;
+mod traits;
+mod version_data;
+mod versions;
 
-mod asset_rec;
-mod env_rec;
-mod index_rec;
-mod package_rec;
-mod python_version_rec;
-mod repositories_rec;
-mod repository_rec;
-mod url_serde;
-
-pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::python_version_rec::PythonVersionRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+pub use self::adoptium_jvm_impl::AdoptiumJvmImpl;
+pub use self::adoptium_vendor::AdoptiumVendor;
+pub use self::architecture::Architecture;
+pub use self::binary::Binary;
+pub use self::heap_size::HeapSize;
+pub use self::image_type::ImageType;
+pub use self::operating_system::OperatingSystem;
+pub use self::package::Package;
+pub use self::project::Project;
+pub use self::release::Release;
+pub use self::release_type::ReleaseType;
+pub use self::sort_method::SortMethod;
+pub use self::sort_order::SortOrder;
+pub use self::traits::{List, Singleton};
+pub use self::version_data::VersionData;
+pub use self::versions::Versions;

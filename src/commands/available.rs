@@ -20,16 +20,54 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::args::PackageFilter;
+use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
 use crate::download::download_stream;
 use crate::object_model::AssetFilter;
 use crate::print::print;
 use crate::status::Status;
-use anyhow::{anyhow, Result};
+use crate::{adoptium::AdoptiumIndexManager, print::print_title};
+use anyhow::{anyhow, Ok, Result};
+use colored::Colorize;
 
-pub async fn do_available(app: &App) -> Result<Status> {
+pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<Status> {
+    match package_filter {
+        PackageFilter::All => {
+            show_python_index(app).await?;
+            show_openjdk_index(app).await?;
+        }
+        PackageFilter::Python => show_python_index(app).await?,
+        PackageFilter::OpenJdk => show_openjdk_index(app).await?,
+    }
+    Ok(Status::OK)
+}
+
+async fn show_python_index(app: &App) -> Result<()> {
+    print_title("Python");
+
     update_index_if_necessary(app).await?;
     show_available_downloads(app)?;
-    Ok(Status::OK)
+
+    Ok(())
+}
+
+async fn show_openjdk_index(app: &App) -> Result<()> {
+    print_title("OpenJDK");
+
+    let manager = AdoptiumIndexManager::new(
+        &ADOPTIUM_SERVER_URL,
+        &app.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
+    );
+
+    for version in &manager.read_versions().await? {
+        print(&format!(
+            "  {:<15} {}",
+            version.openjdk_version.to_string().bright_yellow(),
+            version.file_name.display()
+        ));
+    }
+
+    Ok(())
 }
 
 async fn update_index_if_necessary(app: &App) -> Result<()> {
@@ -62,6 +100,7 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
 fn show_available_downloads(app: &App) -> Result<()> {
     let assets = app.read_assets()?;
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
+        print!("  ");
         print(&asset.name);
     }
     Ok(())

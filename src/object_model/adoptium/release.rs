@@ -19,21 +19,39 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod adoptium;
+use super::adoptium_vendor::AdoptiumVendor;
+use super::binary::Binary;
+use super::release_type::ReleaseType;
+use super::version_data::VersionData;
+use chrono::{DateTime, Utc};
+use serde::Deserialize;
 
-mod asset_rec;
-mod env_rec;
-mod index_rec;
-mod package_rec;
-mod python_version_rec;
-mod repositories_rec;
-mod repository_rec;
-mod url_serde;
+#[derive(Clone, Debug, Deserialize)]
+pub struct Release {
+    #[serde(rename = "id")]
+    pub id: String,
 
-pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::python_version_rec::PythonVersionRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+    #[serde(rename = "release_link")]
+    pub release_link: String,
+
+    #[serde(rename = "release_name")]
+    pub release_name: String,
+
+    #[serde(rename = "timestamp")]
+    pub timestamp: DateTime<Utc>,
+
+    #[serde(rename = "updated_at")]
+    pub updated_at: DateTime<Utc>,
+
+    #[serde(rename = "binaries")]
+    pub binaries: Vec<Binary>,
+
+    #[serde(rename = "release_type")]
+    pub release_type: ReleaseType,
+
+    #[serde(rename = "vendor")]
+    pub vendor: AdoptiumVendor,
+
+    #[serde(rename = "version_data")]
+    pub version_data: VersionData,
+}

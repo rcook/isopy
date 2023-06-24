@@ -19,21 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod adoptium;
+mod adoptium_client;
+mod adoptium_index_manager;
+mod query;
 
-mod asset_rec;
-mod env_rec;
-mod index_rec;
-mod package_rec;
-mod python_version_rec;
-mod repositories_rec;
-mod repository_rec;
-mod url_serde;
-
-pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::python_version_rec::PythonVersionRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+pub use self::adoptium_client::AdoptiumClient;
+pub use self::adoptium_index_manager::AdoptiumIndexManager;
+pub use self::query::Query;

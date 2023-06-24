@@ -19,21 +19,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod adoptium;
+pub trait List {
+    type Item;
 
-mod asset_rec;
-mod env_rec;
-mod index_rec;
-mod package_rec;
-mod python_version_rec;
-mod repositories_rec;
-mod repository_rec;
-mod url_serde;
+    fn items(&self) -> Vec<Self::Item>;
+}
 
-pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::python_version_rec::PythonVersionRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+impl<T> List for Vec<T>
+where
+    T: Clone,
+{
+    type Item = T;
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.clone()
+    }
+}
+
+pub trait Singleton {
+    type Item;
+
+    fn single(&self) -> Option<&Self::Item>;
+}
+
+impl<T> Singleton for Vec<T> {
+    type Item = T;
+
+    fn single(&self) -> Option<&Self::Item> {
+        if self.len() == 1 {
+            self.first()
+        } else {
+            None
+        }
+    }
+}

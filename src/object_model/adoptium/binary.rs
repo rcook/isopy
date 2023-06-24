@@ -19,21 +19,39 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod adoptium;
+use super::adoptium_jvm_impl::AdoptiumJvmImpl;
+use super::architecture::Architecture;
+use super::heap_size::HeapSize;
+use super::image_type::ImageType;
+use super::operating_system::OperatingSystem;
+use super::package::Package;
+use super::project::Project;
+use chrono::{DateTime, Utc};
+use serde::Deserialize;
 
-mod asset_rec;
-mod env_rec;
-mod index_rec;
-mod package_rec;
-mod python_version_rec;
-mod repositories_rec;
-mod repository_rec;
-mod url_serde;
+#[derive(Clone, Debug, Deserialize)]
+pub struct Binary {
+    #[serde(rename = "os")]
+    pub os: OperatingSystem,
 
-pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::python_version_rec::PythonVersionRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+    #[serde(rename = "architecture")]
+    pub architecture: Architecture,
+
+    #[serde(rename = "image_type")]
+    pub image_type: ImageType,
+
+    #[serde(rename = "jvm_impl")]
+    pub jvm_impl: AdoptiumJvmImpl,
+
+    #[serde(rename = "package")]
+    pub package: Option<Package>,
+
+    #[serde(rename = "heap_size")]
+    pub heap_size: HeapSize,
+
+    #[serde(rename = "updated_at")]
+    pub updated_at: DateTime<Utc>,
+
+    #[serde(rename = "project")]
+    pub project: Project,
+}

@@ -19,21 +19,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod adoptium;
+use serde::{Deserialize, Serialize};
 
-mod asset_rec;
-mod env_rec;
-mod index_rec;
-mod package_rec;
-mod python_version_rec;
-mod repositories_rec;
-mod repository_rec;
-mod url_serde;
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub enum Architecture {
+    #[serde(rename = "x64")]
+    X64,
 
-pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::python_version_rec::PythonVersionRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+    #[serde(rename = "x86")]
+    X86,
+
+    #[serde(rename = "x32")]
+    X32,
+
+    #[serde(rename = "ppc64")]
+    PPC64,
+
+    #[serde(rename = "ppc64le")]
+    PPC64le,
+
+    #[serde(rename = "s390x")]
+    S390x,
+
+    #[serde(rename = "aarch64")]
+    AArch64,
+
+    #[serde(rename = "arm")]
+    Arm,
+
+    #[serde(rename = "sparcv9")]
+    Sparcv9,
+
+    #[serde(rename = "riscv64")]
+    Riscv64,
+}

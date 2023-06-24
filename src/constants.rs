@@ -24,12 +24,16 @@ use regex::Regex;
 use reqwest::Url;
 
 lazy_static! {
+    pub static ref ADOPTIUM_SERVER_URL: Url =
+        Url::parse("https://api.adoptium.net/").expect("lazy_static: URL must be valid");
     pub static ref RELEASES_URL: Url =
         Url::parse("https://api.github.com/repos/indygreg/python-build-standalone/releases")
             .expect("lazy_static: URL must be valid");
     pub static ref REPOSITORY_NAME_REGEX: Regex =
         Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
 }
+
+pub const ADOPTIUM_INDEX_FILE_NAME: &str = "adoptium-index.yaml";
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";
 

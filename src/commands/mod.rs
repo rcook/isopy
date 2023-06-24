@@ -31,6 +31,7 @@ mod init_config;
 mod link;
 mod list;
 mod prompt;
+mod scratch;
 mod shell;
 mod wrap;
 
@@ -46,5 +47,6 @@ pub use self::init_config::do_init_config;
 pub use self::link::do_link;
 pub use self::list::do_list;
 pub use self::prompt::do_prompt;
+pub use self::scratch::do_scratch;
 pub use self::shell::do_shell;
 pub use self::wrap::do_wrap;

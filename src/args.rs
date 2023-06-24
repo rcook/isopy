@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{Tag, Version};
+use crate::object_model::{OpenJdkVersion, Tag, Version};
 use clap::{Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
@@ -67,7 +67,16 @@ pub enum Command {
         name = "available",
         about = "List Python packages available for download"
     )]
-    Available,
+    Available {
+        #[arg(
+            help = "Package filter",
+            short = 'p',
+            long = "package",
+            default_value_t = PackageFilter::Python,
+            value_enum
+        )]
+        package_filter: PackageFilter,
+    },
 
     #[command(
         name = "check",
@@ -137,6 +146,12 @@ pub enum Command {
     #[command(name = "prompt", about = "Show brief information in prompt")]
     Prompt,
 
+    #[command(name = "scratch", about = "Experimental stuff")]
+    Scratch {
+        #[arg(help = "OpenJDK version")]
+        openjdk_version: OpenJdkVersion,
+    },
+
     #[command(name = "shell", about = "Start Python environment shell")]
     Shell,
 
@@ -194,6 +209,18 @@ impl From<LogLevel> for LevelFilter {
             LogLevel::Trace => Self::Trace,
         }
     }
+}
+
+#[derive(Clone, Debug, ValueEnum)]
+pub enum PackageFilter {
+    #[clap(name = "all")]
+    All,
+
+    #[clap(name = "python")]
+    Python,
+
+    #[clap(name = "openjdk")]
+    OpenJdk,
 }
 
 fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
