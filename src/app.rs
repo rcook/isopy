@@ -93,7 +93,7 @@ impl App {
 
         let output_path = self.repo.shared_dir().join(&version.file_name);
         if output_path.exists() {
-            println!("{} already downloaded", version.file_name.display());
+            info!("{} already downloaded", version.file_name.display());
             return Ok(output_path);
         }
 
