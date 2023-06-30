@@ -92,6 +92,9 @@ impl Query {
 impl Default for Query {
     fn default() -> Self {
         Self {
+            #[cfg(target_arch = "aarch64")]
+            architecture: Some(Architecture::AArch64),
+            #[cfg(target_arch = "x86_64")]
             architecture: Some(Architecture::X64),
             heap_size: Some(HeapSize::Normal),
             image_type: Some(ImageType::Jre),
