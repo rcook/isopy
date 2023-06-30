@@ -37,13 +37,13 @@ pub enum OpenJdkVersionParseError {
 
 pub type OpenJdkVersionParseResult<T> = StdResult<T, OpenJdkVersionParseError>;
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum OpenJdkVersionKind {
     V1,
     V2,
 }
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct OpenJdkVersion {
     pub raw: String,
     pub kind: OpenJdkVersionKind,
