@@ -19,19 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
+use crate::object_model::ProductDescriptor;
 use crate::status::Status;
-use crate::{app::App, object_model::ProductDescriptor};
 use anyhow::{bail, Result};
 
 pub async fn do_init(app: App, product_descriptor: &ProductDescriptor) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
-        bail!(
-            "Directory {} already has Python environment",
-            app.cwd.display()
-        )
+        bail!("Directory {} already has environment", app.cwd.display())
     }
 
-    app.init_project(product_descriptor).await?;
+    match product_descriptor {
+        ProductDescriptor::Python(d) => app.init_project(d).await?,
+        ProductDescriptor::OpenJdk(_d) => todo!(),
+    }
 
     Ok(Status::OK)
 }

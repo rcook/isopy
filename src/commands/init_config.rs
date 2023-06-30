@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::PYTHON_VERSION_FILE_NAME;
-use crate::object_model::{ProductDescriptor, PythonProductDescriptor};
+use crate::object_model::PythonProductDescriptor;
 use crate::serialization::PythonVersionRec;
 use crate::{app::App, status::Status};
 use anyhow::{bail, Result};
@@ -38,10 +38,10 @@ pub async fn do_init_config(app: App) -> Result<Status> {
 
     let rec = read_yaml_file::<PythonVersionRec>(&config_path)?;
 
-    app.init_project(&ProductDescriptor::Python(PythonProductDescriptor {
+    app.init_project(&PythonProductDescriptor {
         version: rec.version,
         tag: rec.tag,
-    }))
+    })
     .await?;
 
     Ok(Status::OK)

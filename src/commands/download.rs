@@ -42,10 +42,10 @@ async fn download_python(app: &App, product_descriptor: &PythonProductDescriptor
     let assets = app.read_assets()?;
     let asset = get_asset(
         &assets,
-        &ProductDescriptor::Python(PythonProductDescriptor {
+        &PythonProductDescriptor {
             version: product_descriptor.version.clone(),
             tag: product_descriptor.tag.clone(),
-        }),
+        },
     )?;
     download_asset(app, asset).await?;
     Ok(())

@@ -22,22 +22,13 @@
 use crate::app::App;
 use crate::checksum::validate_sha256_checksum;
 use crate::download::download_stream;
-use crate::object_model::{Asset, AssetFilter, ProductDescriptor, PythonProductDescriptor, Tag};
+use crate::object_model::{Asset, AssetFilter, PythonProductDescriptor, Tag};
 use anyhow::{anyhow, bail, Result};
 use log::info;
 use std::fs::remove_file;
 use std::path::PathBuf;
 
 pub fn get_asset<'a>(
-    assets: &'a [Asset],
-    product_descriptor: &ProductDescriptor,
-) -> Result<&'a Asset> {
-    match product_descriptor {
-        ProductDescriptor::Python(d) => get_asset_python(assets, d),
-        ProductDescriptor::OpenJdk(_d) => todo!(),
-    }
-}
-pub fn get_asset_python<'a>(
     assets: &'a [Asset],
     product_descriptor: &PythonProductDescriptor,
 ) -> Result<&'a Asset> {

@@ -23,7 +23,9 @@ use crate::asset::{download_asset, get_asset};
 use crate::constants::{
     ENV_FILE_NAME, INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
-use crate::object_model::{Asset, AssetMeta, LastModified, ProductDescriptor, RepositoryName};
+use crate::object_model::{
+    Asset, AssetMeta, LastModified, PythonProductDescriptor, RepositoryName,
+};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::EnvRec;
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
@@ -160,7 +162,7 @@ impl App {
         Ok(assets)
     }
 
-    pub async fn init_project(&self, product_descriptor: &ProductDescriptor) -> Result<()> {
+    pub async fn init_project(&self, product_descriptor: &PythonProductDescriptor) -> Result<()> {
         let assets = self.read_assets()?;
         let asset = get_asset(&assets, product_descriptor)?;
 
