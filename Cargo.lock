@@ -925,6 +925,7 @@ dependencies = [
  "sha2",
  "sysinfo",
  "tar",
+ "thiserror",
  "time 0.3.22",
  "tinytemplate",
  "tokio",

@@ -27,6 +27,7 @@ mod asset_meta;
 mod family;
 mod flavour;
 mod last_modified;
+mod openjdk_version;
 mod os;
 mod platform;
 mod repository_name;
@@ -43,6 +44,9 @@ pub use self::asset_meta::AssetMeta;
 pub use self::family::Family;
 pub use self::flavour::Flavour;
 pub use self::last_modified::LastModified;
+pub use self::openjdk_version::{
+    OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
+};
 pub use self::os::OS;
 pub use self::platform::Platform;
 pub use self::repository_name::RepositoryName;

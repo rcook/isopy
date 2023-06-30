@@ -39,6 +39,7 @@ serde = { version = "1.0.164", features = ["derive"] }
 serde_yaml = "0.9.21"
 sha2 = "0.10.6"
 tar = "0.4.38"
+thiserror = "1.0.40"
 time = "0.3.22"
 tinytemplate = "1.2.1"
 tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread"] }
