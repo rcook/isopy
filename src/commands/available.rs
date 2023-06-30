@@ -19,16 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::adoptium::AdoptiumIndexManager;
 use crate::app::App;
 use crate::args::PackageFilter;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
 use crate::download::download_stream;
-use crate::object_model::AssetFilter;
-use crate::print::print;
+use crate::object_model::{Asset, AssetFilter};
+use crate::print::{print, print_title};
 use crate::status::Status;
-use crate::{adoptium::AdoptiumIndexManager, print::print_title};
 use anyhow::{anyhow, Ok, Result};
 use colored::Colorize;
+use std::cmp::Ordering;
 
 pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<Status> {
     match package_filter {
@@ -98,7 +99,16 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
 }
 
 fn show_available_downloads(app: &App) -> Result<()> {
-    let assets = app.read_assets()?;
+    fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
+        match a.meta.version.cmp(&b.meta.version) {
+            Ordering::Equal => a.tag.cmp(&b.tag),
+            result => result,
+        }
+    }
+
+    let mut assets = app.read_assets()?;
+    assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
+
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
         print(&format!(
             "  {:<20} {}",
