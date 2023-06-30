@@ -103,6 +103,8 @@ impl Default for Query {
             os: Some(OperatingSystem::Linux),
             #[cfg(target_os = "macos")]
             os: Some(OperatingSystem::Mac),
+            #[cfg(target_os = "windows")]
+            os: Some(OperatingSystem::Windows),
             project: Some(Project::Jdk),
             release_type: Some(ReleaseType::Ga),
             sort_method: Some(SortMethod::Default),
