@@ -52,9 +52,10 @@ pub struct Args {
         help = "Logging level",
         short = 'l',
         long = "level",
-        default_value = "info"
+        default_value_t = LogLevel::Info,
+        value_enum
     )]
-    pub log_level: Option<LogLevel>,
+    pub log_level: LogLevel,
 
     #[command(subcommand)]
     pub command: Command,
@@ -163,11 +164,22 @@ pub struct PythonVersion {
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum LogLevel {
+    #[clap(name = "off")]
     Off,
+
+    #[clap(name = "error")]
     Error,
+
+    #[clap(name = "warn")]
     Warn,
+
+    #[clap(name = "info")]
     Info,
+
+    #[clap(name = "debug")]
     Debug,
+
+    #[clap(name = "trace")]
     Trace,
 }
 

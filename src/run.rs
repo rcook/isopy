@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::{Args, Command, LogLevel};
+use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
     do_available, do_check, do_download, do_downloaded, do_exec, do_gen_config, do_info, do_init,
@@ -56,7 +56,7 @@ pub async fn run() -> Result<Status> {
 
     let args = Args::parse();
 
-    set_max_level(args.log_level.unwrap_or(LogLevel::Info).into());
+    set_max_level(args.log_level.into());
 
     let Some(cache_dir) = args.cache_dir.or_else(default_cache_dir) else {
         bail!("Could not infer isopy cache directory location: please specify using --dir option")
