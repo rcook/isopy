@@ -34,7 +34,7 @@ pub fn do_gen_config(
 ) -> Result<Status> {
     match product_descriptor {
         ProductDescriptor::Python { version, tag } => {
-            do_gen_config_python(app, version, tag, force)?
+            do_gen_config_python(app, version, tag, force)?;
         }
         ProductDescriptor::OpenJdk { version } => do_gen_config_openjdk(app, version, force)?,
     }
