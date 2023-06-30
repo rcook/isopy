@@ -74,10 +74,13 @@ impl AdoptiumClient {
         version: &MavenVersion,
         query: &Query,
     ) -> Result<Vec<Release>> {
-        let url = Self::make_version_url(&self.server_url, version)?;
-        println!("url={}", url.as_str());
-        self.get_list::<Vec<Release>>(query.apply(self.client.get(url)))
-            .await
+        self.get_list::<Vec<Release>>(
+            query.apply(
+                self.client
+                    .get(Self::make_version_url(&self.server_url, version)?),
+            ),
+        )
+        .await
     }
 
     pub async fn download_asset(&self, url: &Url, output_path: &Path) -> Result<()> {
