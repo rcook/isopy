@@ -19,22 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::{Repository, Response, Stream};
+use super::reqwest_response::ReqwestResponse;
+use super::traits::{Repository, Response};
 use crate::constants::ISOPY_USER_AGENT;
-use crate::download::ContentLength;
 use crate::object_model::{Asset, LastModified};
 use crate::url::{dir_url, file_url};
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use async_trait::async_trait;
-use bytes::Bytes;
-use futures_util::stream::Stream as FuturesStream;
-use futures_util::StreamExt;
 use log::info;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
-use reqwest::{Client, Response as ReqwestResponse, StatusCode, Url};
-use std::pin::Pin;
-
-type PinnedStream = Pin<Box<dyn FuturesStream<Item = reqwest::Result<Bytes>> + Send>>;
+use reqwest::{Client, StatusCode, Url};
 
 pub struct GitHubRepository {
     base_url: Url,
@@ -89,7 +83,7 @@ impl Repository for GitHubRepository {
             .get(self.index_url.clone())
             .header(USER_AGENT, ISOPY_USER_AGENT);
         let index_response = index_request.send().await?;
-        Ok(Some(Box::new(GitHubResponse::new(
+        Ok(Some(Box::new(ReqwestResponse::new(
             Some(new_last_modified),
             index_response,
         ))))
@@ -101,64 +95,6 @@ impl Repository for GitHubRepository {
             .get(asset.url.clone())
             .header(USER_AGENT, ISOPY_USER_AGENT);
         let response = request.send().await?;
-        Ok(Box::new(GitHubResponse::new(None, response)))
-    }
-}
-
-struct GitHubResponse {
-    last_modified: Option<LastModified>,
-    content_length: Option<ContentLength>,
-    response: Option<ReqwestResponse>,
-}
-
-impl GitHubResponse {
-    fn new(last_modified: Option<LastModified>, response: ReqwestResponse) -> Self {
-        let content_length = response.content_length();
-        Self {
-            last_modified,
-            content_length,
-            response: Some(response),
-        }
-    }
-}
-
-impl Response for GitHubResponse {
-    fn last_modified(&self) -> &Option<LastModified> {
-        &self.last_modified
-    }
-
-    fn content_length(&self) -> Option<ContentLength> {
-        self.content_length
-    }
-
-    fn bytes_stream(&mut self) -> Result<Box<dyn Stream>> {
-        let response = self
-            .response
-            .take()
-            .ok_or_else(|| anyhow!("Response already consumed"))?;
-        let stream = response.bytes_stream();
-        Ok(Box::new(GitHubStream::new(Box::pin(stream))))
-    }
-}
-
-struct GitHubStream {
-    stream: PinnedStream,
-}
-
-impl GitHubStream {
-    fn new(stream: PinnedStream) -> Self {
-        Self { stream }
-    }
-}
-
-unsafe impl Sync for GitHubStream {}
-
-#[async_trait]
-impl Stream for GitHubStream {
-    async fn next(&mut self) -> Option<Result<Bytes>> {
-        self.stream
-            .next()
-            .await
-            .map(|x| x.map_err(reqwest::Error::into))
+        Ok(Box::new(ReqwestResponse::new(None, response)))
     }
 }
