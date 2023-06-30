@@ -72,7 +72,7 @@ pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
     }
 
     let mut response = repository.repository.get_asset(asset).await?;
-    download_stream("asset", &mut response, &asset_path).await?;
+    download_stream("Python asset", &mut response, &asset_path).await?;
 
     let is_valid = validate_sha256_checksum(&asset_path, &asset.tag)?;
     if !is_valid {
