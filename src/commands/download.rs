@@ -25,7 +25,7 @@ use crate::args::PythonVersion;
 use crate::asset::{download_asset, get_asset};
 use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
-use crate::object_model::{OpenJdkVersion, ProductDescriptor, Tag, Version};
+use crate::object_model::{OpenJdkProductDescriptor, ProductDescriptor, PythonProductDescriptor};
 use crate::status::Status;
 use anyhow::{bail, Result};
 use log::info;
@@ -33,24 +33,26 @@ use std::fs::remove_file;
 
 pub async fn do_download(app: &App, product_descriptor: &ProductDescriptor) -> Result<Status> {
     match product_descriptor {
-        ProductDescriptor::Python { version, tag } => download_python(app, version, tag).await?,
-        ProductDescriptor::OpenJdk { version } => download_openjdk(app, version).await?,
+        ProductDescriptor::Python(d) => download_python(app, d).await?,
+        ProductDescriptor::OpenJdk(d) => download_openjdk(app, d).await?,
     }
     Ok(Status::OK)
 }
 
-async fn download_python(app: &App, version: &Version, tag: &Option<Tag>) -> Result<()> {
-    let python_version = &PythonVersion {
-        version: version.clone(),
-        tag: tag.clone(),
-    };
+async fn download_python(app: &App, product_descriptor: &PythonProductDescriptor) -> Result<()> {
     let assets = app.read_assets()?;
-    let asset = get_asset(&assets, python_version)?;
+    let asset = get_asset(
+        &assets,
+        &PythonVersion {
+            version: product_descriptor.version.clone(),
+            tag: product_descriptor.tag.clone(),
+        },
+    )?;
     download_asset(app, asset).await?;
     Ok(())
 }
 
-async fn download_openjdk(app: &App, version: &OpenJdkVersion) -> Result<()> {
+async fn download_openjdk(app: &App, product_descriptor: &OpenJdkProductDescriptor) -> Result<()> {
     let manager = AdoptiumIndexManager::new(
         &ADOPTIUM_SERVER_URL,
         &app.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
@@ -59,8 +61,8 @@ async fn download_openjdk(app: &App, version: &OpenJdkVersion) -> Result<()> {
     let versions = manager.read_versions().await?;
     let Some(version) = versions
         .iter()
-        .find(|x| x.openjdk_version == *version) else {
-        bail!("no version matching {}", version);
+        .find(|x| x.openjdk_version == product_descriptor.version) else {
+        bail!("no version matching {}", product_descriptor.version);
     };
 
     let output_path = app.repo.shared_dir().join(&version.file_name);

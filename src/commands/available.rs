@@ -24,7 +24,9 @@ use crate::app::App;
 use crate::args::PackageFilter;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, RELEASES_URL};
 use crate::download::download_stream;
-use crate::object_model::{Asset, AssetFilter, ProductDescriptor};
+use crate::object_model::{
+    Asset, AssetFilter, OpenJdkProductDescriptor, ProductDescriptor, PythonProductDescriptor,
+};
 use crate::print::print;
 use crate::status::Status;
 use anyhow::{anyhow, Ok, Result};
@@ -69,12 +71,13 @@ async fn show_openjdk_index(app: &App) -> Result<()> {
     );
 
     for version in &manager.read_versions().await? {
-        let descriptor = ProductDescriptor::OpenJdk {
+        let product_descriptor = ProductDescriptor::OpenJdk(OpenJdkProductDescriptor {
             version: version.openjdk_version.clone(),
-        };
+        });
+
         print(&format!(
             "  {:<30} {}",
-            format!("{descriptor}").bright_yellow(),
+            format!("{product_descriptor}").bright_yellow(),
             version.file_name.display()
         ));
     }
@@ -121,13 +124,14 @@ fn show_available_downloads(app: &App) -> Result<()> {
     assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
-        let descriptor = ProductDescriptor::Python {
+        let product_descriptor = ProductDescriptor::Python(PythonProductDescriptor {
             version: asset.meta.version.clone(),
             tag: Some(asset.tag.clone()),
-        };
+        });
+
         print(&format!(
             "  {:<30} {}",
-            format!("{descriptor}").bright_yellow(),
+            format!("{product_descriptor}").bright_yellow(),
             asset.name
         ));
     }

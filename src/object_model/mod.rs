@@ -54,7 +54,9 @@ pub use self::openjdk_version::{
 };
 pub use self::os::OS;
 pub use self::platform::Platform;
-pub use self::product_descriptor::ProductDescriptor;
+pub use self::product_descriptor::{
+    OpenJdkProductDescriptor, ProductDescriptor, PythonProductDescriptor,
+};
 pub use self::repository_name::RepositoryName;
 pub use self::subflavour::Subflavour;
 pub use self::tag::option_tag;
