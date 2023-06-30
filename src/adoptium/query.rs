@@ -90,14 +90,16 @@ impl Query {
 }
 
 impl Default for Query {
-    #[cfg(target_os = "linux")]
     fn default() -> Self {
         Self {
             architecture: Some(Architecture::X64),
             heap_size: Some(HeapSize::Normal),
             image_type: Some(ImageType::Jre),
             jvm_impl: Some(AdoptiumJvmImpl::Hotspot),
+            #[cfg(target_os = "linux")]
             os: Some(OperatingSystem::Linux),
+            #[cfg(target_os = "macos")]
+            os: Some(OperatingSystem::Mac),
             project: Some(Project::Jdk),
             release_type: Some(ReleaseType::Ga),
             sort_method: Some(SortMethod::Default),
