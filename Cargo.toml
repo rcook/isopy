@@ -39,7 +39,7 @@ reqwest = { version = "0.11.18", features = ["json", "stream"] }
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1.0.97"
 serde_yaml = "0.9.21"
-sha2 = "0.10.6"
+sha2 = "0.10.7"
 tar = "0.4.38"
 thiserror = "1.0.40"
 time = "0.3.22"
