@@ -89,7 +89,7 @@ pub enum Command {
 
     #[command(name = "download", about = "Download product")]
     Download {
-        #[arg(help = "Product Python or OpenJDK product descriptor")]
+        #[arg(help = "Python or OpenJDK product descriptor")]
         product_descriptor: ProductDescriptor,
     },
 
@@ -108,11 +108,11 @@ pub enum Command {
 
     #[command(
         name = "gen-config",
-        about = "Generate .python-version.yaml Python configuration file"
+        about = "Generate .python-version.yaml or .openjdk-version.yaml configuration file"
     )]
     GenConfig {
-        #[clap(flatten)]
-        python_version: PythonVersion,
+        #[arg(help = "Python or OpenJDK product descriptor")]
+        product_descriptor: ProductDescriptor,
 
         #[arg(
             short = 'f',

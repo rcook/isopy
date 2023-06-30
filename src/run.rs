@@ -87,9 +87,9 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::Downloaded => do_downloaded(&app),
         Command::Exec { program, args } => do_exec(app, &program, &args),
         Command::GenConfig {
-            python_version,
+            product_descriptor,
             force,
-        } => do_gen_config(&app, &python_version, force),
+        } => do_gen_config(&app, &product_descriptor, force),
         Command::Info => do_info(&app),
         Command::Init(python_version) => do_init(app, &python_version).await,
         Command::InitConfig => do_init_config(app).await,
