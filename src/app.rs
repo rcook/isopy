@@ -19,12 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::adoptium::AdoptiumIndexManager;
 use crate::asset::{download_asset, get_asset};
+use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{
-    ENV_FILE_NAME, INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
+    ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, ENV_FILE_NAME, INDEX_FILE_NAME,
+    RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
 use crate::object_model::{
-    Asset, AssetMeta, LastModified, PythonProductDescriptor, RepositoryName,
+    Asset, AssetMeta, LastModified, OpenJdkProductDescriptor, PythonProductDescriptor,
+    RepositoryName,
 };
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::EnvRec;
@@ -34,9 +38,10 @@ use crate::url::dir_url;
 use anyhow::{bail, Result};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
+use log::info;
 use std::collections::HashMap;
-use std::path::Path;
-use std::path::PathBuf;
+use std::fs::remove_file;
+use std::path::{Path, PathBuf};
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,
@@ -52,6 +57,63 @@ pub struct App {
 impl App {
     pub const fn new(cwd: PathBuf, repo: Repo) -> Self {
         Self { cwd, repo }
+    }
+
+    pub async fn download_python(
+        &self,
+        product_descriptor: &PythonProductDescriptor,
+    ) -> Result<()> {
+        let assets = self.read_assets()?;
+        let asset = get_asset(
+            &assets,
+            &PythonProductDescriptor {
+                version: product_descriptor.version.clone(),
+                tag: product_descriptor.tag.clone(),
+            },
+        )?;
+        download_asset(self, asset).await?;
+        Ok(())
+    }
+
+    pub async fn download_openjdk(
+        &self,
+        product_descriptor: &OpenJdkProductDescriptor,
+    ) -> Result<PathBuf> {
+        let manager = AdoptiumIndexManager::new(
+            &ADOPTIUM_SERVER_URL,
+            &self.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
+        );
+
+        let versions = manager.read_versions().await?;
+        let Some(version) = versions
+            .iter()
+            .find(|x| x.openjdk_version == product_descriptor.version) else {
+            bail!("no version matching {}", product_descriptor.version);
+        };
+
+        let output_path = self.repo.shared_dir().join(&version.file_name);
+        if output_path.exists() {
+            println!("{} already downloaded", version.file_name.display());
+            return Ok(output_path);
+        }
+
+        manager.download_asset(&version.url, &output_path).await?;
+
+        let is_valid = verify_sha256_file_checksum(&version.checksum, &output_path)?;
+        if !is_valid {
+            remove_file(&output_path)?;
+            bail!(
+                "SHA256 checksum validation failed on {}",
+                output_path.display()
+            );
+        }
+
+        info!(
+            "SHA256 checksum validation succeeded on {}",
+            output_path.display()
+        );
+
+        Ok(output_path)
     }
 
     pub fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {

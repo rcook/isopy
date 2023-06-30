@@ -91,7 +91,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             force,
         } => do_gen_config(&app, &product_descriptor, force),
         Command::Info => do_info(&app),
-        Command::Init { product_descriptor } => do_init(app, &product_descriptor).await,
+        Command::Init { product_descriptor } => do_init(&app, &product_descriptor).await,
         Command::InitConfig => do_init_config(app).await,
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
