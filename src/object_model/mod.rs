@@ -45,6 +45,7 @@ pub use self::asset_meta::AssetMeta;
 pub use self::family::Family;
 pub use self::flavour::Flavour;
 pub use self::last_modified::LastModified;
+pub use self::maven_version::{MavenVersion, MavenVersionLimit, MavenVersionValue};
 pub use self::openjdk_version::{
     OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
 };
