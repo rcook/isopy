@@ -25,6 +25,7 @@ use super::version::Version;
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
 use anyhow::anyhow;
 use serde::Deserialize;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use thiserror::Error;
@@ -69,6 +70,21 @@ impl ProductDescriptor {
         s.parse::<OpenJdkVersion>()
             .map_err(|e| ProductDescriptorParseError::Other(anyhow!(e)))
             .map(|version| Self::OpenJdk { version })
+    }
+}
+
+impl Display for ProductDescriptor {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Self::Python {
+                version,
+                tag: Some(tag),
+            } => write!(f, "{PYTHON_PRODUCT_VERSION_PREFIX}:{version}:{tag}"),
+            Self::Python { version, tag: None } => {
+                write!(f, "{PYTHON_PRODUCT_VERSION_PREFIX}:{version}")
+            }
+            Self::OpenJdk { version } => write!(f, "{OPENJDK_PRODUCT_VERSION_PREFIX}:{version}"),
+        }
     }
 }
 

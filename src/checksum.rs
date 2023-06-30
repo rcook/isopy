@@ -57,12 +57,14 @@ pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> 
         .ok_or_else(|| anyhow!("Could not get file name"))?;
     match map.get(archive_file_name) {
         None => Ok(false),
-        Some(expected_hash_str) => {
-            let expected_hash = decode(expected_hash_str)?;
-            let mut hasher = Sha256::new();
-            hasher.update(read_bytes(archive_path)?);
-            let hash = hasher.finalize().to_vec();
-            Ok(expected_hash == hash)
-        }
+        Some(required_hash_str) => verify_sha256_file_checksum(required_hash_str, archive_path),
     }
+}
+
+pub fn verify_sha256_file_checksum(required_hash_str: &str, input_path: &Path) -> Result<bool> {
+    let required_hash = decode(required_hash_str)?;
+    let mut hasher = Sha256::new();
+    hasher.update(read_bytes(input_path)?);
+    let hash = hasher.finalize().to_vec();
+    Ok(required_hash == hash)
 }

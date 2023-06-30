@@ -23,10 +23,13 @@ use crate::adoptium::AdoptiumIndexManager;
 use crate::app::App;
 use crate::args::PythonVersion;
 use crate::asset::{download_asset, get_asset};
+use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
 use crate::object_model::{OpenJdkVersion, ProductDescriptor, Tag, Version};
 use crate::status::Status;
 use anyhow::{bail, Result};
+use log::info;
+use std::fs::remove_file;
 
 pub async fn do_download(app: &App, product_descriptor: &ProductDescriptor) -> Result<Status> {
     match product_descriptor {
@@ -66,6 +69,20 @@ async fn download_openjdk(app: &App, version: &OpenJdkVersion) -> Result<()> {
     } else {
         manager.download_asset(&version.url, &output_path).await?;
     }
+
+    let is_valid = verify_sha256_file_checksum(&version.checksum, &output_path)?;
+    if !is_valid {
+        remove_file(&output_path)?;
+        bail!(
+            "SHA256 checksum validation failed on {}",
+            output_path.display()
+        );
+    }
+
+    info!(
+        "SHA256 checksum validation succeeded on {}",
+        output_path.display()
+    );
 
     Ok(())
 }
