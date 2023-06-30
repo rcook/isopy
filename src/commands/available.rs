@@ -22,10 +22,10 @@
 use crate::adoptium::AdoptiumIndexManager;
 use crate::app::App;
 use crate::args::PackageFilter;
-use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
+use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, RELEASES_URL};
 use crate::download::download_stream;
 use crate::object_model::{Asset, AssetFilter};
-use crate::print::{print, print_title};
+use crate::print::print;
 use crate::status::Status;
 use anyhow::{anyhow, Ok, Result};
 use colored::Colorize;
@@ -44,7 +44,11 @@ pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<St
 }
 
 async fn show_python_index(app: &App) -> Result<()> {
-    print_title("Python");
+    print(&format!(
+        "{} ({})",
+        "Python".cyan(),
+        RELEASES_URL.as_str().bright_magenta()
+    ));
 
     update_index_if_necessary(app).await?;
     show_available_downloads(app)?;
@@ -53,7 +57,11 @@ async fn show_python_index(app: &App) -> Result<()> {
 }
 
 async fn show_openjdk_index(app: &App) -> Result<()> {
-    print_title("OpenJDK");
+    print(&format!(
+        "{} ({})",
+        "OpenJDK".cyan(),
+        ADOPTIUM_SERVER_URL.as_str().bright_magenta()
+    ));
 
     let manager = AdoptiumIndexManager::new(
         &ADOPTIUM_SERVER_URL,
