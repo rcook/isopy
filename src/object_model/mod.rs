@@ -27,6 +27,7 @@ mod asset_meta;
 mod family;
 mod flavour;
 mod last_modified;
+mod maven_version;
 mod openjdk_version;
 mod os;
 mod platform;
