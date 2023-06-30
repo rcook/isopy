@@ -19,32 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::adoptium::AdoptiumIndexManager;
 use crate::app::App;
-use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
-use crate::object_model::OpenJdkVersion;
 use crate::status::Status;
-use anyhow::{bail, Result};
+use anyhow::Result;
 
-pub async fn do_scratch(app: &App, openjdk_version: &OpenJdkVersion) -> Result<Status> {
-    let manager = AdoptiumIndexManager::new(
-        &ADOPTIUM_SERVER_URL,
-        &app.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
-    );
-
-    let versions = manager.read_versions().await?;
-    let Some(version) = versions
-        .iter()
-        .find(|x| x.openjdk_version == *openjdk_version) else {
-        bail!("no version matching {}", openjdk_version);
-    };
-
-    let output_path = app.repo.shared_dir().join(&version.file_name);
-    if output_path.exists() {
-        println!("{} already downloaded", version.file_name.display());
-    } else {
-        manager.download_asset(&version.url, &output_path).await?;
-    }
-
+#[allow(clippy::unnecessary_wraps)]
+pub fn do_scratch(_app: &App) -> Result<Status> {
+    println!("SCRATCH");
     Ok(Status::OK)
 }

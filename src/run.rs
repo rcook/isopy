@@ -83,7 +83,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Command::Available { package_filter } => do_available(&app, package_filter).await,
         Command::Check { clean } => do_check(&app, clean),
-        Command::Download(python_version) => do_download(&app, &python_version).await,
+        Command::Download { product_descriptor } => do_download(&app, &product_descriptor).await,
         Command::Downloaded => do_downloaded(&app),
         Command::Exec { program, args } => do_exec(app, &program, &args),
         Command::GenConfig {
@@ -96,7 +96,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
         Command::Prompt => do_prompt(&app),
-        Command::Scratch { openjdk_version } => do_scratch(&app, &openjdk_version).await,
+        Command::Scratch => do_scratch(&app),
         Command::Shell => do_shell(app),
         Command::Wrap {
             wrapper_path,

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{OpenJdkVersion, Tag, Version};
+use crate::object_model::{ProductDescriptor, Tag, Version};
 use clap::{Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
@@ -87,8 +87,11 @@ pub enum Command {
         clean: bool,
     },
 
-    #[command(name = "download", about = "Download Python package")]
-    Download(PythonVersion),
+    #[command(name = "download", about = "Download product")]
+    Download {
+        #[arg(help = "Product Python or OpenJDK product descriptor")]
+        product_descriptor: ProductDescriptor,
+    },
 
     #[command(name = "downloaded", about = "List downloaded Python packages")]
     Downloaded,
@@ -147,10 +150,7 @@ pub enum Command {
     Prompt,
 
     #[command(name = "scratch", about = "Experimental stuff")]
-    Scratch {
-        #[arg(help = "OpenJDK version")]
-        openjdk_version: OpenJdkVersion,
-    },
+    Scratch,
 
     #[command(name = "shell", about = "Start Python environment shell")]
     Shell,

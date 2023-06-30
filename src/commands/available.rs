@@ -70,8 +70,8 @@ async fn show_openjdk_index(app: &App) -> Result<()> {
 
     for version in &manager.read_versions().await? {
         print(&format!(
-            "  {:<20} {}",
-            version.openjdk_version.to_string().bright_yellow(),
+            "  {:<30} {}",
+            format!("openjdk:{}", version.openjdk_version).bright_yellow(),
             version.file_name.display()
         ));
     }
@@ -119,8 +119,8 @@ fn show_available_downloads(app: &App) -> Result<()> {
 
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
         print(&format!(
-            "  {:<20} {}",
-            format!("{} -t {}", asset.meta.version, asset.tag).bright_yellow(),
+            "  {:<30} {}",
+            format!("python:{}:{}", asset.meta.version, asset.tag).bright_yellow(),
             asset.name
         ));
     }

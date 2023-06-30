@@ -24,6 +24,7 @@ use super::tag::Tag;
 use super::version::Version;
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
 use anyhow::anyhow;
+use serde::Deserialize;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use thiserror::Error;
@@ -36,7 +37,7 @@ pub enum ProductDescriptorParseError {
 
 pub type ProductDescriptorParseResult<T> = StdResult<T, ProductDescriptorParseError>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ProductDescriptor {
     Python { version: Version, tag: Option<Tag> },
     OpenJdk { version: OpenJdkVersion },
@@ -84,6 +85,17 @@ impl FromStr for ProductDescriptor {
             }
             _ => Self::from_python_version_str(s),
         }
+    }
+}
+
+impl<'de> Deserialize<'de> for ProductDescriptor {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
     }
 }
 
