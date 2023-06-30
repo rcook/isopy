@@ -19,12 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::ENV_FILE_NAME;
 use crate::object_model::ProductDescriptor;
+use crate::serialization::{EnvRec, OpenJdkEnvRec};
 use crate::status::Status;
-use crate::unpack::unpack_file;
+use crate::unpack::{unpack_file, UnpackPathTransform};
 use crate::{app::App, object_model::OpenJdkProductDescriptor};
 use anyhow::{bail, Result};
-use std::path::PathBuf;
+use joatmon::safe_write_file;
+use std::path::{Path, PathBuf};
 
 pub async fn do_init(app: &App, product_descriptor: &ProductDescriptor) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
@@ -40,10 +43,39 @@ pub async fn do_init(app: &App, product_descriptor: &ProductDescriptor) -> Resul
 }
 
 async fn do_init_openjdk(app: &App, product_descriptor: &OpenJdkProductDescriptor) -> Result<()> {
+    struct ReplacePrefixPathTransform;
+
+    impl UnpackPathTransform for ReplacePrefixPathTransform {
+        fn transform_path(path: &Path) -> PathBuf {
+            let mut i = path.iter();
+            _ = i.next();
+            Path::new("jdk").join(i)
+        }
+    }
+
+    let Some(dir_info) = app.repo.init(&app.cwd)? else {
+        bail!(
+            "Could not initialize metadirectory for directory {}",
+            app.cwd.display()
+        )
+    };
+
     let asset_path = app.download_openjdk(product_descriptor).await?;
 
-    //unpack_file(&asset_path, dir_info.data_dir())?;
-    unpack_file(&asset_path, &PathBuf::from("XYZ"))?;
+    unpack_file::<ReplacePrefixPathTransform>(&asset_path, dir_info.data_dir())?;
+
+    safe_write_file(
+        &dir_info.data_dir().join(ENV_FILE_NAME),
+        serde_yaml::to_string(&EnvRec {
+            config_path: app.cwd.clone(),
+            python: None,
+            openjdk: Some(OpenJdkEnvRec {
+                dir: PathBuf::from("jdk"),
+                version: product_descriptor.version.clone(),
+            }),
+        })?,
+        false,
+    )?;
 
     Ok(())
 }

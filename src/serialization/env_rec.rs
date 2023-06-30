@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{Tag, Version};
+use crate::object_model::{OpenJdkVersion, Tag, Version};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -28,12 +28,30 @@ pub struct EnvRec {
     #[serde(rename = "config_path")]
     pub config_path: PathBuf,
 
-    #[serde(rename = "python_dir")]
-    pub python_dir_rel: PathBuf,
+    #[serde(rename = "python", skip_serializing_if = "Option::is_none")]
+    pub python: Option<PythonEnvRec>,
+
+    #[serde(rename = "openjdk", skip_serializing_if = "Option::is_none")]
+    pub openjdk: Option<OpenJdkEnvRec>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PythonEnvRec {
+    #[serde(rename = "dir")]
+    pub dir: PathBuf,
 
     #[serde(rename = "version")]
     pub version: Version,
 
     #[serde(rename = "tag")]
     pub tag: Tag,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct OpenJdkEnvRec {
+    #[serde(rename = "dir")]
+    pub dir: PathBuf,
+
+    #[serde(rename = "version")]
+    pub version: OpenJdkVersion,
 }

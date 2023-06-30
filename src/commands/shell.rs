@@ -43,8 +43,13 @@ pub fn do_shell(app: App) -> Result<Status> {
     };
 
     let data_dir = dir_info.data_dir();
-    let rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
-    let python_dir = data_dir.join(rec.python_dir_rel);
+    let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
+
+    let Some(rec) = env_rec.python else {
+        bail!("No Python configured for directory {}", app.cwd.display())
+    };
+
+    let python_dir = data_dir.join(rec.dir);
 
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);

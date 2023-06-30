@@ -32,7 +32,7 @@ mod repository_rec;
 mod url_serde;
 
 pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
+pub use self::env_rec::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
 pub use self::index_rec::IndexRec;
 pub use self::openjdk_version_rec::OpenJdkVersionRec;
 pub use self::package_rec::PackageRec;

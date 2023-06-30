@@ -31,9 +31,9 @@ use crate::object_model::{
     RepositoryName,
 };
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
-use crate::serialization::EnvRec;
+use crate::serialization::{EnvRec, PythonEnvRec};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::unpack::unpack_file;
+use crate::unpack::{unpack_file, NoOpUnpackPathTransform};
 use crate::url::dir_url;
 use anyhow::{bail, Result};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
@@ -240,15 +240,18 @@ impl App {
             )
         };
 
-        unpack_file(&asset_path, dir_info.data_dir())?;
+        unpack_file::<NoOpUnpackPathTransform>(&asset_path, dir_info.data_dir())?;
 
         safe_write_file(
             &dir_info.data_dir().join(ENV_FILE_NAME),
             serde_yaml::to_string(&EnvRec {
                 config_path: self.cwd.clone(),
-                python_dir_rel: PathBuf::from("python"),
-                version: asset.meta.version.clone(),
-                tag: asset.tag.clone(),
+                python: Some(PythonEnvRec {
+                    dir: PathBuf::from("python"),
+                    version: asset.meta.version.clone(),
+                    tag: asset.tag.clone(),
+                }),
+                openjdk: None,
             })?,
             false,
         )?;

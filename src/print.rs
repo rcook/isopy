@@ -61,11 +61,19 @@ pub fn print_repo(repo: &Repo) {
 }
 
 pub fn print_metadir(manifest: &Manifest, rec_opt: &Option<EnvRec>) {
-    if let Some(rec) = rec_opt {
-        print_value("Project path", rec.config_path.display());
-        print_value("Python version", rec.version.as_str());
-        print_value("Python build tag", rec.tag.as_str());
-        print_value("Python directory", rec.python_dir_rel.display());
+    if let Some(env_rec) = rec_opt {
+        print_value("Project path", env_rec.config_path.display());
+
+        if let Some(rec) = env_rec.python.as_ref() {
+            print_value("Python version", rec.version.as_str());
+            print_value("Python build tag", rec.tag.as_str());
+            print_value("Python directory", rec.dir.display());
+        }
+
+        if let Some(rec) = env_rec.openjdk.as_ref() {
+            print_value("OpenJDK version", &rec.version);
+            print_value("OpenJDK directory", rec.dir.display());
+        }
     } else {
         print_value(
             "Original project directory",
@@ -79,11 +87,19 @@ pub fn print_metadir(manifest: &Manifest, rec_opt: &Option<EnvRec>) {
 }
 
 pub fn print_dir_info(dir_info: &DirInfo, rec_opt: &Option<EnvRec>) {
-    if let Some(rec) = rec_opt {
-        print_value("Project path", rec.config_path.display());
-        print_value("Python version", rec.version.as_str());
-        print_value("Python build tag", rec.tag.as_str());
-        print_value("Python directory", rec.python_dir_rel.display());
+    if let Some(env_rec) = rec_opt {
+        print_value("Project path", env_rec.config_path.display());
+
+        if let Some(rec) = env_rec.python.as_ref() {
+            print_value("Python version", rec.version.as_str());
+            print_value("Python build tag", rec.tag.as_str());
+            print_value("Python directory", rec.dir.display());
+        }
+
+        if let Some(rec) = env_rec.openjdk.as_ref() {
+            print_value("OpenJDK version", &rec.version);
+            print_value("OpenJDK directory", rec.dir.display());
+        }
     }
 
     print_value("Data directory", dir_info.data_dir().display());
