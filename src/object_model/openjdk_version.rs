@@ -128,7 +128,7 @@ impl FromStr for OpenJdkVersion {
             });
         }
 
-        todo!("(1): {s}")
+        Err(OpenJdkVersionParseError::InvalidFormat(String::from(s)))
     }
 }
 
@@ -311,5 +311,10 @@ mod tests {
 
         assert_eq!(versions_in_order, versions);
         Ok(())
+    }
+
+    #[test]
+    fn error() {
+        assert!("garbage".parse::<OpenJdkVersion>().is_err());
     }
 }

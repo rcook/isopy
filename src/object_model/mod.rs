@@ -33,6 +33,7 @@ mod maven_version;
 mod openjdk_version;
 mod os;
 mod platform;
+mod product_descriptor;
 mod repository_name;
 mod subflavour;
 mod tag;
@@ -53,6 +54,7 @@ pub use self::openjdk_version::{
 };
 pub use self::os::OS;
 pub use self::platform::Platform;
+pub use self::product_descriptor::ProductDescriptor;
 pub use self::repository_name::RepositoryName;
 pub use self::subflavour::Subflavour;
 pub use self::tag::option_tag;
