@@ -19,12 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::args::PythonVersion;
 use crate::asset::{download_asset, get_asset};
 use crate::constants::{
     ENV_FILE_NAME, INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
-use crate::object_model::{Asset, AssetMeta, LastModified, RepositoryName};
+use crate::object_model::{Asset, AssetMeta, LastModified, ProductDescriptor, RepositoryName};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::EnvRec;
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
@@ -161,9 +160,9 @@ impl App {
         Ok(assets)
     }
 
-    pub async fn init_project(&self, python_version: &PythonVersion) -> Result<()> {
+    pub async fn init_project(&self, product_descriptor: &ProductDescriptor) -> Result<()> {
         let assets = self.read_assets()?;
-        let asset = get_asset(&assets, python_version)?;
+        let asset = get_asset(&assets, product_descriptor)?;
 
         let mut asset_path = self.make_asset_path(asset);
         if !asset_path.is_file() {

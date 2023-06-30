@@ -20,26 +20,37 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::PythonVersion;
 use crate::checksum::validate_sha256_checksum;
 use crate::download::download_stream;
-use crate::object_model::{Asset, AssetFilter, Tag};
+use crate::object_model::{Asset, AssetFilter, ProductDescriptor, PythonProductDescriptor, Tag};
 use anyhow::{anyhow, bail, Result};
 use log::info;
 use std::fs::remove_file;
 use std::path::PathBuf;
 
-pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Result<&'a Asset> {
+pub fn get_asset<'a>(
+    assets: &'a [Asset],
+    product_descriptor: &ProductDescriptor,
+) -> Result<&'a Asset> {
+    match product_descriptor {
+        ProductDescriptor::Python(d) => get_asset_python(assets, d),
+        ProductDescriptor::OpenJdk(_d) => todo!(),
+    }
+}
+pub fn get_asset_python<'a>(
+    assets: &'a [Asset],
+    product_descriptor: &PythonProductDescriptor,
+) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
-    asset_filter.version = Some(python_version.version.clone());
-    asset_filter.tag = python_version.tag.clone();
+    asset_filter.version = Some(product_descriptor.version.clone());
+    asset_filter.tag = product_descriptor.tag.clone();
     let matching_assets = asset_filter.filter(assets.iter());
 
     if matching_assets.len() > 1 {
         bail!(
             "More than one asset matching version {} and tag {}",
-            python_version.version,
-            python_version
+            product_descriptor.version,
+            product_descriptor
                 .tag
                 .as_ref()
                 .map_or_else(|| String::from("(none)"), Tag::to_string)
@@ -52,8 +63,8 @@ pub fn get_asset<'a>(assets: &'a [Asset], python_version: &PythonVersion) -> Res
 
     bail!(
         "No asset matching version {} and tag {}",
-        python_version.version,
-        python_version
+        product_descriptor.version,
+        product_descriptor
             .tag
             .as_ref()
             .map_or_else(|| String::from("(none)"), Tag::to_string)

@@ -21,7 +21,6 @@
 //
 use crate::adoptium::AdoptiumIndexManager;
 use crate::app::App;
-use crate::args::PythonVersion;
 use crate::asset::{download_asset, get_asset};
 use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
@@ -43,10 +42,10 @@ async fn download_python(app: &App, product_descriptor: &PythonProductDescriptor
     let assets = app.read_assets()?;
     let asset = get_asset(
         &assets,
-        &PythonVersion {
+        &ProductDescriptor::Python(PythonProductDescriptor {
             version: product_descriptor.version.clone(),
             tag: product_descriptor.tag.clone(),
-        },
+        }),
     )?;
     download_asset(app, asset).await?;
     Ok(())

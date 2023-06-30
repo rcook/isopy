@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::args::PythonVersion;
 use crate::constants::PYTHON_VERSION_FILE_NAME;
+use crate::object_model::{ProductDescriptor, PythonProductDescriptor};
 use crate::serialization::PythonVersionRec;
 use crate::{app::App, status::Status};
 use anyhow::{bail, Result};
@@ -38,12 +38,11 @@ pub async fn do_init_config(app: App) -> Result<Status> {
 
     let rec = read_yaml_file::<PythonVersionRec>(&config_path)?;
 
-    let python_version = PythonVersion {
+    app.init_project(&ProductDescriptor::Python(PythonProductDescriptor {
         version: rec.version,
         tag: rec.tag,
-    };
-
-    app.init_project(&python_version).await?;
+    }))
+    .await?;
 
     Ok(Status::OK)
 }

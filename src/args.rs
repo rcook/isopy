@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{ProductDescriptor, Tag, Version};
-use clap::{Args as ClapArgs, Parser, Subcommand, ValueEnum};
+use crate::object_model::ProductDescriptor;
+use clap::{Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
@@ -125,8 +125,11 @@ pub enum Command {
     #[command(name = "info", about = "Show information")]
     Info,
 
-    #[command(name = "init", about = "Create Python environment")]
-    Init(PythonVersion),
+    #[command(name = "init", about = "Create environment")]
+    Init {
+        #[arg(help = "Python or OpenJDK product descriptor")]
+        product_descriptor: ProductDescriptor,
+    },
 
     #[command(
         name = "init-config",
@@ -166,15 +169,6 @@ pub enum Command {
         #[arg(help = "Base directory", value_parser = parse_absolute_path)]
         base_dir: PathBuf,
     },
-}
-
-#[derive(ClapArgs, Debug)]
-pub struct PythonVersion {
-    #[arg(help = "Python version", value_parser = parse_version)]
-    pub version: Version,
-
-    #[arg(help = "Build tag", short = 't', long = "tag", value_parser = parse_tag)]
-    pub tag: Option<Tag>,
 }
 
 #[derive(Clone, Debug, ValueEnum)]
@@ -228,15 +222,6 @@ fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {
         .absolutize()
         .map_err(|_| String::from("invalid path"))
         .map(|x| x.to_path_buf())
-}
-
-fn parse_version(s: &str) -> Result<Version, String> {
-    s.parse::<Version>()
-        .map_err(|_| String::from("invalid version"))
-}
-
-fn parse_tag(s: &str) -> Result<Tag, String> {
-    s.parse::<Tag>().map_err(|_| String::from("invalid tag"))
 }
 
 fn parse_meta_id(s: &str) -> Result<MetaId, String> {
