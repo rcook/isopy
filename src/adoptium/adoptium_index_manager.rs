@@ -21,7 +21,7 @@
 //
 use super::adoptium_client::{all_versions, AdoptiumClient};
 use super::query::Query;
-use crate::object_model::adoptium::{Release, Singleton};
+use crate::api::adoptium::{Release, Singleton};
 use crate::serialization::adoptium::{IndexRec, VersionRec};
 use anyhow::Result;
 use chrono::{Duration, Utc};

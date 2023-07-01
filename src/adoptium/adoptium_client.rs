@@ -20,9 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::query::Query;
+use crate::api::adoptium::{List, Release, VersionData, Versions};
 use crate::download::download_stream;
 use crate::link_header::LinkHeader;
-use crate::object_model::adoptium::{List, Release, VersionData, Versions};
 use crate::object_model::MavenVersion::{self, Range};
 use crate::object_model::MavenVersionLimit::{Closed, Open};
 use crate::object_model::MavenVersionValue;
