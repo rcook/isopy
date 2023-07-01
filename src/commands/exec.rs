@@ -50,6 +50,11 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
 
-    command.exec(dir_info.link_id(), dir_info.meta_id(), &python_dir)?;
+    command.exec(
+        dir_info.link_id(),
+        dir_info.meta_id(),
+        &python_dir,
+        Vec::new(),
+    )?;
     Ok(Status::OK)
 }

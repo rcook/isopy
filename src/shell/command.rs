@@ -60,12 +60,17 @@ impl Command {
         link_id: &LinkId,
         meta_id: &MetaId,
         python_dir: &Path,
+        envs: Vec<(&str, &str)>,
     ) -> Result<ExitStatus> {
         use anyhow::{anyhow, bail};
         use exec::execvp;
         use std::iter::once;
 
         set_var(ISOPY_ENV_NAME, format!("{meta_id}-{link_id}"));
+        for (key, value) in envs {
+            set_var(key, value);
+        }
+
         prepend_paths(&[&python_dir.join("bin")])?;
 
         let p = if let Some(program) = &self.program {

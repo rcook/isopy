@@ -23,9 +23,12 @@ use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
 use crate::constants::ISOPY_ENV_NAME;
 use crate::serialization::EnvRec;
+use crate::serialization::OpenJdkEnvRec;
+use crate::serialization::PythonEnvRec;
 use crate::shell::Command;
 use crate::status::Status;
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
+use joat_repo::DirInfo;
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
 
@@ -42,18 +45,54 @@ pub fn do_shell(app: App) -> Result<Status> {
         bail!("Could not find environment for directory {}", app.cwd.display())
     };
 
-    let data_dir = dir_info.data_dir();
-    let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
+    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(ENV_FILE_NAME))?;
 
-    let Some(rec) = env_rec.python else {
-        bail!("No Python configured for directory {}", app.cwd.display())
+    if let Some(rec) = env_rec.python {
+        do_shell_python(app, &rec, &dir_info)?;
+        return Ok(Status::OK);
     };
 
-    let python_dir = data_dir.join(rec.dir);
+    if let Some(rec) = env_rec.openjdk {
+        do_shell_openjdk(app, &rec, &dir_info)?;
+        return Ok(Status::OK);
+    }
+
+    bail!(
+        "Environment for directory {} is incorrectly configured",
+        app.cwd.display()
+    )
+}
+
+fn do_shell_python(app: App, rec: &PythonEnvRec, dir_info: &DirInfo) -> Result<()> {
+    let python_dir = dir_info.data_dir().join(&rec.dir);
 
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
 
-    Command::new_shell().exec(dir_info.link_id(), dir_info.meta_id(), &python_dir)?;
-    Ok(Status::OK)
+    Command::new_shell().exec(
+        dir_info.link_id(),
+        dir_info.meta_id(),
+        &python_dir,
+        Vec::new(),
+    )?;
+    Ok(())
+}
+
+fn do_shell_openjdk(app: App, rec: &OpenJdkEnvRec, dir_info: &DirInfo) -> Result<()> {
+    let openjdk_dir = dir_info.data_dir().join(&rec.dir);
+
+    // Explicitly drop app so that repository is unlocked in shell
+    drop(app);
+
+    let openjdk_dir_str = openjdk_dir
+        .to_str()
+        .ok_or_else(|| anyhow!("could not convert path to string"))?;
+
+    Command::new_shell().exec(
+        dir_info.link_id(),
+        dir_info.meta_id(),
+        &openjdk_dir,
+        vec![("JAVA_HOME", openjdk_dir_str)],
+    )?;
+    Ok(())
 }
