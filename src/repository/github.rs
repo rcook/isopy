@@ -21,8 +21,9 @@
 //
 use super::reqwest_response::ReqwestResponse;
 use super::traits::{Repository, Response};
+use crate::api::python_standalone_builds::LastModified;
 use crate::constants::ISOPY_USER_AGENT;
-use crate::object_model::{Asset, LastModified};
+use crate::object_model::Asset;
 use crate::url::{dir_url, file_url};
 use anyhow::Result;
 use async_trait::async_trait;

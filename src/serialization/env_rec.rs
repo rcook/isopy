@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::{OpenJdkVersion, Tag, Version};
+use crate::api::python_standalone_builds::Tag;
+use crate::object_model::{OpenJdkVersion, Version};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 

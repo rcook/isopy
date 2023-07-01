@@ -1,5 +1,3 @@
-use crate::object_model::archive_type::ArchiveTypeBaseName;
-
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -21,7 +19,10 @@ use crate::object_model::archive_type::ArchiveTypeBaseName;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::{Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, Version, OS};
+use super::version::Version;
+use crate::api::python_standalone_builds::{
+    Arch, ArchiveType, ArchiveTypeBaseName, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
+};
 use anyhow::{bail, Error, Result};
 use std::str::FromStr;
 

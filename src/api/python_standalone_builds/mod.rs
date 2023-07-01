@@ -19,3 +19,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+mod arch;
+mod archive_type;
+mod family;
+mod flavour;
+mod last_modified;
+mod os;
+mod platform;
+mod subflavour;
+mod tag;
+mod variant;
+
+pub use self::arch::Arch;
+pub use self::archive_type::{ArchiveType, ArchiveTypeBaseName};
+pub use self::family::Family;
+pub use self::flavour::Flavour;
+pub use self::last_modified::LastModified;
+pub use self::os::OS;
+pub use self::platform::Platform;
+pub use self::subflavour::Subflavour;
+pub use self::tag::option_tag;
+pub use self::tag::Tag;
+pub use self::variant::Variant;

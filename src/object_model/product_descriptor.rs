@@ -22,8 +22,8 @@
 use super::openjdk_product_descriptor::OpenJdkProductDescriptor;
 use super::openjdk_version::OpenJdkVersion;
 use super::python_product_descriptor::PythonProductDescriptor;
-use super::tag::Tag;
 use super::version::Version;
+use crate::api::python_standalone_builds::Tag;
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
 use anyhow::anyhow;
 use serde::Deserialize;

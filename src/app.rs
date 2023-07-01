@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::adoptium::AdoptiumIndexManager;
+use crate::api::python_standalone_builds::LastModified;
 use crate::asset::{download_asset, get_asset};
 use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{
@@ -27,8 +28,7 @@ use crate::constants::{
     RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
 use crate::object_model::{
-    Asset, AssetMeta, LastModified, OpenJdkProductDescriptor, PythonProductDescriptor,
-    RepositoryName,
+    Asset, AssetMeta, OpenJdkProductDescriptor, PythonProductDescriptor, RepositoryName,
 };
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::serialization::{EnvRec, PythonEnvRec};

@@ -19,8 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::{
-    Arch, ArchiveType, Asset, Family, Flavour, Platform, Subflavour, Tag, Variant, Version, OS,
+use super::asset::Asset;
+use super::version::Version;
+use crate::api::python_standalone_builds::{
+    Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
 };
 use std::iter::Iterator;
 

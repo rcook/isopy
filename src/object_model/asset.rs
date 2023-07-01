@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::{AssetMeta, Tag};
+use super::AssetMeta;
+use crate::api::python_standalone_builds::Tag;
 use reqwest::Url;
 
 #[derive(Debug, PartialEq)]

@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::traits::{Response, Stream};
+use crate::api::python_standalone_builds::LastModified;
 use crate::download::ContentLength;
-use crate::object_model::LastModified;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;

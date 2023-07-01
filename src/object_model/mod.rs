@@ -19,47 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod arch;
-mod archive_type;
 mod asset;
 mod asset_filter;
 mod asset_meta;
-mod family;
-mod flavour;
-mod last_modified;
 mod maven_version;
 mod openjdk_product_descriptor;
 mod openjdk_version;
-mod os;
-mod platform;
 mod product_descriptor;
 mod python_product_descriptor;
 mod repository_name;
-mod subflavour;
-mod tag;
-mod variant;
 mod version;
 
-pub use self::arch::Arch;
-pub use self::archive_type::ArchiveType;
 pub use self::asset::Asset;
 pub use self::asset_filter::AssetFilter;
 pub use self::asset_meta::AssetMeta;
-pub use self::family::Family;
-pub use self::flavour::Flavour;
-pub use self::last_modified::LastModified;
 pub use self::maven_version::{MavenVersion, MavenVersionLimit, MavenVersionValue};
 pub use self::openjdk_product_descriptor::OpenJdkProductDescriptor;
 pub use self::openjdk_version::{
     OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
 };
-pub use self::os::OS;
-pub use self::platform::Platform;
 pub use self::product_descriptor::ProductDescriptor;
 pub use self::python_product_descriptor::PythonProductDescriptor;
 pub use self::repository_name::RepositoryName;
-pub use self::subflavour::Subflavour;
-pub use self::tag::option_tag;
-pub use self::tag::Tag;
-pub use self::variant::Variant;
 pub use self::version::Version;
