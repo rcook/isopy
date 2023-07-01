@@ -19,7 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use super::openjdk_product_descriptor::OpenJdkProductDescriptor;
 use super::openjdk_version::OpenJdkVersion;
+use super::python_product_descriptor::PythonProductDescriptor;
 use super::tag::Tag;
 use super::version::Version;
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
@@ -29,32 +31,6 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use thiserror::Error;
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct PythonProductDescriptor {
-    pub version: Version,
-    pub tag: Option<Tag>,
-}
-
-impl Display for PythonProductDescriptor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match self.tag.as_ref() {
-            Some(tag) => write!(f, "{PYTHON_PRODUCT_VERSION_PREFIX}:{}:{tag}", self.version),
-            None => write!(f, "{PYTHON_PRODUCT_VERSION_PREFIX}:{}", self.version),
-        }
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct OpenJdkProductDescriptor {
-    pub version: OpenJdkVersion,
-}
-
-impl Display for OpenJdkProductDescriptor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.version)
-    }
-}
 
 #[derive(Debug, Error)]
 pub enum ProductDescriptorParseError {
