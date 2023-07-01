@@ -29,7 +29,6 @@ mod package_rec;
 mod python_version_rec;
 mod repositories_rec;
 mod repository_rec;
-mod url_serde;
 
 pub use self::asset_rec::AssetRec;
 pub use self::env_rec::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
