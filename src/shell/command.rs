@@ -20,12 +20,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ISOPY_ENV_NAME;
+use crate::serialization::{OpenJdkEnvRec, PythonEnvRec};
 use anyhow::Result;
 use joat_repo::{LinkId, MetaId};
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub fn make_python_path_dirs(data_dir: &Path, rec: &PythonEnvRec) -> Vec<PathBuf> {
+    vec![data_dir.join(&rec.dir).join("bin")]
+}
+
+#[cfg(target_os = "windows")]
+pub fn make_python_path_dirs(data_dir: &Path, rec: &PythonEnvRec) -> Vec<PathBuf> {
+    vec![
+        data_dir.join(&rec.dir).join("bin"),
+        data_dir.join(&rec.dir).join("Scripts"),
+    ]
+}
+
+pub fn make_openjdk_path_dirs(data_dir: &Path, rec: &OpenJdkEnvRec) -> Vec<PathBuf> {
+    vec![data_dir.join(&rec.dir).join("bin")]
+}
 
 pub struct Command {
     program: Option<OsString>,
@@ -54,24 +72,28 @@ impl Command {
         self
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
     pub fn exec(
         &self,
         link_id: &LinkId,
         meta_id: &MetaId,
-        python_dir: &Path,
-        envs: Vec<(&str, &str)>,
+        path_dirs: &[&Path],
+        envs: &[(&str, &str)],
     ) -> Result<ExitStatus> {
-        use anyhow::{anyhow, bail};
-        use exec::execvp;
-        use std::iter::once;
+        prepend_paths(path_dirs)?;
 
         set_var(ISOPY_ENV_NAME, format!("{meta_id}-{link_id}"));
         for (key, value) in envs {
             set_var(key, value);
         }
 
-        prepend_paths(&[&python_dir.join("bin")])?;
+        self.exec_impl()
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn exec_impl(&self) -> Result<ExitStatus> {
+        use anyhow::{anyhow, bail};
+        use exec::execvp;
+        use std::iter::once;
 
         let p = if let Some(program) = &self.program {
             program.clone()
@@ -83,18 +105,10 @@ impl Command {
         bail!(err);
     }
 
-    #[cfg(any(target_os = "windows"))]
-    pub fn exec(
-        &self,
-        link_id: &LinkId,
-        meta_id: &MetaId,
-        python_dir: &Path,
-    ) -> Result<ExitStatus> {
+    #[cfg(target_os = "windows")]
+    fn exec_impl(&self) -> Result<ExitStatus> {
         use crate::shell::{get_windows_shell_info, WindowsShellKind};
         use std::process::Command;
-
-        set_var(ISOPY_ENV_NAME, format!("{}-{}", meta_id, link_id));
-        prepend_paths(&[python_dir, &python_dir.join("Scripts")])?;
 
         let windows_shell_info = get_windows_shell_info()?;
         let mut command = match &self.program {

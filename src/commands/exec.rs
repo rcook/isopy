@@ -19,14 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
+use crate::{app::App, shell::make_python_path_dirs};
 use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
 use std::ffi::OsString;
+use std::path::Path;
 
 pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
     let mut command = Command::new(OsString::from(program));
@@ -45,16 +46,17 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
         bail!("No Python configured for directory {}", app.cwd.display())
     };
 
-    let python_dir = data_dir.join(rec.dir);
-
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
 
     command.exec(
         dir_info.link_id(),
         dir_info.meta_id(),
-        &python_dir,
-        Vec::new(),
+        &make_python_path_dirs(dir_info.data_dir(), &rec)
+            .iter()
+            .map(|p| p as &Path)
+            .collect::<Vec<_>>(),
+        &[],
     )?;
     Ok(Status::OK)
 }

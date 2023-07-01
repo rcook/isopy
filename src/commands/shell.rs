@@ -25,12 +25,15 @@ use crate::constants::ISOPY_ENV_NAME;
 use crate::serialization::EnvRec;
 use crate::serialization::OpenJdkEnvRec;
 use crate::serialization::PythonEnvRec;
+use crate::shell::make_openjdk_path_dirs;
+use crate::shell::make_python_path_dirs;
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::{anyhow, bail, Result};
 use joat_repo::DirInfo;
 use joatmon::read_yaml_file;
 use std::env::{var, VarError};
+use std::path::Path;
 
 pub fn do_shell(app: App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
@@ -64,26 +67,26 @@ pub fn do_shell(app: App) -> Result<Status> {
 }
 
 fn do_shell_python(app: App, rec: &PythonEnvRec, dir_info: &DirInfo) -> Result<()> {
-    let python_dir = dir_info.data_dir().join(&rec.dir);
-
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
 
     Command::new_shell().exec(
         dir_info.link_id(),
         dir_info.meta_id(),
-        &python_dir,
-        Vec::new(),
+        &make_python_path_dirs(dir_info.data_dir(), rec)
+            .iter()
+            .map(|p| p as &Path)
+            .collect::<Vec<_>>(),
+        &[],
     )?;
     Ok(())
 }
 
 fn do_shell_openjdk(app: App, rec: &OpenJdkEnvRec, dir_info: &DirInfo) -> Result<()> {
-    let openjdk_dir = dir_info.data_dir().join(&rec.dir);
-
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
 
+    let openjdk_dir = dir_info.data_dir().join(&rec.dir);
     let openjdk_dir_str = openjdk_dir
         .to_str()
         .ok_or_else(|| anyhow!("could not convert path to string"))?;
@@ -91,8 +94,11 @@ fn do_shell_openjdk(app: App, rec: &OpenJdkEnvRec, dir_info: &DirInfo) -> Result
     Command::new_shell().exec(
         dir_info.link_id(),
         dir_info.meta_id(),
-        &openjdk_dir,
-        vec![("JAVA_HOME", openjdk_dir_str)],
+        &make_openjdk_path_dirs(dir_info.data_dir(), rec)
+            .iter()
+            .map(|p| p as &Path)
+            .collect::<Vec<_>>(),
+        &[("JAVA_HOME", openjdk_dir_str)],
     )?;
     Ok(())
 }
