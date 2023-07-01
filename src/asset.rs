@@ -23,7 +23,7 @@ use crate::api::python_standalone_builds::Tag;
 use crate::app::App;
 use crate::checksum::validate_sha256_checksum;
 use crate::download::download_stream;
-use crate::object_model::{Asset, AssetFilter, PythonProductDescriptor};
+use crate::python::{Asset, AssetFilter, PythonProductDescriptor};
 use anyhow::{anyhow, bail, Result};
 use log::info;
 use std::fs::remove_file;

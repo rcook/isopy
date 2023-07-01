@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::PYTHON_VERSION_FILE_NAME;
-use crate::object_model::PythonProductDescriptor;
+use crate::python::PythonProductDescriptor;
 use crate::serialization::PythonVersionRec;
 use crate::{app::App, status::Status};
 use anyhow::{bail, Result};

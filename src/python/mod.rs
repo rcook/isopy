@@ -19,15 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::product_descriptor::ProductDescriptor;
-use crate::status::Status;
-use anyhow::Result;
+mod asset;
+mod asset_filter;
+mod asset_meta;
+mod python_product_descriptor;
+mod python_version;
 
-pub async fn do_download(app: &App, product_descriptor: &ProductDescriptor) -> Result<Status> {
-    match product_descriptor {
-        ProductDescriptor::Python(d) => app.download_python(d).await?,
-        ProductDescriptor::OpenJdk(d) => _ = app.download_openjdk(d).await?,
-    }
-    Ok(Status::OK)
-}
+pub use self::asset::Asset;
+pub use self::asset_filter::AssetFilter;
+pub use self::asset_meta::AssetMeta;
+pub use self::python_product_descriptor::PythonProductDescriptor;
+pub use self::python_version::PythonVersion;

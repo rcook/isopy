@@ -27,10 +27,10 @@ use crate::constants::{
     ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, ENV_FILE_NAME, INDEX_FILE_NAME,
     RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
-use crate::object_model::{
-    Asset, AssetMeta, OpenJdkProductDescriptor, PythonProductDescriptor, RepositoryName,
-};
+use crate::openjdk::OpenJdkProductDescriptor;
+use crate::python::{Asset, AssetMeta, PythonProductDescriptor};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
+use crate::repository_name::RepositoryName;
 use crate::serialization::{EnvRec, PythonEnvRec};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
 use crate::unpack::{unpack_file, NoOpUnpackPathTransform};

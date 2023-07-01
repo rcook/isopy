@@ -19,26 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod asset;
-mod asset_filter;
-mod asset_meta;
 mod maven_version;
 mod openjdk_product_descriptor;
 mod openjdk_version;
-mod product_descriptor;
-mod python_product_descriptor;
-mod python_version;
-mod repository_name;
 
-pub use self::asset::Asset;
-pub use self::asset_filter::AssetFilter;
-pub use self::asset_meta::AssetMeta;
 pub use self::maven_version::{MavenVersion, MavenVersionLimit, MavenVersionValue};
 pub use self::openjdk_product_descriptor::OpenJdkProductDescriptor;
 pub use self::openjdk_version::{
     OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
 };
-pub use self::product_descriptor::ProductDescriptor;
-pub use self::python_product_descriptor::PythonProductDescriptor;
-pub use self::python_version::PythonVersion;
-pub use self::repository_name::RepositoryName;

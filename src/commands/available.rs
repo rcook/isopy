@@ -24,12 +24,12 @@ use crate::app::App;
 use crate::args::PackageFilter;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, RELEASES_URL};
 use crate::download::download_stream;
-use crate::object_model::{
-    Asset, AssetFilter, OpenJdkProductDescriptor, ProductDescriptor, PythonProductDescriptor,
-};
+use crate::openjdk::OpenJdkProductDescriptor;
 use crate::print::print;
+use crate::product_descriptor::ProductDescriptor;
+use crate::python::{Asset, AssetFilter, PythonProductDescriptor};
 use crate::status::Status;
-use anyhow::{anyhow, Ok, Result};
+use anyhow::{anyhow, Result};
 use colored::Colorize;
 use std::cmp::Ordering;
 

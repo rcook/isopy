@@ -21,7 +21,9 @@
 //
 use crate::app::App;
 use crate::constants::{OPENJDK_VERSION_FILE_NAME, PYTHON_VERSION_FILE_NAME};
-use crate::object_model::{OpenJdkProductDescriptor, ProductDescriptor, PythonProductDescriptor};
+use crate::openjdk::OpenJdkProductDescriptor;
+use crate::product_descriptor::ProductDescriptor;
+use crate::python::PythonProductDescriptor;
 use crate::serialization::{OpenJdkVersionRec, PythonVersionRec};
 use crate::status::Status;
 use anyhow::Result;

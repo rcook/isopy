@@ -21,7 +21,7 @@
 //
 use crate::api::python_standalone_builds::LastModified;
 use crate::download::ContentLength;
-use crate::object_model::Asset;
+use crate::python::Asset;
 use anyhow::Result;
 use async_trait::async_trait;
 use bytes::Bytes;

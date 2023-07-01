@@ -23,9 +23,9 @@ use super::query::Query;
 use crate::api::adoptium::{List, Release, VersionData, Versions};
 use crate::download::download_stream;
 use crate::link_header::LinkHeader;
-use crate::object_model::MavenVersion::{self, Range};
-use crate::object_model::MavenVersionLimit::{Closed, Open};
-use crate::object_model::MavenVersionValue;
+use crate::openjdk::MavenVersion::{self, Range};
+use crate::openjdk::MavenVersionLimit::{Closed, Open};
+use crate::openjdk::MavenVersionValue;
 use crate::repository::{ReqwestResponse, Response};
 use anyhow::Result;
 use lazy_static::lazy_static;
@@ -118,9 +118,9 @@ impl AdoptiumClient {
 #[cfg(test)]
 mod tests {
     use super::AdoptiumClient;
-    use crate::object_model::MavenVersion::{self, Range, Value};
-    use crate::object_model::MavenVersionLimit::{Closed, Open};
-    use crate::object_model::MavenVersionValue;
+    use crate::openjdk::MavenVersion::{self, Range, Value};
+    use crate::openjdk::MavenVersionLimit::{Closed, Open};
+    use crate::openjdk::MavenVersionValue;
     use anyhow::Result;
     use rstest::rstest;
 

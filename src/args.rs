@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::object_model::ProductDescriptor;
+use crate::product_descriptor::ProductDescriptor;
 use clap::{Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;

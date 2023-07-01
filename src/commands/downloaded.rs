@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::object_model::AssetMeta;
 use crate::print::print;
+use crate::python::AssetMeta;
 use crate::status::Status;
 use anyhow::Result;
 use std::fs::read_dir;
