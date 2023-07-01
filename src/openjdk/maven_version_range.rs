@@ -25,20 +25,20 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 const MAVEN_VERSION: &AsciiSet = &CONTROLS.add(b'(').add(b')').add(b',').add(b'[').add(b']');
 
 #[allow(unused)]
-pub enum MavenVersion {
+pub enum MavenVersionRange {
     OpenJdkVersion(String),
     Value(MavenVersionValue),
     Range(MavenVersionLimit, MavenVersionLimit),
 }
 
-impl MavenVersion {
+impl MavenVersionRange {
     #[allow(unused)]
     pub fn to_path_segment(&self) -> String {
         utf8_percent_encode(&self.to_string(), MAVEN_VERSION).to_string()
     }
 }
 
-impl Display for MavenVersion {
+impl Display for MavenVersionRange {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         use MavenVersionLimit::*;
 
@@ -110,8 +110,8 @@ pub enum MavenVersionLimit {
 
 #[cfg(test)]
 mod tests {
-    use super::MavenVersion::{self, OpenJdkVersion, Range, Value};
     use super::MavenVersionLimit::{Closed, Open};
+    use super::MavenVersionRange::{self, OpenJdkVersion, Range, Value};
     use super::MavenVersionValue;
     use rstest::rstest;
 
@@ -143,7 +143,7 @@ mod tests {
     fn basics(
         #[case] expected_str: &str,
         #[case] expected_path_segment: &str,
-        #[case] version: MavenVersion,
+        #[case] version: MavenVersionRange,
     ) {
         assert_eq!(expected_str, version.to_string());
         assert_eq!(expected_path_segment, version.to_path_segment());

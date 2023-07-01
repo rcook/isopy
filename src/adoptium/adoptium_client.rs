@@ -23,8 +23,8 @@ use super::query::Query;
 use crate::api::adoptium::{List, Release, VersionData, Versions};
 use crate::download::download_stream;
 use crate::link_header::LinkHeader;
-use crate::openjdk::MavenVersion::{self, Range};
 use crate::openjdk::MavenVersionLimit::{Closed, Open};
+use crate::openjdk::MavenVersionRange::{self, Range};
 use crate::openjdk::MavenVersionValue;
 use crate::repository::{ReqwestResponse, Response};
 use anyhow::Result;
@@ -34,13 +34,13 @@ use serde::de::DeserializeOwned;
 use std::path::Path;
 
 lazy_static! {
-    static ref ALL_VERSIONS: MavenVersion = Range(
+    static ref ALL_VERSIONS: MavenVersionRange = Range(
         Open(None),
         Closed(Some(MavenVersionValue::new(1_000_000, Some(0)))),
     );
 }
 
-pub fn all_versions() -> &'static MavenVersion {
+pub fn all_versions() -> &'static MavenVersionRange {
     &ALL_VERSIONS
 }
 
@@ -71,13 +71,13 @@ impl AdoptiumClient {
 
     pub async fn get_releases(
         &self,
-        version: &MavenVersion,
+        version_range: &MavenVersionRange,
         query: &Query,
     ) -> Result<Vec<Release>> {
         self.get_list::<Vec<Release>>(
             query.apply(
                 self.client
-                    .get(Self::make_version_url(&self.server_url, version)?),
+                    .get(Self::make_version_url(&self.server_url, version_range)?),
             ),
         )
         .await
@@ -108,9 +108,13 @@ impl AdoptiumClient {
         }
     }
 
-    fn make_version_url(server_url: &Url, version: &MavenVersion) -> Result<Url> {
+    fn make_version_url(server_url: &Url, version_range: &MavenVersionRange) -> Result<Url> {
         let mut url = server_url.join("/v3/assets/version")?;
-        url.set_path(&format!("{}/{}", url.path(), version.to_path_segment()));
+        url.set_path(&format!(
+            "{}/{}",
+            url.path(),
+            version_range.to_path_segment()
+        ));
         Ok(url)
     }
 }
@@ -118,8 +122,8 @@ impl AdoptiumClient {
 #[cfg(test)]
 mod tests {
     use super::AdoptiumClient;
-    use crate::openjdk::MavenVersion::{self, Range, Value};
     use crate::openjdk::MavenVersionLimit::{Closed, Open};
+    use crate::openjdk::MavenVersionRange::{self, Range, Value};
     use crate::openjdk::MavenVersionValue;
     use anyhow::Result;
     use rstest::rstest;
@@ -133,10 +137,10 @@ mod tests {
         "http://host/v3/assets/version/%28%2C1000000.0%5D",
         Range(Open(None), Closed(Some(MavenVersionValue::new(1_000_000, Some(0)))),)
     )]
-    fn basics(#[case] expected_str: &str, #[case] version: MavenVersion) -> Result<()> {
+    fn basics(#[case] expected_str: &str, #[case] version_range: MavenVersionRange) -> Result<()> {
         assert_eq!(
             expected_str,
-            AdoptiumClient::make_version_url(&"http://host".parse()?, &version)?.as_str()
+            AdoptiumClient::make_version_url(&"http://host".parse()?, &version_range)?.as_str()
         );
         Ok(())
     }

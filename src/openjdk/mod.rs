@@ -19,11 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod maven_version;
+mod maven_version_range;
 mod openjdk_product_descriptor;
 mod openjdk_version;
 
-pub use self::maven_version::{MavenVersion, MavenVersionLimit, MavenVersionValue};
+pub use self::maven_version_range::{MavenVersionLimit, MavenVersionRange, MavenVersionValue};
 pub use self::openjdk_product_descriptor::OpenJdkProductDescriptor;
 pub use self::openjdk_version::{
     OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
