@@ -21,19 +21,14 @@
 //
 use crate::api::python_standalone_builds::option_tag;
 use crate::api::python_standalone_builds::Tag;
-use crate::object_model::Version;
+use crate::object_model::PythonVersion;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PythonVersionRec {
     #[serde(rename = "version")]
-    pub version: Version,
+    pub version: PythonVersion,
 
-    #[serde(
-        rename = "tag",
-        default,
-        //skip_serializing_if = "Option::is_none", // Incompatible with Python isopy!
-        with = "option_tag",
-    )]
+    #[serde(rename = "tag", default, with = "option_tag")]
     pub tag: Option<Tag>,
 }

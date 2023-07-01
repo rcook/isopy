@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::python_standalone_builds::Tag;
-use crate::object_model::{OpenJdkVersion, Version};
+use super::openjdk_env_rec::OpenJdkEnvRec;
+use super::python_env_rec::PythonEnvRec;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -34,25 +34,4 @@ pub struct EnvRec {
 
     #[serde(rename = "openjdk", skip_serializing_if = "Option::is_none")]
     pub openjdk: Option<OpenJdkEnvRec>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct PythonEnvRec {
-    #[serde(rename = "dir")]
-    pub dir: PathBuf,
-
-    #[serde(rename = "version")]
-    pub version: Version,
-
-    #[serde(rename = "tag")]
-    pub tag: Tag,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct OpenJdkEnvRec {
-    #[serde(rename = "dir")]
-    pub dir: PathBuf,
-
-    #[serde(rename = "version")]
-    pub version: OpenJdkVersion,
 }

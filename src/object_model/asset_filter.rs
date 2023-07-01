@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::asset::Asset;
-use super::version::Version;
+use super::python_version::PythonVersion;
 use crate::api::python_standalone_builds::{
     Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
 };
@@ -29,7 +29,7 @@ use std::iter::Iterator;
 pub struct AssetFilter {
     pub archive_type: Option<ArchiveType>,
     pub family: Option<Family>,
-    pub version: Option<Version>,
+    pub version: Option<PythonVersion>,
     pub tag: Option<Tag>,
     pub arch: Option<Arch>,
     pub platform: Option<Platform>,
@@ -208,7 +208,9 @@ impl AssetFilter {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{ArchiveType, Asset, AssetFilter, AssetMeta, Tag};
+    use super::super::{Asset, AssetMeta};
+    use super::AssetFilter;
+    use crate::api::python_standalone_builds::{ArchiveType, Tag};
     use reqwest::Url;
 
     #[test]

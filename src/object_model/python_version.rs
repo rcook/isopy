@@ -25,14 +25,14 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct Version {
+pub struct PythonVersion {
     major: i32,
     minor: i32,
     build: i32,
     value: String,
 }
 
-impl Version {
+impl PythonVersion {
     pub fn new(major: i32, minor: i32, build: i32) -> Self {
         Self {
             major,
@@ -47,7 +47,7 @@ impl Version {
     }
 }
 
-impl FromStr for Version {
+impl FromStr for PythonVersion {
     type Err = Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
@@ -64,13 +64,13 @@ impl FromStr for Version {
     }
 }
 
-impl Display for Version {
+impl Display for PythonVersion {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         write!(f, "{}.{}.{}", self.major, self.minor, self.build)
     }
 }
 
-impl<'de> Deserialize<'de> for Version {
+impl<'de> Deserialize<'de> for PythonVersion {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -81,7 +81,7 @@ impl<'de> Deserialize<'de> for Version {
     }
 }
 
-impl Serialize for Version {
+impl Serialize for PythonVersion {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -92,12 +92,15 @@ impl Serialize for Version {
 
 #[cfg(test)]
 mod tests {
-    use super::Version;
+    use super::PythonVersion;
     use anyhow::Result;
 
     #[test]
     fn test_parse() -> Result<()> {
-        assert_eq!(Version::new(1, 2, 3), "1.2.3".parse::<Version>()?);
+        assert_eq!(
+            PythonVersion::new(1, 2, 3),
+            "1.2.3".parse::<PythonVersion>()?
+        );
         Ok(())
     }
 }

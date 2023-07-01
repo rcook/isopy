@@ -27,8 +27,8 @@ mod openjdk_product_descriptor;
 mod openjdk_version;
 mod product_descriptor;
 mod python_product_descriptor;
+mod python_version;
 mod repository_name;
-mod version;
 
 pub use self::asset::Asset;
 pub use self::asset_filter::AssetFilter;
@@ -40,5 +40,5 @@ pub use self::openjdk_version::{
 };
 pub use self::product_descriptor::ProductDescriptor;
 pub use self::python_product_descriptor::PythonProductDescriptor;
+pub use self::python_version::PythonVersion;
 pub use self::repository_name::RepositoryName;
-pub use self::version::Version;

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::version::Version;
+use super::python_version::PythonVersion;
 use crate::api::python_standalone_builds::{
     Arch, ArchiveType, ArchiveTypeBaseName, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
 };
@@ -30,7 +30,7 @@ use std::str::FromStr;
 pub struct AssetMeta {
     pub archive_type: ArchiveType,
     pub family: Family,
-    pub version: Version,
+    pub version: PythonVersion,
     pub arch: Arch,
     pub platform: Platform,
     pub os: OS,
@@ -62,7 +62,7 @@ impl FromStr for AssetMeta {
             }
         }
 
-        fn parse_version_and_tag_opt(s: &str) -> Result<(Version, Option<Tag>)> {
+        fn parse_version_and_tag_opt(s: &str) -> Result<(PythonVersion, Option<Tag>)> {
             let parts = s.split('+').collect::<Vec<_>>();
             let (version_str, tag) = match parts.len() {
                 1 => (parts[0], None),
@@ -70,7 +70,7 @@ impl FromStr for AssetMeta {
                 _ => bail!("invalid version/tag \"{}\"", s),
             };
 
-            let version = version_str.parse::<Version>()?;
+            let version = version_str.parse::<PythonVersion>()?;
             Ok((version, tag))
         }
 
@@ -162,8 +162,10 @@ impl FromStr for AssetMeta {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{
-        Arch, ArchiveType, AssetMeta, Family, Platform, Subflavour, Tag, Variant, Version, OS,
+    use super::super::python_version::PythonVersion;
+    use super::AssetMeta;
+    use crate::api::python_standalone_builds::{
+        Arch, ArchiveType, Family, Platform, Subflavour, Tag, Variant, OS,
     };
     use anyhow::Result;
     use rstest::rstest;
@@ -173,7 +175,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
-            version: Version::new(3, 10, 9),
+            version: PythonVersion::new(3, 10, 9),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -189,7 +191,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: Version::new(3, 10, 9),
+            version: PythonVersion::new(3, 10, 9),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -205,7 +207,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
-            version: Version::new(3, 10, 2),
+            version: PythonVersion::new(3, 10, 2),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -221,7 +223,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: Version::new(3, 9, 6),
+            version: PythonVersion::new(3, 9, 6),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,
