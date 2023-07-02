@@ -19,22 +19,34 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-mod descriptor;
-mod product;
+use anyhow::anyhow;
+use std::error::Error as StdError;
+use std::fmt::{Debug, Display};
+use std::result::Result as StdResult;
+use thiserror::Error;
 
-pub use self::descriptor::{Descriptor, DescriptorParseError, DescriptorParseResult};
-pub use self::product::Product;
+#[derive(Debug, Error)]
+pub enum DescriptorParseError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+impl DescriptorParseError {
+    pub fn other<E>(e: E) -> Self
+    where
+        E: StdError + Send + Sync + 'static,
+    {
+        Self::Other(anyhow!(e))
+    }
+
+    pub fn msg<M>(message: M) -> Self
+    where
+        M: Display + Debug + Send + Sync + 'static,
+    {
+        Self::Other(anyhow!(message))
+    }
+}
+
+pub type DescriptorParseResult<T> = StdResult<T, DescriptorParseError>;
+
+pub trait Descriptor: Debug + Display {}
