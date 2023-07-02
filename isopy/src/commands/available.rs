@@ -27,10 +27,11 @@ use crate::download::download_stream;
 use crate::openjdk::OpenJdkProductDescriptor;
 use crate::print::print;
 use crate::product_descriptor::ProductDescriptor;
-use crate::python::{Asset, AssetFilter, PythonProductDescriptor};
+use crate::python::{Asset, AssetFilter};
 use crate::status::Status;
 use anyhow::{anyhow, Result};
 use colored::Colorize;
+use isopy_python::PythonProductDescriptor;
 use std::cmp::Ordering;
 
 pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<Status> {

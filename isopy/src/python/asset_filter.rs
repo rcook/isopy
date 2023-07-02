@@ -20,10 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::asset::Asset;
-use super::python_version::PythonVersion;
 use crate::api::python_standalone_builds::{
-    Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Tag, Variant, OS,
+    Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS,
 };
+use isopy_python::{PythonVersion, Tag};
 use std::iter::Iterator;
 
 pub struct AssetFilter {
@@ -210,7 +210,8 @@ impl AssetFilter {
 mod tests {
     use super::super::{Asset, AssetMeta};
     use super::AssetFilter;
-    use crate::api::python_standalone_builds::{ArchiveType, Tag};
+    use crate::api::python_standalone_builds::ArchiveType;
+    use isopy_python::Tag;
     use reqwest::Url;
 
     #[test]

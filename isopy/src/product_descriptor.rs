@@ -19,11 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::python_standalone_builds::Tag;
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
 use crate::openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
-use crate::python::{PythonProductDescriptor, PythonVersion};
 use anyhow::anyhow;
+use isopy_python::{PythonProductDescriptor, PythonVersion, Tag};
 use serde::Deserialize;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
@@ -114,10 +113,9 @@ impl<'de> Deserialize<'de> for ProductDescriptor {
 #[cfg(test)]
 mod tests {
     use super::ProductDescriptor;
-    use crate::api::python_standalone_builds::Tag;
     use crate::openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
-    use crate::python::{PythonProductDescriptor, PythonVersion};
     use anyhow::Result;
+    use isopy_python::{PythonProductDescriptor, PythonVersion, Tag};
     use rstest::rstest;
 
     #[rstest]

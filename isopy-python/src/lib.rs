@@ -19,6 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+mod python_product_descriptor;
+mod python_version;
+mod tag;
+
+pub use self::python_product_descriptor::PythonProductDescriptor;
+pub use self::python_version::PythonVersion;
+pub use self::tag::{option_tag, Tag};
+
 use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;

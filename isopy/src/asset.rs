@@ -19,12 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::python_standalone_builds::Tag;
 use crate::app::App;
 use crate::checksum::validate_sha256_checksum;
 use crate::download::download_stream;
-use crate::python::{Asset, AssetFilter, PythonProductDescriptor};
+use crate::python::{Asset, AssetFilter};
 use anyhow::{anyhow, bail, Result};
+use isopy_python::{PythonProductDescriptor, Tag};
 use log::info;
 use std::fs::remove_file;
 use std::path::PathBuf;

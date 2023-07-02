@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::AssetRec;
-use crate::api::python_standalone_builds::Tag;
+use isopy_python::Tag;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

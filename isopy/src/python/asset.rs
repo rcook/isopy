@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::AssetMeta;
-use crate::api::python_standalone_builds::Tag;
+use isopy_python::Tag;
 use reqwest::Url;
 
 #[derive(Debug, PartialEq)]

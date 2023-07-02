@@ -27,7 +27,6 @@ mod last_modified;
 mod os;
 mod platform;
 mod subflavour;
-mod tag;
 mod variant;
 
 pub use self::arch::Arch;
@@ -38,6 +37,4 @@ pub use self::last_modified::LastModified;
 pub use self::os::OS;
 pub use self::platform::Platform;
 pub use self::subflavour::Subflavour;
-pub use self::tag::option_tag;
-pub use self::tag::Tag;
 pub use self::variant::Variant;

@@ -22,11 +22,7 @@
 mod asset;
 mod asset_filter;
 mod asset_meta;
-mod python_product_descriptor;
-mod python_version;
 
 pub use self::asset::Asset;
 pub use self::asset_filter::AssetFilter;
 pub use self::asset_meta::AssetMeta;
-pub use self::python_product_descriptor::PythonProductDescriptor;
-pub use self::python_version::PythonVersion;

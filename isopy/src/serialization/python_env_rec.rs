@@ -19,8 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::python_standalone_builds::Tag;
-use crate::python::PythonVersion;
+use isopy_python::{PythonVersion, Tag};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 

@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::python_standalone_builds::Tag;
 use anyhow::{anyhow, Result};
 use hex::decode;
 use include_dir::{include_dir, Dir};
+use isopy_python::Tag;
 use joatmon::read_bytes;
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
