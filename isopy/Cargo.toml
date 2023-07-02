@@ -10,8 +10,6 @@ name = "isopy"
 repository = "https://rcook.github.io/isopy"
 version = "0.1.4"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 anyhow = "1.0.71"
 async-trait = "0.1.68"
@@ -57,12 +55,6 @@ openssl-sys = { version = "0.9.90", features = ["vendored"] }
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
 sysinfo = "0.29.3"
-
-[profile.release]
-codegen-units = 1
-lto = true
-opt-level = "z"
-strip = true
 
 [dev-dependencies]
 rstest = "0.17.0"
