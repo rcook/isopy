@@ -1,0 +1,68 @@
+[package]
+authors = ["Richard Cook"]
+categories = ["development-tools"]
+description = "Isolated Python Tool"
+edition = "2021"
+homepage = "https://rcook.github.io/isopy"
+keywords = ["general"]
+license = "MIT"
+name = "isopy"
+repository = "https://rcook.github.io/isopy"
+version = "0.1.4"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.71"
+async-trait = "0.1.68"
+bytes = "1.4.0"
+chrono = { version = "0.4.26", features = ["serde"] }
+clap = { version = "4.3.10", features = ["derive"] }
+color-backtrace = "0.5.1"
+colored = "2.0.0"
+flate2 = "1.0.26"
+futures-util = "0.3.28"
+hex = "0.4.3"
+home = "0.5.5"
+include_dir = "0.7.3"
+indicatif = "0.17.5"
+joat-logger = "0.0.1"
+joat-repo = "0.0.8"
+joatmon = "0.0.29"
+lazy_static = "1.4.0"
+log = { version = "0.4.19", features = ["std"] }
+md5 = "0.7.0"
+path-absolutize = "3.1.0"
+percent-encoding = "2.3.0"
+regex = "1.8.4"
+reqwest = { version = "0.11.18", features = ["json", "stream"] }
+serde = { version = "1.0.164", features = ["derive"] }
+serde_json = "1.0.99"
+serde_yaml = "0.9.22"
+sha2 = "0.10.7"
+tar = "0.4.38"
+thiserror = "1.0.40"
+time = "0.3.22"
+tinytemplate = "1.2.1"
+tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"] }
+url = { version = "2.4.0", features = ["serde"] }
+uuid = { version = "1.4.0", features = ["v4"] }
+
+[target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
+exec = "0.3.1"
+
+[target."cfg(target_os = \"linux\")".dependencies]
+openssl-sys = { version = "0.9.90", features = ["vendored"] }
+
+[target."cfg(target_os = \"windows\")".dependencies]
+same-file = "1.0.6"
+sysinfo = "0.29.3"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z"
+strip = true
+
+[dev-dependencies]
+rstest = "0.17.0"
