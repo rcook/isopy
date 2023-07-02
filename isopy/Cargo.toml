@@ -24,6 +24,9 @@ hex = "0.4.3"
 home = "0.5.5"
 include_dir = "0.7.3"
 indicatif = "0.17.5"
+isopy-lib = { path = "../isopy-lib" }
+isopy-openjdk = { path = "../isopy-openjdk" }
+isopy-python = { path = "../isopy-python" }
 joat-logger = "0.0.1"
 joat-repo = "0.0.8"
 joatmon = "0.0.29"

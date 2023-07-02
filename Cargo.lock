@@ -929,6 +929,9 @@ dependencies = [
  "home",
  "include_dir",
  "indicatif",
+ "isopy-lib",
+ "isopy-openjdk",
+ "isopy-python",
  "joat-logger",
  "joat-repo",
  "joatmon 0.0.29",
@@ -954,6 +957,32 @@ dependencies = [
  "tokio",
  "url",
  "uuid",
+]
+
+[[package]]
+name = "isopy-lib"
+version = "0.1.4"
+dependencies = [
+ "anyhow",
+ "thiserror",
+]
+
+[[package]]
+name = "isopy-openjdk"
+version = "0.1.4"
+dependencies = [
+ "anyhow",
+ "isopy-lib",
+ "thiserror",
+]
+
+[[package]]
+name = "isopy-python"
+version = "0.1.4"
+dependencies = [
+ "anyhow",
+ "isopy-lib",
+ "thiserror",
 ]
 
 [[package]]

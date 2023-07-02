@@ -1,0 +1,16 @@
+[package]
+authors = ["Richard Cook"]
+categories = ["development-tools"]
+description = "Isolated Python Tool - Python Support"
+edition = "2021"
+homepage = "https://rcook.github.io/isopy"
+keywords = ["general"]
+license = "MIT"
+name = "isopy-python"
+repository = "https://rcook.github.io/isopy"
+version = "0.1.4"
+
+[dependencies]
+anyhow = "1.0.71"
+isopy-lib = { path = "../isopy-lib" }
+thiserror = "1.0.40"
