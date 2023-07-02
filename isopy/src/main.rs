@@ -47,6 +47,7 @@ mod link_header;
 mod print;
 mod product_descriptor;
 mod python;
+mod registry;
 mod repository;
 mod repository_name;
 mod run;

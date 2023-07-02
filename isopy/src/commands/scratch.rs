@@ -20,11 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::registry::demo;
 use crate::status::Status;
 use anyhow::Result;
 
 #[allow(clippy::unnecessary_wraps)]
 pub fn do_scratch(_app: &App) -> Result<Status> {
     println!("SCRATCH");
+    demo()?;
     Ok(Status::OK)
 }

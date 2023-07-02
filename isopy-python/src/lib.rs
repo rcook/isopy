@@ -33,68 +33,16 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
+mod python;
+mod python_descriptor;
 mod python_product_descriptor;
 mod python_version;
 mod tag;
 
+pub use self::python::Python;
+pub use self::python_descriptor::{
+    PythonDescriptor, PythonDescriptorParseError, PythonDescriptorParseResult,
+};
 pub use self::python_product_descriptor::PythonProductDescriptor;
 pub use self::python_version::PythonVersion;
 pub use self::tag::{option_tag, Tag};
-
-use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::result::Result as StdResult;
-use std::str::FromStr;
-use thiserror::Error;
-
-const NAME: &str = "Python";
-
-pub struct Python;
-
-impl Default for Python {
-    fn default() -> Self {
-        Self
-    }
-}
-
-impl Product for Python {
-    fn name(&self) -> &str {
-        NAME
-    }
-
-    fn parse_descriptor(&self, s: &str) -> DescriptorParseResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<PythonDescriptor>()
-                .map_err(DescriptorParseError::other)?,
-        ))
-    }
-}
-
-#[derive(Debug, Error)]
-pub enum PythonDescriptorParseError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-#[derive(Debug)]
-pub struct PythonDescriptor {
-    version: String,
-}
-
-impl FromStr for PythonDescriptor {
-    type Err = PythonDescriptorParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self {
-            version: String::from(s),
-        })
-    }
-}
-
-impl Display for PythonDescriptor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.version)
-    }
-}
-
-impl Descriptor for PythonDescriptor {}
