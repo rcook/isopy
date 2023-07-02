@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 #![warn(clippy::all)]
-#![warn(clippy::cargo)]
+//#![warn(clippy::cargo)]
 //#![warn(clippy::expect_used)]
 #![warn(clippy::nursery)]
 //#![warn(clippy::panic_in_result_fn)]

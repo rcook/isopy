@@ -122,10 +122,10 @@ impl AdoptiumClient {
 #[cfg(test)]
 mod tests {
     use super::AdoptiumClient;
-    use crate::openjdk::MavenVersionLimit::{Closed, Open};
-    use crate::openjdk::MavenVersionRange::{self, Range, Value};
-    use crate::openjdk::MavenVersionValue;
     use anyhow::Result;
+    use isopy_openjdk::MavenVersionLimit::{Closed, Open};
+    use isopy_openjdk::MavenVersionRange::{self, Range, Value};
+    use isopy_openjdk::MavenVersionValue;
     use rstest::rstest;
 
     #[rstest]

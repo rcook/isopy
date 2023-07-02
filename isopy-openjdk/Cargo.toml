@@ -16,3 +16,6 @@ isopy-lib = { path = "../isopy-lib" }
 percent-encoding = "2.3.0"
 serde = "1.0.164"
 thiserror = "1.0.40"
+
+[dev-dependencies]
+rstest = "0.17.0"

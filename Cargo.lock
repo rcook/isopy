@@ -973,6 +973,7 @@ dependencies = [
  "anyhow",
  "isopy-lib",
  "percent-encoding",
+ "rstest",
  "serde",
  "thiserror",
 ]

@@ -33,6 +33,7 @@ pub struct PythonVersion {
 }
 
 impl PythonVersion {
+    #[must_use]
     pub fn new(major: i32, minor: i32, build: i32) -> Self {
         Self {
             major,
@@ -42,6 +43,7 @@ impl PythonVersion {
         }
     }
 
+    #[must_use]
     pub fn as_str(&self) -> &str {
         &self.value
     }

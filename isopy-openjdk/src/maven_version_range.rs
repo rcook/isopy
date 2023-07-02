@@ -33,6 +33,7 @@ pub enum MavenVersionRange {
 
 impl MavenVersionRange {
     #[allow(unused)]
+    #[must_use]
     pub fn to_path_segment(&self) -> String {
         utf8_percent_encode(&self.to_string(), MAVEN_VERSION).to_string()
     }
@@ -87,6 +88,7 @@ pub struct MavenVersionValue {
 
 impl MavenVersionValue {
     #[allow(unused)]
+    #[must_use]
     pub const fn new(major: u32, minor: Option<u32>) -> Self {
         Self { major, minor }
     }

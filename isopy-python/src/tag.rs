@@ -28,6 +28,7 @@ use std::str::FromStr;
 pub struct Tag(String);
 
 impl Tag {
+    #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
     }
