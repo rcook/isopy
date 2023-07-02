@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::openjdk::OpenJdkVersion;
+use isopy_openjdk::OpenJdkVersion;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;

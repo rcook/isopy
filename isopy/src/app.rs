@@ -27,7 +27,6 @@ use crate::constants::{
     ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, ENV_FILE_NAME, INDEX_FILE_NAME,
     RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
-use crate::openjdk::OpenJdkProductDescriptor;
 use crate::python::{Asset, AssetMeta};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::repository_name::RepositoryName;
@@ -36,6 +35,7 @@ use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec}
 use crate::unpack::{unpack_file, NoOpUnpackPathTransform};
 use crate::url::dir_url;
 use anyhow::{bail, Result};
+use isopy_openjdk::OpenJdkProductDescriptor;
 use isopy_python::PythonProductDescriptor;
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};

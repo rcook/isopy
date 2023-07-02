@@ -940,7 +940,6 @@ dependencies = [
  "md5",
  "openssl-sys",
  "path-absolutize",
- "percent-encoding",
  "regex",
  "reqwest",
  "rstest",
@@ -973,6 +972,8 @@ version = "0.1.4"
 dependencies = [
  "anyhow",
  "isopy-lib",
+ "percent-encoding",
+ "serde",
  "thiserror",
 ]
 

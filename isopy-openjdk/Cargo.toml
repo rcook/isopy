@@ -13,4 +13,6 @@ version = "0.1.4"
 [dependencies]
 anyhow = "1.0.71"
 isopy-lib = { path = "../isopy-lib" }
+percent-encoding = "2.3.0"
+serde = "1.0.164"
 thiserror = "1.0.40"

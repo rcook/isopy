@@ -21,12 +21,12 @@
 //
 use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
-use crate::openjdk::OpenJdkProductDescriptor;
 use crate::product_descriptor::ProductDescriptor;
 use crate::serialization::{EnvRec, OpenJdkEnvRec};
 use crate::status::Status;
 use crate::unpack::{unpack_file, UnpackPathTransform};
 use anyhow::{bail, Result};
+use isopy_openjdk::OpenJdkProductDescriptor;
 use joatmon::safe_write_file;
 use std::path::{Path, PathBuf};
 

@@ -19,60 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::result::Result as StdResult;
-use std::str::FromStr;
-use thiserror::Error;
+#![warn(clippy::all)]
+#![warn(clippy::cargo)]
+//#![warn(clippy::expect_used)]
+#![warn(clippy::nursery)]
+//#![warn(clippy::panic_in_result_fn)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::derive_partial_eq_without_eq)]
+#![allow(clippy::enum_glob_use)]
+#![allow(clippy::future_not_send)]
+#![allow(clippy::match_wildcard_for_single_variants)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::option_if_let_else)]
+mod maven_version_range;
+mod openjdk_product_descriptor;
+mod openjdk_version;
 
-const NAME: &str = "OpenJDK";
-
-pub struct OpenJdk;
-
-impl Default for OpenJdk {
-    fn default() -> Self {
-        Self
-    }
-}
-
-impl Product for OpenJdk {
-    fn name(&self) -> &str {
-        NAME
-    }
-
-    fn parse_descriptor(&self, s: &str) -> DescriptorParseResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<OpenJdkDescriptor>()
-                .map_err(DescriptorParseError::other)?,
-        ))
-    }
-}
-
-#[derive(Debug, Error)]
-pub enum OpenJdkDescriptorParseError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-#[derive(Debug)]
-pub struct OpenJdkDescriptor {
-    version: String,
-}
-
-impl FromStr for OpenJdkDescriptor {
-    type Err = OpenJdkDescriptorParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self {
-            version: String::from(s),
-        })
-    }
-}
-
-impl Display for OpenJdkDescriptor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.version)
-    }
-}
-
-impl Descriptor for OpenJdkDescriptor {}
+pub use self::maven_version_range::{MavenVersionLimit, MavenVersionRange, MavenVersionValue};
+pub use self::openjdk_product_descriptor::OpenJdkProductDescriptor;
+pub use self::openjdk_version::{
+    OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
+};

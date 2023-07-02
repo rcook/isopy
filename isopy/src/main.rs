@@ -44,7 +44,6 @@ mod commands;
 mod constants;
 mod download;
 mod link_header;
-mod openjdk;
 mod print;
 mod product_descriptor;
 mod python;

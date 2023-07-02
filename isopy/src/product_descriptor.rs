@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
-use crate::openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
 use anyhow::anyhow;
+use isopy_openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
 use isopy_python::{PythonProductDescriptor, PythonVersion, Tag};
 use serde::Deserialize;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -113,8 +113,8 @@ impl<'de> Deserialize<'de> for ProductDescriptor {
 #[cfg(test)]
 mod tests {
     use super::ProductDescriptor;
-    use crate::openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
     use anyhow::Result;
+    use isopy_openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
     use isopy_python::{PythonProductDescriptor, PythonVersion, Tag};
     use rstest::rstest;
 
