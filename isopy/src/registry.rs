@@ -19,10 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
 use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
-use isopy_openjdk::OpenJdk;
-use isopy_python::Python;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::rc::Rc;
 
@@ -76,26 +73,32 @@ impl Display for DescriptorInfo {
     }
 }
 
-pub fn demo() -> Result<()> {
-    let registry = Registry::new(vec![
-        ProductInfo {
-            prefix: String::from("python"),
-            product: Box::<Python>::default(),
-        },
-        ProductInfo {
-            prefix: String::from("openjdk"),
-            product: Box::<OpenJdk>::default(),
-        },
-    ]);
+#[cfg(test)]
+mod tests {
+    use super::{ProductInfo, Registry};
+    use anyhow::Result;
+    use isopy_openjdk::OpenJdk;
+    use isopy_python::Python;
+    use rstest::rstest;
 
-    let descriptor_info = registry.parse_descriptor("1.2.3:tag")?;
-    println!("descriptor_info={descriptor_info}");
+    #[rstest]
+    #[case("python:1.2.3:tag", "1.2.3:tag")]
+    #[case("python:1.2.3:tag", "python:1.2.3:tag")]
+    #[case("openjdk:1.2.3:tag", "openjdk:1.2.3:tag")]
+    fn parse_descriptor(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
+        let registry = Registry::new(vec![
+            ProductInfo {
+                prefix: String::from("python"),
+                product: Box::<Python>::default(),
+            },
+            ProductInfo {
+                prefix: String::from("openjdk"),
+                product: Box::<OpenJdk>::default(),
+            },
+        ]);
 
-    let descriptor_info = registry.parse_descriptor("python:1.2.3:tag")?;
-    println!("descriptor_info={descriptor_info}");
-
-    let descriptor_info = registry.parse_descriptor("openjdk:1.2.3:tag")?;
-    println!("descriptor_info={descriptor_info}");
-
-    Ok(())
+        let descriptor_info = registry.parse_descriptor(input)?;
+        assert_eq!(expected_str, descriptor_info.to_string());
+        Ok(())
+    }
 }
