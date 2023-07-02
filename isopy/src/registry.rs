@@ -23,15 +23,18 @@ use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::rc::Rc;
 
+#[allow(unused)]
 struct ProductInfo {
     prefix: String,
     product: Box<dyn Product>,
 }
 
+#[allow(unused)]
 struct Registry {
     product_infos: Vec<Rc<ProductInfo>>,
 }
 
+#[allow(unused)]
 impl Registry {
     fn new(product_infos: Vec<ProductInfo>) -> Self {
         Self {
