@@ -37,7 +37,7 @@ impl FromStr for OpenJdkDescriptor {
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         s.parse::<OpenJdkVersion>()
             .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
-            .map(|version| OpenJdkDescriptor { version })
+            .map(|version| Self { version })
     }
 }
 

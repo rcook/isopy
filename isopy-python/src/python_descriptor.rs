@@ -45,7 +45,7 @@ impl FromStr for PythonDescriptor {
                     suffix
                         .parse::<Tag>()
                         .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
-                        .map(|tag| PythonDescriptor {
+                        .map(|tag| Self {
                             version,
                             tag: Some(tag),
                         })
@@ -53,7 +53,7 @@ impl FromStr for PythonDescriptor {
             None => s
                 .parse::<PythonVersion>()
                 .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
-                .map(|version| PythonDescriptor { version, tag: None }),
+                .map(|version| Self { version, tag: None }),
         }
     }
 }
