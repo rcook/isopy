@@ -85,9 +85,9 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case("python:1.2.3:tag", "1.2.3:tag")]
-    #[case("python:1.2.3:tag", "python:1.2.3:tag")]
-    #[case("openjdk:1.2.3:tag", "openjdk:1.2.3:tag")]
+    #[case("python:1.2.3:11223344", "1.2.3:11223344")]
+    #[case("python:1.2.3:11223344", "python:1.2.3:11223344")]
+    #[case("openjdk:19.0.1+10", "openjdk:19.0.1+10")]
     fn parse_descriptor(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
         let registry = Registry::new(vec![
             ProductInfo {

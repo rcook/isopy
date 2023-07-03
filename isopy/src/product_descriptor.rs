@@ -83,7 +83,7 @@ impl<'de> Deserialize<'de> for ProductDescriptor {
 mod tests {
     use super::ProductDescriptor;
     use anyhow::Result;
-    use isopy_openjdk::{OpenJdkProductDescriptor, OpenJdkVersion};
+    use isopy_openjdk::{OpenJdkDescriptor, OpenJdkVersion};
     use isopy_python::{PythonDescriptor, PythonVersion, Tag};
     use rstest::rstest;
 
@@ -105,7 +105,7 @@ mod tests {
         "python:111.222.333:tag"
     )]
     #[case(
-        ProductDescriptor::OpenJdk(OpenJdkProductDescriptor { version: "111.222.333+444".parse::<OpenJdkVersion>().expect("test: must be valid OpenJDK version")}),
+        ProductDescriptor::OpenJdk(OpenJdkDescriptor { version: "111.222.333+444".parse::<OpenJdkVersion>().expect("test: must be valid OpenJDK version")}),
         "openjdk:111.222.333+444"
     )]
     fn parse(#[case] expected_result: ProductDescriptor, #[case] input: &str) -> Result<()> {
