@@ -27,13 +27,10 @@ use crate::commands::{
     do_init_config, do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap,
 };
 use crate::constants::CACHE_DIR_NAME;
-use crate::registry::{ProductInfo, ProductRegistry};
 use crate::status::Status;
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
 use clap::Parser;
-use isopy_openjdk::OpenJdk;
-use isopy_python::Python;
 use joat_logger::init_ui;
 use joat_repo::RepoConfig;
 use log::{set_max_level, LevelFilter};
@@ -79,39 +76,23 @@ pub async fn run() -> Result<Status> {
     };
 
     let app = App::new(cwd, repo);
-
-    let registry = ProductRegistry::new(vec![
-        ProductInfo {
-            prefix: String::from("python"),
-            product: Box::<Python>::default(),
-        },
-        ProductInfo {
-            prefix: String::from("openjdk"),
-            product: Box::<OpenJdk>::default(),
-        },
-    ]);
-
-    do_it(&registry, app, args.command).await
+    do_it(app, args.command).await
 }
 
-async fn do_it(registry: &ProductRegistry, app: App, command: Command) -> Result<Status> {
+async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Command::Available { package_filter } => do_available(&app, package_filter).await,
         Command::Check { clean } => do_check(&app, clean),
-        Command::Download { descriptor_str } => {
-            do_download(&app, &registry.to_descriptor_info(&descriptor_str)?).await
-        }
+        Command::Download { descriptor_id } => do_download(&app, &descriptor_id).await,
         Command::Downloaded => do_downloaded(&app),
         Command::Exec { program, args } => do_exec(app, &program, &args),
         Command::GenConfig {
-            descriptor_str,
+            descriptor_id,
             force,
-        } => do_gen_config(&app, &registry.to_descriptor_info(&descriptor_str)?, force),
+        } => do_gen_config(&app, &descriptor_id, force),
         Command::Info => do_info(&app),
-        Command::Init { descriptor_str } => {
-            do_init(&app, &registry.to_descriptor_info(&descriptor_str)?).await
-        }
-        Command::InitConfig => do_init_config(app).await,
+        Command::Init { descriptor_id } => do_init(&app, &descriptor_id).await,
+        Command::InitConfig => do_init_config(&app).await,
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
         Command::Prompt => do_prompt(&app),

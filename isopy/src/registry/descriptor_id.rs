@@ -19,19 +19,50 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::registry::{DescriptorId, ProductDescriptor};
-use crate::status::Status;
-use anyhow::Result;
+use anyhow::Error;
+use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::str::FromStr;
 
-pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
-    match app
-        .registry
-        .to_descriptor_info(descriptor_id)?
-        .to_product_descriptor()?
-    {
-        ProductDescriptor::Python(d) => app.download_python(&d).await?,
-        ProductDescriptor::OpenJdk(d) => _ = app.download_openjdk(&d).await?,
+#[derive(Clone, Debug)]
+pub struct DescriptorId(String);
+
+impl DescriptorId {
+    pub fn as_str(&self) -> &str {
+        &self.0
     }
-    Ok(Status::OK)
+}
+
+impl FromStr for DescriptorId {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(String::from(s)))
+    }
+}
+
+impl Display for DescriptorId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl<'de> Deserialize<'de> for DescriptorId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+impl Serialize for DescriptorId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.0)
+    }
 }

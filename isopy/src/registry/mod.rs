@@ -19,12 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+mod descriptor_id;
 mod descriptor_info;
 mod product_descriptor;
 mod product_info;
 mod product_registry;
 
+pub use self::descriptor_id::DescriptorId;
 pub use self::descriptor_info::DescriptorInfo;
-pub use self::product_descriptor::{DescriptorString, ProductDescriptor};
+pub use self::product_descriptor::ProductDescriptor;
 pub use self::product_info::ProductInfo;
 pub use self::product_registry::ProductRegistry;

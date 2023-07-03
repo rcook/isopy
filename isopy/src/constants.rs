@@ -33,9 +33,9 @@ lazy_static! {
         Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
 }
 
-pub const PYTHON_PRODUCT_VERSION_PREFIX: &str = "python";
+pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
-pub const OPENJDK_PRODUCT_VERSION_PREFIX: &str = "openjdk";
+pub const OPENJDK_DESCRIPTOR_PREFIX: &str = "openjdk";
 
 pub const ADOPTIUM_INDEX_FILE_NAME: &str = "adoptium-index.yaml";
 

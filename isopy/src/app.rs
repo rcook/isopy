@@ -25,18 +25,20 @@ use crate::asset::{download_asset, get_asset};
 use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{
     ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, ENV_FILE_NAME, INDEX_FILE_NAME,
-    RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
+    OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX, RELEASES_FILE_NAME, RELEASES_URL,
+    REPOSITORIES_FILE_NAME,
 };
 use crate::python::{Asset, AssetMeta};
+use crate::registry::{DescriptorId, ProductDescriptor, ProductInfo, ProductRegistry};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::repository_name::RepositoryName;
-use crate::serialization::{EnvRec, PythonEnvRec};
+use crate::serialization::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::unpack::{unpack_file, NoOpUnpackPathTransform};
+use crate::unpack::{unpack_file, NoOpUnpackPathTransform, UnpackPathTransform};
 use crate::url::dir_url;
 use anyhow::{bail, Result};
-use isopy_openjdk::OpenJdkDescriptor;
-use isopy_python::PythonDescriptor;
+use isopy_openjdk::{OpenJdk, OpenJdkDescriptor};
+use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
 use log::info;
@@ -49,15 +51,29 @@ pub struct RepositoryInfo {
     pub repository: Box<dyn Repository>,
 }
 
-#[derive(Debug)]
 pub struct App {
     pub cwd: PathBuf,
     pub repo: Repo,
+    pub registry: ProductRegistry,
 }
 
 impl App {
-    pub const fn new(cwd: PathBuf, repo: Repo) -> Self {
-        Self { cwd, repo }
+    pub fn new(cwd: PathBuf, repo: Repo) -> Self {
+        let registry = ProductRegistry::new(vec![
+            ProductInfo {
+                prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
+                product: Box::<Python>::default(),
+            },
+            ProductInfo {
+                prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
+                product: Box::<OpenJdk>::default(),
+            },
+        ]);
+        Self {
+            cwd,
+            repo,
+            registry,
+        }
     }
 
     pub async fn download_python(&self, descriptor: &PythonDescriptor) -> Result<()> {
@@ -219,37 +235,89 @@ impl App {
         Ok(assets)
     }
 
-    pub async fn init_project(&self, descriptor: &PythonDescriptor) -> Result<()> {
-        let assets = self.read_assets()?;
-        let asset = get_asset(&assets, descriptor)?;
+    pub async fn init_project(&self, descriptor_id: &DescriptorId) -> Result<()> {
+        async fn init_project_python(app: &App, descriptor: &PythonDescriptor) -> Result<()> {
+            let assets = app.read_assets()?;
+            let asset = get_asset(&assets, descriptor)?;
 
-        let mut asset_path = self.make_asset_path(asset);
-        if !asset_path.is_file() {
-            asset_path = download_asset(self, asset).await?;
+            let mut asset_path = app.make_asset_path(asset);
+            if !asset_path.is_file() {
+                asset_path = download_asset(app, asset).await?;
+            }
+
+            let Some(dir_info) = app.repo.init(&app.cwd)? else {
+                bail!(
+                    "Could not initialize metadirectory for directory {}",
+                    app.cwd.display()
+                )
+            };
+
+            unpack_file::<NoOpUnpackPathTransform>(&asset_path, dir_info.data_dir())?;
+
+            safe_write_file(
+                &dir_info.data_dir().join(ENV_FILE_NAME),
+                serde_yaml::to_string(&EnvRec {
+                    config_path: app.cwd.clone(),
+                    python: Some(PythonEnvRec {
+                        dir: PathBuf::from("python"),
+                        version: asset.meta.version.clone(),
+                        tag: asset.tag.clone(),
+                    }),
+                    openjdk: None,
+                })?,
+                false,
+            )?;
+
+            Ok(())
         }
 
-        let Some(dir_info) = self.repo.init(&self.cwd)? else {
-            bail!(
-                "Could not initialize metadirectory for directory {}",
-                self.cwd.display()
-            )
-        };
+        async fn init_project_openjdk(app: &App, descriptor: &OpenJdkDescriptor) -> Result<()> {
+            struct ReplacePrefixPathTransform;
 
-        unpack_file::<NoOpUnpackPathTransform>(&asset_path, dir_info.data_dir())?;
+            impl UnpackPathTransform for ReplacePrefixPathTransform {
+                fn transform_path(path: &Path) -> PathBuf {
+                    let mut i = path.iter();
+                    _ = i.next();
+                    Path::new("jdk").join(i)
+                }
+            }
 
-        safe_write_file(
-            &dir_info.data_dir().join(ENV_FILE_NAME),
-            serde_yaml::to_string(&EnvRec {
-                config_path: self.cwd.clone(),
-                python: Some(PythonEnvRec {
-                    dir: PathBuf::from("python"),
-                    version: asset.meta.version.clone(),
-                    tag: asset.tag.clone(),
-                }),
-                openjdk: None,
-            })?,
-            false,
-        )?;
+            let Some(dir_info) = app.repo.init(&app.cwd)? else {
+                bail!(
+                    "Could not initialize metadirectory for directory {}",
+                    app.cwd.display()
+                )
+            };
+
+            let asset_path = app.download_openjdk(descriptor).await?;
+
+            unpack_file::<ReplacePrefixPathTransform>(&asset_path, dir_info.data_dir())?;
+
+            safe_write_file(
+                &dir_info.data_dir().join(ENV_FILE_NAME),
+                serde_yaml::to_string(&EnvRec {
+                    config_path: app.cwd.clone(),
+                    python: None,
+                    openjdk: Some(OpenJdkEnvRec {
+                        dir: PathBuf::from("jdk"),
+                        version: descriptor.version.clone(),
+                    }),
+                })?,
+                false,
+            )?;
+
+            Ok(())
+        }
+
+        // TBD: Nasty hack!
+        match self
+            .registry
+            .to_descriptor_info(descriptor_id)?
+            .to_product_descriptor()?
+        {
+            ProductDescriptor::Python(d) => init_project_python(self, &d).await?,
+            ProductDescriptor::OpenJdk(d) => init_project_openjdk(self, &d).await?,
+        }
 
         Ok(())
     }

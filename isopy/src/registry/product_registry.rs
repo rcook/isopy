@@ -19,19 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use super::descriptor_id::DescriptorId;
 use super::descriptor_info::DescriptorInfo;
-use super::product_descriptor::DescriptorString;
 use super::product_info::ProductInfo;
 use anyhow::anyhow;
 use isopy_lib::{DescriptorParseError, DescriptorParseResult};
 use std::rc::Rc;
 
-#[allow(unused)]
 pub struct ProductRegistry {
     product_infos: Vec<Rc<ProductInfo>>,
 }
 
-#[allow(unused)]
 impl ProductRegistry {
     pub fn new(product_infos: Vec<ProductInfo>) -> Self {
         Self {
@@ -41,9 +39,9 @@ impl ProductRegistry {
 
     pub fn to_descriptor_info(
         &self,
-        descriptor_str: &DescriptorString,
+        descriptor_id: &DescriptorId,
     ) -> DescriptorParseResult<DescriptorInfo> {
-        let s = descriptor_str.as_str();
+        let s = descriptor_id.as_str();
 
         let Some((product_info, tail)) = self.find_product_info(s) else {
             return Err(DescriptorParseError::Other(anyhow!("unsupported descriptor format {s}")));
@@ -70,7 +68,7 @@ impl ProductRegistry {
 #[cfg(test)]
 mod tests {
     use super::{ProductInfo, ProductRegistry};
-    use crate::registry::DescriptorString;
+    use crate::registry::DescriptorId;
     use anyhow::Result;
     use isopy_openjdk::OpenJdk;
     use isopy_python::Python;
@@ -92,8 +90,8 @@ mod tests {
             },
         ]);
 
-        let descriptor_str = input.parse::<DescriptorString>()?;
-        let descriptor_info = registry.to_descriptor_info(&descriptor_str)?;
+        let descriptor_id = input.parse::<DescriptorId>()?;
+        let descriptor_info = registry.to_descriptor_info(&descriptor_id)?;
         assert_eq!(expected_str, descriptor_info.to_string());
         Ok(())
     }

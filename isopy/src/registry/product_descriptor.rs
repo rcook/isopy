@@ -19,57 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
-use anyhow::Error;
+use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use isopy_lib::DescriptorParseError;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::PythonDescriptor;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
-
-#[derive(Clone, Debug)]
-pub struct DescriptorString(String);
-
-impl DescriptorString {
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl FromStr for DescriptorString {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self(String::from(s)))
-    }
-}
-
-impl Display for DescriptorString {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl<'de> Deserialize<'de> for DescriptorString {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        String::deserialize(deserializer)?
-            .parse::<Self>()
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-impl Serialize for DescriptorString {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(&self.0)
-    }
-}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ProductDescriptor {
@@ -80,8 +36,8 @@ pub enum ProductDescriptor {
 impl Display for ProductDescriptor {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            Self::Python(d) => write!(f, "{PYTHON_PRODUCT_VERSION_PREFIX}:{d}"),
-            Self::OpenJdk(d) => write!(f, "{OPENJDK_PRODUCT_VERSION_PREFIX}:{d}"),
+            Self::Python(d) => write!(f, "{PYTHON_DESCRIPTOR_PREFIX}:{d}"),
+            Self::OpenJdk(d) => write!(f, "{OPENJDK_DESCRIPTOR_PREFIX}:{d}"),
         }
     }
 }
@@ -91,10 +47,10 @@ impl FromStr for ProductDescriptor {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s.split_once(':') {
-            Some((prefix, suffix)) if prefix == PYTHON_PRODUCT_VERSION_PREFIX => {
+            Some((prefix, suffix)) if prefix == PYTHON_DESCRIPTOR_PREFIX => {
                 Self::Python(suffix.parse::<PythonDescriptor>()?)
             }
-            Some((prefix, suffix)) if prefix == OPENJDK_PRODUCT_VERSION_PREFIX => {
+            Some((prefix, suffix)) if prefix == OPENJDK_DESCRIPTOR_PREFIX => {
                 Self::OpenJdk(suffix.parse::<OpenJdkDescriptor>()?)
             }
             _ => Self::Python(s.parse::<PythonDescriptor>()?),
