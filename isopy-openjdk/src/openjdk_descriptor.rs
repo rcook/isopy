@@ -19,32 +19,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::Descriptor;
+use crate::openjdk_version::OpenJdkVersion;
+use anyhow::anyhow;
+use isopy_lib::{Descriptor, DescriptorParseError};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
-use thiserror::Error;
 
-#[derive(Debug, Error)]
-pub enum OpenJdkDescriptorParseError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type OpenJdkDescriptorParseResult<T> = StdResult<T, OpenJdkDescriptorParseError>;
-
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct OpenJdkDescriptor {
-    version: String,
+    pub version: OpenJdkVersion,
 }
 
 impl FromStr for OpenJdkDescriptor {
-    type Err = OpenJdkDescriptorParseError;
+    type Err = DescriptorParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self {
-            version: String::from(s),
-        })
+        s.parse::<OpenJdkVersion>()
+            .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+            .map(|version| OpenJdkDescriptor { version })
     }
 }
 

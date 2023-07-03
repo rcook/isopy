@@ -36,15 +36,11 @@
 mod maven_version_range;
 mod openjdk;
 mod openjdk_descriptor;
-mod openjdk_product_descriptor;
 mod openjdk_version;
 
 pub use self::maven_version_range::{MavenVersionLimit, MavenVersionRange, MavenVersionValue};
 pub use self::openjdk::OpenJdk;
-pub use self::openjdk_descriptor::{
-    OpenJdkDescriptor, OpenJdkDescriptorParseError, OpenJdkDescriptorParseResult,
-};
-pub use self::openjdk_product_descriptor::OpenJdkProductDescriptor;
+pub use self::openjdk_descriptor::OpenJdkDescriptor;
 pub use self::openjdk_version::{
     OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
 };

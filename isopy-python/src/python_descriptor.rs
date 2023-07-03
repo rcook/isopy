@@ -19,39 +19,75 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::Descriptor;
+use crate::python_version::PythonVersion;
+use crate::tag::Tag;
+use anyhow::anyhow;
+use isopy_lib::{Descriptor, DescriptorParseError};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
-use thiserror::Error;
 
-#[derive(Debug, Error)]
-pub enum PythonDescriptorParseError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type PythonDescriptorParseResult<T> = StdResult<T, PythonDescriptorParseError>;
-
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PythonDescriptor {
-    version: String,
+    pub version: PythonVersion,
+    pub tag: Option<Tag>,
 }
 
 impl FromStr for PythonDescriptor {
-    type Err = PythonDescriptorParseError;
+    type Err = DescriptorParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self {
-            version: String::from(s),
-        })
+        match s.split_once(':') {
+            Some((prefix, suffix)) => prefix
+                .parse::<PythonVersion>()
+                .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+                .and_then(|version| {
+                    suffix
+                        .parse::<Tag>()
+                        .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+                        .map(|tag| PythonDescriptor {
+                            version,
+                            tag: Some(tag),
+                        })
+                }),
+            None => s
+                .parse::<PythonVersion>()
+                .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+                .map(|version| PythonDescriptor { version, tag: None }),
+        }
     }
 }
 
 impl Display for PythonDescriptor {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.version)
+        match self.tag.as_ref() {
+            Some(tag) => write!(f, "{}:{tag}", self.version),
+            None => write!(f, "{}", self.version),
+        }
     }
 }
 
 impl Descriptor for PythonDescriptor {}
+
+#[cfg(test)]
+mod tests {
+    use super::PythonDescriptor;
+    use crate::PythonVersion;
+    use anyhow::Result;
+
+    #[test]
+    fn basics() -> Result<()> {
+        let descriptor = "3.11.1:20230702".parse::<PythonDescriptor>()?;
+        assert_eq!(PythonVersion::new(3, 11, 1), descriptor.version);
+        assert_eq!("20230702", descriptor.tag.unwrap().as_str());
+        Ok(())
+    }
+
+    #[test]
+    fn basics_no_tag() -> Result<()> {
+        let descriptor = "3.11.2".parse::<PythonDescriptor>()?;
+        assert_eq!(PythonVersion::new(3, 11, 2), descriptor.version);
+        assert!(descriptor.tag.is_none());
+        Ok(())
+    }
+}

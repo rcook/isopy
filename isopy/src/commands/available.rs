@@ -30,8 +30,8 @@ use crate::python::{Asset, AssetFilter};
 use crate::status::Status;
 use anyhow::{anyhow, Result};
 use colored::Colorize;
-use isopy_openjdk::OpenJdkProductDescriptor;
-use isopy_python::PythonProductDescriptor;
+use isopy_openjdk::OpenJdkDescriptor;
+use isopy_python::PythonDescriptor;
 use std::cmp::Ordering;
 
 pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<Status> {
@@ -72,7 +72,7 @@ async fn show_openjdk_index(app: &App) -> Result<()> {
     );
 
     for version in &manager.read_versions().await? {
-        let product_descriptor = ProductDescriptor::OpenJdk(OpenJdkProductDescriptor {
+        let product_descriptor = ProductDescriptor::OpenJdk(OpenJdkDescriptor {
             version: version.openjdk_version.clone(),
         });
 
@@ -125,7 +125,7 @@ fn show_available_downloads(app: &App) -> Result<()> {
     assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {
-        let product_descriptor = ProductDescriptor::Python(PythonProductDescriptor {
+        let product_descriptor = ProductDescriptor::Python(PythonDescriptor {
             version: asset.meta.version.clone(),
             tag: Some(asset.tag.clone()),
         });

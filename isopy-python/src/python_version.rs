@@ -19,10 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error};
+use anyhow::anyhow;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum PythonVersionParseError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type PythonVersionParseResult<T> = StdResult<T, PythonVersionParseError>;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct PythonVersion {
@@ -50,17 +60,20 @@ impl PythonVersion {
 }
 
 impl FromStr for PythonVersion {
-    type Err = Error;
+    type Err = PythonVersionParseError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let parts = s.split('.').collect::<Vec<_>>();
         if parts.len() != 3 {
-            bail!("invalid version \"{}\"", s)
+            return Err(PythonVersionParseError::Other(anyhow!(
+                "invalid version \"{}\"",
+                s
+            )));
         }
 
-        let major = parts[0].parse()?;
-        let minor = parts[1].parse()?;
-        let build = parts[2].parse()?;
+        let major = parts[0].parse::<i32>().map_err(|e| anyhow!(e))?;
+        let minor = parts[1].parse::<i32>().map_err(|e| anyhow!(e))?;
+        let build = parts[2].parse::<i32>().map_err(|e| anyhow!(e))?;
 
         Ok(Self::new(major, minor, build))
     }
@@ -98,11 +111,16 @@ mod tests {
     use anyhow::Result;
 
     #[test]
-    fn test_parse() -> Result<()> {
+    fn parse() -> Result<()> {
         assert_eq!(
             PythonVersion::new(1, 2, 3),
             "1.2.3".parse::<PythonVersion>()?
         );
         Ok(())
+    }
+
+    #[test]
+    fn parse_error() {
+        assert!("xyz.2.3".parse::<PythonVersion>().is_err());
     }
 }

@@ -35,14 +35,10 @@
 #![allow(clippy::option_if_let_else)]
 mod python;
 mod python_descriptor;
-mod python_product_descriptor;
 mod python_version;
 mod tag;
 
 pub use self::python::Python;
-pub use self::python_descriptor::{
-    PythonDescriptor, PythonDescriptorParseError, PythonDescriptorParseResult,
-};
-pub use self::python_product_descriptor::PythonProductDescriptor;
-pub use self::python_version::PythonVersion;
+pub use self::python_descriptor::PythonDescriptor;
+pub use self::python_version::{PythonVersion, PythonVersionParseError, PythonVersionParseResult};
 pub use self::tag::{option_tag, Tag};

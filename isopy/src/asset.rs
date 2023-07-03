@@ -24,14 +24,14 @@ use crate::checksum::validate_sha256_checksum;
 use crate::download::download_stream;
 use crate::python::{Asset, AssetFilter};
 use anyhow::{anyhow, bail, Result};
-use isopy_python::{PythonProductDescriptor, Tag};
+use isopy_python::{PythonDescriptor, Tag};
 use log::info;
 use std::fs::remove_file;
 use std::path::PathBuf;
 
 pub fn get_asset<'a>(
     assets: &'a [Asset],
-    product_descriptor: &PythonProductDescriptor,
+    product_descriptor: &PythonDescriptor,
 ) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(product_descriptor.version.clone());

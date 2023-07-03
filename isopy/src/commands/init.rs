@@ -26,7 +26,7 @@ use crate::serialization::{EnvRec, OpenJdkEnvRec};
 use crate::status::Status;
 use crate::unpack::{unpack_file, UnpackPathTransform};
 use anyhow::{bail, Result};
-use isopy_openjdk::OpenJdkProductDescriptor;
+use isopy_openjdk::OpenJdkDescriptor;
 use joatmon::safe_write_file;
 use std::path::{Path, PathBuf};
 
@@ -43,7 +43,7 @@ pub async fn do_init(app: &App, product_descriptor: &ProductDescriptor) -> Resul
     Ok(Status::OK)
 }
 
-async fn do_init_openjdk(app: &App, product_descriptor: &OpenJdkProductDescriptor) -> Result<()> {
+async fn do_init_openjdk(app: &App, product_descriptor: &OpenJdkDescriptor) -> Result<()> {
     struct ReplacePrefixPathTransform;
 
     impl UnpackPathTransform for ReplacePrefixPathTransform {

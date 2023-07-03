@@ -23,7 +23,7 @@ use crate::constants::PYTHON_VERSION_FILE_NAME;
 use crate::serialization::PythonVersionRec;
 use crate::{app::App, status::Status};
 use anyhow::{bail, Result};
-use isopy_python::PythonProductDescriptor;
+use isopy_python::PythonDescriptor;
 use joatmon::read_yaml_file;
 
 pub async fn do_init_config(app: App) -> Result<Status> {
@@ -38,7 +38,7 @@ pub async fn do_init_config(app: App) -> Result<Status> {
 
     let rec = read_yaml_file::<PythonVersionRec>(&config_path)?;
 
-    app.init_project(&PythonProductDescriptor {
+    app.init_project(&PythonDescriptor {
         version: rec.version,
         tag: rec.tag,
     })

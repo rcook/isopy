@@ -25,8 +25,8 @@ use crate::product_descriptor::ProductDescriptor;
 use crate::serialization::{OpenJdkVersionRec, PythonVersionRec};
 use crate::status::Status;
 use anyhow::Result;
-use isopy_openjdk::OpenJdkProductDescriptor;
-use isopy_python::PythonProductDescriptor;
+use isopy_openjdk::OpenJdkDescriptor;
+use isopy_python::PythonDescriptor;
 use joatmon::safe_write_file;
 
 pub fn do_gen_config(
@@ -46,7 +46,7 @@ pub fn do_gen_config(
 
 fn do_gen_config_python(
     app: &App,
-    product_descriptor: &PythonProductDescriptor,
+    product_descriptor: &PythonDescriptor,
     force: bool,
 ) -> Result<()> {
     Ok(safe_write_file(
@@ -61,7 +61,7 @@ fn do_gen_config_python(
 
 fn do_gen_config_openjdk(
     app: &App,
-    product_description: &OpenJdkProductDescriptor,
+    product_description: &OpenJdkDescriptor,
     force: bool,
 ) -> Result<()> {
     Ok(safe_write_file(

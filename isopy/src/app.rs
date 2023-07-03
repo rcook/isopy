@@ -35,8 +35,8 @@ use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec}
 use crate::unpack::{unpack_file, NoOpUnpackPathTransform};
 use crate::url::dir_url;
 use anyhow::{bail, Result};
-use isopy_openjdk::OpenJdkProductDescriptor;
-use isopy_python::PythonProductDescriptor;
+use isopy_openjdk::OpenJdkDescriptor;
+use isopy_python::PythonDescriptor;
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
 use log::info;
@@ -60,14 +60,11 @@ impl App {
         Self { cwd, repo }
     }
 
-    pub async fn download_python(
-        &self,
-        product_descriptor: &PythonProductDescriptor,
-    ) -> Result<()> {
+    pub async fn download_python(&self, product_descriptor: &PythonDescriptor) -> Result<()> {
         let assets = self.read_assets()?;
         let asset = get_asset(
             &assets,
-            &PythonProductDescriptor {
+            &PythonDescriptor {
                 version: product_descriptor.version.clone(),
                 tag: product_descriptor.tag.clone(),
             },
@@ -78,7 +75,7 @@ impl App {
 
     pub async fn download_openjdk(
         &self,
-        product_descriptor: &OpenJdkProductDescriptor,
+        product_descriptor: &OpenJdkDescriptor,
     ) -> Result<PathBuf> {
         let manager = AdoptiumIndexManager::new(
             &ADOPTIUM_SERVER_URL,
@@ -225,7 +222,7 @@ impl App {
         Ok(assets)
     }
 
-    pub async fn init_project(&self, product_descriptor: &PythonProductDescriptor) -> Result<()> {
+    pub async fn init_project(&self, product_descriptor: &PythonDescriptor) -> Result<()> {
         let assets = self.read_assets()?;
         let asset = get_asset(&assets, product_descriptor)?;
 
