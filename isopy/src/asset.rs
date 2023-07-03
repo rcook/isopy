@@ -29,20 +29,17 @@ use log::info;
 use std::fs::remove_file;
 use std::path::PathBuf;
 
-pub fn get_asset<'a>(
-    assets: &'a [Asset],
-    product_descriptor: &PythonDescriptor,
-) -> Result<&'a Asset> {
+pub fn get_asset<'a>(assets: &'a [Asset], descriptor: &PythonDescriptor) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
-    asset_filter.version = Some(product_descriptor.version.clone());
-    asset_filter.tag = product_descriptor.tag.clone();
+    asset_filter.version = Some(descriptor.version.clone());
+    asset_filter.tag = descriptor.tag.clone();
     let matching_assets = asset_filter.filter(assets.iter());
 
     if matching_assets.len() > 1 {
         bail!(
             "More than one asset matching version {} and tag {}",
-            product_descriptor.version,
-            product_descriptor
+            descriptor.version,
+            descriptor
                 .tag
                 .as_ref()
                 .map_or_else(|| String::from("(none)"), Tag::to_string)
@@ -55,8 +52,8 @@ pub fn get_asset<'a>(
 
     bail!(
         "No asset matching version {} and tag {}",
-        product_descriptor.version,
-        product_descriptor
+        descriptor.version,
+        descriptor
             .tag
             .as_ref()
             .map_or_else(|| String::from("(none)"), Tag::to_string)

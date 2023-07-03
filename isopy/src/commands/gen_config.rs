@@ -44,30 +44,22 @@ pub fn do_gen_config(
     Ok(Status::OK)
 }
 
-fn do_gen_config_python(
-    app: &App,
-    product_descriptor: &PythonDescriptor,
-    force: bool,
-) -> Result<()> {
+fn do_gen_config_python(app: &App, descriptor: &PythonDescriptor, force: bool) -> Result<()> {
     Ok(safe_write_file(
         &app.cwd.join(PYTHON_VERSION_FILE_NAME),
         serde_yaml::to_string(&PythonVersionRec {
-            version: product_descriptor.version.clone(),
-            tag: product_descriptor.tag.clone(),
+            version: descriptor.version.clone(),
+            tag: descriptor.tag.clone(),
         })?,
         force,
     )?)
 }
 
-fn do_gen_config_openjdk(
-    app: &App,
-    product_description: &OpenJdkDescriptor,
-    force: bool,
-) -> Result<()> {
+fn do_gen_config_openjdk(app: &App, descriptor: &OpenJdkDescriptor, force: bool) -> Result<()> {
     Ok(safe_write_file(
         &app.cwd.join(OPENJDK_VERSION_FILE_NAME),
         serde_yaml::to_string(&OpenJdkVersionRec {
-            version: product_description.version.clone(),
+            version: descriptor.version.clone(),
         })?,
         force,
     )?)

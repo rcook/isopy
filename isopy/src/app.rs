@@ -60,23 +60,20 @@ impl App {
         Self { cwd, repo }
     }
 
-    pub async fn download_python(&self, product_descriptor: &PythonDescriptor) -> Result<()> {
+    pub async fn download_python(&self, descriptor: &PythonDescriptor) -> Result<()> {
         let assets = self.read_assets()?;
         let asset = get_asset(
             &assets,
             &PythonDescriptor {
-                version: product_descriptor.version.clone(),
-                tag: product_descriptor.tag.clone(),
+                version: descriptor.version.clone(),
+                tag: descriptor.tag.clone(),
             },
         )?;
         download_asset(self, asset).await?;
         Ok(())
     }
 
-    pub async fn download_openjdk(
-        &self,
-        product_descriptor: &OpenJdkDescriptor,
-    ) -> Result<PathBuf> {
+    pub async fn download_openjdk(&self, descriptor: &OpenJdkDescriptor) -> Result<PathBuf> {
         let manager = AdoptiumIndexManager::new(
             &ADOPTIUM_SERVER_URL,
             &self.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
@@ -85,8 +82,8 @@ impl App {
         let versions = manager.read_versions().await?;
         let Some(version) = versions
             .iter()
-            .find(|x| x.openjdk_version == product_descriptor.version) else {
-            bail!("no version matching {}", product_descriptor.version);
+            .find(|x| x.openjdk_version == descriptor.version) else {
+            bail!("no version matching {}", descriptor.version);
         };
 
         let output_path = self.repo.shared_dir().join(&version.file_name);
@@ -222,9 +219,9 @@ impl App {
         Ok(assets)
     }
 
-    pub async fn init_project(&self, product_descriptor: &PythonDescriptor) -> Result<()> {
+    pub async fn init_project(&self, descriptor: &PythonDescriptor) -> Result<()> {
         let assets = self.read_assets()?;
-        let asset = get_asset(&assets, product_descriptor)?;
+        let asset = get_asset(&assets, descriptor)?;
 
         let mut asset_path = self.make_asset_path(asset);
         if !asset_path.is_file() {

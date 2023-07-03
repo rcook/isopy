@@ -43,7 +43,7 @@ pub async fn do_init(app: &App, product_descriptor: &ProductDescriptor) -> Resul
     Ok(Status::OK)
 }
 
-async fn do_init_openjdk(app: &App, product_descriptor: &OpenJdkDescriptor) -> Result<()> {
+async fn do_init_openjdk(app: &App, descriptor: &OpenJdkDescriptor) -> Result<()> {
     struct ReplacePrefixPathTransform;
 
     impl UnpackPathTransform for ReplacePrefixPathTransform {
@@ -61,7 +61,7 @@ async fn do_init_openjdk(app: &App, product_descriptor: &OpenJdkDescriptor) -> R
         )
     };
 
-    let asset_path = app.download_openjdk(product_descriptor).await?;
+    let asset_path = app.download_openjdk(descriptor).await?;
 
     unpack_file::<ReplacePrefixPathTransform>(&asset_path, dir_info.data_dir())?;
 
@@ -72,7 +72,7 @@ async fn do_init_openjdk(app: &App, product_descriptor: &OpenJdkDescriptor) -> R
             python: None,
             openjdk: Some(OpenJdkEnvRec {
                 dir: PathBuf::from("jdk"),
-                version: product_descriptor.version.clone(),
+                version: descriptor.version.clone(),
             }),
         })?,
         false,
