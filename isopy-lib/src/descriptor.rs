@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use std::fmt::{Debug, Display};
+use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use thiserror::Error;
 
@@ -31,4 +32,6 @@ pub enum DescriptorParseError {
 
 pub type DescriptorParseResult<T> = StdResult<T, DescriptorParseError>;
 
-pub trait Descriptor: Debug + Display {}
+pub trait Descriptor: Debug + Display {
+    fn transform_archive_path(&self, path: &Path) -> PathBuf;
+}

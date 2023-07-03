@@ -34,7 +34,7 @@ use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::repository_name::RepositoryName;
 use crate::serialization::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::unpack::{unpack_file, NoOpUnpackPathTransform, UnpackPathTransform};
+use crate::unpack::unpack_file;
 use crate::url::dir_url;
 use anyhow::{bail, Result};
 use isopy_openjdk::{OpenJdk, OpenJdkDescriptor};
@@ -252,7 +252,7 @@ impl App {
                 )
             };
 
-            unpack_file::<NoOpUnpackPathTransform>(&asset_path, dir_info.data_dir())?;
+            unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
             safe_write_file(
                 &dir_info.data_dir().join(ENV_FILE_NAME),
@@ -272,16 +272,6 @@ impl App {
         }
 
         async fn init_project_openjdk(app: &App, descriptor: &OpenJdkDescriptor) -> Result<()> {
-            struct ReplacePrefixPathTransform;
-
-            impl UnpackPathTransform for ReplacePrefixPathTransform {
-                fn transform_path(path: &Path) -> PathBuf {
-                    let mut i = path.iter();
-                    _ = i.next();
-                    Path::new("jdk").join(i)
-                }
-            }
-
             let Some(dir_info) = app.repo.init(&app.cwd)? else {
                 bail!(
                     "Could not initialize metadirectory for directory {}",
@@ -291,7 +281,7 @@ impl App {
 
             let asset_path = app.download_openjdk(descriptor).await?;
 
-            unpack_file::<ReplacePrefixPathTransform>(&asset_path, dir_info.data_dir())?;
+            unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
             safe_write_file(
                 &dir_info.data_dir().join(ENV_FILE_NAME),

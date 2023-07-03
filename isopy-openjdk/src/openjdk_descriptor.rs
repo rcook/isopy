@@ -23,6 +23,7 @@ use crate::openjdk_version::OpenJdkVersion;
 use anyhow::anyhow;
 use isopy_lib::{Descriptor, DescriptorParseError};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
@@ -47,4 +48,10 @@ impl Display for OpenJdkDescriptor {
     }
 }
 
-impl Descriptor for OpenJdkDescriptor {}
+impl Descriptor for OpenJdkDescriptor {
+    fn transform_archive_path(&self, path: &Path) -> PathBuf {
+        let mut i = path.iter();
+        _ = i.next();
+        Path::new("jdk").join(i)
+    }
+}

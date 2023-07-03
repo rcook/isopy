@@ -21,27 +21,16 @@
 //
 use anyhow::{anyhow, Result};
 use flate2::read::GzDecoder;
+use isopy_lib::Descriptor;
 use joat_logger::{begin_operation, OpProgress};
 use joatmon::open_file;
 use std::fs::{create_dir_all, File};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use tar::{Archive, Entry};
 
-pub trait UnpackPathTransform {
-    fn transform_path(path: &Path) -> PathBuf;
-}
-
-pub struct NoOpUnpackPathTransform;
-
-impl UnpackPathTransform for NoOpUnpackPathTransform {
-    fn transform_path(path: &Path) -> PathBuf {
-        path.to_path_buf()
-    }
-}
-
-pub fn unpack_file<T>(path: &Path, dir: &Path) -> Result<()>
+pub fn unpack_file<D>(descriptor: &D, path: &Path, dir: &Path) -> Result<()>
 where
-    T: UnpackPathTransform,
+    D: Descriptor,
 {
     fn unpack_entry(entry: &mut Entry<GzDecoder<File>>, path: &Path) -> Result<()> {
         let dir = path
@@ -71,7 +60,7 @@ where
         .filter_map(std::result::Result::ok)
         .enumerate()
     {
-        let rel_path = T::transform_path(&entry.path()?);
+        let rel_path = descriptor.transform_archive_path(&entry.path()?);
         let path = dir.join(rel_path);
         unpack_entry(&mut entry, &path)?;
         op.set_progress(idx as OpProgress);

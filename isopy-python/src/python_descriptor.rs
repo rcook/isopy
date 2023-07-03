@@ -24,6 +24,7 @@ use crate::tag::Tag;
 use anyhow::anyhow;
 use isopy_lib::{Descriptor, DescriptorParseError};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
@@ -67,7 +68,11 @@ impl Display for PythonDescriptor {
     }
 }
 
-impl Descriptor for PythonDescriptor {}
+impl Descriptor for PythonDescriptor {
+    fn transform_archive_path(&self, path: &Path) -> PathBuf {
+        path.to_path_buf()
+    }
+}
 
 #[cfg(test)]
 mod tests {
