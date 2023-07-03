@@ -22,7 +22,8 @@
 use crate::python_version::PythonVersion;
 use crate::tag::Tag;
 use anyhow::anyhow;
-use isopy_lib::{Descriptor, DescriptorParseError};
+use isopy_lib::{Descriptor, GetConfigValueError, GetConfigValueResult, ParseDescriptorError};
+use serde::Serialize;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -35,17 +36,17 @@ pub struct PythonDescriptor {
 }
 
 impl FromStr for PythonDescriptor {
-    type Err = DescriptorParseError;
+    type Err = ParseDescriptorError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match s.split_once(':') {
             Some((prefix, suffix)) => prefix
                 .parse::<PythonVersion>()
-                .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
                 .and_then(|version| {
                     suffix
                         .parse::<Tag>()
-                        .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+                        .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
                         .map(|tag| Self {
                             version,
                             tag: Some(tag),
@@ -53,7 +54,7 @@ impl FromStr for PythonDescriptor {
                 }),
             None => s
                 .parse::<PythonVersion>()
-                .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
                 .map(|version| Self { version, tag: None }),
         }
     }
@@ -71,6 +72,27 @@ impl Display for PythonDescriptor {
 impl Descriptor for PythonDescriptor {
     fn transform_archive_path(&self, path: &Path) -> PathBuf {
         path.to_path_buf()
+    }
+
+    fn get_config_value(&self) -> GetConfigValueResult<serde_json::Value> {
+        #[derive(Serialize)]
+        struct EnvRec {
+            #[serde(rename = "dir")]
+            dir: PathBuf,
+
+            #[serde(rename = "version")]
+            version: PythonVersion,
+
+            #[serde(rename = "tag", skip_serializing_if = "Option::is_none")]
+            tag: Option<Tag>,
+        }
+
+        serde_json::to_value(EnvRec {
+            dir: PathBuf::from("python"),
+            version: self.version.clone(),
+            tag: self.tag.clone(),
+        })
+        .map_err(|e| GetConfigValueError::Other(anyhow!(e)))
     }
 }
 

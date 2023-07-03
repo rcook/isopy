@@ -36,5 +36,5 @@
 mod descriptor;
 mod product;
 
-pub use self::descriptor::{Descriptor, DescriptorParseError, DescriptorParseResult};
-pub use self::product::Product;
+pub use self::descriptor::{Descriptor, GetConfigValueError, GetConfigValueResult};
+pub use self::product::{ParseDescriptorError, ParseDescriptorResult, Product};

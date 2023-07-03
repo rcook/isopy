@@ -33,7 +33,7 @@ mod repositories_rec;
 mod repository_rec;
 
 pub use self::asset_rec::AssetRec;
-pub use self::env_rec::EnvRec;
+pub use self::env_rec::{EnvRec, PackageDirRec};
 pub use self::index_rec::IndexRec;
 pub use self::openjdk_env_rec::OpenJdkEnvRec;
 pub use self::openjdk_version_rec::OpenJdkVersionRec;

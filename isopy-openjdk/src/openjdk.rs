@@ -21,7 +21,7 @@
 //
 use crate::openjdk_descriptor::OpenJdkDescriptor;
 use anyhow::anyhow;
-use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
+use isopy_lib::{Descriptor, ParseDescriptorError, ParseDescriptorResult, Product};
 
 const NAME: &str = "OpenJDK";
 
@@ -38,10 +38,10 @@ impl Product for OpenJdk {
         NAME
     }
 
-    fn parse_descriptor(&self, s: &str) -> DescriptorParseResult<Box<dyn Descriptor>> {
+    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
         Ok(Box::new(
             s.parse::<OpenJdkDescriptor>()
-                .map_err(|e| DescriptorParseError::Other(anyhow!(e)))?,
+                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))?,
         ))
     }
 }

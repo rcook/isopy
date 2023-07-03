@@ -34,4 +34,16 @@ pub struct EnvRec {
 
     #[serde(rename = "openjdk", skip_serializing_if = "Option::is_none")]
     pub openjdk: Option<OpenJdkEnvRec>,
+
+    #[serde(rename = "package_dirs")]
+    pub package_dirs: Vec<PackageDirRec>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PackageDirRec {
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(flatten)]
+    pub properties: serde_json::Value,
 }

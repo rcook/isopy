@@ -21,7 +21,8 @@
 //
 use crate::openjdk_version::OpenJdkVersion;
 use anyhow::anyhow;
-use isopy_lib::{Descriptor, DescriptorParseError};
+use isopy_lib::{Descriptor, GetConfigValueError, GetConfigValueResult, ParseDescriptorError};
+use serde::Serialize;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -33,11 +34,11 @@ pub struct OpenJdkDescriptor {
 }
 
 impl FromStr for OpenJdkDescriptor {
-    type Err = DescriptorParseError;
+    type Err = ParseDescriptorError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         s.parse::<OpenJdkVersion>()
-            .map_err(|e| DescriptorParseError::Other(anyhow!(e)))
+            .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
             .map(|version| Self { version })
     }
 }
@@ -53,5 +54,22 @@ impl Descriptor for OpenJdkDescriptor {
         let mut i = path.iter();
         _ = i.next();
         Path::new("jdk").join(i)
+    }
+
+    fn get_config_value(&self) -> GetConfigValueResult<serde_json::Value> {
+        #[derive(Serialize)]
+        struct EnvRec {
+            #[serde(rename = "dir")]
+            dir: PathBuf,
+
+            #[serde(rename = "version")]
+            version: OpenJdkVersion,
+        }
+
+        serde_json::to_value(EnvRec {
+            dir: PathBuf::from("openjdk"),
+            version: self.version.clone(),
+        })
+        .map_err(|e| GetConfigValueError::Other(anyhow!(e)))
     }
 }

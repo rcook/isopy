@@ -28,10 +28,7 @@ use std::fs::{create_dir_all, File};
 use std::path::Path;
 use tar::{Archive, Entry};
 
-pub fn unpack_file<D>(descriptor: &D, path: &Path, dir: &Path) -> Result<()>
-where
-    D: Descriptor,
-{
+pub fn unpack_file(descriptor: &dyn Descriptor, path: &Path, dir: &Path) -> Result<()> {
     fn unpack_entry(entry: &mut Entry<GzDecoder<File>>, path: &Path) -> Result<()> {
         let dir = path
             .parent()

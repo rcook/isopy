@@ -19,9 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor::{Descriptor, DescriptorParseResult};
+use crate::descriptor::Descriptor;
+use std::result::Result as StdResult;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum ParseDescriptorError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type ParseDescriptorResult<T> = StdResult<T, ParseDescriptorError>;
 
 pub trait Product {
     fn name(&self) -> &str;
-    fn parse_descriptor(&self, s: &str) -> DescriptorParseResult<Box<dyn Descriptor>>;
+    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>>;
 }

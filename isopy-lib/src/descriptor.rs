@@ -25,13 +25,14 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum DescriptorParseError {
+pub enum GetConfigValueError {
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 
-pub type DescriptorParseResult<T> = StdResult<T, DescriptorParseError>;
+pub type GetConfigValueResult<T> = StdResult<T, GetConfigValueError>;
 
 pub trait Descriptor: Debug + Display {
     fn transform_archive_path(&self, path: &Path) -> PathBuf;
+    fn get_config_value(&self) -> GetConfigValueResult<serde_json::Value>;
 }

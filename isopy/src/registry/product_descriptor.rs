@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use isopy_lib::DescriptorParseError;
+use isopy_lib::ParseDescriptorError;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::PythonDescriptor;
 use serde::Deserialize;
@@ -43,7 +43,7 @@ impl Display for ProductDescriptor {
 }
 
 impl FromStr for ProductDescriptor {
-    type Err = DescriptorParseError;
+    type Err = ParseDescriptorError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s.split_once(':') {

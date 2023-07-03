@@ -32,11 +32,12 @@ use crate::python::{Asset, AssetMeta};
 use crate::registry::{DescriptorId, ProductDescriptor, ProductInfo, ProductRegistry};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::repository_name::RepositoryName;
-use crate::serialization::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
+use crate::serialization::{EnvRec, PackageDirRec};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
 use crate::unpack::unpack_file;
 use crate::url::dir_url;
 use anyhow::{bail, Result};
+use isopy_lib::Descriptor;
 use isopy_openjdk::{OpenJdk, OpenJdkDescriptor};
 use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
@@ -236,7 +237,10 @@ impl App {
     }
 
     pub async fn init_project(&self, descriptor_id: &DescriptorId) -> Result<()> {
-        async fn init_project_python(app: &App, descriptor: &PythonDescriptor) -> Result<()> {
+        async fn download_python_asset(
+            app: &App,
+            descriptor: &PythonDescriptor,
+        ) -> Result<PathBuf> {
             let assets = app.read_assets()?;
             let asset = get_asset(&assets, descriptor)?;
 
@@ -245,69 +249,51 @@ impl App {
                 asset_path = download_asset(app, asset).await?;
             }
 
-            let Some(dir_info) = app.repo.init(&app.cwd)? else {
-                bail!(
-                    "Could not initialize metadirectory for directory {}",
-                    app.cwd.display()
-                )
-            };
-
-            unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
-
-            safe_write_file(
-                &dir_info.data_dir().join(ENV_FILE_NAME),
-                serde_yaml::to_string(&EnvRec {
-                    config_path: app.cwd.clone(),
-                    python: Some(PythonEnvRec {
-                        dir: PathBuf::from("python"),
-                        version: asset.meta.version.clone(),
-                        tag: asset.tag.clone(),
-                    }),
-                    openjdk: None,
-                })?,
-                false,
-            )?;
-
-            Ok(())
+            Ok(asset_path)
         }
 
-        async fn init_project_openjdk(app: &App, descriptor: &OpenJdkDescriptor) -> Result<()> {
-            let Some(dir_info) = app.repo.init(&app.cwd)? else {
-                bail!(
-                    "Could not initialize metadirectory for directory {}",
-                    app.cwd.display()
-                )
-            };
-
-            let asset_path = app.download_openjdk(descriptor).await?;
-
-            unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
-
-            safe_write_file(
-                &dir_info.data_dir().join(ENV_FILE_NAME),
-                serde_yaml::to_string(&EnvRec {
-                    config_path: app.cwd.clone(),
-                    python: None,
-                    openjdk: Some(OpenJdkEnvRec {
-                        dir: PathBuf::from("jdk"),
-                        version: descriptor.version.clone(),
-                    }),
-                })?,
-                false,
-            )?;
-
-            Ok(())
+        async fn download_openjdk_asset(
+            app: &App,
+            descriptor: &OpenJdkDescriptor,
+        ) -> Result<PathBuf> {
+            app.download_openjdk(descriptor).await
         }
 
-        // TBD: Nasty hack!
-        match self
-            .registry
-            .to_descriptor_info(descriptor_id)?
-            .to_product_descriptor()?
-        {
-            ProductDescriptor::Python(d) => init_project_python(self, &d).await?,
-            ProductDescriptor::OpenJdk(d) => init_project_openjdk(self, &d).await?,
-        }
+        let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
+        let product_descriptor = descriptor_info.to_product_descriptor()?;
+
+        let d: &dyn Descriptor = match &product_descriptor {
+            ProductDescriptor::Python(d) => d,
+            ProductDescriptor::OpenJdk(d) => d,
+        };
+
+        let asset_path = match &product_descriptor {
+            ProductDescriptor::Python(d) => download_python_asset(self, d).await?,
+            ProductDescriptor::OpenJdk(d) => download_openjdk_asset(self, d).await?,
+        };
+
+        let Some(dir_info) = self.repo.init(&self.cwd)? else {
+            bail!(
+                "Could not initialize metadirectory for directory {}",
+                self.cwd.display()
+            )
+        };
+
+        unpack_file(d, &asset_path, dir_info.data_dir())?;
+
+        safe_write_file(
+            &dir_info.data_dir().join(ENV_FILE_NAME),
+            serde_yaml::to_string(&EnvRec {
+                config_path: self.cwd.clone(),
+                python: None,
+                openjdk: None,
+                package_dirs: vec![PackageDirRec {
+                    id: descriptor_info.product_info.prefix.clone(),
+                    properties: d.get_config_value()?,
+                }],
+            })?,
+            false,
+        )?;
 
         Ok(())
     }

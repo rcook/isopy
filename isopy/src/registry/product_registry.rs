@@ -23,7 +23,7 @@ use super::descriptor_id::DescriptorId;
 use super::descriptor_info::DescriptorInfo;
 use super::product_info::ProductInfo;
 use anyhow::anyhow;
-use isopy_lib::{DescriptorParseError, DescriptorParseResult};
+use isopy_lib::{ParseDescriptorError, ParseDescriptorResult};
 use std::rc::Rc;
 
 pub struct ProductRegistry {
@@ -40,11 +40,11 @@ impl ProductRegistry {
     pub fn to_descriptor_info(
         &self,
         descriptor_id: &DescriptorId,
-    ) -> DescriptorParseResult<DescriptorInfo> {
+    ) -> ParseDescriptorResult<DescriptorInfo> {
         let s = descriptor_id.as_str();
 
         let Some((product_info, tail)) = self.find_product_info(s) else {
-            return Err(DescriptorParseError::Other(anyhow!("unsupported descriptor format {s}")));
+            return Err(ParseDescriptorError::Other(anyhow!("unsupported descriptor format {s}")));
         };
 
         let descriptor = product_info.product.parse_descriptor(tail)?;
