@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::anyhow;
 use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::rc::Rc;
@@ -44,7 +45,7 @@ impl Registry {
 
     fn parse_descriptor(&self, s: &str) -> DescriptorParseResult<DescriptorInfo> {
         let Some((product_info, tail)) = self.find_product_info(s) else {
-            return Err(DescriptorParseError::msg(format!("unsupported descriptor format {s}")));
+            return Err(DescriptorParseError::Other(anyhow!("unsupported descriptor format {s}")));
         };
 
         let descriptor = product_info.product.parse_descriptor(tail)?;

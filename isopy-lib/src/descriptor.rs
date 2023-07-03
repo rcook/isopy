@@ -19,8 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::anyhow;
-use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
 use std::result::Result as StdResult;
 use thiserror::Error;
@@ -29,22 +27,6 @@ use thiserror::Error;
 pub enum DescriptorParseError {
     #[error(transparent)]
     Other(#[from] anyhow::Error),
-}
-
-impl DescriptorParseError {
-    pub fn other<E>(e: E) -> Self
-    where
-        E: StdError + Send + Sync + 'static,
-    {
-        Self::Other(anyhow!(e))
-    }
-
-    pub fn msg<M>(message: M) -> Self
-    where
-        M: Display + Debug + Send + Sync + 'static,
-    {
-        Self::Other(anyhow!(message))
-    }
 }
 
 pub type DescriptorParseResult<T> = StdResult<T, DescriptorParseError>;
