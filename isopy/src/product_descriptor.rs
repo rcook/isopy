@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
-use isopy_lib::{DescriptorParseError, DescriptorParseResult};
+use isopy_lib::DescriptorParseError;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::PythonDescriptor;
 use serde::Deserialize;
@@ -31,16 +31,6 @@ use std::str::FromStr;
 pub enum ProductDescriptor {
     Python(PythonDescriptor),
     OpenJdk(OpenJdkDescriptor),
-}
-
-impl ProductDescriptor {
-    fn from_python_version_str(s: &str) -> DescriptorParseResult<Self> {
-        Ok(Self::Python(s.parse::<PythonDescriptor>()?))
-    }
-
-    fn from_openjdk_version_str(s: &str) -> DescriptorParseResult<Self> {
-        Ok(Self::OpenJdk(s.parse::<OpenJdkDescriptor>()?))
-    }
 }
 
 impl Display for ProductDescriptor {
@@ -56,15 +46,15 @@ impl FromStr for ProductDescriptor {
     type Err = DescriptorParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.split_once(':') {
+        Ok(match s.split_once(':') {
             Some((prefix, suffix)) if prefix == PYTHON_PRODUCT_VERSION_PREFIX => {
-                Self::from_python_version_str(suffix)
+                Self::Python(suffix.parse::<PythonDescriptor>()?)
             }
             Some((prefix, suffix)) if prefix == OPENJDK_PRODUCT_VERSION_PREFIX => {
-                Self::from_openjdk_version_str(suffix)
+                Self::OpenJdk(suffix.parse::<OpenJdkDescriptor>()?)
             }
-            _ => Self::from_python_version_str(s),
-        }
+            _ => Self::OpenJdk(s.parse::<OpenJdkDescriptor>()?),
+        })
     }
 }
 
