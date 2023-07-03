@@ -53,7 +53,7 @@ impl FromStr for ProductDescriptor {
             Some((prefix, suffix)) if prefix == OPENJDK_PRODUCT_VERSION_PREFIX => {
                 Self::OpenJdk(suffix.parse::<OpenJdkDescriptor>()?)
             }
-            _ => Self::OpenJdk(s.parse::<OpenJdkDescriptor>()?),
+            _ => Self::Python(s.parse::<PythonDescriptor>()?),
         })
     }
 }
