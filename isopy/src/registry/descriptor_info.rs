@@ -19,56 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-mod adoptium;
-mod api;
-mod app;
-mod args;
-mod asset;
-mod backtrace;
-mod checksum;
-mod commands;
-mod constants;
-mod download;
-mod link_header;
-mod print;
-mod python;
-mod registry;
-mod repository;
-mod repository_name;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod terminal;
-mod unpack;
-mod url;
+use super::product_descriptor::ProductDescriptor;
+use super::product_info::ProductInfo;
+use isopy_lib::{Descriptor, DescriptorParseResult};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::rc::Rc;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::print::print_error;
-    use crate::run::run;
-    use std::process::exit;
+pub struct DescriptorInfo {
+    pub product_info: Rc<ProductInfo>,
+    pub descriptor: Box<dyn Descriptor>,
+}
 
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{e}"));
-            ERROR
-        }
-    })
+impl DescriptorInfo {
+    pub fn to_product_descriptor(&self) -> DescriptorParseResult<ProductDescriptor> {
+        // Temporary hack: should be replaced with calls into
+        // implementers of Descriptor trait etc.
+        self.descriptor.to_string().parse::<ProductDescriptor>()
+    }
+}
+
+impl Display for DescriptorInfo {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}:{}", self.product_info.prefix, self.descriptor)
+    }
 }

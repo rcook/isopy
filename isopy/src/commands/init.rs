@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
-use crate::product_descriptor::ProductDescriptor;
+use crate::registry::{DescriptorInfo, ProductDescriptor};
 use crate::serialization::{EnvRec, OpenJdkEnvRec};
 use crate::status::Status;
 use crate::unpack::{unpack_file, UnpackPathTransform};
@@ -30,14 +30,14 @@ use isopy_openjdk::OpenJdkDescriptor;
 use joatmon::safe_write_file;
 use std::path::{Path, PathBuf};
 
-pub async fn do_init(app: &App, product_descriptor: &ProductDescriptor) -> Result<Status> {
+pub async fn do_init(app: &App, descriptor_info: &DescriptorInfo) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         bail!("Directory {} already has environment", app.cwd.display())
     }
 
-    match product_descriptor {
-        ProductDescriptor::Python(d) => app.init_project(d).await?,
-        ProductDescriptor::OpenJdk(d) => do_init_openjdk(app, d).await?,
+    match descriptor_info.to_product_descriptor()? {
+        ProductDescriptor::Python(d) => app.init_project(&d).await?,
+        ProductDescriptor::OpenJdk(d) => do_init_openjdk(app, &d).await?,
     }
 
     Ok(Status::OK)

@@ -19,56 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-mod adoptium;
-mod api;
-mod app;
-mod args;
-mod asset;
-mod backtrace;
-mod checksum;
-mod commands;
-mod constants;
-mod download;
-mod link_header;
-mod print;
-mod python;
-mod registry;
-mod repository;
-mod repository_name;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod terminal;
-mod unpack;
-mod url;
+mod descriptor_info;
+mod product_descriptor;
+mod product_info;
+mod product_registry;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::print::print_error;
-    use crate::run::run;
-    use std::process::exit;
-
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{e}"));
-            ERROR
-        }
-    })
-}
+pub use self::descriptor_info::DescriptorInfo;
+pub use self::product_descriptor::{DescriptorString, ProductDescriptor};
+pub use self::product_info::ProductInfo;
+pub use self::product_registry::ProductRegistry;

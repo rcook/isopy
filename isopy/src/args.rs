@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::product_descriptor::ProductDescriptor;
+use crate::registry::DescriptorString;
 use clap::{Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
@@ -90,7 +90,7 @@ pub enum Command {
     #[command(name = "download", about = "Download product")]
     Download {
         #[arg(help = "Python or OpenJDK product descriptor")]
-        product_descriptor: ProductDescriptor,
+        descriptor_str: DescriptorString,
     },
 
     #[command(name = "downloaded", about = "List downloaded Python packages")]
@@ -112,7 +112,7 @@ pub enum Command {
     )]
     GenConfig {
         #[arg(help = "Python or OpenJDK product descriptor")]
-        product_descriptor: ProductDescriptor,
+        descriptor_str: DescriptorString,
 
         #[arg(
             short = 'f',
@@ -128,7 +128,7 @@ pub enum Command {
     #[command(name = "init", about = "Create environment")]
     Init {
         #[arg(help = "Python or OpenJDK product descriptor")]
-        product_descriptor: ProductDescriptor,
+        descriptor_str: DescriptorString,
     },
 
     #[command(

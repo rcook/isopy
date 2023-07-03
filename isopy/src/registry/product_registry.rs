@@ -19,31 +19,32 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use super::descriptor_info::DescriptorInfo;
+use super::product_descriptor::DescriptorString;
+use super::product_info::ProductInfo;
 use anyhow::anyhow;
-use isopy_lib::{Descriptor, DescriptorParseError, DescriptorParseResult, Product};
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use isopy_lib::{DescriptorParseError, DescriptorParseResult};
 use std::rc::Rc;
 
 #[allow(unused)]
-struct ProductInfo {
-    prefix: String,
-    product: Box<dyn Product>,
-}
-
-#[allow(unused)]
-struct Registry {
+pub struct ProductRegistry {
     product_infos: Vec<Rc<ProductInfo>>,
 }
 
 #[allow(unused)]
-impl Registry {
-    fn new(product_infos: Vec<ProductInfo>) -> Self {
+impl ProductRegistry {
+    pub fn new(product_infos: Vec<ProductInfo>) -> Self {
         Self {
             product_infos: product_infos.into_iter().map(Rc::new).collect::<Vec<_>>(),
         }
     }
 
-    fn parse_descriptor(&self, s: &str) -> DescriptorParseResult<DescriptorInfo> {
+    pub fn to_descriptor_info(
+        &self,
+        descriptor_str: &DescriptorString,
+    ) -> DescriptorParseResult<DescriptorInfo> {
+        let s = descriptor_str.as_str();
+
         let Some((product_info, tail)) = self.find_product_info(s) else {
             return Err(DescriptorParseError::Other(anyhow!("unsupported descriptor format {s}")));
         };
@@ -66,20 +67,10 @@ impl Registry {
     }
 }
 
-struct DescriptorInfo {
-    product_info: Rc<ProductInfo>,
-    descriptor: Box<dyn Descriptor>,
-}
-
-impl Display for DescriptorInfo {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}:{}", self.product_info.prefix, self.descriptor)
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{ProductInfo, Registry};
+    use super::{ProductInfo, ProductRegistry};
+    use crate::registry::DescriptorString;
     use anyhow::Result;
     use isopy_openjdk::OpenJdk;
     use isopy_python::Python;
@@ -89,8 +80,8 @@ mod tests {
     #[case("python:1.2.3:11223344", "1.2.3:11223344")]
     #[case("python:1.2.3:11223344", "python:1.2.3:11223344")]
     #[case("openjdk:19.0.1+10", "openjdk:19.0.1+10")]
-    fn parse_descriptor(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
-        let registry = Registry::new(vec![
+    fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
+        let registry = ProductRegistry::new(vec![
             ProductInfo {
                 prefix: String::from("python"),
                 product: Box::<Python>::default(),
@@ -101,7 +92,8 @@ mod tests {
             },
         ]);
 
-        let descriptor_info = registry.parse_descriptor(input)?;
+        let descriptor_str = input.parse::<DescriptorString>()?;
+        let descriptor_info = registry.to_descriptor_info(&descriptor_str)?;
         assert_eq!(expected_str, descriptor_info.to_string());
         Ok(())
     }

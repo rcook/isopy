@@ -20,12 +20,56 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{OPENJDK_PRODUCT_VERSION_PREFIX, PYTHON_PRODUCT_VERSION_PREFIX};
+use anyhow::Error;
 use isopy_lib::DescriptorParseError;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::PythonDescriptor;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
+
+#[derive(Clone, Debug)]
+pub struct DescriptorString(String);
+
+impl DescriptorString {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl FromStr for DescriptorString {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(String::from(s)))
+    }
+}
+
+impl Display for DescriptorString {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl<'de> Deserialize<'de> for DescriptorString {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+impl Serialize for DescriptorString {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.0)
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ProductDescriptor {
@@ -108,5 +152,11 @@ mod tests {
     #[case("111")]
     fn parse_errors(#[case] input: &str) {
         assert!(input.parse::<ProductDescriptor>().is_err());
+    }
+
+    #[test]
+    fn basics() -> Result<()> {
+        assert_eq!("foo", "foo".parse::<Tag>()?.as_str());
+        Ok(())
     }
 }
