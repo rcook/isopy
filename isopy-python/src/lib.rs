@@ -33,6 +33,8 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
+pub mod python_standalone_builds;
+
 mod python;
 mod python_descriptor;
 mod python_version;

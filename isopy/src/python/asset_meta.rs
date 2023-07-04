@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::python_standalone_builds::{
+use anyhow::{bail, Error, Result};
+use isopy_python::python_standalone_builds::api::{
     Arch, ArchiveType, ArchiveTypeBaseName, Family, Flavour, Platform, Subflavour, Variant, OS,
 };
-use anyhow::{bail, Error, Result};
 use isopy_python::{PythonVersion, Tag};
 use std::str::FromStr;
 
@@ -163,10 +163,10 @@ impl FromStr for AssetMeta {
 #[cfg(test)]
 mod tests {
     use super::AssetMeta;
-    use crate::api::python_standalone_builds::{
+    use anyhow::Result;
+    use isopy_python::python_standalone_builds::api::{
         Arch, ArchiveType, Family, Platform, Subflavour, Variant, OS,
     };
-    use anyhow::Result;
     use isopy_python::{PythonVersion, Tag};
     use rstest::rstest;
 
