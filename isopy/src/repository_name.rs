@@ -19,8 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{DEFAULT_REPOSITORY_NAME, EXAMPLE_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
 use anyhow::{bail, Error};
+use isopy_python::constants::{
+    DEFAULT_REPOSITORY_NAME, EXAMPLE_REPOSITORY_NAME, REPOSITORY_NAME_REGEX,
+};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
@@ -95,8 +97,8 @@ impl Serialize for RepositoryName {
 #[cfg(test)]
 mod tests {
     use super::RepositoryName;
-    use crate::constants::REPOSITORY_NAME_REGEX;
     use anyhow::Result;
+    use isopy_python::constants::REPOSITORY_NAME_REGEX;
     use rstest::rstest;
 
     #[rstest]

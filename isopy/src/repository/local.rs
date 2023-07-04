@@ -20,12 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::Repository;
-use crate::constants::RELEASES_FILE_NAME;
 use crate::python::Asset;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
 use isopy_lib::{ContentLength, LastModified, Response, Stream};
+use isopy_python::constants::RELEASES_FILE_NAME;
 use std::fs::{metadata, File};
 use std::io::Read;
 use std::path::PathBuf;

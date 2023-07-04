@@ -20,10 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::asset::{download_asset, get_asset};
-use crate::constants::{
-    ENV_FILE_NAME, INDEX_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX,
-    RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
-};
+use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::python::{Asset, AssetMeta};
 use crate::registry::{ProductInfo, ProductRegistry};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
@@ -35,6 +32,9 @@ use crate::unpack::unpack_file;
 use anyhow::{anyhow, bail, Result};
 use isopy_lib::{dir_url, Descriptor, LastModified};
 use isopy_openjdk::OpenJdk;
+use isopy_python::constants::{
+    INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
+};
 use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};

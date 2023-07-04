@@ -19,30 +19,41 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-pub mod constants;
-pub mod python_standalone_builds;
+use lazy_static::lazy_static;
+use regex::Regex;
+use reqwest::Url;
 
-mod python;
-mod python_descriptor;
-mod python_version;
-mod serialization;
-mod tag;
+lazy_static! {
+    pub static ref RELEASES_URL: Url =
+        Url::parse("https://api.github.com/repos/indygreg/python-build-standalone/releases")
+            .expect("lazy_static: URL must be valid");
+    pub static ref REPOSITORY_NAME_REGEX: Regex =
+        Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
+}
 
-pub use self::python::Python;
-pub use self::python_descriptor::PythonDescriptor;
-pub use self::python_version::{PythonVersion, PythonVersionParseError, PythonVersionParseResult};
-pub use self::tag::{option_tag, Tag};
+pub const DEFAULT_REPOSITORY_NAME: &str = "default";
+
+pub const EXAMPLE_REPOSITORY_NAME: &str = "example";
+
+pub const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
+
+pub const RELEASES_FILE_NAME: &str = "releases.json";
+
+pub const INDEX_FILE_NAME: &str = "index.yaml";
+
+pub const ISOPY_USER_AGENT: &str = "isopy";
+
+#[cfg(test)]
+mod tests {
+    use super::{RELEASES_URL, REPOSITORY_NAME_REGEX};
+
+    #[test]
+    fn releases_url() {
+        _ = RELEASES_URL.as_str().to_string();
+    }
+
+    #[test]
+    fn repository_name_regex() {
+        _ = REPOSITORY_NAME_REGEX.as_str().to_string();
+    }
+}

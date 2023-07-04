@@ -21,7 +21,6 @@
 //
 use crate::app::App;
 use crate::args::PackageFilter;
-use crate::constants::RELEASES_URL;
 use crate::print::print;
 use crate::python::{Asset, AssetFilter};
 use crate::registry::ProductDescriptor;
@@ -31,6 +30,7 @@ use colored::Colorize;
 use isopy_lib::download_stream;
 use isopy_openjdk::adoptium::AdoptiumIndexManager;
 use isopy_openjdk::OpenJdkDescriptor;
+use isopy_python::constants::RELEASES_URL;
 use isopy_python::PythonDescriptor;
 use std::cmp::Ordering;
 

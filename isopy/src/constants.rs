@@ -19,25 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use lazy_static::lazy_static;
-use regex::Regex;
-use reqwest::Url;
-
-lazy_static! {
-    pub static ref RELEASES_URL: Url =
-        Url::parse("https://api.github.com/repos/indygreg/python-build-standalone/releases")
-            .expect("lazy_static: URL must be valid");
-    pub static ref REPOSITORY_NAME_REGEX: Regex =
-        Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
-}
-
 pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
 pub const OPENJDK_DESCRIPTOR_PREFIX: &str = "openjdk";
-
-pub const DEFAULT_REPOSITORY_NAME: &str = "default";
-
-pub const EXAMPLE_REPOSITORY_NAME: &str = "example";
 
 pub type ExitCode = i32;
 
@@ -47,29 +31,6 @@ pub const ERROR: ExitCode = 1;
 
 pub const CACHE_DIR_NAME: &str = ".isopy";
 
-pub const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
-
-pub const RELEASES_FILE_NAME: &str = "releases.json";
-
-pub const INDEX_FILE_NAME: &str = "index.yaml";
-
 pub const ENV_FILE_NAME: &str = "env.yaml";
 
 pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";
-
-pub const ISOPY_USER_AGENT: &str = "isopy";
-
-#[cfg(test)]
-mod tests {
-    use super::{RELEASES_URL, REPOSITORY_NAME_REGEX};
-
-    #[test]
-    fn releases_url() {
-        _ = RELEASES_URL.as_str().to_string();
-    }
-
-    #[test]
-    fn repository_name_regex() {
-        _ = REPOSITORY_NAME_REGEX.as_str().to_string();
-    }
-}
