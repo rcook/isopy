@@ -41,6 +41,7 @@ mod link_header;
 mod product;
 mod reqwest_response;
 mod response;
+mod url;
 
 pub use self::checksum::verify_sha256_file_checksum;
 pub use self::descriptor::{
@@ -56,3 +57,4 @@ pub use self::product::{
 };
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
+pub use self::url::{dir_url, file_url};
