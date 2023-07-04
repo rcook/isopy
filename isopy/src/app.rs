@@ -78,6 +78,7 @@ impl App {
         shared_dir: &Path,
     ) -> Result<PathBuf> {
         if let Some(d) = descriptor.as_any().downcast_ref::<PythonDescriptor>() {
+            // TBD: Push into Product::download_asset
             Ok(self.download_python(d, shared_dir).await?)
         } else {
             Ok(product_info
