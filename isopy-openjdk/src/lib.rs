@@ -38,6 +38,7 @@ mod maven_version_range;
 mod openjdk;
 mod openjdk_descriptor;
 mod openjdk_version;
+mod serialization;
 
 pub use self::maven_version_range::{MavenVersionLimit, MavenVersionRange, MavenVersionValue};
 pub use self::openjdk::OpenJdk;
@@ -45,3 +46,4 @@ pub use self::openjdk_descriptor::OpenJdkDescriptor;
 pub use self::openjdk_version::{
     OpenJdkVersion, OpenJdkVersionKind, OpenJdkVersionParseError, OpenJdkVersionParseResult,
 };
+pub use self::serialization::{IndexRec, VersionRec};
