@@ -20,18 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::registry::{DescriptorId, ProductDescriptor};
+use crate::registry::DescriptorId;
 use crate::status::Status;
 use anyhow::Result;
 
 pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
-    match app
-        .registry
-        .to_descriptor_info(descriptor_id)?
-        .to_product_descriptor()?
-    {
-        ProductDescriptor::Python(d) => app.download_python(&d).await?,
-        ProductDescriptor::OpenJdk(d) => _ = app.download_openjdk(&d).await?,
-    }
+    _ = app
+        .download_asset(descriptor_id, &app.repo.shared_dir())
+        .await?;
     Ok(Status::OK)
 }

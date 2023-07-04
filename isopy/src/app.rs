@@ -77,23 +77,41 @@ impl App {
         }
     }
 
-    pub async fn download_python(&self, descriptor: &PythonDescriptor) -> Result<()> {
-        let assets = self.read_assets()?;
-        let asset = get_asset(
-            &assets,
-            &PythonDescriptor {
-                version: descriptor.version.clone(),
-                tag: descriptor.tag.clone(),
-            },
-        )?;
-        download_asset(self, asset).await?;
-        Ok(())
+    pub async fn download_asset(
+        &self,
+        descriptor_id: &DescriptorId,
+        shared_dir: &Path,
+    ) -> Result<PathBuf> {
+        let product_descriptor = self
+            .registry
+            .to_descriptor_info(descriptor_id)?
+            .to_product_descriptor()?;
+
+        Ok(match &product_descriptor {
+            ProductDescriptor::Python(d) => self.download_python(d, &shared_dir).await?,
+            ProductDescriptor::OpenJdk(d) => self.download_openjdk(d, &shared_dir).await?,
+        })
     }
 
-    pub async fn download_openjdk(&self, descriptor: &OpenJdkDescriptor) -> Result<PathBuf> {
+    pub async fn download_python(
+        &self,
+        descriptor: &PythonDescriptor,
+        shared_dir: &Path,
+    ) -> Result<PathBuf> {
+        let assets = self.read_assets()?;
+        let asset = get_asset(&assets, descriptor)?;
+        let asset_path = download_asset(self, asset, shared_dir).await?;
+        Ok(asset_path)
+    }
+
+    pub async fn download_openjdk(
+        &self,
+        descriptor: &OpenJdkDescriptor,
+        shared_dir: &Path,
+    ) -> Result<PathBuf> {
         let manager = AdoptiumIndexManager::new(
             &ADOPTIUM_SERVER_URL,
-            &self.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
+            &shared_dir.join(ADOPTIUM_INDEX_FILE_NAME),
         );
 
         let versions = manager.read_versions().await?;
@@ -103,29 +121,29 @@ impl App {
             bail!("no version matching {}", descriptor.version);
         };
 
-        let output_path = self.repo.shared_dir().join(&version.file_name);
-        if output_path.exists() {
-            info!("{} already downloaded", version.file_name.display());
-            return Ok(output_path);
+        let asset_path = shared_dir.join(&version.file_name);
+        if asset_path.exists() {
+            info!("Asset {} already downloaded", version.file_name.display());
+            return Ok(asset_path);
         }
 
-        manager.download_asset(&version.url, &output_path).await?;
+        manager.download_asset(&version.url, &asset_path).await?;
 
-        let is_valid = verify_sha256_file_checksum(&version.checksum, &output_path)?;
+        let is_valid = verify_sha256_file_checksum(&version.checksum, &asset_path)?;
         if !is_valid {
-            remove_file(&output_path)?;
+            remove_file(&asset_path)?;
             bail!(
                 "SHA256 checksum validation failed on {}",
-                output_path.display()
+                asset_path.display()
             );
         }
 
         info!(
             "SHA256 checksum validation succeeded on {}",
-            output_path.display()
+            asset_path.display()
         );
 
-        Ok(output_path)
+        Ok(asset_path)
     }
 
     pub fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {
@@ -210,10 +228,6 @@ impl App {
         }
     }
 
-    pub fn make_asset_path(&self, asset: &Asset) -> PathBuf {
-        self.repo.shared_dir().join(&asset.name)
-    }
-
     pub fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_json_path = self.repo.shared_dir().join(RELEASES_FILE_NAME);
         let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
@@ -237,28 +251,6 @@ impl App {
     }
 
     pub async fn init_project(&self, descriptor_id: &DescriptorId) -> Result<()> {
-        async fn download_python_asset(
-            app: &App,
-            descriptor: &PythonDescriptor,
-        ) -> Result<PathBuf> {
-            let assets = app.read_assets()?;
-            let asset = get_asset(&assets, descriptor)?;
-
-            let mut asset_path = app.make_asset_path(asset);
-            if !asset_path.is_file() {
-                asset_path = download_asset(app, asset).await?;
-            }
-
-            Ok(asset_path)
-        }
-
-        async fn download_openjdk_asset(
-            app: &App,
-            descriptor: &OpenJdkDescriptor,
-        ) -> Result<PathBuf> {
-            app.download_openjdk(descriptor).await
-        }
-
         let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
         let product_descriptor = descriptor_info.to_product_descriptor()?;
 
@@ -267,10 +259,9 @@ impl App {
             ProductDescriptor::OpenJdk(d) => d,
         };
 
-        let asset_path = match &product_descriptor {
-            ProductDescriptor::Python(d) => download_python_asset(self, d).await?,
-            ProductDescriptor::OpenJdk(d) => download_openjdk_asset(self, d).await?,
-        };
+        let asset_path = self
+            .download_asset(&descriptor_id, &self.repo.shared_dir())
+            .await?;
 
         let Some(dir_info) = self.repo.init(&self.cwd)? else {
             bail!(

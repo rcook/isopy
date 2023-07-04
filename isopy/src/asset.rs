@@ -27,7 +27,7 @@ use anyhow::{anyhow, bail, Result};
 use isopy_python::{PythonDescriptor, Tag};
 use log::info;
 use std::fs::remove_file;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub fn get_asset<'a>(assets: &'a [Asset], descriptor: &PythonDescriptor) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
@@ -60,15 +60,16 @@ pub fn get_asset<'a>(assets: &'a [Asset], descriptor: &PythonDescriptor) -> Resu
     );
 }
 
-pub async fn download_asset(app: &App, asset: &Asset) -> Result<PathBuf> {
+pub async fn download_asset(app: &App, asset: &Asset, shared_dir: &Path) -> Result<PathBuf> {
     let repositories = app.read_repositories()?;
     let repository = repositories
         .first()
         .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
 
-    let asset_path = app.make_asset_path(asset);
+    let asset_path = shared_dir.join(&asset.name);
     if asset_path.exists() {
-        bail!("Asset {} already downloaded", asset_path.display());
+        info!("Asset {} already downloaded", asset_path.display());
+        return Ok(asset_path);
     }
 
     let mut response = repository.repository.get_asset(asset).await?;
