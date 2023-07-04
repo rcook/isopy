@@ -40,6 +40,7 @@ mod backtrace;
 mod checksum;
 mod commands;
 mod constants;
+mod foo;
 mod print;
 mod python;
 mod registry;

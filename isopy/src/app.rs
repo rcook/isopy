@@ -19,25 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::asset::{download_asset, get_asset};
 use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use crate::python::{Asset, AssetMeta};
+use crate::foo::Foo;
 use crate::registry::{ProductInfo, ProductRegistry};
-use crate::repository::{GitHubRepository, LocalRepository, Repository};
-use crate::repository_info::RepositoryInfo;
 use crate::repository_name::RepositoryName;
+use crate::serialization::IndexRec;
 use crate::serialization::{EnvRec, PackageDirRec};
-use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
 use crate::unpack::unpack_file;
-use anyhow::{anyhow, bail, Result};
-use isopy_lib::{dir_url, Descriptor, LastModified};
+use anyhow::{bail, Result};
+use isopy_lib::{Descriptor, LastModified};
 use isopy_openjdk::OpenJdk;
-use isopy_python::constants::{
-    INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
-};
+use isopy_python::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME};
 use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
+use joatmon::{label_file_name, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -234,103 +229,5 @@ impl App {
                 return Ok(None);
             }
         }
-    }
-}
-
-pub struct Foo;
-
-impl Foo {
-    fn new() -> Self {
-        Self
-    }
-
-    pub fn read_assets(&self, shared_dir: &Path) -> Result<Vec<Asset>> {
-        let index_json_path = shared_dir.join(RELEASES_FILE_NAME);
-        let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
-
-        let mut assets = Vec::new();
-        for package_rec in package_recs {
-            for asset_rec in package_rec.assets {
-                if !AssetMeta::definitely_not_an_asset_name(&asset_rec.name) {
-                    let meta = asset_rec.name.parse::<AssetMeta>()?;
-                    assets.push(Asset {
-                        name: asset_rec.name,
-                        tag: package_rec.tag.clone(),
-                        url: asset_rec.url,
-                        size: asset_rec.size,
-                        meta,
-                    });
-                }
-            }
-        }
-        Ok(assets)
-    }
-
-    pub fn read_repositories(&self, shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
-        fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
-            match rec {
-                RepositoryRec::GitHub { name, url, enabled } => {
-                    (name, enabled, Box::new(GitHubRepository::new(&url)))
-                }
-                RepositoryRec::Local { name, dir, enabled } => {
-                    (name, enabled, Box::new(LocalRepository::new(dir)))
-                }
-            }
-        }
-
-        let repositories_yaml_path = shared_dir.join(REPOSITORIES_FILE_NAME);
-        let repositories_rec = if repositories_yaml_path.is_file() {
-            read_yaml_file::<RepositoriesRec>(&repositories_yaml_path)?
-        } else {
-            let repositories_rec = RepositoriesRec {
-                repositories: vec![
-                    RepositoryRec::GitHub {
-                        name: RepositoryName::Default,
-                        url: dir_url(&RELEASES_URL),
-                        enabled: true,
-                    },
-                    RepositoryRec::Local {
-                        name: RepositoryName::Example,
-                        dir: PathBuf::from("/path/to/local/repository"),
-                        enabled: false,
-                    },
-                ],
-            };
-            safe_write_file(
-                &repositories_yaml_path,
-                serde_yaml::to_string(&repositories_rec)?,
-                false,
-            )?;
-            repositories_rec
-        };
-
-        let all_repositories = repositories_rec
-            .repositories
-            .into_iter()
-            .map(make_repository);
-        let enabled_repositories = all_repositories
-            .into_iter()
-            .filter(|x| x.1)
-            .map(|x| RepositoryInfo {
-                name: x.0,
-                repository: x.2,
-            })
-            .collect::<Vec<_>>();
-        Ok(enabled_repositories)
-    }
-
-    pub async fn download_python(
-        &self,
-        descriptor: &PythonDescriptor,
-        shared_dir: &Path,
-    ) -> Result<PathBuf> {
-        let assets = self.read_assets(shared_dir)?;
-        let asset = get_asset(&assets, descriptor)?;
-        let repositories = self.read_repositories(shared_dir)?;
-        let repository = repositories
-            .first()
-            .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
-        let asset_path = download_asset(repository, asset, shared_dir).await?;
-        Ok(asset_path)
     }
 }
