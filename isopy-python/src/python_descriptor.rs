@@ -24,6 +24,7 @@ use crate::tag::Tag;
 use anyhow::anyhow;
 use isopy_lib::{Descriptor, GetConfigValueError, GetConfigValueResult, ParseDescriptorError};
 use serde::Serialize;
+use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -70,6 +71,10 @@ impl Display for PythonDescriptor {
 }
 
 impl Descriptor for PythonDescriptor {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn transform_archive_path(&self, path: &Path) -> PathBuf {
         path.to_path_buf()
     }

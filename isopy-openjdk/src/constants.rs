@@ -19,42 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_descriptor::PythonDescriptor;
-use anyhow::anyhow;
-use async_trait::async_trait;
-use isopy_lib::{
-    Descriptor, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
-};
-use std::path::{Path, PathBuf};
+use lazy_static::lazy_static;
+use reqwest::Url;
 
-const NAME: &str = "Python";
-
-pub struct Python;
-
-impl Default for Python {
-    fn default() -> Self {
-        Self
-    }
+lazy_static! {
+    pub static ref ADOPTIUM_SERVER_URL: Url =
+        Url::parse("https://api.adoptium.net/").expect("lazy_static: URL must be valid");
 }
 
-#[async_trait]
-impl Product for Python {
-    fn name(&self) -> &str {
-        NAME
-    }
-
-    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<PythonDescriptor>()
-                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))?,
-        ))
-    }
-
-    async fn download_asset(
-        &self,
-        _descriptor: &dyn Descriptor,
-        _shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
-        todo!();
-    }
-}
+pub const ADOPTIUM_INDEX_FILE_NAME: &str = "adoptium-index.yaml";

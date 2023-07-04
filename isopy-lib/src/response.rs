@@ -26,13 +26,13 @@ use bytes::Bytes;
 
 pub type ContentLength = u64;
 
-pub trait Response {
+pub trait Response: Send {
     fn last_modified(&self) -> &Option<LastModified>;
     fn content_length(&self) -> Option<ContentLength>;
     fn bytes_stream(&mut self) -> Result<Box<dyn Stream>>;
 }
 
 #[async_trait]
-pub trait Stream {
+pub trait Stream: Send {
     async fn next(&mut self) -> Option<Result<Bytes>>;
 }

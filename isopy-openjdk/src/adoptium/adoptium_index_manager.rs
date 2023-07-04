@@ -21,6 +21,7 @@
 //
 use super::api::{Release, Singleton};
 use super::client::{all_versions, AdoptiumClient, Query};
+use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
 use crate::serialization::{IndexRec, VersionRec};
 use anyhow::Result;
 use chrono::{Duration, Utc};
@@ -29,17 +30,38 @@ use reqwest::Url;
 use std::path::{Path, PathBuf};
 
 pub struct AdoptiumIndexManager {
+    server_uri: Url,
     client: AdoptiumClient,
     index_path: PathBuf,
 }
 
 impl AdoptiumIndexManager {
+    #[must_use]
+    pub fn new_default(shared_dir: &Path) -> Self {
+        Self::new(
+            &ADOPTIUM_SERVER_URL,
+            &shared_dir.join(ADOPTIUM_INDEX_FILE_NAME),
+        )
+    }
+
+    /// Creates index manager.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `index_path` is not absolute.
+    #[must_use]
     pub fn new(server_url: &Url, index_path: &Path) -> Self {
         assert!(index_path.is_absolute());
         Self {
+            server_uri: server_url.clone(),
             client: AdoptiumClient::new(server_url),
             index_path: index_path.to_path_buf(),
         }
+    }
+
+    #[must_use]
+    pub const fn server_url(&self) -> &Url {
+        &self.server_uri
     }
 
     pub async fn read_versions(&self) -> Result<Vec<VersionRec>> {

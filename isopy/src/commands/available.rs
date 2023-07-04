@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::args::PackageFilter;
-use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, RELEASES_URL};
+use crate::constants::RELEASES_URL;
 use crate::print::print;
 use crate::python::{Asset, AssetFilter};
 use crate::registry::ProductDescriptor;
@@ -60,16 +60,13 @@ async fn show_python_index(app: &App) -> Result<()> {
 }
 
 async fn show_openjdk_index(app: &App) -> Result<()> {
+    let manager = AdoptiumIndexManager::new_default(app.repo.shared_dir());
+
     print(&format!(
         "{} ({})",
         "OpenJDK".cyan(),
-        ADOPTIUM_SERVER_URL.as_str().bright_magenta()
+        manager.server_url().as_str().bright_magenta()
     ));
-
-    let manager = AdoptiumIndexManager::new(
-        &ADOPTIUM_SERVER_URL,
-        &app.repo.shared_dir().join(ADOPTIUM_INDEX_FILE_NAME),
-    );
 
     for version in &manager.read_versions().await? {
         let product_descriptor = ProductDescriptor::OpenJdk(OpenJdkDescriptor {

@@ -33,6 +33,7 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
+mod checksum;
 mod descriptor;
 mod download;
 mod last_modified;
@@ -41,10 +42,13 @@ mod product;
 mod reqwest_response;
 mod response;
 
+pub use self::checksum::verify_sha256_file_checksum;
 pub use self::descriptor::{Descriptor, GetConfigValueError, GetConfigValueResult};
 pub use self::download::download_stream;
 pub use self::last_modified::LastModified;
 pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErrorResult};
-pub use self::product::{ParseDescriptorError, ParseDescriptorResult, Product};
+pub use self::product::{
+    DownloadAssetError, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
+};
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};

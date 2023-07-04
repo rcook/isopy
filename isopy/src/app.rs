@@ -20,11 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::asset::{download_asset, get_asset};
-use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{
-    ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, ENV_FILE_NAME, INDEX_FILE_NAME,
-    OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX, RELEASES_FILE_NAME, RELEASES_URL,
-    REPOSITORIES_FILE_NAME,
+    ENV_FILE_NAME, INDEX_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX,
+    RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
 use crate::python::{Asset, AssetMeta};
 use crate::registry::{DescriptorId, ProductDescriptor, ProductInfo, ProductRegistry};
@@ -36,14 +34,11 @@ use crate::unpack::unpack_file;
 use crate::url::dir_url;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, LastModified};
-use isopy_openjdk::adoptium::AdoptiumIndexManager;
-use isopy_openjdk::{OpenJdk, OpenJdkDescriptor};
+use isopy_openjdk::OpenJdk;
 use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_json_file, read_yaml_file, safe_write_file};
-use log::info;
 use std::collections::HashMap;
-use std::fs::remove_file;
 use std::path::{Path, PathBuf};
 
 pub struct RepositoryInfo {
@@ -81,14 +76,18 @@ impl App {
         descriptor_id: &DescriptorId,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        let product_descriptor = self
-            .registry
-            .to_descriptor_info(descriptor_id)?
-            .to_product_descriptor()?;
+        let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
+        let product_descriptor = descriptor_info.to_product_descriptor()?;
 
         Ok(match &product_descriptor {
-            ProductDescriptor::Python(d) => self.download_python(d, &shared_dir).await?,
-            ProductDescriptor::OpenJdk(d) => self.download_openjdk(d, &shared_dir).await?,
+            ProductDescriptor::Python(d) => self.download_python(d, shared_dir).await?,
+            ProductDescriptor::OpenJdk(_) => {
+                descriptor_info
+                    .product_info
+                    .product
+                    .download_asset(descriptor_info.descriptor.as_ref(), shared_dir)
+                    .await?
+            }
         })
     }
 
@@ -100,48 +99,6 @@ impl App {
         let assets = self.read_assets()?;
         let asset = get_asset(&assets, descriptor)?;
         let asset_path = download_asset(self, asset, shared_dir).await?;
-        Ok(asset_path)
-    }
-
-    pub async fn download_openjdk(
-        &self,
-        descriptor: &OpenJdkDescriptor,
-        shared_dir: &Path,
-    ) -> Result<PathBuf> {
-        let manager = AdoptiumIndexManager::new(
-            &ADOPTIUM_SERVER_URL,
-            &shared_dir.join(ADOPTIUM_INDEX_FILE_NAME),
-        );
-
-        let versions = manager.read_versions().await?;
-        let Some(version) = versions
-            .iter()
-            .find(|x| x.openjdk_version == descriptor.version) else {
-            bail!("no version matching {}", descriptor.version);
-        };
-
-        let asset_path = shared_dir.join(&version.file_name);
-        if asset_path.exists() {
-            info!("Asset {} already downloaded", version.file_name.display());
-            return Ok(asset_path);
-        }
-
-        manager.download_asset(&version.url, &asset_path).await?;
-
-        let is_valid = verify_sha256_file_checksum(&version.checksum, &asset_path)?;
-        if !is_valid {
-            remove_file(&asset_path)?;
-            bail!(
-                "SHA256 checksum validation failed on {}",
-                asset_path.display()
-            );
-        }
-
-        info!(
-            "SHA256 checksum validation succeeded on {}",
-            asset_path.display()
-        );
-
         Ok(asset_path)
     }
 
@@ -259,7 +216,7 @@ impl App {
         };
 
         let asset_path = self
-            .download_asset(&descriptor_id, &self.repo.shared_dir())
+            .download_asset(descriptor_id, self.repo.shared_dir())
             .await?;
 
         let Some(dir_info) = self.repo.init(&self.cwd)? else {

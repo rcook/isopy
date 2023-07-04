@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::any::Any;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -32,7 +33,8 @@ pub enum GetConfigValueError {
 
 pub type GetConfigValueResult<T> = StdResult<T, GetConfigValueError>;
 
-pub trait Descriptor: Debug + Display {
+pub trait Descriptor: Any + Debug + Display + Send + Sync {
+    fn as_any(&self) -> &dyn Any;
     fn transform_archive_path(&self, path: &Path) -> PathBuf;
     fn get_config_value(&self) -> GetConfigValueResult<serde_json::Value>;
 }

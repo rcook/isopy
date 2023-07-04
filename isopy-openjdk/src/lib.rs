@@ -35,6 +35,7 @@
 #![allow(clippy::option_if_let_else)]
 pub mod adoptium;
 
+mod constants;
 mod maven_version_range;
 mod openjdk;
 mod openjdk_descriptor;

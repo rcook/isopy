@@ -19,42 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_descriptor::PythonDescriptor;
-use anyhow::anyhow;
-use async_trait::async_trait;
-use isopy_lib::{
-    Descriptor, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
-};
-use std::path::{Path, PathBuf};
+use anyhow::Result;
+use hex::decode;
+use joatmon::read_bytes;
+use sha2::{Digest, Sha256};
+use std::path::Path;
 
-const NAME: &str = "Python";
-
-pub struct Python;
-
-impl Default for Python {
-    fn default() -> Self {
-        Self
-    }
-}
-
-#[async_trait]
-impl Product for Python {
-    fn name(&self) -> &str {
-        NAME
-    }
-
-    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<PythonDescriptor>()
-                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))?,
-        ))
-    }
-
-    async fn download_asset(
-        &self,
-        _descriptor: &dyn Descriptor,
-        _shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
-        todo!();
-    }
+pub fn verify_sha256_file_checksum(required_hash_str: &str, input_path: &Path) -> Result<bool> {
+    let required_hash = decode(required_hash_str)?;
+    let mut hasher = Sha256::new();
+    hasher.update(read_bytes(input_path)?);
+    let hash = hasher.finalize().to_vec();
+    Ok(required_hash == hash)
 }

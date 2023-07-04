@@ -20,11 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{anyhow, Result};
-use hex::decode;
 use include_dir::{include_dir, Dir};
+use isopy_lib::verify_sha256_file_checksum;
 use isopy_python::Tag;
-use joatmon::read_bytes;
-use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -59,12 +57,4 @@ pub fn validate_sha256_checksum(archive_path: &Path, tag: &Tag) -> Result<bool> 
         None => Ok(false),
         Some(required_hash_str) => verify_sha256_file_checksum(required_hash_str, archive_path),
     }
-}
-
-pub fn verify_sha256_file_checksum(required_hash_str: &str, input_path: &Path) -> Result<bool> {
-    let required_hash = decode(required_hash_str)?;
-    let mut hasher = Sha256::new();
-    hasher.update(read_bytes(input_path)?);
-    let hash = hasher.finalize().to_vec();
-    Ok(required_hash == hash)
 }

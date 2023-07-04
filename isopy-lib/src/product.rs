@@ -20,6 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor::Descriptor;
+use async_trait::async_trait;
+use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use thiserror::Error;
 
@@ -31,7 +33,29 @@ pub enum ParseDescriptorError {
 
 pub type ParseDescriptorResult<T> = StdResult<T, ParseDescriptorError>;
 
+#[derive(Debug, Error)]
+pub enum DownloadAssetError {
+    #[error("version {0} not found")]
+    VersionNotFound(String),
+
+    #[error("checksum validation failed on {0}")]
+    ChecksumValidationFailed(String),
+
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type DownloadAssetResult<T> = StdResult<T, DownloadAssetError>;
+
+#[async_trait]
 pub trait Product {
     fn name(&self) -> &str;
+
     fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>>;
+
+    async fn download_asset(
+        &self,
+        descriptor: &dyn Descriptor,
+        shared_dir: &Path,
+    ) -> DownloadAssetResult<PathBuf>;
 }

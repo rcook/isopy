@@ -23,6 +23,7 @@ use crate::openjdk_version::OpenJdkVersion;
 use anyhow::anyhow;
 use isopy_lib::{Descriptor, GetConfigValueError, GetConfigValueResult, ParseDescriptorError};
 use serde::Serialize;
+use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -50,6 +51,10 @@ impl Display for OpenJdkDescriptor {
 }
 
 impl Descriptor for OpenJdkDescriptor {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn transform_archive_path(&self, path: &Path) -> PathBuf {
         let mut i = path.iter();
         _ = i.next();

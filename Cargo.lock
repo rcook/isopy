@@ -925,7 +925,6 @@ dependencies = [
  "exec",
  "flate2",
  "futures-util",
- "hex",
  "home",
  "include_dir",
  "indicatif",
@@ -947,7 +946,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
- "sha2",
  "sysinfo",
  "tar",
  "thiserror",
@@ -966,12 +964,14 @@ dependencies = [
  "async-trait",
  "bytes",
  "futures-util",
+ "hex",
  "joat-logger",
  "joatmon 0.0.29",
  "log",
  "reqwest",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror",
 ]
 
@@ -980,10 +980,12 @@ name = "isopy-openjdk"
 version = "0.1.4"
 dependencies = [
  "anyhow",
+ "async-trait",
  "chrono",
  "isopy-lib",
  "joatmon 0.0.29",
  "lazy_static",
+ "log",
  "percent-encoding",
  "reqwest",
  "rstest",
@@ -999,6 +1001,7 @@ name = "isopy-python"
 version = "0.1.4"
 dependencies = [
  "anyhow",
+ "async-trait",
  "isopy-lib",
  "serde",
  "serde_json",

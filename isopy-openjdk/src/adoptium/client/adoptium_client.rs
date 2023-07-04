@@ -38,6 +38,7 @@ lazy_static! {
     );
 }
 
+#[must_use]
 pub fn all_versions() -> &'static MavenVersionRange {
     &ALL_VERSIONS
 }
@@ -48,6 +49,7 @@ pub struct AdoptiumClient {
 }
 
 impl AdoptiumClient {
+    #[must_use]
     pub fn new(server_url: &Url) -> Self {
         let client = Client::new();
         Self {

@@ -30,6 +30,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 pub struct LastModified(String);
 
 impl LastModified {
+    #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
     }

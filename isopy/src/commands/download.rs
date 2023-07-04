@@ -26,7 +26,7 @@ use anyhow::Result;
 
 pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
     _ = app
-        .download_asset(descriptor_id, &app.repo.shared_dir())
+        .download_asset(descriptor_id, app.repo.shared_dir())
         .await?;
     Ok(Status::OK)
 }

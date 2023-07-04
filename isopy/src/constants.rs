@@ -24,8 +24,6 @@ use regex::Regex;
 use reqwest::Url;
 
 lazy_static! {
-    pub static ref ADOPTIUM_SERVER_URL: Url =
-        Url::parse("https://api.adoptium.net/").expect("lazy_static: URL must be valid");
     pub static ref RELEASES_URL: Url =
         Url::parse("https://api.github.com/repos/indygreg/python-build-standalone/releases")
             .expect("lazy_static: URL must be valid");
@@ -36,8 +34,6 @@ lazy_static! {
 pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
 pub const OPENJDK_DESCRIPTOR_PREFIX: &str = "openjdk";
-
-pub const ADOPTIUM_INDEX_FILE_NAME: &str = "adoptium-index.yaml";
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";
 
