@@ -19,37 +19,42 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::PYTHON_VERSION_FILE_NAME;
-
+use crate::registry::ProductInfo;
 use crate::{app::App, status::Status};
-use anyhow::{bail, Result};
+use anyhow::Result;
+use log::error;
+use std::path::PathBuf;
+use std::rc::Rc;
 
 pub async fn do_init_config(app: &App) -> Result<Status> {
-    let _config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
-
     if app.repo.get(&app.cwd)?.is_some() {
-        bail!(
-            "Directory {} already has Python environment",
-            app.cwd.display()
-        )
+        error!("directory {} already has an environment", app.cwd.display());
+        return Ok(Status::Fail);
     }
 
-    /*
-    let rec = read_yaml_file::<PythonVersionRec>(&config_path)?;
-
-    // TBD: Nasty hack!
-    let s = if let Some(tag) = rec.tag {
-        format!("{}:{}:{}", PYTHON_DESCRIPTOR_PREFIX, rec.version, tag)
-    } else {
-        format!("{}:{}", PYTHON_DESCRIPTOR_PREFIX, rec.version)
+    let Some((product_info, project_config_path)) = get_product_info_and_project_config_path(app) else {
+        error!("no project configuration file was found in {}", app.cwd.display());
+        return Ok(Status::Fail)
     };
-    let descriptor_id = s.parse::<DescriptorId>()?;
 
-    app.init_project(&descriptor_id).await?;
+    let descriptor = product_info
+        .product
+        .read_project_config_file(&project_config_path)?;
 
-    */
-
-    tokio::time::sleep(std::time::Duration::from_millis(0)).await;
+    app.init_project(&product_info, descriptor.as_ref()).await?;
 
     Ok(Status::OK)
+}
+
+fn get_product_info_and_project_config_path(app: &App) -> Option<(Rc<ProductInfo>, PathBuf)> {
+    for product_info in &app.registry.product_infos {
+        let project_config_path = app
+            .cwd
+            .join(product_info.product.project_config_file_name());
+        if project_config_path.is_file() {
+            return Some((Rc::clone(product_info), project_config_path));
+        }
+    }
+
+    None
 }

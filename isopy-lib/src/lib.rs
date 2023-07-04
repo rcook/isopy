@@ -52,6 +52,7 @@ pub use self::last_modified::LastModified;
 pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErrorResult};
 pub use self::product::{
     DownloadAssetError, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
+    ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};

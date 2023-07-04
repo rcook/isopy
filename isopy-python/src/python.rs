@@ -19,15 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_descriptor::PythonDescriptor;
+use crate::{python_descriptor::PythonDescriptor, serialization::ProjectConfigRec};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     Descriptor, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
+    ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
+use joatmon::read_yaml_file;
 use std::path::{Path, PathBuf};
 
 const NAME: &str = "Python";
+
+pub const PYTHON_PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
 
 pub struct Python;
 
@@ -41,6 +45,23 @@ impl Default for Python {
 impl Product for Python {
     fn name(&self) -> &str {
         NAME
+    }
+
+    fn project_config_file_name(&self) -> &Path {
+        Path::new(PYTHON_PROJECT_CONFIG_FILE_NAME)
+    }
+
+    fn read_project_config_file(
+        &self,
+        path: &Path,
+    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>> {
+        let project_config_rec = read_yaml_file::<ProjectConfigRec>(path)
+            .map_err(|e| ReadProjectConfigFileError::Other(anyhow!(e)))?;
+
+        Ok(Box::new(PythonDescriptor {
+            version: project_config_rec.version,
+            tag: project_config_rec.tag,
+        }))
     }
 
     fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {

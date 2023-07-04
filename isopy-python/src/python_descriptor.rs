@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_version::PythonVersion;
+use crate::serialization::ProjectConfigRec;
 use crate::tag::Tag;
 use anyhow::anyhow;
 use isopy_lib::{
@@ -32,8 +33,6 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use std::str::FromStr;
-
-pub const PYTHON_VERSION_FILE_NAME: &str = ".python-version.yaml";
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct PythonDescriptor {
@@ -106,25 +105,13 @@ impl Descriptor for PythonDescriptor {
     }
 
     fn get_project_config_info(&self) -> GetProjectConfigValueResult<ProjectConfigInfo> {
-        #[derive(Serialize)]
-        struct ProjectRec {
-            #[serde(rename = "version")]
-            version: PythonVersion,
-
-            #[serde(rename = "tag", skip_serializing_if = "Option::is_none")]
-            tag: Option<Tag>,
-        }
-
-        let value = serde_json::to_value(ProjectRec {
+        let value = serde_json::to_value(ProjectConfigRec {
             version: self.version.clone(),
             tag: self.tag.clone(),
         })
         .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?;
 
-        Ok(ProjectConfigInfo {
-            file_name: PathBuf::from(PYTHON_VERSION_FILE_NAME),
-            value,
-        })
+        Ok(ProjectConfigInfo { value })
     }
 }
 

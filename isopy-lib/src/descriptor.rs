@@ -43,7 +43,6 @@ pub type GetProjectConfigValueResult<T> = StdResult<T, GetProjectConfigValueErro
 
 #[derive(Debug)]
 pub struct ProjectConfigInfo {
-    pub file_name: PathBuf,
     pub value: serde_json::Value,
 }
 

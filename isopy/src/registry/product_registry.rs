@@ -27,7 +27,7 @@ use isopy_lib::{ParseDescriptorError, ParseDescriptorResult};
 use std::rc::Rc;
 
 pub struct ProductRegistry {
-    product_infos: Vec<Rc<ProductInfo>>,
+    pub product_infos: Vec<Rc<ProductInfo>>,
 }
 
 impl ProductRegistry {

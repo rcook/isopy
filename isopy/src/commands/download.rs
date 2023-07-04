@@ -25,8 +25,14 @@ use crate::status::Status;
 use anyhow::Result;
 
 pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
+    let descriptor_info = app.registry.to_descriptor_info(descriptor_id)?;
+
     _ = app
-        .download_asset(descriptor_id, app.repo.shared_dir())
+        .download_asset(
+            &descriptor_info.product_info,
+            descriptor_info.descriptor.as_ref(),
+            app.repo.shared_dir(),
+        )
         .await?;
     Ok(Status::OK)
 }

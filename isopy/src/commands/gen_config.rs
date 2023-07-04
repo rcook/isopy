@@ -24,19 +24,27 @@ use crate::registry::DescriptorId;
 use crate::status::Status;
 use anyhow::Result;
 use joatmon::safe_write_file;
+use log::info;
 
 pub fn do_gen_config(app: &App, descriptor_id: &DescriptorId, force: bool) -> Result<Status> {
-    let project_config_info = app
-        .registry
-        .to_descriptor_info(descriptor_id)?
-        .descriptor
-        .get_project_config_info()?;
+    let descriptor_info = app.registry.to_descriptor_info(descriptor_id)?;
+    let project_config_file_name = descriptor_info
+        .product_info
+        .product
+        .project_config_file_name();
+    let project_config_info = descriptor_info.descriptor.get_project_config_info()?;
+    let project_config_path = app.cwd.join(project_config_file_name);
 
     safe_write_file(
-        &app.cwd.join(project_config_info.file_name),
+        &project_config_path,
         serde_yaml::to_string(&project_config_info.value)?,
         force,
     )?;
+
+    info!(
+        "generated project configuration file {}",
+        project_config_path.display()
+    );
 
     Ok(Status::OK)
 }

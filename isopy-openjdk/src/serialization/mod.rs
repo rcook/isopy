@@ -20,7 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod index_rec;
+mod project_config_rec;
 mod version_rec;
 
 pub use self::index_rec::IndexRec;
+pub use self::project_config_rec::ProjectConfigRec;
 pub use self::version_rec::VersionRec;

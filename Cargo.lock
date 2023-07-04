@@ -1003,6 +1003,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "isopy-lib",
+ "joatmon 0.0.29",
  "rstest",
  "serde",
  "serde_json",

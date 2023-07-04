@@ -19,29 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-pub mod python_standalone_builds;
+use crate::python_version::PythonVersion;
+use crate::tag::Tag;
+use serde::{Deserialize, Serialize};
 
-mod python;
-mod python_descriptor;
-mod python_version;
-mod serialization;
-mod tag;
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ProjectConfigRec {
+    #[serde(rename = "version")]
+    pub version: PythonVersion,
 
-pub use self::python::Python;
-pub use self::python_descriptor::PythonDescriptor;
-pub use self::python_version::{PythonVersion, PythonVersionParseError, PythonVersionParseResult};
-pub use self::tag::{option_tag, Tag};
+    #[serde(rename = "tag", skip_serializing_if = "Option::is_none")]
+    pub tag: Option<Tag>,
+}

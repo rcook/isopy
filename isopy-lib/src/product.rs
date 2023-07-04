@@ -26,6 +26,14 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
+pub enum ReadProjectConfigFileError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type ReadProjectConfigFileResult<T> = StdResult<T, ReadProjectConfigFileError>;
+
+#[derive(Debug, Error)]
 pub enum ParseDescriptorError {
     #[error(transparent)]
     Other(#[from] anyhow::Error),
@@ -50,6 +58,13 @@ pub type DownloadAssetResult<T> = StdResult<T, DownloadAssetError>;
 #[async_trait]
 pub trait Product {
     fn name(&self) -> &str;
+
+    fn project_config_file_name(&self) -> &Path;
+
+    fn read_project_config_file(
+        &self,
+        path: &Path,
+    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>>;
 
     fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>>;
 

@@ -47,8 +47,6 @@ pub const ERROR: ExitCode = 1;
 
 pub const CACHE_DIR_NAME: &str = ".isopy";
 
-pub const PYTHON_VERSION_FILE_NAME: &str = ".python-version.yaml";
-
 pub const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
 
 pub const RELEASES_FILE_NAME: &str = "releases.json";

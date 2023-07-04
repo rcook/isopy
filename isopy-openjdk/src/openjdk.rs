@@ -21,17 +21,22 @@
 //
 use crate::adoptium::AdoptiumIndexManager;
 use crate::openjdk_descriptor::OpenJdkDescriptor;
+use crate::serialization::ProjectConfigRec;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     verify_sha256_file_checksum, Descriptor, DownloadAssetError, DownloadAssetResult,
-    ParseDescriptorError, ParseDescriptorResult, Product,
+    ParseDescriptorError, ParseDescriptorResult, Product, ReadProjectConfigFileError,
+    ReadProjectConfigFileResult,
 };
+use joatmon::read_yaml_file;
 use log::info;
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};
 
 const NAME: &str = "OpenJDK";
+
+pub const OPENJDK_PROJECT_CONFIG_FILE_NAME: &str = ".openjdk-version.yaml";
 
 pub struct OpenJdk;
 
@@ -85,6 +90,21 @@ impl OpenJdk {
 impl Product for OpenJdk {
     fn name(&self) -> &str {
         NAME
+    }
+
+    fn project_config_file_name(&self) -> &Path {
+        Path::new(OPENJDK_PROJECT_CONFIG_FILE_NAME)
+    }
+
+    fn read_project_config_file(
+        &self,
+        path: &Path,
+    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>> {
+        Ok(Box::new(OpenJdkDescriptor {
+            version: read_yaml_file::<ProjectConfigRec>(path)
+                .map_err(|e| ReadProjectConfigFileError::Other(anyhow!(e)))?
+                .version,
+        }))
     }
 
     fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {

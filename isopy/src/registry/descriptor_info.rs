@@ -19,31 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::product_descriptor::ProductDescriptor;
 use super::product_info::ProductInfo;
 use isopy_lib::Descriptor;
-use isopy_openjdk::OpenJdkDescriptor;
-use isopy_python::PythonDescriptor;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::rc::Rc;
 
 pub struct DescriptorInfo {
     pub product_info: Rc<ProductInfo>,
     pub descriptor: Box<dyn Descriptor>,
-}
-
-impl DescriptorInfo {
-    pub fn to_product_descriptor(&self) -> ProductDescriptor {
-        // Temporary hack: should be replaced with calls into
-        // implementers of Descriptor trait etc.
-        if let Some(d) = self.descriptor.as_any().downcast_ref::<PythonDescriptor>() {
-            return ProductDescriptor::Python(d.clone());
-        }
-        if let Some(d) = self.descriptor.as_any().downcast_ref::<OpenJdkDescriptor>() {
-            return ProductDescriptor::OpenJdk(d.clone());
-        }
-        todo!();
-    }
 }
 
 impl Display for DescriptorInfo {

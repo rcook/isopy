@@ -25,7 +25,7 @@ use crate::constants::{
     RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
 use crate::python::{Asset, AssetMeta};
-use crate::registry::{DescriptorId, ProductDescriptor, ProductInfo, ProductRegistry};
+use crate::registry::{ProductInfo, ProductRegistry};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::repository_name::RepositoryName;
 use crate::serialization::{EnvRec, PackageDirRec};
@@ -73,22 +73,18 @@ impl App {
 
     pub async fn download_asset(
         &self,
-        descriptor_id: &DescriptorId,
+        product_info: &ProductInfo,
+        descriptor: &dyn Descriptor,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
-        let product_descriptor = descriptor_info.to_product_descriptor();
-
-        Ok(match &product_descriptor {
-            ProductDescriptor::Python(d) => self.download_python(d, shared_dir).await?,
-            ProductDescriptor::OpenJdk(_) => {
-                descriptor_info
-                    .product_info
-                    .product
-                    .download_asset(descriptor_info.descriptor.as_ref(), shared_dir)
-                    .await?
-            }
-        })
+        if let Some(d) = descriptor.as_any().downcast_ref::<PythonDescriptor>() {
+            Ok(self.download_python(d, shared_dir).await?)
+        } else {
+            Ok(product_info
+                .product
+                .download_asset(descriptor, shared_dir)
+                .await?)
+        }
     }
 
     pub async fn download_python(
@@ -206,17 +202,13 @@ impl App {
         Ok(assets)
     }
 
-    pub async fn init_project(&self, descriptor_id: &DescriptorId) -> Result<()> {
-        let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
-        let product_descriptor = descriptor_info.to_product_descriptor();
-
-        let d: &dyn Descriptor = match &product_descriptor {
-            ProductDescriptor::Python(d) => d,
-            ProductDescriptor::OpenJdk(d) => d,
-        };
-
+    pub async fn init_project(
+        &self,
+        product_info: &ProductInfo,
+        descriptor: &dyn Descriptor,
+    ) -> Result<()> {
         let asset_path = self
-            .download_asset(descriptor_id, self.repo.shared_dir())
+            .download_asset(product_info, descriptor, self.repo.shared_dir())
             .await?;
 
         let Some(dir_info) = self.repo.init(&self.cwd)? else {
@@ -226,7 +218,7 @@ impl App {
             )
         };
 
-        unpack_file(d, &asset_path, dir_info.data_dir())?;
+        unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
         safe_write_file(
             &dir_info.data_dir().join(ENV_FILE_NAME),
@@ -235,8 +227,8 @@ impl App {
                 python: None,
                 openjdk: None,
                 package_dirs: vec![PackageDirRec {
-                    id: descriptor_info.product_info.prefix.clone(),
-                    properties: d.get_env_config_value()?,
+                    id: product_info.prefix.clone(),
+                    properties: descriptor.get_env_config_value()?,
                 }],
             })?,
             false,
