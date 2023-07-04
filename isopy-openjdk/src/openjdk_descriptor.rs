@@ -20,13 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::openjdk_version::OpenJdkVersion;
-use crate::serialization::ProjectConfigRec;
+use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
 use isopy_lib::{
     Descriptor, GetEnvConfigValueError, GetEnvConfigValueResult, GetProjectConfigValueError,
     GetProjectConfigValueResult, ParseDescriptorError, ProjectConfigInfo,
 };
-use serde::Serialize;
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -66,16 +65,7 @@ impl Descriptor for OpenJdkDescriptor {
     }
 
     fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value> {
-        #[derive(Serialize)]
-        struct EnvRec {
-            #[serde(rename = "dir")]
-            dir: PathBuf,
-
-            #[serde(rename = "version")]
-            version: OpenJdkVersion,
-        }
-
-        serde_json::to_value(EnvRec {
+        serde_json::to_value(EnvConfigRec {
             dir: PathBuf::from("openjdk"),
             version: self.version.clone(),
         })
@@ -83,11 +73,11 @@ impl Descriptor for OpenJdkDescriptor {
     }
 
     fn get_project_config_info(&self) -> GetProjectConfigValueResult<ProjectConfigInfo> {
-        let value = serde_json::to_value(ProjectConfigRec {
-            version: self.version.clone(),
+        Ok(ProjectConfigInfo {
+            value: serde_json::to_value(ProjectConfigRec {
+                version: self.version.clone(),
+            })
+            .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?,
         })
-        .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?;
-
-        Ok(ProjectConfigInfo { value })
     }
 }

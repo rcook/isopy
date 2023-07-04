@@ -20,14 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_version::PythonVersion;
-use crate::serialization::ProjectConfigRec;
+use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
 use anyhow::anyhow;
 use isopy_lib::{
     Descriptor, GetEnvConfigValueError, GetEnvConfigValueResult, GetProjectConfigValueError,
     GetProjectConfigValueResult, ParseDescriptorError, ProjectConfigInfo,
 };
-use serde::Serialize;
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -84,19 +83,7 @@ impl Descriptor for PythonDescriptor {
     }
 
     fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value> {
-        #[derive(Serialize)]
-        struct EnvRec {
-            #[serde(rename = "dir")]
-            dir: PathBuf,
-
-            #[serde(rename = "version")]
-            version: PythonVersion,
-
-            #[serde(rename = "tag", skip_serializing_if = "Option::is_none")]
-            tag: Option<Tag>,
-        }
-
-        serde_json::to_value(EnvRec {
+        serde_json::to_value(EnvConfigRec {
             dir: PathBuf::from("python"),
             version: self.version.clone(),
             tag: self.tag.clone(),
@@ -105,13 +92,13 @@ impl Descriptor for PythonDescriptor {
     }
 
     fn get_project_config_info(&self) -> GetProjectConfigValueResult<ProjectConfigInfo> {
-        let value = serde_json::to_value(ProjectConfigRec {
-            version: self.version.clone(),
-            tag: self.tag.clone(),
+        Ok(ProjectConfigInfo {
+            value: serde_json::to_value(ProjectConfigRec {
+                version: self.version.clone(),
+                tag: self.tag.clone(),
+            })
+            .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?,
         })
-        .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?;
-
-        Ok(ProjectConfigInfo { value })
     }
 }
 

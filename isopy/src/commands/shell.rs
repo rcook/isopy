@@ -20,14 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ENV_FILE_NAME;
-use crate::constants::ISOPY_ENV_NAME;
-use crate::serialization::EnvRec;
-use crate::serialization::OpenJdkEnvRec;
-use crate::serialization::PythonEnvRec;
-use crate::shell::make_openjdk_path_dirs;
-use crate::shell::make_python_path_dirs;
-use crate::shell::Command;
+use crate::constants::{ENV_FILE_NAME, ISOPY_ENV_NAME};
+use crate::serialization::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
+use crate::shell::{make_openjdk_path_dirs, make_python_path_dirs, Command};
 use crate::status::Status;
 use anyhow::{anyhow, bail, Result};
 use joat_repo::DirInfo;

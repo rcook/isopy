@@ -19,12 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod env_config_rec;
-mod index_rec;
-mod project_config_rec;
-mod version_rec;
+use crate::python_version::PythonVersion;
+use crate::tag::Tag;
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
-pub use self::env_config_rec::EnvConfigRec;
-pub use self::index_rec::IndexRec;
-pub use self::project_config_rec::ProjectConfigRec;
-pub use self::version_rec::VersionRec;
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EnvConfigRec {
+    #[serde(rename = "dir")]
+    pub dir: PathBuf,
+
+    #[serde(rename = "version")]
+    pub version: PythonVersion,
+
+    #[serde(rename = "tag", skip_serializing_if = "Option::is_none")]
+    pub tag: Option<Tag>,
+}

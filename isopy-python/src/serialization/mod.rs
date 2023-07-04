@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+mod env_config_rec;
 mod project_config_rec;
 
+pub use self::env_config_rec::EnvConfigRec;
 pub use self::project_config_rec::ProjectConfigRec;
