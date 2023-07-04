@@ -20,30 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ISOPY_ENV_NAME;
-use crate::serialization::{OpenJdkEnvRec, PythonEnvRec};
 use anyhow::Result;
 use joat_repo::{LinkId, MetaId};
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-pub fn make_python_path_dirs(data_dir: &Path, rec: &PythonEnvRec) -> Vec<PathBuf> {
-    vec![data_dir.join(&rec.dir).join("bin")]
-}
-
-#[cfg(target_os = "windows")]
-pub fn make_python_path_dirs(data_dir: &Path, rec: &PythonEnvRec) -> Vec<PathBuf> {
-    vec![
-        data_dir.join(&rec.dir).join("bin"),
-        data_dir.join(&rec.dir).join("Scripts"),
-    ]
-}
-
-pub fn make_openjdk_path_dirs(data_dir: &Path, rec: &OpenJdkEnvRec) -> Vec<PathBuf> {
-    vec![data_dir.join(&rec.dir).join("bin")]
-}
 
 pub struct Command {
     program: Option<OsString>,

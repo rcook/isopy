@@ -1,3 +1,5 @@
+use crate::serialization::PackageDirRec;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -22,8 +24,9 @@
 use super::descriptor_id::DescriptorId;
 use super::descriptor_info::DescriptorInfo;
 use super::product_info::ProductInfo;
-use anyhow::anyhow;
-use isopy_lib::{ParseDescriptorError, ParseDescriptorResult};
+use anyhow::{anyhow, Result};
+use isopy_lib::{EnvInfo, ParseDescriptorError, ParseDescriptorResult};
+use std::path::Path;
 use std::rc::Rc;
 
 pub struct ProductRegistry {
@@ -52,6 +55,25 @@ impl ProductRegistry {
             product_info: Rc::clone(product_info),
             descriptor,
         })
+    }
+
+    pub fn blah(
+        &self,
+        data_dir: &Path,
+        package_dir_rec: &PackageDirRec,
+    ) -> Result<Option<EnvInfo>> {
+        let Some(product_info) = self
+            .product_infos
+            .iter()
+            .find(|p| p.prefix == package_dir_rec.id) else {
+            return Ok(None);
+        };
+
+        Ok(Some(
+            product_info
+                .product
+                .read_env_config(data_dir, &package_dir_rec.properties)?,
+        ))
     }
 
     fn find_product_info<'a>(&self, s: &'a str) -> Option<(&Rc<ProductInfo>, &'a str)> {

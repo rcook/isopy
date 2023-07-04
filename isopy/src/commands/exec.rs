@@ -19,13 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
-use crate::{app::App, shell::make_python_path_dirs};
-use anyhow::{bail, Result};
+use anyhow::Result;
 use joatmon::read_yaml_file;
+use log::error;
 use std::ffi::OsString;
 use std::path::Path;
 
@@ -35,15 +36,23 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
         command.arg(OsString::from(arg));
     }
 
-    let Some(dir_info) = app.find_dir_info(&app.cwd,None)? else {
-        bail!("Could not find environment for directory {}", app.cwd.display())
+    let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
+        error!("could not find environment for directory {}", app.cwd.display());
+        return Ok(Status::Fail);
     };
 
-    let data_dir = dir_info.data_dir();
-    let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
+    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(ENV_FILE_NAME))?;
 
-    let Some(rec) = env_rec.python else {
-        bail!("No Python configured for directory {}", app.cwd.display())
+    let package_dir_rec = env_rec.package_dirs.first();
+
+    let Some(package_dir_rec) = package_dir_rec else {
+        error!("could not find default package directory");
+        return Ok(Status::Fail);
+    };
+
+    let Some(env_info) = app.registry.blah(dir_info.data_dir(), package_dir_rec)? else {
+        error!("could not get environment info");
+        return Ok(Status::Fail);
     };
 
     // Explicitly drop app so that repository is unlocked in shell
@@ -52,11 +61,17 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
     command.exec(
         dir_info.link_id(),
         dir_info.meta_id(),
-        &make_python_path_dirs(dir_info.data_dir(), &rec)
+        &env_info
+            .path_dirs
             .iter()
             .map(|p| p as &Path)
             .collect::<Vec<_>>(),
-        &[],
+        &env_info
+            .envs
+            .iter()
+            .map(|(k, v)| (k.as_str(), v.as_str()))
+            .collect::<Vec<_>>(),
     )?;
+
     Ok(Status::OK)
 }

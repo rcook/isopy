@@ -21,13 +21,13 @@
 //
 use crate::adoptium::AdoptiumIndexManager;
 use crate::openjdk_descriptor::OpenJdkDescriptor;
-use crate::serialization::ProjectConfigRec;
+use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
-    verify_sha256_file_checksum, Descriptor, DownloadAssetError, DownloadAssetResult,
-    ParseDescriptorError, ParseDescriptorResult, Product, ReadProjectConfigFileError,
-    ReadProjectConfigFileResult,
+    verify_sha256_file_checksum, Descriptor, DownloadAssetError, DownloadAssetResult, EnvInfo,
+    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
+    ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -124,5 +124,30 @@ impl Product for OpenJdk {
             .downcast_ref::<OpenJdkDescriptor>()
             .expect("must be OpenJdkDescriptor");
         self.download_openjdk(descriptor, shared_dir).await
+    }
+
+    fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> ReadEnvConfigResult<EnvInfo> {
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_config_rec.dir).join("bin")]
+        }
+
+        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
+            .map_err(|e| ReadEnvConfigError::Other(anyhow!(e)))?;
+
+        let openjdk_dir = data_dir.join(&env_config_rec.dir);
+        let openjdk_dir_str = String::from(
+            openjdk_dir
+                .to_str()
+                .ok_or_else(|| anyhow!("could not convert path to string"))?,
+        );
+
+        Ok(EnvInfo {
+            path_dirs: make_path_dirs(data_dir, &env_config_rec),
+            envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
+        })
     }
 }

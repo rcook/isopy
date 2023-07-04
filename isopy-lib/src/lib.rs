@@ -36,6 +36,7 @@
 mod checksum;
 mod descriptor;
 mod download;
+mod env_info;
 mod last_modified;
 mod link_header;
 mod product;
@@ -49,11 +50,13 @@ pub use self::descriptor::{
     GetProjectConfigValueResult, ProjectConfigInfo,
 };
 pub use self::download::download_stream;
+pub use self::env_info::EnvInfo;
 pub use self::last_modified::LastModified;
 pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErrorResult};
 pub use self::product::{
     DownloadAssetError, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
-    ReadProjectConfigFileError, ReadProjectConfigFileResult,
+    ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
+    ReadProjectConfigFileResult,
 };
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};

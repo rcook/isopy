@@ -1,3 +1,4 @@
+use crate::EnvInfo;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -55,6 +56,14 @@ pub enum DownloadAssetError {
 
 pub type DownloadAssetResult<T> = StdResult<T, DownloadAssetError>;
 
+#[derive(Debug, Error)]
+pub enum ReadEnvConfigError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type ReadEnvConfigResult<T> = StdResult<T, ReadEnvConfigError>;
+
 #[async_trait]
 pub trait Product {
     fn name(&self) -> &str;
@@ -73,4 +82,10 @@ pub trait Product {
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
     ) -> DownloadAssetResult<PathBuf>;
+
+    fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> ReadEnvConfigResult<EnvInfo>;
 }

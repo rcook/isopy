@@ -19,25 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::openjdk_env_rec::OpenJdkEnvRec;
-use super::package_dir_rec::PackageDirRec;
-use super::python_env_rec::PythonEnvRec;
-use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct EnvRec {
-    #[serde(rename = "config_path")]
-    pub config_path: PathBuf,
-
-    // TBD: Remove this!
-    #[serde(rename = "python", skip_serializing_if = "Option::is_none")]
-    pub python: Option<PythonEnvRec>,
-
-    // TBD: Remove this!
-    #[serde(rename = "openjdk", skip_serializing_if = "Option::is_none")]
-    pub openjdk: Option<OpenJdkEnvRec>,
-
-    #[serde(rename = "package_dirs")]
-    pub package_dirs: Vec<PackageDirRec>,
+#[derive(Debug)]
+pub struct EnvInfo {
+    pub path_dirs: Vec<PathBuf>,
+    pub envs: Vec<(String, String)>,
 }

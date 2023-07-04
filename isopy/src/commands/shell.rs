@@ -21,16 +21,16 @@
 //
 use crate::app::App;
 use crate::constants::{ENV_FILE_NAME, ISOPY_ENV_NAME};
-use crate::serialization::{EnvRec, OpenJdkEnvRec, PythonEnvRec};
-use crate::shell::{make_openjdk_path_dirs, make_python_path_dirs, Command};
+use crate::serialization::EnvRec;
+use crate::shell::Command;
 use crate::status::Status;
-use anyhow::{anyhow, bail, Result};
-use joat_repo::DirInfo;
+use anyhow::{bail, Result};
 use joatmon::read_yaml_file;
+use log::error;
 use std::env::{var, VarError};
 use std::path::Path;
 
-pub fn do_shell(app: App) -> Result<Status> {
+pub fn do_shell(app: App, package_dir_id: &Option<String>) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             bail!("You are already in an isopy shell");
@@ -40,60 +40,48 @@ pub fn do_shell(app: App) -> Result<Status> {
     }
 
     let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
-        bail!("Could not find environment for directory {}", app.cwd.display())
+        error!("could not find environment for directory {}", app.cwd.display());
+        return Ok(Status::Fail);
     };
 
     let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(ENV_FILE_NAME))?;
 
-    if let Some(rec) = env_rec.python {
-        do_shell_python(app, &rec, &dir_info)?;
-        return Ok(Status::OK);
+    let package_dir_rec = match package_dir_id.as_ref() {
+        Some(id) => env_rec.package_dirs.iter().find(|p| p.id == *id),
+        None => env_rec.package_dirs.first(),
     };
 
-    if let Some(rec) = env_rec.openjdk {
-        do_shell_openjdk(app, &rec, &dir_info)?;
-        return Ok(Status::OK);
-    }
+    let Some(package_dir_rec) = package_dir_rec else {
+        if let Some(package_dir_id) = package_dir_id {
+            error!("could not find package directory with ID {}", package_dir_id);
+        } else {
+            error!("could not find default package directory");
+        }
+        return Ok(Status::Fail);
+    };
 
-    bail!(
-        "Environment for directory {} is incorrectly configured",
-        app.cwd.display()
-    )
-}
+    let Some(env_info) = app.registry.blah(dir_info.data_dir(), package_dir_rec)? else {
+        error!("could not get environment info");
+        return Ok(Status::Fail);
+    };
 
-fn do_shell_python(app: App, rec: &PythonEnvRec, dir_info: &DirInfo) -> Result<()> {
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
 
     Command::new_shell().exec(
         dir_info.link_id(),
         dir_info.meta_id(),
-        &make_python_path_dirs(dir_info.data_dir(), rec)
+        &env_info
+            .path_dirs
             .iter()
             .map(|p| p as &Path)
             .collect::<Vec<_>>(),
-        &[],
-    )?;
-    Ok(())
-}
-
-fn do_shell_openjdk(app: App, rec: &OpenJdkEnvRec, dir_info: &DirInfo) -> Result<()> {
-    // Explicitly drop app so that repository is unlocked in shell
-    drop(app);
-
-    let openjdk_dir = dir_info.data_dir().join(&rec.dir);
-    let openjdk_dir_str = openjdk_dir
-        .to_str()
-        .ok_or_else(|| anyhow!("could not convert path to string"))?;
-
-    Command::new_shell().exec(
-        dir_info.link_id(),
-        dir_info.meta_id(),
-        &make_openjdk_path_dirs(dir_info.data_dir(), rec)
+        &env_info
+            .envs
             .iter()
-            .map(|p| p as &Path)
+            .map(|(k, v)| (k.as_str(), v.as_str()))
             .collect::<Vec<_>>(),
-        &[("JAVA_HOME", openjdk_dir_str)],
     )?;
-    Ok(())
+
+    Ok(Status::OK)
 }

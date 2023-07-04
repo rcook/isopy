@@ -97,7 +97,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::List => do_list(&app),
         Command::Prompt => do_prompt(&app),
         Command::Scratch => do_scratch(&app),
-        Command::Shell => do_shell(app),
+        Command::Shell { package_dir_id } => do_shell(app, &package_dir_id),
         Command::Wrap {
             wrapper_path,
             script_path,

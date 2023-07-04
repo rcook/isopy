@@ -25,6 +25,6 @@ mod proc;
 #[cfg(target_os = "windows")]
 mod windows;
 
-pub use self::command::{make_openjdk_path_dirs, make_python_path_dirs, Command};
+pub use self::command::Command;
 #[cfg(target_os = "windows")]
 pub use self::windows::{get_windows_shell_info, WindowsShellKind};

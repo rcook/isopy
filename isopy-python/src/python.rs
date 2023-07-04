@@ -19,12 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::{python_descriptor::PythonDescriptor, serialization::ProjectConfigRec};
+use crate::{
+    python_descriptor::PythonDescriptor,
+    serialization::{EnvConfigRec, ProjectConfigRec},
+};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
-    Descriptor, DownloadAssetResult, ParseDescriptorError, ParseDescriptorResult, Product,
-    ReadProjectConfigFileError, ReadProjectConfigFileResult,
+    Descriptor, DownloadAssetResult, EnvInfo, ParseDescriptorError, ParseDescriptorResult, Product,
+    ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
+    ReadProjectConfigFileResult,
 };
 use joatmon::read_yaml_file;
 use std::path::{Path, PathBuf};
@@ -77,5 +81,32 @@ impl Product for Python {
         _shared_dir: &Path,
     ) -> DownloadAssetResult<PathBuf> {
         todo!();
+    }
+
+    fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> ReadEnvConfigResult<EnvInfo> {
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_config_rec.dir).join("bin")]
+        }
+
+        #[cfg(target_os = "windows")]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![
+                data_dir.join(&env_config_rec.dir).join("bin"),
+                data_dir.join(&env_config_rec.dir).join("Scripts"),
+            ]
+        }
+
+        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
+            .map_err(|e| ReadEnvConfigError::Other(anyhow!(e)))?;
+
+        Ok(EnvInfo {
+            path_dirs: make_path_dirs(data_dir, &env_config_rec),
+            envs: vec![],
+        })
     }
 }

@@ -156,7 +156,10 @@ pub enum Command {
     Scratch,
 
     #[command(name = "shell", about = "Start Python environment shell")]
-    Shell,
+    Shell {
+        #[arg(help = "Package directory ID")]
+        package_dir_id: Option<String>,
+    },
 
     #[command(name = "wrap", about = "Generate wrapper script for Python script")]
     Wrap {
