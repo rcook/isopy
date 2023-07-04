@@ -39,10 +39,12 @@ pub mod python_standalone_builds;
 mod python;
 mod python_descriptor;
 mod python_version;
+mod repository_name;
 mod serialization;
 mod tag;
 
 pub use self::python::Python;
 pub use self::python_descriptor::PythonDescriptor;
 pub use self::python_version::{PythonVersion, PythonVersionParseError, PythonVersionParseResult};
+pub use self::repository_name::RepositoryName;
 pub use self::tag::{option_tag, Tag};

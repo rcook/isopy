@@ -23,12 +23,11 @@ use crate::asset::{download_asset, get_asset};
 use crate::python::{Asset, AssetMeta};
 use crate::repository::{GitHubRepository, LocalRepository, Repository};
 use crate::repository_info::RepositoryInfo;
-use crate::repository_name::RepositoryName;
 use crate::serialization::{PackageRec, RepositoriesRec, RepositoryRec};
 use anyhow::{anyhow, Result};
 use isopy_lib::dir_url;
 use isopy_python::constants::{RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
-use isopy_python::PythonDescriptor;
+use isopy_python::{PythonDescriptor, RepositoryName};
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::path::{Path, PathBuf};
 

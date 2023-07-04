@@ -46,7 +46,6 @@ mod python;
 mod registry;
 mod repository;
 mod repository_info;
-mod repository_name;
 mod run;
 mod serialization;
 mod shell;

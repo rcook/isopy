@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repository::Repository;
-use crate::repository_name::RepositoryName;
+use isopy_python::RepositoryName;
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,

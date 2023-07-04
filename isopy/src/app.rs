@@ -22,7 +22,6 @@
 use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::foo::Foo;
 use crate::registry::{ProductInfo, ProductRegistry};
-use crate::repository_name::RepositoryName;
 use crate::serialization::IndexRec;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
@@ -30,7 +29,7 @@ use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, LastModified};
 use isopy_openjdk::OpenJdk;
 use isopy_python::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME};
-use isopy_python::{Python, PythonDescriptor};
+use isopy_python::{Python, PythonDescriptor, RepositoryName};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{label_file_name, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
