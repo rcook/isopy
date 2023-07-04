@@ -19,44 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::repository::Response;
+use crate::last_modified::LastModified;
 use anyhow::Result;
-use joat_logger::begin_operation;
-use joatmon::{safe_back_up, safe_create_file};
-use log::info;
-use std::fs::remove_file;
-use std::io::Write;
-use std::path::Path;
+use async_trait::async_trait;
+use bytes::Bytes;
 
 pub type ContentLength = u64;
 
-pub async fn download_stream(
-    label: &str,
-    response: &mut Box<dyn Response>,
-    output_path: &Path,
-) -> Result<()> {
-    if output_path.exists() {
-        let safe_back_up_path = safe_back_up(output_path)?;
-        info!(
-            "Data file {} backed up to {}",
-            output_path.display(),
-            safe_back_up_path.display()
-        );
-        remove_file(output_path)?;
-    }
+pub trait Response {
+    fn last_modified(&self) -> &Option<LastModified>;
+    fn content_length(&self) -> Option<ContentLength>;
+    fn bytes_stream(&mut self) -> Result<Box<dyn Stream>>;
+}
 
-    let op = begin_operation(response.content_length())?;
-    let mut stream = response.bytes_stream()?;
-    let mut file = safe_create_file(output_path, false)?;
-    let mut downloaded = 0;
-    op.set_message(&format!("Fetching {label}"));
-    while let Some(item) = stream.next().await {
-        let chunk = item?;
-        downloaded += chunk.len() as ContentLength;
-        file.write_all(&chunk)?;
-        op.set_progress(downloaded);
-    }
-    op.set_message(&format!("Finished fetching {label}"));
-    drop(op);
-    Ok(())
+#[async_trait]
+pub trait Stream {
+    async fn next(&mut self) -> Option<Result<Bytes>>;
 }

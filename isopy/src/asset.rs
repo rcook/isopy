@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::checksum::validate_sha256_checksum;
-use crate::download::download_stream;
 use crate::python::{Asset, AssetFilter};
 use anyhow::{anyhow, bail, Result};
+use isopy_lib::download_stream;
 use isopy_python::{PythonDescriptor, Tag};
 use log::info;
 use std::fs::remove_file;

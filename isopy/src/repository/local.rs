@@ -19,14 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::{Repository, Response, Stream};
-use crate::api::python_standalone_builds::LastModified;
+use super::Repository;
 use crate::constants::RELEASES_FILE_NAME;
-use crate::download::ContentLength;
 use crate::python::Asset;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
+use isopy_lib::{ContentLength, LastModified, Response, Stream};
 use std::fs::{metadata, File};
 use std::io::Read;
 use std::path::PathBuf;

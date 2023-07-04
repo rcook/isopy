@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::adoptium::AdoptiumIndexManager;
-use crate::api::python_standalone_builds::LastModified;
 use crate::asset::{download_asset, get_asset};
 use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{
@@ -37,7 +36,7 @@ use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec}
 use crate::unpack::unpack_file;
 use crate::url::dir_url;
 use anyhow::{bail, Result};
-use isopy_lib::Descriptor;
+use isopy_lib::{Descriptor, LastModified};
 use isopy_openjdk::{OpenJdk, OpenJdkDescriptor};
 use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};

@@ -20,13 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::reqwest_response::ReqwestResponse;
-use super::traits::{Repository, Response};
-use crate::api::python_standalone_builds::LastModified;
+use super::traits::Repository;
 use crate::constants::ISOPY_USER_AGENT;
 use crate::python::Asset;
 use crate::url::{dir_url, file_url};
 use anyhow::Result;
 use async_trait::async_trait;
+use isopy_lib::{LastModified, Response};
 use log::info;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode, Url};

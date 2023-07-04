@@ -22,6 +22,7 @@
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -51,7 +52,7 @@ impl FromStr for LastModified {
 impl TryFrom<&SystemTime> for LastModified {
     type Error = Error;
 
-    fn try_from(value: &SystemTime) -> std::result::Result<Self, Self::Error> {
+    fn try_from(value: &SystemTime) -> StdResult<Self, Self::Error> {
         let nanos = value.duration_since(UNIX_EPOCH)?.as_nanos();
         nanos.to_string().parse::<Self>()
     }
@@ -60,7 +61,7 @@ impl TryFrom<&SystemTime> for LastModified {
 impl TryFrom<&LastModified> for SystemTime {
     type Error = Error;
 
-    fn try_from(value: &LastModified) -> std::result::Result<Self, Self::Error> {
+    fn try_from(value: &LastModified) -> StdResult<Self, Self::Error> {
         let nanos = str::parse::<u64>(value.as_str())?;
         Ok(UNIX_EPOCH + Duration::from_nanos(nanos))
     }
@@ -93,7 +94,7 @@ mod tests {
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
     #[test]
-    fn tryfrom_basics() -> Result<()> {
+    fn try_from_basics() -> Result<()> {
         let system_time = UNIX_EPOCH + Duration::from_secs(12_345_678);
         let last_modified = LastModified::try_from(&system_time)?;
         assert_eq!("12345678000000000", format!("{last_modified}"));

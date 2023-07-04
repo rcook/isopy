@@ -42,7 +42,6 @@ mod backtrace;
 mod checksum;
 mod commands;
 mod constants;
-mod download;
 mod print;
 mod python;
 mod registry;

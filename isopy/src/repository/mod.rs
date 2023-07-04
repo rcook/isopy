@@ -27,4 +27,4 @@ mod traits;
 pub use self::github::GitHubRepository;
 pub use self::local::LocalRepository;
 pub use self::reqwest_response::ReqwestResponse;
-pub use self::traits::{Repository, Response, Stream};
+pub use self::traits::Repository;

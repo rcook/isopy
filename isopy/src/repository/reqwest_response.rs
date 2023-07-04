@@ -19,14 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::traits::{Response, Stream};
-use crate::api::python_standalone_builds::LastModified;
-use crate::download::ContentLength;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures_util::stream::Stream as FuturesStream;
 use futures_util::StreamExt;
+use isopy_lib::{ContentLength, LastModified, Response, Stream};
 use std::pin::Pin;
 
 type PinnedStream = Pin<Box<dyn FuturesStream<Item = reqwest::Result<Bytes>> + Send>>;
