@@ -19,15 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PYTHON_DESCRIPTOR_PREFIX, PYTHON_VERSION_FILE_NAME};
-use crate::registry::DescriptorId;
-use crate::serialization::PythonVersionRec;
+use crate::constants::PYTHON_VERSION_FILE_NAME;
+
 use crate::{app::App, status::Status};
 use anyhow::{bail, Result};
-use joatmon::read_yaml_file;
 
 pub async fn do_init_config(app: &App) -> Result<Status> {
-    let config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
+    let _config_path = app.cwd.join(PYTHON_VERSION_FILE_NAME);
 
     if app.repo.get(&app.cwd)?.is_some() {
         bail!(
@@ -36,6 +34,7 @@ pub async fn do_init_config(app: &App) -> Result<Status> {
         )
     }
 
+    /*
     let rec = read_yaml_file::<PythonVersionRec>(&config_path)?;
 
     // TBD: Nasty hack!
@@ -47,6 +46,10 @@ pub async fn do_init_config(app: &App) -> Result<Status> {
     let descriptor_id = s.parse::<DescriptorId>()?;
 
     app.init_project(&descriptor_id).await?;
+
+    */
+
+    tokio::time::sleep(std::time::Duration::from_millis(0)).await;
 
     Ok(Status::OK)
 }

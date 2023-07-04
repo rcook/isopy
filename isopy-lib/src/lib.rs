@@ -43,7 +43,10 @@ mod reqwest_response;
 mod response;
 
 pub use self::checksum::verify_sha256_file_checksum;
-pub use self::descriptor::{Descriptor, GetConfigValueError, GetConfigValueResult};
+pub use self::descriptor::{
+    Descriptor, GetEnvConfigValueError, GetEnvConfigValueResult, GetProjectConfigValueError,
+    GetProjectConfigValueResult, ProjectConfigInfo,
+};
 pub use self::download::download_stream;
 pub use self::last_modified::LastModified;
 pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErrorResult};

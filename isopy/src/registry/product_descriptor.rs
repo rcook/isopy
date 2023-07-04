@@ -20,12 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use isopy_lib::ParseDescriptorError;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::PythonDescriptor;
-use serde::Deserialize;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::str::FromStr;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ProductDescriptor {
@@ -39,80 +36,5 @@ impl Display for ProductDescriptor {
             Self::Python(d) => write!(f, "{PYTHON_DESCRIPTOR_PREFIX}:{d}"),
             Self::OpenJdk(d) => write!(f, "{OPENJDK_DESCRIPTOR_PREFIX}:{d}"),
         }
-    }
-}
-
-impl FromStr for ProductDescriptor {
-    type Err = ParseDescriptorError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s.split_once(':') {
-            Some((prefix, suffix)) if prefix == PYTHON_DESCRIPTOR_PREFIX => {
-                Self::Python(suffix.parse::<PythonDescriptor>()?)
-            }
-            Some((prefix, suffix)) if prefix == OPENJDK_DESCRIPTOR_PREFIX => {
-                Self::OpenJdk(suffix.parse::<OpenJdkDescriptor>()?)
-            }
-            _ => Self::Python(s.parse::<PythonDescriptor>()?),
-        })
-    }
-}
-
-impl<'de> Deserialize<'de> for ProductDescriptor {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        String::deserialize(deserializer)?
-            .parse::<Self>()
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::ProductDescriptor;
-    use anyhow::Result;
-    use isopy_openjdk::{OpenJdkDescriptor, OpenJdkVersion};
-    use isopy_python::{PythonDescriptor, PythonVersion, Tag};
-    use rstest::rstest;
-
-    #[rstest]
-    #[case(
-        ProductDescriptor::Python(PythonDescriptor { version: PythonVersion::new(111, 222, 333), tag: None}),
-        "111.222.333"
-    )]
-    #[case(
-        ProductDescriptor::Python(PythonDescriptor { version: PythonVersion::new(111, 222, 333), tag: None}),
-        "python:111.222.333"
-    )]
-    #[case(
-        ProductDescriptor::Python(PythonDescriptor { version: PythonVersion::new(111, 222, 333), tag: Some("tag".parse::<Tag>().expect("test: must be valid tag"))}),
-        "111.222.333:tag"
-    )]
-    #[case(
-        ProductDescriptor::Python(PythonDescriptor { version: PythonVersion::new(111, 222, 333), tag: Some("tag".parse::<Tag>().expect("test: must be valid tag"))}),
-        "python:111.222.333:tag"
-    )]
-    #[case(
-        ProductDescriptor::OpenJdk(OpenJdkDescriptor { version: "111.222.333+444".parse::<OpenJdkVersion>().expect("test: must be valid OpenJDK version")}),
-        "openjdk:111.222.333+444"
-    )]
-    fn parse(#[case] expected_result: ProductDescriptor, #[case] input: &str) -> Result<()> {
-        assert_eq!(expected_result, input.parse::<ProductDescriptor>()?);
-        Ok(())
-    }
-
-    #[rstest]
-    #[case("")]
-    #[case("111")]
-    fn parse_errors(#[case] input: &str) {
-        assert!(input.parse::<ProductDescriptor>().is_err());
-    }
-
-    #[test]
-    fn basics() -> Result<()> {
-        assert_eq!("foo", "foo".parse::<Tag>()?.as_str());
-        Ok(())
     }
 }

@@ -26,15 +26,33 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum GetConfigValueError {
+pub enum GetEnvConfigValueError {
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 
-pub type GetConfigValueResult<T> = StdResult<T, GetConfigValueError>;
+pub type GetEnvConfigValueResult<T> = StdResult<T, GetEnvConfigValueError>;
+
+#[derive(Debug, Error)]
+pub enum GetProjectConfigValueError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type GetProjectConfigValueResult<T> = StdResult<T, GetProjectConfigValueError>;
+
+#[derive(Debug)]
+pub struct ProjectConfigInfo {
+    pub file_name: PathBuf,
+    pub value: serde_json::Value,
+}
 
 pub trait Descriptor: Any + Debug + Display + Send + Sync {
     fn as_any(&self) -> &dyn Any;
+
     fn transform_archive_path(&self, path: &Path) -> PathBuf;
-    fn get_config_value(&self) -> GetConfigValueResult<serde_json::Value>;
+
+    fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value>;
+
+    fn get_project_config_info(&self) -> GetProjectConfigValueResult<ProjectConfigInfo>;
 }

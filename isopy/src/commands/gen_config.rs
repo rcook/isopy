@@ -20,48 +20,23 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::{OPENJDK_VERSION_FILE_NAME, PYTHON_VERSION_FILE_NAME};
-use crate::registry::{DescriptorId, ProductDescriptor};
-use crate::serialization::{OpenJdkVersionRec, PythonVersionRec};
+use crate::registry::DescriptorId;
 use crate::status::Status;
 use anyhow::Result;
-use isopy_openjdk::OpenJdkDescriptor;
-use isopy_python::PythonDescriptor;
 use joatmon::safe_write_file;
 
 pub fn do_gen_config(app: &App, descriptor_id: &DescriptorId, force: bool) -> Result<Status> {
-    // TBD: Nasty hack
-    match app
+    let project_config_info = app
         .registry
         .to_descriptor_info(descriptor_id)?
-        .to_product_descriptor()?
-    {
-        ProductDescriptor::Python(d) => {
-            do_gen_config_python(app, &d, force)?;
-        }
-        ProductDescriptor::OpenJdk(d) => do_gen_config_openjdk(app, &d, force)?,
-    }
+        .descriptor
+        .get_project_config_info()?;
+
+    safe_write_file(
+        &app.cwd.join(project_config_info.file_name),
+        serde_yaml::to_string(&project_config_info.value)?,
+        force,
+    )?;
 
     Ok(Status::OK)
-}
-
-fn do_gen_config_python(app: &App, descriptor: &PythonDescriptor, force: bool) -> Result<()> {
-    Ok(safe_write_file(
-        &app.cwd.join(PYTHON_VERSION_FILE_NAME),
-        serde_yaml::to_string(&PythonVersionRec {
-            version: descriptor.version.clone(),
-            tag: descriptor.tag.clone(),
-        })?,
-        force,
-    )?)
-}
-
-fn do_gen_config_openjdk(app: &App, descriptor: &OpenJdkDescriptor, force: bool) -> Result<()> {
-    Ok(safe_write_file(
-        &app.cwd.join(OPENJDK_VERSION_FILE_NAME),
-        serde_yaml::to_string(&OpenJdkVersionRec {
-            version: descriptor.version.clone(),
-        })?,
-        force,
-    )?)
 }

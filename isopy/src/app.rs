@@ -77,7 +77,7 @@ impl App {
         shared_dir: &Path,
     ) -> Result<PathBuf> {
         let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
-        let product_descriptor = descriptor_info.to_product_descriptor()?;
+        let product_descriptor = descriptor_info.to_product_descriptor();
 
         Ok(match &product_descriptor {
             ProductDescriptor::Python(d) => self.download_python(d, shared_dir).await?,
@@ -208,7 +208,7 @@ impl App {
 
     pub async fn init_project(&self, descriptor_id: &DescriptorId) -> Result<()> {
         let descriptor_info = self.registry.to_descriptor_info(descriptor_id)?;
-        let product_descriptor = descriptor_info.to_product_descriptor()?;
+        let product_descriptor = descriptor_info.to_product_descriptor();
 
         let d: &dyn Descriptor = match &product_descriptor {
             ProductDescriptor::Python(d) => d,
@@ -236,7 +236,7 @@ impl App {
                 openjdk: None,
                 package_dirs: vec![PackageDirRec {
                     id: descriptor_info.product_info.prefix.clone(),
-                    properties: d.get_config_value()?,
+                    properties: d.get_env_config_value()?,
                 }],
             })?,
             false,
