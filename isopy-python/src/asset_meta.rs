@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error, Result};
-use isopy_python::python_standalone_builds::api::{
+use crate::python_standalone_builds::api::{
     Arch, ArchiveType, ArchiveTypeBaseName, Family, Flavour, Platform, Subflavour, Variant, OS,
 };
-use isopy_python::{PythonVersion, Tag};
+use crate::python_version::PythonVersion;
+use crate::tag::Tag;
+use anyhow::{bail, Error, Result};
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -42,6 +43,7 @@ pub struct AssetMeta {
 }
 
 impl AssetMeta {
+    #[must_use]
     pub fn definitely_not_an_asset_name(s: &str) -> bool {
         if "libuuid-1.0.3.tar.gz" == s || "SHA256SUMS" == s {
             true
@@ -163,11 +165,12 @@ impl FromStr for AssetMeta {
 #[cfg(test)]
 mod tests {
     use super::AssetMeta;
-    use anyhow::Result;
-    use isopy_python::python_standalone_builds::api::{
+    use crate::python_standalone_builds::api::{
         Arch, ArchiveType, Family, Platform, Subflavour, Variant, OS,
     };
-    use isopy_python::{PythonVersion, Tag};
+    use crate::python_version::PythonVersion;
+    use crate::tag::Tag;
+    use anyhow::Result;
     use rstest::rstest;
 
     #[rstest]

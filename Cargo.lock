@@ -1003,9 +1003,12 @@ version = "0.1.4"
 dependencies = [
  "anyhow",
  "async-trait",
+ "bytes",
+ "include_dir",
  "isopy-lib",
  "joatmon 0.0.29",
  "lazy_static",
+ "log",
  "regex",
  "reqwest",
  "rstest",

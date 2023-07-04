@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod github;
-mod local;
-mod traits;
+use crate::repository_name::RepositoryName;
+use crate::traits::Repository;
 
-pub use self::github::GitHubRepository;
-pub use self::local::LocalRepository;
-pub use self::traits::Repository;
+pub struct RepositoryInfo {
+    pub name: RepositoryName,
+    pub repository: Box<dyn Repository>,
+}

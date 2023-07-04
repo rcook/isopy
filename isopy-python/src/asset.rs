@@ -19,17 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python::Asset;
-use anyhow::Result;
-use async_trait::async_trait;
-use isopy_lib::{LastModified, Response};
+use crate::asset_meta::AssetMeta;
+use crate::tag::Tag;
+use reqwest::Url;
 
-#[async_trait]
-pub trait Repository {
-    async fn get_latest_index(
-        &self,
-        last_modified: &Option<LastModified>,
-    ) -> Result<Option<Box<dyn Response>>>;
-
-    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>>;
+#[derive(Debug, PartialEq)]
+pub struct Asset {
+    pub name: String,
+    pub tag: Tag,
+    pub url: Url,
+    pub size: i64,
+    pub meta: AssetMeta,
 }

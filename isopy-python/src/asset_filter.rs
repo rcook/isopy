@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::asset::Asset;
-use isopy_python::python_standalone_builds::api::{
+use crate::asset::Asset;
+use crate::python_standalone_builds::api::{
     Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS,
 };
-use isopy_python::{PythonVersion, Tag};
+use crate::python_version::PythonVersion;
+use crate::tag::Tag;
 use std::iter::Iterator;
 
 pub struct AssetFilter {
@@ -42,6 +43,7 @@ pub struct AssetFilter {
 
 impl AssetFilter {
     #[allow(unused)]
+    #[must_use]
     pub const fn all() -> Self {
         Self {
             archive_type: None,
@@ -59,6 +61,7 @@ impl AssetFilter {
     }
 
     #[cfg(target_os = "linux")]
+    #[must_use]
     pub const fn default_for_platform() -> Self {
         Self {
             archive_type: Some(ArchiveType::TarGZ),
@@ -208,10 +211,11 @@ impl AssetFilter {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{Asset, AssetMeta};
     use super::AssetFilter;
-    use isopy_python::python_standalone_builds::api::ArchiveType;
-    use isopy_python::Tag;
+    use crate::asset::Asset;
+    use crate::asset_meta::AssetMeta;
+    use crate::python_standalone_builds::api::ArchiveType;
+    use crate::tag::Tag;
     use reqwest::Url;
 
     #[test]

@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::print::print;
-use crate::python::AssetMeta;
 use crate::status::Status;
 use anyhow::Result;
+use isopy_python::AssetMeta;
 use std::fs::read_dir;
 
 pub fn do_downloaded(app: &App) -> Result<Status> {

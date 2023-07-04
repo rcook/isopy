@@ -21,8 +21,8 @@
 //
 use crate::app::App;
 use crate::args::PackageFilter;
+use crate::foo::Foo;
 use crate::print::print;
-use crate::python::{Asset, AssetFilter};
 use crate::registry::ProductDescriptor;
 use crate::status::Status;
 use anyhow::{anyhow, Result};
@@ -31,7 +31,7 @@ use isopy_lib::download_stream;
 use isopy_openjdk::adoptium::AdoptiumIndexManager;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::constants::RELEASES_URL;
-use isopy_python::PythonDescriptor;
+use isopy_python::{Asset, AssetFilter, PythonDescriptor};
 use std::cmp::Ordering;
 
 pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<Status> {
@@ -84,7 +84,7 @@ async fn show_openjdk_index(app: &App) -> Result<()> {
 }
 
 async fn update_index_if_necessary(app: &App) -> Result<()> {
-    let repositories = app.foo.read_repositories(&app.repo.shared_dir())?;
+    let repositories = Foo::read_repositories(app.repo.shared_dir())?;
     let repository = repositories
         .first()
         .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
@@ -118,7 +118,7 @@ fn show_available_downloads(app: &App) -> Result<()> {
         }
     }
 
-    let mut assets = app.foo.read_assets(&app.repo.shared_dir())?;
+    let mut assets = Foo::read_assets(app.repo.shared_dir())?;
     assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {

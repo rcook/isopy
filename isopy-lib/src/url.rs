@@ -21,10 +21,12 @@
 //
 use reqwest::Url;
 
+#[must_use]
 pub fn file_url(url: &Url) -> Url {
     helper(url, false)
 }
 
+#[must_use]
 pub fn dir_url(url: &Url) -> Url {
     helper(url, true)
 }

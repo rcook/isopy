@@ -19,12 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::traits::Repository;
-use crate::python::Asset;
+use crate::asset::Asset;
+use crate::constants::ISOPY_USER_AGENT;
+use crate::traits::Repository;
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{dir_url, file_url, LastModified, ReqwestResponse, Response};
-use isopy_python::constants::ISOPY_USER_AGENT;
 use log::info;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode, Url};
@@ -36,6 +36,7 @@ pub struct GitHubRepository {
 }
 
 impl GitHubRepository {
+    #[must_use]
     pub fn new(url: &Url) -> Self {
         Self {
             base_url: dir_url(url),

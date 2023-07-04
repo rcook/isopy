@@ -35,17 +35,12 @@
 #![allow(clippy::option_if_let_else)]
 mod app;
 mod args;
-mod asset;
 mod backtrace;
-mod checksum;
 mod commands;
 mod constants;
 mod foo;
 mod print;
-mod python;
 mod registry;
-mod repository;
-mod repository_info;
 mod run;
 mod serialization;
 mod shell;

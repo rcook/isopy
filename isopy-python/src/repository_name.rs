@@ -33,10 +33,12 @@ pub enum RepositoryName {
 }
 
 impl RepositoryName {
+    #[must_use]
     pub const fn is_default(&self) -> bool {
         matches!(self, Self::Default)
     }
 
+    #[must_use]
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => DEFAULT_REPOSITORY_NAME,
@@ -95,8 +97,8 @@ impl Serialize for RepositoryName {
 #[cfg(test)]
 mod tests {
     use super::RepositoryName;
+    use crate::constants::REPOSITORY_NAME_REGEX;
     use anyhow::Result;
-    use isopy_python::constants::REPOSITORY_NAME_REGEX;
     use rstest::rstest;
 
     #[rstest]

@@ -19,26 +19,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::asset::{download_asset, get_asset};
-use crate::python::{Asset, AssetMeta};
-use crate::repository::{GitHubRepository, LocalRepository, Repository};
-use crate::repository_info::RepositoryInfo;
 use crate::serialization::{PackageRec, RepositoriesRec, RepositoryRec};
 use anyhow::{anyhow, Result};
 use isopy_lib::dir_url;
 use isopy_python::constants::{RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
-use isopy_python::{PythonDescriptor, RepositoryName};
+use isopy_python::{
+    download_asset, get_asset, Asset, AssetMeta, GitHubRepository, LocalRepository,
+    PythonDescriptor, Repository, RepositoryInfo, RepositoryName,
+};
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::path::{Path, PathBuf};
 
 pub struct Foo;
 
 impl Foo {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self
     }
 
-    pub fn read_assets(&self, shared_dir: &Path) -> Result<Vec<Asset>> {
+    pub fn read_assets(shared_dir: &Path) -> Result<Vec<Asset>> {
         let index_json_path = shared_dir.join(RELEASES_FILE_NAME);
         let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
 
@@ -60,7 +59,7 @@ impl Foo {
         Ok(assets)
     }
 
-    pub fn read_repositories(&self, shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
+    pub fn read_repositories(shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
         fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
             match rec {
                 RepositoryRec::GitHub { name, url, enabled } => {
@@ -118,9 +117,9 @@ impl Foo {
         descriptor: &PythonDescriptor,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        let assets = self.read_assets(shared_dir)?;
+        let assets = Self::read_assets(shared_dir)?;
         let asset = get_asset(&assets, descriptor)?;
-        let repositories = self.read_repositories(shared_dir)?;
+        let repositories = Self::read_repositories(shared_dir)?;
         let repository = repositories
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;

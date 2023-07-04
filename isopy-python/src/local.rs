@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::Repository;
-use crate::python::Asset;
+use crate::asset::Asset;
+use crate::constants::RELEASES_FILE_NAME;
+use crate::traits::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
 use isopy_lib::{ContentLength, LastModified, Response, Stream};
-use isopy_python::constants::RELEASES_FILE_NAME;
 use std::fs::{metadata, File};
 use std::io::Read;
 use std::path::PathBuf;
@@ -36,6 +36,7 @@ pub struct LocalRepository {
 }
 
 impl LocalRepository {
+    #[must_use]
     pub const fn new(dir: PathBuf) -> Self {
         Self { dir }
     }
