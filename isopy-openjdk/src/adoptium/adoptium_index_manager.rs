@@ -19,12 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::adoptium_client::{all_versions, AdoptiumClient};
-use super::query::Query;
+use super::api::{Release, Singleton};
+use super::client::{all_versions, AdoptiumClient, Query};
+use crate::serialization::{IndexRec, VersionRec};
 use anyhow::Result;
 use chrono::{Duration, Utc};
-use isopy_openjdk::adoptium::api::{Release, Singleton};
-use isopy_openjdk::{IndexRec, VersionRec};
 use joatmon::{read_yaml_file, safe_write_file};
 use reqwest::Url;
 use std::path::{Path, PathBuf};

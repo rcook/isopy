@@ -20,9 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod adoptium_client;
-mod adoptium_index_manager;
 mod query;
 
-pub use self::adoptium_client::AdoptiumClient;
-pub use self::adoptium_index_manager::AdoptiumIndexManager;
+pub use self::adoptium_client::{all_versions, AdoptiumClient};
 pub use self::query::Query;

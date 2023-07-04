@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::adoptium::AdoptiumIndexManager;
 use crate::app::App;
 use crate::args::PackageFilter;
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, RELEASES_URL};
@@ -30,6 +29,7 @@ use crate::status::Status;
 use anyhow::{anyhow, Result};
 use colored::Colorize;
 use isopy_lib::download_stream;
+use isopy_openjdk::adoptium::AdoptiumIndexManager;
 use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::PythonDescriptor;
 use std::cmp::Ordering;

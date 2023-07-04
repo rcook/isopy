@@ -20,3 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 pub mod api;
+pub mod client;
+
+mod adoptium_index_manager;
+
+pub use self::adoptium_index_manager::AdoptiumIndexManager;

@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::adoptium::AdoptiumIndexManager;
 use crate::asset::{download_asset, get_asset};
 use crate::checksum::verify_sha256_file_checksum;
 use crate::constants::{
@@ -37,6 +36,7 @@ use crate::unpack::unpack_file;
 use crate::url::dir_url;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, LastModified};
+use isopy_openjdk::adoptium::AdoptiumIndexManager;
 use isopy_openjdk::{OpenJdk, OpenJdkDescriptor};
 use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};

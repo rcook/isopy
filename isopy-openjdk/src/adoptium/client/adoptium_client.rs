@@ -19,14 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use super::super::api::{List, Release, VersionData, Versions};
 use super::query::Query;
-use crate::repository::ReqwestResponse;
+use crate::MavenVersionLimit::{Closed, Open};
+use crate::MavenVersionRange::{self, Range};
+use crate::MavenVersionValue;
 use anyhow::Result;
-use isopy_lib::{download_stream, LinkHeader, Response};
-use isopy_openjdk::adoptium::api::{List, Release, VersionData, Versions};
-use isopy_openjdk::MavenVersionLimit::{Closed, Open};
-use isopy_openjdk::MavenVersionRange::{self, Range};
-use isopy_openjdk::MavenVersionValue;
+use isopy_lib::{download_stream, LinkHeader, ReqwestResponse, Response};
 use lazy_static::lazy_static;
 use reqwest::{Client, RequestBuilder, Url};
 use serde::de::DeserializeOwned;
@@ -121,10 +120,10 @@ impl AdoptiumClient {
 #[cfg(test)]
 mod tests {
     use super::AdoptiumClient;
+    use crate::MavenVersionLimit::{Closed, Open};
+    use crate::MavenVersionRange::{self, Range, Value};
+    use crate::MavenVersionValue;
     use anyhow::Result;
-    use isopy_openjdk::MavenVersionLimit::{Closed, Open};
-    use isopy_openjdk::MavenVersionRange::{self, Range, Value};
-    use isopy_openjdk::MavenVersionValue;
     use rstest::rstest;
 
     #[rstest]
