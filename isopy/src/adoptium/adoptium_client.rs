@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::query::Query;
-use crate::api::adoptium::{List, Release, VersionData, Versions};
 use crate::download::download_stream;
-use crate::link_header::LinkHeader;
 use crate::repository::{ReqwestResponse, Response};
 use anyhow::Result;
+use isopy_lib::LinkHeader;
+use isopy_openjdk::adoptium::api::{List, Release, VersionData, Versions};
 use isopy_openjdk::MavenVersionLimit::{Closed, Open};
 use isopy_openjdk::MavenVersionRange::{self, Range};
 use isopy_openjdk::MavenVersionValue;

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::adoptium::{
+use isopy_openjdk::adoptium::api::{
     AdoptiumJvmImpl, AdoptiumVendor, Architecture, HeapSize, ImageType, OperatingSystem, Project,
     ReleaseType, SortMethod, SortOrder,
 };

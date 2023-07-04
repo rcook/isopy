@@ -21,10 +21,10 @@
 //
 use super::adoptium_client::{all_versions, AdoptiumClient};
 use super::query::Query;
-use crate::api::adoptium::{Release, Singleton};
 use crate::serialization::adoptium::{IndexRec, VersionRec};
 use anyhow::Result;
 use chrono::{Duration, Utc};
+use isopy_openjdk::adoptium::api::{Release, Singleton};
 use joatmon::{read_yaml_file, safe_write_file};
 use reqwest::Url;
 use std::path::{Path, PathBuf};

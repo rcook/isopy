@@ -963,6 +963,7 @@ name = "isopy-lib"
 version = "0.1.4"
 dependencies = [
  "anyhow",
+ "reqwest",
  "serde_json",
  "thiserror",
 ]
@@ -972,6 +973,7 @@ name = "isopy-openjdk"
 version = "0.1.4"
 dependencies = [
  "anyhow",
+ "chrono",
  "isopy-lib",
  "percent-encoding",
  "rstest",

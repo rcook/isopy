@@ -43,7 +43,6 @@ mod checksum;
 mod commands;
 mod constants;
 mod download;
-mod link_header;
 mod print;
 mod python;
 mod registry;
