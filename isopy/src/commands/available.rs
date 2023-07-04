@@ -84,7 +84,7 @@ async fn show_openjdk_index(app: &App) -> Result<()> {
 }
 
 async fn update_index_if_necessary(app: &App) -> Result<()> {
-    let repositories = app.read_repositories()?;
+    let repositories = app.foo.read_repositories(&app.repo.shared_dir())?;
     let repository = repositories
         .first()
         .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
@@ -118,7 +118,7 @@ fn show_available_downloads(app: &App) -> Result<()> {
         }
     }
 
-    let mut assets = app.read_assets()?;
+    let mut assets = app.foo.read_assets(&app.repo.shared_dir())?;
     assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
     for asset in AssetFilter::default_for_platform().filter(assets.iter()) {

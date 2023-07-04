@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::checksum::validate_sha256_checksum;
 use crate::python::{Asset, AssetFilter};
-use anyhow::{anyhow, bail, Result};
+use crate::repository_info::RepositoryInfo;
+use anyhow::{bail, Result};
 use isopy_lib::download_stream;
 use isopy_python::{PythonDescriptor, Tag};
 use log::info;
@@ -60,12 +60,11 @@ pub fn get_asset<'a>(assets: &'a [Asset], descriptor: &PythonDescriptor) -> Resu
     );
 }
 
-pub async fn download_asset(app: &App, asset: &Asset, shared_dir: &Path) -> Result<PathBuf> {
-    let repositories = app.read_repositories()?;
-    let repository = repositories
-        .first()
-        .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
-
+pub async fn download_asset(
+    repository: &RepositoryInfo,
+    asset: &Asset,
+    shared_dir: &Path,
+) -> Result<PathBuf> {
     let asset_path = shared_dir.join(&asset.name);
     if asset_path.exists() {
         info!("Asset {} already downloaded", asset_path.display());
