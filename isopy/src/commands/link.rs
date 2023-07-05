@@ -30,7 +30,7 @@ pub fn do_link(app: &App, meta_id: &MetaId) -> Result<Status> {
         bail!("could not create link");
     };
 
-    print_dir_info_and_env(&dir_info)?;
+    print_dir_info_and_env(app, &dir_info)?;
 
     Ok(Status::OK)
 }

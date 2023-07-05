@@ -141,8 +141,6 @@ impl App {
             &dir_info.data_dir().join(ENV_FILE_NAME),
             serde_yaml::to_string(&EnvRec {
                 config_path: self.cwd.clone(),
-                python: None,
-                openjdk: None,
                 package_dirs: vec![PackageDirRec {
                     id: product_info.prefix.clone(),
                     properties: descriptor.get_env_config_value()?,

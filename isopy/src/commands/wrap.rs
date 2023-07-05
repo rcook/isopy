@@ -24,19 +24,24 @@ use crate::constants::ENV_FILE_NAME;
 use crate::serialization::EnvRec;
 use crate::status::Status;
 use anyhow::{bail, Result};
+#[allow(unused)]
 use joatmon::{read_yaml_file, safe_write_file};
 use serde::Serialize;
 use std::env::join_paths;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+#[allow(unused)]
 use tinytemplate::TinyTemplate;
 
+#[allow(unused)]
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const PYTHON_EXECUTABLE_NAME: &str = "python3";
 
+#[allow(unused)]
 #[cfg(target_os = "windows")]
 const PYTHON_EXECUTABLE_NAME: &str = "python";
 
+#[allow(unused)]
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
 set -euo pipefail
@@ -59,6 +64,7 @@ struct Context {
     script_path: PathBuf,
 }
 
+#[allow(unused)]
 pub fn do_wrap(
     app: &App,
     wrapper_path: &Path,
@@ -72,10 +78,8 @@ pub fn do_wrap(
     let data_dir = dir_info.data_dir();
     let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
 
-    let Some(rec) = env_rec.python else {
-        bail!("No Python configured for directory {}", app.cwd.display())
-    };
-
+    todo!()
+    /*
     let python_dir = data_dir.join(rec.dir);
 
     let mut template = TinyTemplate::new();
@@ -108,8 +112,10 @@ pub fn do_wrap(
     set_file_attributes(wrapper_path)?;
 
     Ok(Status::OK)
+    */
 }
 
+#[allow(unused)]
 fn make_path_env(paths: &[&Path]) -> Result<OsString> {
     let mut new_paths = paths.to_vec();
 
@@ -125,6 +131,7 @@ fn make_path_env(paths: &[&Path]) -> Result<OsString> {
     Ok(s)
 }
 
+#[allow(unused)]
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
     use std::fs::{metadata, set_permissions};
@@ -136,6 +143,7 @@ fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
     Ok(())
 }
 
+#[allow(unused)]
 #[cfg(target_os = "windows")]
 fn set_file_attributes(_wrapper_path: &Path) -> Result<()> {
     Ok(())

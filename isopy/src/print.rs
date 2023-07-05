@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
 use crate::serialization::EnvRec;
 use anyhow::Result;
@@ -60,19 +61,17 @@ pub fn print_repo(repo: &Repo) {
     print_value("Shared directory", repo.shared_dir().display());
 }
 
-pub fn print_metadir(manifest: &Manifest, rec_opt: &Option<EnvRec>) {
-    if let Some(env_rec) = rec_opt {
+pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>) {
+    if let Some(env_rec) = env_rec {
         print_value("Project path", env_rec.config_path.display());
 
-        if let Some(rec) = env_rec.python.as_ref() {
-            print_value("Python version", rec.version.as_str());
-            print_value("Python build tag", rec.tag.as_str());
-            print_value("Python directory", rec.dir.display());
-        }
-
-        if let Some(rec) = env_rec.openjdk.as_ref() {
-            print_value("OpenJDK version", &rec.version);
-            print_value("OpenJDK directory", rec.dir.display());
+        for package_dir_rec in &env_rec.package_dirs {
+            print_value("Package", &package_dir_rec.id);
+            if let Ok(s) = serde_yaml::to_string(&package_dir_rec.properties) {
+                for line in s.lines() {
+                    println!("    {line}");
+                }
+            }
         }
     } else {
         print_value(
@@ -86,19 +85,25 @@ pub fn print_metadir(manifest: &Manifest, rec_opt: &Option<EnvRec>) {
     print_value("Created at", manifest.created_at());
 }
 
-pub fn print_dir_info(dir_info: &DirInfo, rec_opt: &Option<EnvRec>) {
-    if let Some(env_rec) = rec_opt {
+pub fn print_dir_info(app: &App, dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
+    if let Some(env_rec) = env_rec {
         print_value("Project path", env_rec.config_path.display());
 
-        if let Some(rec) = env_rec.python.as_ref() {
-            print_value("Python version", rec.version.as_str());
-            print_value("Python build tag", rec.tag.as_str());
-            print_value("Python directory", rec.dir.display());
-        }
-
-        if let Some(rec) = env_rec.openjdk.as_ref() {
-            print_value("OpenJDK version", &rec.version);
-            print_value("OpenJDK directory", rec.dir.display());
+        for package_dir_rec in &env_rec.package_dirs {
+            if let Ok(Some(env_info)) = app.registry.blah(dir_info.data_dir(), package_dir_rec) {
+                print_value("Package", &package_dir_rec.id);
+                if let Ok(s) = serde_yaml::to_string(&package_dir_rec.properties) {
+                    for line in s.lines() {
+                        println!("    {line}");
+                    }
+                }
+                for p in env_info.path_dirs {
+                    println!("    {}", p.display());
+                }
+                for (k, v) in env_info.envs {
+                    println!("    {k} = {v}");
+                }
+            };
         }
     }
 
@@ -116,7 +121,7 @@ pub fn print_dir_info(dir_info: &DirInfo, rec_opt: &Option<EnvRec>) {
     print_value("Project directory", dir_info.project_dir().display());
 }
 
-pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
+pub fn print_dir_info_and_env(app: &App, dir_info: &DirInfo) -> Result<()> {
     print_title("Environment info");
 
     let env_yaml_path = dir_info.data_dir().join(ENV_FILE_NAME);
@@ -126,7 +131,7 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
         None
     };
 
-    print_dir_info(dir_info, &rec_opt);
+    print_dir_info(app, dir_info, &rec_opt);
 
     Ok(())
 }
