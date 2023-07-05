@@ -22,10 +22,10 @@
 use crate::plugin::Plugin;
 use isopy_lib::Descriptor;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct DescriptorInfo {
-    pub plugin: Rc<Plugin>,
+    pub plugin: Arc<Plugin>,
     pub descriptor: Box<dyn Descriptor>,
 }
 

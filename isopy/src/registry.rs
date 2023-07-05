@@ -19,23 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::descriptor_id::DescriptorId;
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin::Plugin;
 use crate::serialization::PackageDirRec;
 use anyhow::{anyhow, Result};
 use isopy_lib::{EnvInfo, ParseDescriptorError, ParseDescriptorResult};
+use isopy_openjdk::OpenJdk;
+use isopy_python::Python;
+use lazy_static::lazy_static;
 use std::path::Path;
-use std::rc::Rc;
+use std::sync::Arc;
+
+lazy_static! {
+    pub static ref GLOBAL: Registry = Registry::new(vec![
+        Plugin {
+            prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
+            product: Box::<Python>::default(),
+        },
+        Plugin {
+            prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
+            product: Box::<OpenJdk>::default(),
+        },
+    ]);
+}
 
 pub struct Registry {
-    pub plugins: Vec<Rc<Plugin>>,
+    pub plugins: Vec<Arc<Plugin>>,
 }
 
 impl Registry {
     pub fn new(plugins: Vec<Plugin>) -> Self {
         Self {
-            plugins: plugins.into_iter().map(Rc::new).collect::<Vec<_>>(),
+            plugins: plugins.into_iter().map(Arc::new).collect::<Vec<_>>(),
         }
     }
 
@@ -51,7 +68,7 @@ impl Registry {
 
         let descriptor = plugin.product.parse_descriptor(tail)?;
         Ok(DescriptorInfo {
-            plugin: Rc::clone(plugin),
+            plugin: Arc::clone(plugin),
             descriptor,
         })
     }
@@ -75,7 +92,7 @@ impl Registry {
         ))
     }
 
-    fn find_plugin<'a>(&self, s: &'a str) -> Option<(&Rc<Plugin>, &'a str)> {
+    fn find_plugin<'a>(&self, s: &'a str) -> Option<(&Arc<Plugin>, &'a str)> {
         if let Some((prefix, tail)) = s.split_once(':') {
             if let Some(plugin) = self.plugins.iter().find(|p| p.prefix == prefix) {
                 return Some((plugin, tail));

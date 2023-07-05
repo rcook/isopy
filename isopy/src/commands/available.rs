@@ -25,7 +25,7 @@ use crate::print::print;
 use crate::status::Status;
 use anyhow::Result;
 use colored::Colorize;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub async fn do_available(app: &App) -> Result<Status> {
     for plugin in &app.registry.plugins {
@@ -42,7 +42,7 @@ pub async fn do_available(app: &App) -> Result<Status> {
 
             for package_info in package_infos {
                 let descriptor_info = DescriptorInfo {
-                    plugin: Rc::clone(plugin),
+                    plugin: Arc::clone(plugin),
                     descriptor: package_info.descriptor,
                 };
                 print(&format!(

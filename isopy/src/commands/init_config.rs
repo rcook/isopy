@@ -25,7 +25,7 @@ use crate::status::Status;
 use anyhow::Result;
 use log::error;
 use std::path::PathBuf;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub async fn do_init_config(app: &App) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
@@ -47,11 +47,11 @@ pub async fn do_init_config(app: &App) -> Result<Status> {
     Ok(Status::OK)
 }
 
-fn get_plugin_and_project_config_path(app: &App) -> Option<(Rc<Plugin>, PathBuf)> {
+fn get_plugin_and_project_config_path(app: &App) -> Option<(Arc<Plugin>, PathBuf)> {
     for plugin in &app.registry.plugins {
         let project_config_path = app.cwd.join(plugin.product.project_config_file_name());
         if project_config_path.is_file() {
-            return Some((Rc::clone(plugin), project_config_path));
+            return Some((Arc::clone(plugin), project_config_path));
         }
     }
 

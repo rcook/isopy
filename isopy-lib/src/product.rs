@@ -1,4 +1,3 @@
-use crate::{EnvInfo, PackageInfo};
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -21,6 +20,8 @@ use crate::{EnvInfo, PackageInfo};
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor::Descriptor;
+use crate::env_info::EnvInfo;
+use crate::package_info::PackageInfo;
 use async_trait::async_trait;
 use reqwest::Url;
 use std::path::{Path, PathBuf};
@@ -82,7 +83,7 @@ pub enum GetDownloadedError {
 pub type GetDownloadedResult<T> = StdResult<T, GetDownloadedError>;
 
 #[async_trait]
-pub trait Product {
+pub trait Product: Send + Sync {
     fn name(&self) -> &str;
 
     fn url(&self) -> &Url;
