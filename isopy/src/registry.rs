@@ -24,7 +24,7 @@ use crate::descriptor_info::DescriptorInfo;
 use crate::plugin::Plugin;
 use crate::serialization::PackageDirRec;
 use anyhow::{anyhow, Result};
-use isopy_lib::{EnvInfo, ParseDescriptorError, ParseDescriptorResult};
+use isopy_lib::{EnvInfo, IsopyLibError, IsopyLibResult};
 use isopy_openjdk::OpenJdk;
 use isopy_python::Python;
 use lazy_static::lazy_static;
@@ -53,9 +53,9 @@ impl Registry {
         }
     }
 
-    pub fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<DescriptorInfo> {
+    pub fn parse_descriptor(&self, s: &str) -> IsopyLibResult<DescriptorInfo> {
         let Some((plugin, tail)) = self.find_plugin(s) else {
-            return Err(ParseDescriptorError::Other(anyhow!("unsupported descriptor format {s}")));
+            return Err(IsopyLibError::Other(anyhow!("unsupported descriptor format {s}")));
         };
 
         let descriptor = Arc::new(plugin.parse_descriptor(tail)?);

@@ -22,7 +22,7 @@
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin::Plugin;
 use crate::registry::Registry;
-use isopy_lib::{Descriptor, ParseDescriptorError};
+use isopy_lib::{Descriptor, IsopyLibError};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
@@ -43,7 +43,7 @@ impl PackageId {
 }
 
 impl FromStr for PackageId {
-    type Err = ParseDescriptorError;
+    type Err = IsopyLibError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let descriptor_info = Registry::global().parse_descriptor(s)?;

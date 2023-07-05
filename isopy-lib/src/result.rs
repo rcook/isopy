@@ -19,22 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::IsopyLibResult;
-use std::any::Any;
-use std::fmt::{Debug, Display};
-use std::path::{Path, PathBuf};
+use crate::error::IsopyLibError;
+use std::result::Result as StdResult;
 
-#[derive(Debug)]
-pub struct ProjectConfigInfo {
-    pub value: serde_json::Value,
-}
-
-pub trait Descriptor: Any + Debug + Display + Send + Sync {
-    fn as_any(&self) -> &dyn Any;
-
-    fn transform_archive_path(&self, path: &Path) -> PathBuf;
-
-    fn get_env_config_value(&self) -> IsopyLibResult<serde_json::Value>;
-
-    fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo>;
-}
+pub type IsopyLibResult<T> = StdResult<T, IsopyLibError>;

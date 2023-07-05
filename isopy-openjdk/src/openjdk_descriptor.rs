@@ -1,4 +1,3 @@
-use crate::constants::ENV_DIR;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -20,13 +19,11 @@ use crate::constants::ENV_DIR;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::ENV_DIR;
 use crate::openjdk_version::OpenJdkVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
-use isopy_lib::{
-    Descriptor, GetEnvConfigValueError, GetEnvConfigValueResult, GetProjectConfigValueError,
-    GetProjectConfigValueResult, ParseDescriptorError, ProjectConfigInfo,
-};
+use isopy_lib::{Descriptor, IsopyLibError, IsopyLibResult, ProjectConfigInfo};
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -39,11 +36,11 @@ pub struct OpenJdkDescriptor {
 }
 
 impl FromStr for OpenJdkDescriptor {
-    type Err = ParseDescriptorError;
+    type Err = IsopyLibError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         s.parse::<OpenJdkVersion>()
-            .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
+            .map_err(|e| IsopyLibError::Other(anyhow!(e)))
             .map(|version| Self { version })
     }
 }
@@ -65,20 +62,20 @@ impl Descriptor for OpenJdkDescriptor {
         ENV_DIR.join(i)
     }
 
-    fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value> {
+    fn get_env_config_value(&self) -> IsopyLibResult<serde_json::Value> {
         serde_json::to_value(EnvConfigRec {
             dir: ENV_DIR.clone(),
             version: self.version.clone(),
         })
-        .map_err(|e| GetEnvConfigValueError::Other(anyhow!(e)))
+        .map_err(|e| IsopyLibError::Other(anyhow!(e)))
     }
 
-    fn get_project_config_info(&self) -> GetProjectConfigValueResult<ProjectConfigInfo> {
+    fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo> {
         Ok(ProjectConfigInfo {
             value: serde_json::to_value(ProjectConfigRec {
                 version: self.version.clone(),
             })
-            .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?,
+            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
         })
     }
 }

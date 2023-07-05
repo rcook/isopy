@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,22 +21,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::IsopyLibResult;
-use std::any::Any;
-use std::fmt::{Debug, Display};
-use std::path::{Path, PathBuf};
+use thiserror::Error;
 
-#[derive(Debug)]
-pub struct ProjectConfigInfo {
-    pub value: serde_json::Value,
-}
+#[derive(Debug, Error)]
+pub enum IsopyLibError {
+    #[error("checksum for file {0} is invalid")]
+    ChecksumValidationFailed(PathBuf),
 
-pub trait Descriptor: Any + Debug + Display + Send + Sync {
-    fn as_any(&self) -> &dyn Any;
+    #[error("version {0} not found")]
+    VersionNotFound(String),
 
-    fn transform_archive_path(&self, path: &Path) -> PathBuf;
-
-    fn get_env_config_value(&self) -> IsopyLibResult<serde_json::Value>;
-
-    fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo>;
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
 }

@@ -26,10 +26,8 @@ use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
-    verify_sha256_file_checksum, Descriptor, DownloadAssetError, DownloadAssetResult, EnvInfo,
-    GetDownloadedError, GetDownloadedResult, GetPackageInfosResult, PackageInfo,
-    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
-    ReadProjectConfigFileError, ReadProjectConfigFileResult,
+    verify_sha256_file_checksum, Descriptor, EnvInfo, IsopyLibError, IsopyLibResult, PackageInfo,
+    Product,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -51,14 +49,14 @@ impl OpenJdk {
         &self,
         descriptor: &OpenJdkDescriptor,
         shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
+    ) -> IsopyLibResult<PathBuf> {
         let manager = AdoptiumIndexManager::new_default(shared_dir);
 
         let versions = manager.read_versions().await?;
         let Some(version) = versions
             .iter()
             .find(|x| x.openjdk_version == descriptor.version) else {
-            return Err(DownloadAssetError::VersionNotFound(descriptor.version.to_string()));
+            return Err(IsopyLibError::VersionNotFound(descriptor.version.to_string()));
         };
 
         let asset_path = shared_dir.join(&version.file_name);
@@ -71,10 +69,8 @@ impl OpenJdk {
 
         let is_valid = verify_sha256_file_checksum(&version.checksum, &asset_path)?;
         if !is_valid {
-            remove_file(&asset_path).map_err(|e| DownloadAssetError::Other(anyhow!(e)))?;
-            return Err(DownloadAssetError::ChecksumValidationFailed(
-                asset_path.display().to_string(),
-            ));
+            remove_file(&asset_path).map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
+            return Err(IsopyLibError::ChecksumValidationFailed(asset_path));
         }
 
         info!(
@@ -100,21 +96,18 @@ impl Product for OpenJdk {
         &PROJECT_CONFIG_FILE_NAME
     }
 
-    fn read_project_config_file(
-        &self,
-        path: &Path,
-    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>> {
+    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
         Ok(Box::new(OpenJdkDescriptor {
             version: read_yaml_file::<ProjectConfigRec>(path)
-                .map_err(|e| ReadProjectConfigFileError::Other(anyhow!(e)))?
+                .map_err(|e| IsopyLibError::Other(anyhow!(e)))?
                 .version,
         }))
     }
 
-    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
         Ok(Box::new(
             s.parse::<OpenJdkDescriptor>()
-                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))?,
+                .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
         ))
     }
 
@@ -122,7 +115,7 @@ impl Product for OpenJdk {
         &self,
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
+    ) -> IsopyLibResult<PathBuf> {
         let descriptor = descriptor
             .as_any()
             .downcast_ref::<OpenJdkDescriptor>()
@@ -134,13 +127,13 @@ impl Product for OpenJdk {
         &self,
         data_dir: &Path,
         properties: &serde_json::Value,
-    ) -> ReadEnvConfigResult<EnvInfo> {
+    ) -> IsopyLibResult<EnvInfo> {
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![data_dir.join(&env_config_rec.dir).join("bin")]
         }
 
         let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
-            .map_err(|e| ReadEnvConfigError::Other(anyhow!(e)))?;
+            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
 
         let openjdk_dir = data_dir.join(&env_config_rec.dir);
         let openjdk_dir_str = String::from(
@@ -155,10 +148,7 @@ impl Product for OpenJdk {
         })
     }
 
-    async fn get_package_infos(
-        &self,
-        shared_dir: &Path,
-    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+    async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
         let manager = AdoptiumIndexManager::new_default(shared_dir);
         Ok(manager
             .read_versions()
@@ -173,10 +163,10 @@ impl Product for OpenJdk {
             .collect::<Vec<_>>())
     }
 
-    fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
+    fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
         let mut asset_file_names = Vec::new();
-        for result in read_dir(shared_dir).map_err(|e| GetDownloadedError::Other(anyhow!(e)))? {
-            let entry = result.map_err(|e| GetDownloadedError::Other(anyhow!(e)))?;
+        for result in read_dir(shared_dir).map_err(|e| IsopyLibError::Other(anyhow!(e)))? {
+            let entry = result.map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
             let asset_file_name = entry.file_name();
             if let Some(asset_file_name) = asset_file_name.to_str() {
                 if asset_file_name.starts_with("OpenJDK") {

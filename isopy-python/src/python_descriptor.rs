@@ -24,10 +24,7 @@ use crate::python_version::PythonVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
 use anyhow::anyhow;
-use isopy_lib::{
-    Descriptor, GetEnvConfigValueError, GetEnvConfigValueResult, GetProjectConfigValueError,
-    GetProjectConfigValueResult, ParseDescriptorError, ProjectConfigInfo,
-};
+use isopy_lib::{Descriptor, IsopyLibError, IsopyLibResult, ProjectConfigInfo};
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -41,17 +38,17 @@ pub struct PythonDescriptor {
 }
 
 impl FromStr for PythonDescriptor {
-    type Err = ParseDescriptorError;
+    type Err = IsopyLibError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match s.split_once(':') {
             Some((prefix, suffix)) => prefix
                 .parse::<PythonVersion>()
-                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
+                .map_err(|e| IsopyLibError::Other(anyhow!(e)))
                 .and_then(|version| {
                     suffix
                         .parse::<Tag>()
-                        .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
+                        .map_err(|e| IsopyLibError::Other(anyhow!(e)))
                         .map(|tag| Self {
                             version,
                             tag: Some(tag),
@@ -59,7 +56,7 @@ impl FromStr for PythonDescriptor {
                 }),
             None => s
                 .parse::<PythonVersion>()
-                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))
+                .map_err(|e| IsopyLibError::Other(anyhow!(e)))
                 .map(|version| Self { version, tag: None }),
         }
     }
@@ -83,22 +80,22 @@ impl Descriptor for PythonDescriptor {
         path.to_path_buf()
     }
 
-    fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value> {
+    fn get_env_config_value(&self) -> IsopyLibResult<serde_json::Value> {
         serde_json::to_value(EnvConfigRec {
             dir: ENV_DIR.clone(),
             version: self.version.clone(),
             tag: self.tag.clone(),
         })
-        .map_err(|e| GetEnvConfigValueError::Other(anyhow!(e)))
+        .map_err(|e| IsopyLibError::Other(anyhow!(e)))
     }
 
-    fn get_project_config_info(&self) -> GetProjectConfigValueResult<ProjectConfigInfo> {
+    fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo> {
         Ok(ProjectConfigInfo {
             value: serde_json::to_value(ProjectConfigRec {
                 version: self.version.clone(),
                 tag: self.tag.clone(),
             })
-            .map_err(|e| GetProjectConfigValueError::Other(anyhow!(e)))?,
+            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
         })
     }
 }

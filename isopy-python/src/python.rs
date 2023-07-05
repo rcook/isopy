@@ -39,10 +39,8 @@ use crate::traits::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, download_stream, Descriptor, DownloadAssetResult, EnvInfo, GetDownloadedError,
-    GetDownloadedResult, GetPackageInfosError, GetPackageInfosResult, LastModified, PackageInfo,
-    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
-    ReadProjectConfigFileError, ReadProjectConfigFileResult,
+    dir_url, download_stream, Descriptor, EnvInfo, IsopyLibError, IsopyLibResult, LastModified,
+    PackageInfo, Product,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -60,7 +58,7 @@ impl Python {
         &self,
         descriptor: &PythonDescriptor,
         shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
+    ) -> IsopyLibResult<PathBuf> {
         let assets = Self::read_assets(shared_dir)?;
         let asset = get_asset(&assets, descriptor)?;
         let repositories = Self::read_repositories(shared_dir)?;
@@ -146,13 +144,9 @@ impl Python {
         Ok(enabled_repositories)
     }
 
-    async fn show_python_index(
-        &self,
-        shared_dir: &Path,
-    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+    async fn show_python_index(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
         self.update_index_if_necessary(shared_dir).await?;
-        Self::show_available_downloads(shared_dir)
-            .map_err(|e| GetPackageInfosError::Other(anyhow!(e)))
+        Self::show_available_downloads(shared_dir).map_err(|e| IsopyLibError::Other(anyhow!(e)))
     }
 
     async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {
@@ -276,12 +270,9 @@ impl Product for Python {
         &PROJECT_CONFIG_FILE_NAME
     }
 
-    fn read_project_config_file(
-        &self,
-        path: &Path,
-    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>> {
+    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
         let project_config_rec = read_yaml_file::<ProjectConfigRec>(path)
-            .map_err(|e| ReadProjectConfigFileError::Other(anyhow!(e)))?;
+            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
 
         Ok(Box::new(PythonDescriptor {
             version: project_config_rec.version,
@@ -289,10 +280,10 @@ impl Product for Python {
         }))
     }
 
-    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
         Ok(Box::new(
             s.parse::<PythonDescriptor>()
-                .map_err(|e| ParseDescriptorError::Other(anyhow!(e)))?,
+                .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
         ))
     }
 
@@ -300,7 +291,7 @@ impl Product for Python {
         &self,
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
+    ) -> IsopyLibResult<PathBuf> {
         let descriptor = descriptor
             .as_any()
             .downcast_ref::<PythonDescriptor>()
@@ -312,7 +303,7 @@ impl Product for Python {
         &self,
         data_dir: &Path,
         properties: &serde_json::Value,
-    ) -> ReadEnvConfigResult<EnvInfo> {
+    ) -> IsopyLibResult<EnvInfo> {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![data_dir.join(&env_config_rec.dir).join("bin")]
@@ -327,7 +318,7 @@ impl Product for Python {
         }
 
         let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
-            .map_err(|e| ReadEnvConfigError::Other(anyhow!(e)))?;
+            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
 
         Ok(EnvInfo {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
@@ -335,17 +326,14 @@ impl Product for Python {
         })
     }
 
-    async fn get_package_infos(
-        &self,
-        shared_dir: &Path,
-    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+    async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
         self.show_python_index(shared_dir).await
     }
 
-    fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
+    fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
         let mut asset_file_names = Vec::new();
-        for result in read_dir(shared_dir).map_err(|e| GetDownloadedError::Other(anyhow!(e)))? {
-            let entry = result.map_err(|e| GetDownloadedError::Other(anyhow!(e)))?;
+        for result in read_dir(shared_dir).map_err(|e| IsopyLibError::Other(anyhow!(e)))? {
+            let entry = result.map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
             let asset_file_name = entry.file_name();
             if let Some(asset_file_name) = asset_file_name.to_str() {
                 if asset_file_name.parse::<AssetMeta>().is_ok() {

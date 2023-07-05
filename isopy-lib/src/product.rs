@@ -1,3 +1,4 @@
+use crate::IsopyLibResult;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -25,62 +26,6 @@ use crate::package_info::PackageInfo;
 use async_trait::async_trait;
 use reqwest::Url;
 use std::path::{Path, PathBuf};
-use std::result::Result as StdResult;
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-pub enum ReadProjectConfigFileError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type ReadProjectConfigFileResult<T> = StdResult<T, ReadProjectConfigFileError>;
-
-#[derive(Debug, Error)]
-pub enum ParseDescriptorError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type ParseDescriptorResult<T> = StdResult<T, ParseDescriptorError>;
-
-#[derive(Debug, Error)]
-pub enum DownloadAssetError {
-    #[error("version {0} not found")]
-    VersionNotFound(String),
-
-    #[error("checksum validation failed on {0}")]
-    ChecksumValidationFailed(String),
-
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type DownloadAssetResult<T> = StdResult<T, DownloadAssetError>;
-
-#[derive(Debug, Error)]
-pub enum ReadEnvConfigError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type ReadEnvConfigResult<T> = StdResult<T, ReadEnvConfigError>;
-
-#[derive(Debug, Error)]
-pub enum GetPackageInfosError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type GetPackageInfosResult<T> = StdResult<T, GetPackageInfosError>;
-
-#[derive(Debug, Error)]
-pub enum GetDownloadedError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type GetDownloadedResult<T> = StdResult<T, GetDownloadedError>;
 
 #[async_trait]
 pub trait Product: Send + Sync {
@@ -90,27 +35,23 @@ pub trait Product: Send + Sync {
 
     fn project_config_file_name(&self) -> &Path;
 
-    fn read_project_config_file(
-        &self,
-        path: &Path,
-    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>>;
+    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>>;
 
-    fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>>;
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
 
     async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf>;
+    ) -> IsopyLibResult<PathBuf>;
 
     fn read_env_config(
         &self,
         data_dir: &Path,
         properties: &serde_json::Value,
-    ) -> ReadEnvConfigResult<EnvInfo>;
+    ) -> IsopyLibResult<EnvInfo>;
 
-    async fn get_package_infos(&self, shared_dir: &Path)
-        -> GetPackageInfosResult<Vec<PackageInfo>>;
+    async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>>;
 
-    fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>>;
+    fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>>;
 }

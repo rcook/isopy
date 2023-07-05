@@ -37,30 +37,26 @@ mod checksum;
 mod descriptor;
 mod download;
 mod env_info;
+mod error;
 mod last_modified;
 mod link_header;
 mod package_info;
 mod product;
 mod reqwest_response;
 mod response;
+mod result;
 mod url;
 
 pub use self::checksum::verify_sha256_file_checksum;
-pub use self::descriptor::{
-    Descriptor, GetEnvConfigValueError, GetEnvConfigValueResult, GetProjectConfigValueError,
-    GetProjectConfigValueResult, ProjectConfigInfo,
-};
+pub use self::descriptor::{Descriptor, ProjectConfigInfo};
 pub use self::download::download_stream;
 pub use self::env_info::EnvInfo;
+pub use self::error::IsopyLibError;
 pub use self::last_modified::LastModified;
 pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErrorResult};
 pub use self::package_info::PackageInfo;
-pub use self::product::{
-    DownloadAssetError, DownloadAssetResult, GetDownloadedError, GetDownloadedResult,
-    GetPackageInfosError, GetPackageInfosResult, ParseDescriptorError, ParseDescriptorResult,
-    Product, ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
-    ReadProjectConfigFileResult,
-};
+pub use self::product::Product;
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
+pub use self::result::IsopyLibResult;
 pub use self::url::{dir_url, file_url};

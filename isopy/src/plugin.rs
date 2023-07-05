@@ -19,10 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::{
-    Descriptor, DownloadAssetResult, EnvInfo, GetDownloadedResult, GetPackageInfosResult,
-    PackageInfo, ParseDescriptorResult, Product, ReadEnvConfigResult, ReadProjectConfigFileResult,
-};
+use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, PackageInfo, Product};
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -51,18 +48,15 @@ impl Plugin {
         &self.prefix
     }
 
-    pub fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
+    pub fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
         self.product.get_downloaded(shared_dir)
     }
 
-    pub async fn get_package_infos(
-        &self,
-        shared_dir: &Path,
-    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+    pub async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
         self.product.get_package_infos(shared_dir).await
     }
 
-    pub fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
+    pub fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
         self.product.parse_descriptor(s)
     }
 
@@ -70,10 +64,7 @@ impl Plugin {
         self.product.project_config_file_name()
     }
 
-    pub fn read_project_config_file(
-        &self,
-        path: &Path,
-    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>> {
+    pub fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
         self.product.read_project_config_file(path)
     }
 
@@ -81,7 +72,7 @@ impl Plugin {
         &self,
         data_dir: &Path,
         properties: &serde_json::Value,
-    ) -> ReadEnvConfigResult<EnvInfo> {
+    ) -> IsopyLibResult<EnvInfo> {
         self.product.read_env_config(data_dir, properties)
     }
 
@@ -89,7 +80,7 @@ impl Plugin {
         &self,
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
-    ) -> DownloadAssetResult<PathBuf> {
+    ) -> IsopyLibResult<PathBuf> {
         self.product.download_asset(descriptor, shared_dir).await
     }
 }
