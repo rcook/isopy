@@ -33,7 +33,7 @@ use std::path::Path;
 use std::sync::Arc;
 
 lazy_static! {
-    pub static ref GLOBAL: Registry = Registry::new(vec![
+    static ref GLOBAL: Registry = Registry::new(vec![
         Plugin {
             prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
             product: Box::<Python>::default(),
@@ -50,6 +50,10 @@ pub struct Registry {
 }
 
 impl Registry {
+    pub fn global() -> &'static Self {
+        &GLOBAL
+    }
+
     pub fn new(plugins: Vec<Plugin>) -> Self {
         Self {
             plugins: plugins.into_iter().map(Arc::new).collect::<Vec<_>>(),

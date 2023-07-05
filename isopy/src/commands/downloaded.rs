@@ -21,12 +21,13 @@
 //
 use crate::app::App;
 use crate::print::print;
+use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
 use colored::Colorize;
 
 pub fn do_downloaded(app: &App) -> Result<Status> {
-    for plugin in &app.registry.plugins {
+    for plugin in &Registry::global().plugins {
         let asset_file_names = plugin.product.get_downloaded(app.repo.shared_dir())?;
         if !asset_file_names.is_empty() {
             print(&format!(

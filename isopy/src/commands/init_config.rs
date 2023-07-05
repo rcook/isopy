@@ -21,6 +21,7 @@
 //
 use crate::app::App;
 use crate::plugin::Plugin;
+use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
 use log::error;
@@ -48,7 +49,7 @@ pub async fn do_init_config(app: &App) -> Result<Status> {
 }
 
 fn get_plugin_and_project_config_path(app: &App) -> Option<(Arc<Plugin>, PathBuf)> {
-    for plugin in &app.registry.plugins {
+    for plugin in &Registry::global().plugins {
         let project_config_path = app.cwd.join(plugin.product.project_config_file_name());
         if project_config_path.is_file() {
             return Some((Arc::clone(plugin), project_config_path));

@@ -21,6 +21,7 @@
 //
 use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
+use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
@@ -50,7 +51,7 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    let Some(env_info) = app.registry.blah(dir_info.data_dir(), package_dir_rec)? else {
+    let Some(env_info) = &Registry::global().blah(dir_info.data_dir(), package_dir_rec)? else {
         error!("could not get environment info");
         return Ok(Status::Fail);
     };

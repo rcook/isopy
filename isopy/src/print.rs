@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::constants::ENV_FILE_NAME;
+use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use anyhow::Result;
 use colored::Colorize;
@@ -85,12 +85,14 @@ pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>) {
     print_value("Created at", manifest.created_at());
 }
 
-pub fn print_dir_info(app: &App, dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
+pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
     if let Some(env_rec) = env_rec {
         print_value("Project path", env_rec.config_path.display());
 
         for package_dir_rec in &env_rec.package_dirs {
-            if let Ok(Some(env_info)) = app.registry.blah(dir_info.data_dir(), package_dir_rec) {
+            if let Ok(Some(env_info)) =
+                Registry::global().blah(dir_info.data_dir(), package_dir_rec)
+            {
                 print_value("Package", &package_dir_rec.id);
                 if let Ok(s) = serde_yaml::to_string(&package_dir_rec.properties) {
                     for line in s.lines() {
@@ -121,17 +123,17 @@ pub fn print_dir_info(app: &App, dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
     print_value("Project directory", dir_info.project_dir().display());
 }
 
-pub fn print_dir_info_and_env(app: &App, dir_info: &DirInfo) -> Result<()> {
+pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     print_title("Environment info");
 
     let env_yaml_path = dir_info.data_dir().join(ENV_FILE_NAME);
-    let rec_opt = if env_yaml_path.is_file() {
+    let env_rec = if env_yaml_path.is_file() {
         Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
     } else {
         None
     };
 
-    print_dir_info(app, dir_info, &rec_opt);
+    print_dir_info(dir_info, &env_rec);
 
     Ok(())
 }

@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::descriptor_id::DescriptorId;
 use crate::status::Status;
+use crate::{app::App, registry::Registry};
 use anyhow::{bail, Result};
 
 pub async fn do_init(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
@@ -29,7 +29,7 @@ pub async fn do_init(app: &App, descriptor_id: &DescriptorId) -> Result<Status> 
         bail!("Directory {} already has environment", app.cwd.display())
     }
 
-    let descriptor_info = app.registry.to_descriptor_info(descriptor_id)?;
+    let descriptor_info = Registry::global().to_descriptor_info(descriptor_id)?;
     app.init_project(&descriptor_info.plugin, descriptor_info.descriptor.as_ref())
         .await?;
     Ok(Status::OK)

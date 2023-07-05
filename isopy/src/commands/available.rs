@@ -22,13 +22,14 @@
 use crate::app::App;
 use crate::descriptor_info::DescriptorInfo;
 use crate::print::print;
+use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
 use colored::Colorize;
 use std::sync::Arc;
 
 pub async fn do_available(app: &App) -> Result<Status> {
-    for plugin in &app.registry.plugins {
+    for plugin in &Registry::global().plugins {
         let package_infos = plugin
             .product
             .get_package_infos(app.repo.shared_dir())
