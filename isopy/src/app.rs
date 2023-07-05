@@ -20,14 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use crate::foo::Foo;
 use crate::registry::{ProductInfo, ProductRegistry};
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::Descriptor;
 use isopy_openjdk::OpenJdk;
-use isopy_python::{Python, PythonDescriptor};
+use isopy_python::{Foo, Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::safe_write_file;
 use std::collections::HashMap;

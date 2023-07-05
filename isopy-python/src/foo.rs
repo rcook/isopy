@@ -19,17 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{anyhow, Result};
-use isopy_lib::{dir_url, download_stream, LastModified, PackageInfo};
-use isopy_python::constants::{
-    INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
-};
-use isopy_python::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use isopy_python::AssetFilter;
-use isopy_python::{
+use crate::asset_filter::AssetFilter;
+use crate::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
+use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
+use crate::{
     download_asset, get_asset, Asset, AssetMeta, GitHubRepository, LocalRepository,
     PythonDescriptor, Repository, RepositoryInfo, RepositoryName,
 };
+use anyhow::{anyhow, Result};
+use isopy_lib::{dir_url, download_stream, LastModified, PackageInfo};
 use joatmon::label_file_name;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::cmp::Ordering;

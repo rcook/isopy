@@ -38,7 +38,6 @@ mod args;
 mod backtrace;
 mod commands;
 mod constants;
-mod foo;
 mod print;
 mod registry;
 mod run;

@@ -1014,6 +1014,7 @@ dependencies = [
  "rstest",
  "serde",
  "serde_json",
+ "serde_yaml",
  "thiserror",
  "url",
 ]
