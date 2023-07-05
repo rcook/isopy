@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::AssetRec;
-use isopy_python::Tag;
+use crate::serialization::AssetRec;
+use crate::tag::Tag;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

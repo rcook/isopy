@@ -22,16 +22,14 @@
 use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::foo::Foo;
 use crate::registry::{ProductInfo, ProductRegistry};
-use crate::serialization::IndexRec;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
-use isopy_lib::{Descriptor, LastModified};
+use isopy_lib::Descriptor;
 use isopy_openjdk::OpenJdk;
-use isopy_python::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME};
-use isopy_python::{Python, PythonDescriptor, RepositoryName};
+use isopy_python::{Python, PythonDescriptor};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::{label_file_name, read_yaml_file, safe_write_file};
+use joatmon::safe_write_file;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -76,49 +74,6 @@ impl App {
                 .product
                 .download_asset(descriptor, shared_dir)
                 .await?)
-        }
-    }
-
-    #[allow(unused)]
-    pub fn read_index_last_modified(
-        &self,
-        repository_name: &RepositoryName,
-    ) -> Result<Option<LastModified>> {
-        let index_path = self.index_path(repository_name);
-        Ok(if index_path.is_file() {
-            Some(read_yaml_file::<IndexRec>(&index_path)?.last_modified)
-        } else {
-            None
-        })
-    }
-
-    #[allow(unused)]
-    pub fn write_index_last_modified(
-        &self,
-        repository_name: &RepositoryName,
-        last_modified: &LastModified,
-    ) -> Result<()> {
-        let index_yaml_path = self.index_path(repository_name);
-        safe_write_file(
-            &index_yaml_path,
-            serde_yaml::to_string(&IndexRec {
-                last_modified: last_modified.clone(),
-            })?,
-            true,
-        )?;
-        Ok(())
-    }
-
-    #[allow(unused)]
-    pub fn releases_path(&self, repository_name: &RepositoryName) -> PathBuf {
-        if repository_name.is_default() {
-            self.repo.shared_dir().join(RELEASES_FILE_NAME)
-        } else {
-            label_file_name(
-                &self.repo.shared_dir().join(RELEASES_FILE_NAME),
-                repository_name.as_str(),
-            )
-            .expect("must be valid")
         }
     }
 
@@ -195,19 +150,6 @@ impl App {
         };
 
         Ok(Some(dir_info))
-    }
-
-    #[allow(unused)]
-    fn index_path(&self, repository_name: &RepositoryName) -> PathBuf {
-        if repository_name.is_default() {
-            self.repo.shared_dir().join(INDEX_FILE_NAME)
-        } else {
-            label_file_name(
-                &self.repo.shared_dir().join(INDEX_FILE_NAME),
-                repository_name.as_str(),
-            )
-            .expect("must be valid")
-        }
     }
 
     fn find_link(&self, dir: &Path) -> Result<Option<Link>> {

@@ -19,18 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod asset_rec;
 mod env_rec;
-mod index_rec;
 mod package_dir_rec;
-mod package_rec;
-mod repositories_rec;
-mod repository_rec;
 
-pub use self::asset_rec::AssetRec;
 pub use self::env_rec::EnvRec;
-pub use self::index_rec::IndexRec;
 pub use self::package_dir_rec::PackageDirRec;
-pub use self::package_rec::PackageRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;

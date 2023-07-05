@@ -35,6 +35,7 @@
 #![allow(clippy::option_if_let_else)]
 pub mod constants;
 pub mod python_standalone_builds;
+pub mod serialization;
 
 mod asset;
 mod asset_filter;
@@ -48,7 +49,6 @@ mod python_descriptor;
 mod python_version;
 mod repository_info;
 mod repository_name;
-mod serialization;
 mod tag;
 mod traits;
 

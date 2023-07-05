@@ -19,16 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::serialization::{PackageRec, RepositoriesRec, RepositoryRec};
 use anyhow::{anyhow, Result};
-use isopy_lib::{dir_url, download_stream, PackageInfo};
-use isopy_python::constants::{RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
+use isopy_lib::{dir_url, download_stream, LastModified, PackageInfo};
+use isopy_python::constants::{
+    INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
+};
+use isopy_python::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
 use isopy_python::AssetFilter;
 use isopy_python::{
     download_asset, get_asset, Asset, AssetMeta, GitHubRepository, LocalRepository,
     PythonDescriptor, Repository, RepositoryInfo, RepositoryName,
 };
+use joatmon::label_file_name;
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
@@ -132,20 +134,20 @@ impl Foo {
 }
 
 #[allow(unused)]
-async fn show_python_index(app: &App) -> Result<Vec<PackageInfo>> {
-    update_index_if_necessary(app).await?;
-    show_available_downloads(app)
+async fn show_python_index(shared_dir: &Path) -> Result<Vec<PackageInfo>> {
+    update_index_if_necessary(shared_dir).await?;
+    show_available_downloads(shared_dir)
 }
 
-async fn update_index_if_necessary(app: &App) -> Result<()> {
-    let repositories = Foo::read_repositories(app.repo.shared_dir())?;
+async fn update_index_if_necessary(shared_dir: &Path) -> Result<()> {
+    let repositories = Foo::read_repositories(shared_dir)?;
     let repository = repositories
         .first()
         .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
 
-    let releases_path = app.releases_path(&repository.name);
+    let releases_path = releases_path(&repository.name, shared_dir);
     let current_last_modified = if releases_path.is_file() {
-        app.read_index_last_modified(&repository.name)?
+        read_index_last_modified(&repository.name, shared_dir)?
     } else {
         None
     };
@@ -157,14 +159,14 @@ async fn update_index_if_necessary(app: &App) -> Result<()> {
     {
         download_stream("release index", &mut response, &releases_path).await?;
         if let Some(last_modified) = response.last_modified() {
-            app.write_index_last_modified(&repository.name, last_modified)?;
+            write_index_last_modified(&repository.name, last_modified, shared_dir)?;
         }
     }
 
     Ok(())
 }
 
-fn show_available_downloads(app: &App) -> Result<Vec<PackageInfo>> {
+fn show_available_downloads(shared_dir: &Path) -> Result<Vec<PackageInfo>> {
     fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
         match a.meta.version.cmp(&b.meta.version) {
             Ordering::Equal => a.tag.cmp(&b.tag),
@@ -172,7 +174,7 @@ fn show_available_downloads(app: &App) -> Result<Vec<PackageInfo>> {
         }
     }
 
-    let mut assets = Foo::read_assets(app.repo.shared_dir())?;
+    let mut assets = Foo::read_assets(shared_dir)?;
     assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
     Ok(AssetFilter::default_for_platform()
@@ -186,4 +188,53 @@ fn show_available_downloads(app: &App) -> Result<Vec<PackageInfo>> {
             file_name: PathBuf::from(asset.name.clone()),
         })
         .collect::<Vec<_>>())
+}
+
+fn releases_path(repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
+    if repository_name.is_default() {
+        shared_dir.join(RELEASES_FILE_NAME)
+    } else {
+        label_file_name(
+            &shared_dir.join(RELEASES_FILE_NAME),
+            repository_name.as_str(),
+        )
+        .expect("must be valid")
+    }
+}
+
+fn read_index_last_modified(
+    repository_name: &RepositoryName,
+    shared_dir: &Path,
+) -> Result<Option<LastModified>> {
+    let index_path = index_path(repository_name, shared_dir);
+    Ok(if index_path.is_file() {
+        Some(read_yaml_file::<IndexRec>(&index_path)?.last_modified)
+    } else {
+        None
+    })
+}
+
+fn write_index_last_modified(
+    repository_name: &RepositoryName,
+    last_modified: &LastModified,
+    shared_dir: &Path,
+) -> Result<()> {
+    let index_yaml_path = index_path(repository_name, shared_dir);
+    safe_write_file(
+        &index_yaml_path,
+        serde_yaml::to_string(&IndexRec {
+            last_modified: last_modified.clone(),
+        })?,
+        true,
+    )?;
+    Ok(())
+}
+
+fn index_path(repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
+    if repository_name.is_default() {
+        shared_dir.join(INDEX_FILE_NAME)
+    } else {
+        label_file_name(&shared_dir.join(INDEX_FILE_NAME), repository_name.as_str())
+            .expect("must be valid")
+    }
 }
