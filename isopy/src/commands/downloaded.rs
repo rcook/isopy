@@ -28,12 +28,12 @@ use colored::Colorize;
 
 pub fn do_downloaded(app: &App) -> Result<Status> {
     for plugin in &Registry::global().plugins {
-        let asset_file_names = plugin.product.get_downloaded(app.repo.shared_dir())?;
+        let asset_file_names = plugin.get_downloaded(app.repo.shared_dir())?;
         if !asset_file_names.is_empty() {
             print(&format!(
                 "{} ({})",
-                plugin.product.name().cyan(),
-                plugin.product.url().as_str().bright_magenta()
+                plugin.name().cyan(),
+                plugin.repository_url().as_str().bright_magenta()
             ));
 
             for asset_file_name in asset_file_names {

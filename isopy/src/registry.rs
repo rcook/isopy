@@ -33,14 +33,8 @@ use std::sync::Arc;
 
 lazy_static! {
     static ref GLOBAL: Registry = Registry::new(vec![
-        Plugin {
-            prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
-            product: Box::<Python>::default(),
-        },
-        Plugin {
-            prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
-            product: Box::<OpenJdk>::default(),
-        },
+        Plugin::new(PYTHON_DESCRIPTOR_PREFIX, Box::<Python>::default()),
+        Plugin::new(OPENJDK_DESCRIPTOR_PREFIX, Box::<OpenJdk>::default())
     ]);
 }
 
@@ -64,7 +58,7 @@ impl Registry {
             return Err(ParseDescriptorError::Other(anyhow!("unsupported descriptor format {s}")));
         };
 
-        let descriptor = Arc::new(plugin.product.parse_descriptor(tail)?);
+        let descriptor = Arc::new(plugin.parse_descriptor(tail)?);
 
         Ok(DescriptorInfo {
             plugin: Arc::clone(plugin),
@@ -80,20 +74,18 @@ impl Registry {
         let Some(plugin) = self
             .plugins
             .iter()
-            .find(|p| p.prefix == package_dir_rec.id) else {
+            .find(|p| p.prefix() == package_dir_rec.id) else {
             return Ok(None);
         };
 
         Ok(Some(
-            plugin
-                .product
-                .read_env_config(data_dir, &package_dir_rec.properties)?,
+            plugin.read_env_config(data_dir, &package_dir_rec.properties)?,
         ))
     }
 
     fn find_plugin<'a>(&self, s: &'a str) -> Option<(&Arc<Plugin>, &'a str)> {
         if let Some((prefix, tail)) = s.split_once(':') {
-            if let Some(plugin) = self.plugins.iter().find(|p| p.prefix == prefix) {
+            if let Some(plugin) = self.plugins.iter().find(|p| p.prefix() == prefix) {
                 return Some((plugin, tail));
             }
         }
@@ -118,14 +110,8 @@ mod tests {
     #[case("openjdk:19.0.1+10", "openjdk:19.0.1+10")]
     fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
         let registry = Registry::new(vec![
-            Plugin {
-                prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
-                product: Box::<Python>::default(),
-            },
-            Plugin {
-                prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
-                product: Box::<OpenJdk>::default(),
-            },
+            Plugin::new(PYTHON_DESCRIPTOR_PREFIX, Box::<Python>::default()),
+            Plugin::new(OPENJDK_DESCRIPTOR_PREFIX, Box::<OpenJdk>::default()),
         ]);
 
         let descriptor_info = registry.parse_descriptor(input)?;

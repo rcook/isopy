@@ -30,15 +30,12 @@ use std::sync::Arc;
 
 pub async fn do_available(app: &App) -> Result<Status> {
     for plugin in &Registry::global().plugins {
-        let package_infos = plugin
-            .product
-            .get_package_infos(app.repo.shared_dir())
-            .await?;
+        let package_infos = plugin.get_package_infos(app.repo.shared_dir()).await?;
         if !package_infos.is_empty() {
             print(&format!(
                 "{} ({})",
-                plugin.product.name().cyan(),
-                plugin.product.url().as_str().bright_magenta()
+                plugin.name().cyan(),
+                plugin.repository_url().as_str().bright_magenta()
             ));
 
             for package_info in package_infos {

@@ -35,13 +35,14 @@ impl Debug for DescriptorInfo {
         write!(
             f,
             "[DescriptorInfo: {}:{}]",
-            self.plugin.prefix, self.descriptor
+            self.plugin.prefix(),
+            self.descriptor
         )
     }
 }
 
 impl Display for DescriptorInfo {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}:{}", self.plugin.prefix, self.descriptor)
+        write!(f, "{}:{}", self.plugin.prefix(), self.descriptor)
     }
 }

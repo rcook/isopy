@@ -86,7 +86,7 @@ pub type GetDownloadedResult<T> = StdResult<T, GetDownloadedError>;
 pub trait Product: Send + Sync {
     fn name(&self) -> &str;
 
-    fn url(&self) -> &Url;
+    fn repository_url(&self) -> &Url;
 
     fn project_config_file_name(&self) -> &Path;
 

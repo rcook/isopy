@@ -19,9 +19,77 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::Product;
+use isopy_lib::{
+    Descriptor, DownloadAssetResult, EnvInfo, GetDownloadedResult, GetPackageInfosResult,
+    PackageInfo, ParseDescriptorResult, Product, ReadEnvConfigResult, ReadProjectConfigFileResult,
+};
+use std::path::{Path, PathBuf};
+use url::Url;
 
 pub struct Plugin {
-    pub prefix: String,
-    pub product: Box<dyn Product>,
+    prefix: String,
+    product: Box<dyn Product>,
+}
+
+impl Plugin {
+    pub fn new(prefix: &str, product: Box<dyn Product>) -> Self {
+        Self {
+            prefix: String::from(prefix),
+            product,
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        self.product.name()
+    }
+
+    pub fn repository_url(&self) -> &Url {
+        self.product.repository_url()
+    }
+
+    pub fn prefix(&self) -> &str {
+        &self.prefix
+    }
+
+    pub fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
+        self.product.get_downloaded(shared_dir)
+    }
+
+    pub async fn get_package_infos(
+        &self,
+        shared_dir: &Path,
+    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+        self.product.get_package_infos(shared_dir).await
+    }
+
+    pub fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<Box<dyn Descriptor>> {
+        self.product.parse_descriptor(s)
+    }
+
+    pub fn project_config_file_name(&self) -> &Path {
+        self.product.project_config_file_name()
+    }
+
+    pub fn read_project_config_file(
+        &self,
+        path: &Path,
+    ) -> ReadProjectConfigFileResult<Box<dyn Descriptor>> {
+        self.product.read_project_config_file(path)
+    }
+
+    pub fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> ReadEnvConfigResult<EnvInfo> {
+        self.product.read_env_config(data_dir, properties)
+    }
+
+    pub async fn download_asset(
+        &self,
+        descriptor: &dyn Descriptor,
+        shared_dir: &Path,
+    ) -> DownloadAssetResult<PathBuf> {
+        self.product.download_asset(descriptor, shared_dir).await
+    }
 }

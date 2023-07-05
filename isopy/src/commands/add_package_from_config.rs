@@ -39,9 +39,7 @@ pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
         return Ok(Status::Fail)
     };
 
-    let descriptor = plugin
-        .product
-        .read_project_config_file(&project_config_path)?;
+    let descriptor = plugin.read_project_config_file(&project_config_path)?;
 
     app.add_package(&plugin, descriptor.as_ref()).await?;
 
@@ -50,7 +48,7 @@ pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
 
 fn get_plugin_and_project_config_path(app: &App) -> Option<(Arc<Plugin>, PathBuf)> {
     for plugin in &Registry::global().plugins {
-        let project_config_path = app.cwd.join(plugin.product.project_config_file_name());
+        let project_config_path = app.cwd.join(plugin.project_config_file_name());
         if project_config_path.is_file() {
             return Some((Arc::clone(plugin), project_config_path));
         }

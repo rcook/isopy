@@ -46,10 +46,7 @@ impl App {
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        Ok(plugin
-            .product
-            .download_asset(descriptor, shared_dir)
-            .await?)
+        Ok(plugin.download_asset(descriptor, shared_dir).await?)
     }
 
     pub async fn add_package(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
@@ -81,10 +78,10 @@ impl App {
             (dir_info, env_config_path)
         };
 
-        if package_dirs.iter().any(|p| p.id == plugin.prefix) {
+        if package_dirs.iter().any(|p| p.id == plugin.prefix()) {
             bail!(
                 "environment already has a package with ID {} configured",
-                plugin.prefix
+                plugin.prefix()
             );
         }
 
@@ -95,7 +92,7 @@ impl App {
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
         package_dirs.push(PackageDirRec {
-            id: plugin.prefix.clone(),
+            id: String::from(plugin.prefix()),
             properties: descriptor.get_env_config_value()?,
         });
 
