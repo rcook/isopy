@@ -27,7 +27,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, EnvInfo,
-    IsopyLibError, IsopyLibResult, PackageInfo, Product,
+    IsopyLibError, IsopyLibResult, Package, Product,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -92,6 +92,21 @@ impl Product for OpenJdk {
         &ADOPTIUM_SERVER_URL
     }
 
+    async fn get_available_packages(&self, shared_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+        let manager = AdoptiumIndexManager::new_default(shared_dir);
+        Ok(manager
+            .read_versions()
+            .await?
+            .into_iter()
+            .map(|x| Package {
+                descriptor: Arc::new(Box::new(OpenJdkDescriptor {
+                    version: x.openjdk_version.clone(),
+                })),
+                file_name: x.file_name,
+            })
+            .collect::<Vec<_>>())
+    }
+
     fn project_config_file_name(&self) -> &Path {
         &PROJECT_CONFIG_FILE_NAME
     }
@@ -146,21 +161,6 @@ impl Product for OpenJdk {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
         })
-    }
-
-    async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
-        let manager = AdoptiumIndexManager::new_default(shared_dir);
-        Ok(manager
-            .read_versions()
-            .await?
-            .into_iter()
-            .map(|x| PackageInfo {
-                descriptor: Arc::new(Box::new(OpenJdkDescriptor {
-                    version: x.openjdk_version.clone(),
-                })),
-                file_name: x.file_name,
-            })
-            .collect::<Vec<_>>())
     }
 
     fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {

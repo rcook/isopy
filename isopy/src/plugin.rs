@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use isopy_lib::{Descriptor, EnvInfo, PackageInfo, Product};
+use isopy_lib::{Descriptor, EnvInfo, Package, Product};
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -49,12 +49,12 @@ impl Plugin {
         &self.prefix
     }
 
-    pub fn get_downloaded(&self, shared_dir: &Path) -> Result<Vec<PathBuf>> {
-        Ok(self.product.get_downloaded(shared_dir)?)
+    pub async fn get_available_packages(&self, shared_dir: &Path) -> Result<Vec<Package>> {
+        Ok(self.product.get_available_packages(shared_dir).await?)
     }
 
-    pub async fn get_package_infos(&self, shared_dir: &Path) -> Result<Vec<PackageInfo>> {
-        Ok(self.product.get_package_infos(shared_dir).await?)
+    pub fn get_downloaded(&self, shared_dir: &Path) -> Result<Vec<PathBuf>> {
+        Ok(self.product.get_downloaded(shared_dir)?)
     }
 
     pub fn parse_descriptor(&self, s: &str) -> Result<Box<dyn Descriptor>> {

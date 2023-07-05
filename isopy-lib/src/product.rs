@@ -1,4 +1,3 @@
-use crate::IsopyLibResult;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -22,7 +21,7 @@ use crate::IsopyLibResult;
 //
 use crate::descriptor::Descriptor;
 use crate::env_info::EnvInfo;
-use crate::package_info::PackageInfo;
+use crate::{IsopyLibResult, Package};
 use async_trait::async_trait;
 use reqwest::Url;
 use std::path::{Path, PathBuf};
@@ -32,6 +31,8 @@ pub trait Product: Send + Sync {
     fn name(&self) -> &str;
 
     fn repository_url(&self) -> &Url;
+
+    async fn get_available_packages(&self, shared_dir: &Path) -> IsopyLibResult<Vec<Package>>;
 
     fn project_config_file_name(&self) -> &Path;
 
@@ -50,8 +51,6 @@ pub trait Product: Send + Sync {
         data_dir: &Path,
         properties: &serde_json::Value,
     ) -> IsopyLibResult<EnvInfo>;
-
-    async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>>;
 
     fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>>;
 }

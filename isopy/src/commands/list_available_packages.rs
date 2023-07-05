@@ -28,28 +28,29 @@ use anyhow::Result;
 use colored::Colorize;
 use std::sync::Arc;
 
-pub async fn do_available(app: &App) -> Result<Status> {
+pub async fn list_available_packages(app: &App) -> Result<Status> {
     for plugin in &Registry::global().plugins {
-        let package_infos = plugin.get_package_infos(app.repo.shared_dir()).await?;
-        if !package_infos.is_empty() {
+        let packages = plugin.get_available_packages(app.repo.shared_dir()).await?;
+        if !packages.is_empty() {
             print(&format!(
                 "{} ({})",
                 plugin.name().cyan(),
                 plugin.repository_url().as_str().bright_magenta()
             ));
 
-            for package_info in package_infos {
+            for package in packages {
                 let descriptor_info = DescriptorInfo {
                     plugin: Arc::clone(plugin),
-                    descriptor: Arc::clone(&package_info.descriptor),
+                    descriptor: Arc::clone(&package.descriptor),
                 };
                 print(&format!(
                     "  {:<30} {}",
                     format!("{descriptor_info}").bright_yellow(),
-                    package_info.file_name.display()
+                    package.file_name.display()
                 ));
             }
         }
     }
+
     Ok(Status::OK)
 }

@@ -40,7 +40,7 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, download_stream, other_error as isopy_lib_other_error, Descriptor, EnvInfo,
-    IsopyLibResult, LastModified, PackageInfo, Product,
+    IsopyLibResult, LastModified, Package, Product,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -144,11 +144,6 @@ impl Python {
         Ok(enabled_repositories)
     }
 
-    async fn show_python_index(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
-        self.update_index_if_necessary(shared_dir).await?;
-        Self::show_available_downloads(shared_dir)
-    }
-
     async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {
         let repositories = Self::read_repositories(shared_dir)?;
         let repository = repositories
@@ -176,7 +171,7 @@ impl Python {
         Ok(())
     }
 
-    fn show_available_downloads(shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
+    fn show_available_downloads(shared_dir: &Path) -> IsopyLibResult<Vec<Package>> {
         fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
             match a.meta.version.cmp(&b.meta.version) {
                 Ordering::Equal => a.tag.cmp(&b.tag),
@@ -190,7 +185,7 @@ impl Python {
         Ok(AssetFilter::default_for_platform()
             .filter(assets.iter())
             .into_iter()
-            .map(|asset| PackageInfo {
+            .map(|asset| Package {
                 descriptor: Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
@@ -266,6 +261,11 @@ impl Product for Python {
         &RELEASES_URL
     }
 
+    async fn get_available_packages(&self, shared_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+        self.update_index_if_necessary(shared_dir).await?;
+        Self::show_available_downloads(shared_dir)
+    }
+
     fn project_config_file_name(&self) -> &Path {
         &PROJECT_CONFIG_FILE_NAME
     }
@@ -324,10 +324,6 @@ impl Product for Python {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             envs: vec![],
         })
-    }
-
-    async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
-        self.show_python_index(shared_dir).await
     }
 
     fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {

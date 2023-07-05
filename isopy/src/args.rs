@@ -75,9 +75,6 @@ pub enum Command {
     )]
     AddPackageFromConfig,
 
-    #[command(name = "available", about = "List packages available for download")]
-    Available,
-
     #[command(
         name = "check",
         about = "Check integrity of repository and optionally clean up"
@@ -136,6 +133,9 @@ pub enum Command {
 
     #[command(name = "list", about = "List Python environments")]
     List,
+
+    #[command(name = "available", about = "List packages available for download")]
+    ListAvailablePackages,
 
     #[command(name = "prompt", about = "Show brief information in prompt")]
     Prompt,

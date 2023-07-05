@@ -21,7 +21,6 @@
 //
 mod add_package;
 mod add_package_from_config;
-mod available;
 mod check;
 mod download;
 mod downloaded;
@@ -30,6 +29,7 @@ mod gen_config;
 mod info;
 mod link;
 mod list;
+mod list_available_packages;
 mod prompt;
 mod scratch;
 mod shell;
@@ -37,7 +37,6 @@ mod wrap;
 
 pub use self::add_package::do_add_package;
 pub use self::add_package_from_config::do_add_package_from_config;
-pub use self::available::do_available;
 pub use self::check::do_check;
 pub use self::download::do_download;
 pub use self::downloaded::do_downloaded;
@@ -46,6 +45,7 @@ pub use self::gen_config::do_gen_config;
 pub use self::info::do_info;
 pub use self::link::do_link;
 pub use self::list::do_list;
+pub use self::list_available_packages::list_available_packages;
 pub use self::prompt::do_prompt;
 pub use self::scratch::do_scratch;
 pub use self::shell::do_shell;
