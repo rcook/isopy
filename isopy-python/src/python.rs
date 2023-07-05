@@ -60,9 +60,9 @@ impl Python {
         descriptor: &PythonDescriptor,
         shared_dir: &Path,
     ) -> DownloadAssetResult<PathBuf> {
-        let assets = self.read_assets(shared_dir)?;
+        let assets = Self::read_assets(shared_dir)?;
         let asset = get_asset(&assets, descriptor)?;
-        let repositories = self.read_repositories(shared_dir)?;
+        let repositories = Self::read_repositories(shared_dir)?;
         let repository = repositories
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
@@ -70,7 +70,7 @@ impl Python {
         Ok(asset_path)
     }
 
-    fn read_assets(&self, shared_dir: &Path) -> Result<Vec<Asset>> {
+    fn read_assets(shared_dir: &Path) -> Result<Vec<Asset>> {
         let index_json_path = shared_dir.join(RELEASES_FILE_NAME);
         let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
 
@@ -92,7 +92,7 @@ impl Python {
         Ok(assets)
     }
 
-    fn read_repositories(&self, shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
+    fn read_repositories(shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
         fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
             match rec {
                 RepositoryRec::GitHub { name, url, enabled } => {
@@ -148,18 +148,18 @@ impl Python {
     #[allow(unused)]
     async fn show_python_index(&self, shared_dir: &Path) -> Result<Vec<PackageInfo>> {
         self.update_index_if_necessary(shared_dir).await?;
-        self.show_available_downloads(shared_dir)
+        Self::show_available_downloads(shared_dir)
     }
 
     async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {
-        let repositories = self.read_repositories(shared_dir)?;
+        let repositories = Self::read_repositories(shared_dir)?;
         let repository = repositories
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
 
-        let releases_path = self.releases_path(&repository.name, shared_dir);
+        let releases_path = Self::releases_path(&repository.name, shared_dir);
         let current_last_modified = if releases_path.is_file() {
-            self.read_index_last_modified(&repository.name, shared_dir)?
+            Self::read_index_last_modified(&repository.name, shared_dir)?
         } else {
             None
         };
@@ -171,14 +171,14 @@ impl Python {
         {
             download_stream("release index", &mut response, &releases_path).await?;
             if let Some(last_modified) = response.last_modified() {
-                self.write_index_last_modified(&repository.name, last_modified, shared_dir)?;
+                Self::write_index_last_modified(&repository.name, last_modified, shared_dir)?;
             }
         }
 
         Ok(())
     }
 
-    fn show_available_downloads(&self, shared_dir: &Path) -> Result<Vec<PackageInfo>> {
+    fn show_available_downloads(shared_dir: &Path) -> Result<Vec<PackageInfo>> {
         fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
             match a.meta.version.cmp(&b.meta.version) {
                 Ordering::Equal => a.tag.cmp(&b.tag),
@@ -186,7 +186,7 @@ impl Python {
             }
         }
 
-        let mut assets = self.read_assets(shared_dir)?;
+        let mut assets = Self::read_assets(shared_dir)?;
         assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
         Ok(AssetFilter::default_for_platform()
@@ -202,7 +202,7 @@ impl Python {
             .collect::<Vec<_>>())
     }
 
-    fn releases_path(&self, repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
+    fn releases_path(repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
         if repository_name.is_default() {
             shared_dir.join(RELEASES_FILE_NAME)
         } else {
@@ -215,11 +215,10 @@ impl Python {
     }
 
     fn read_index_last_modified(
-        &self,
         repository_name: &RepositoryName,
         shared_dir: &Path,
     ) -> Result<Option<LastModified>> {
-        let index_path = self.index_path(repository_name, shared_dir);
+        let index_path = Self::index_path(repository_name, shared_dir);
         Ok(if index_path.is_file() {
             Some(read_yaml_file::<IndexRec>(&index_path)?.last_modified)
         } else {
@@ -228,12 +227,11 @@ impl Python {
     }
 
     fn write_index_last_modified(
-        &self,
         repository_name: &RepositoryName,
         last_modified: &LastModified,
         shared_dir: &Path,
     ) -> Result<()> {
-        let index_yaml_path = self.index_path(repository_name, shared_dir);
+        let index_yaml_path = Self::index_path(repository_name, shared_dir);
         safe_write_file(
             &index_yaml_path,
             serde_yaml::to_string(&IndexRec {
@@ -244,7 +242,7 @@ impl Python {
         Ok(())
     }
 
-    fn index_path(&self, repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
+    fn index_path(repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
         if repository_name.is_default() {
             shared_dir.join(INDEX_FILE_NAME)
         } else {
