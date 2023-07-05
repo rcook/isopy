@@ -42,7 +42,7 @@ mod descriptor_id;
 mod descriptor_info;
 mod print;
 mod product_info;
-mod product_registry;
+mod registry;
 mod run;
 mod serialization;
 mod shell;

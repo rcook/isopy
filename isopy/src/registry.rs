@@ -28,11 +28,11 @@ use isopy_lib::{EnvInfo, ParseDescriptorError, ParseDescriptorResult};
 use std::path::Path;
 use std::rc::Rc;
 
-pub struct ProductRegistry {
+pub struct Registry {
     pub product_infos: Vec<Rc<ProductInfo>>,
 }
 
-impl ProductRegistry {
+impl Registry {
     pub fn new(product_infos: Vec<ProductInfo>) -> Self {
         Self {
             product_infos: product_infos.into_iter().map(Rc::new).collect::<Vec<_>>(),

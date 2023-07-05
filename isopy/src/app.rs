@@ -21,7 +21,7 @@
 //
 use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::product_info::ProductInfo;
-use crate::product_registry::ProductRegistry;
+use crate::registry::Registry;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
@@ -36,12 +36,12 @@ use std::path::{Path, PathBuf};
 pub struct App {
     pub cwd: PathBuf,
     pub repo: Repo,
-    pub registry: ProductRegistry,
+    pub registry: Registry,
 }
 
 impl App {
     pub fn new(cwd: PathBuf, repo: Repo) -> Self {
-        let registry = ProductRegistry::new(vec![
+        let registry = Registry::new(vec![
             ProductInfo {
                 prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
                 product: Box::<Python>::default(),
