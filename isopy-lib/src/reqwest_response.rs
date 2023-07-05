@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::{ContentLength, LastModified, Response, Stream};
+use crate::last_modified::LastModified;
+use crate::response::{ContentLength, Response, Stream};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;

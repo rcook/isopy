@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::IsopyLibResult;
+use crate::result::IsopyLibResult;
 use std::any::Any;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};

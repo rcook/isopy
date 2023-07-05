@@ -21,7 +21,8 @@
 //
 use crate::descriptor::Descriptor;
 use crate::env_info::EnvInfo;
-use crate::{IsopyLibResult, Package};
+use crate::package::Package;
+use crate::result::IsopyLibResult;
 use async_trait::async_trait;
 use reqwest::Url;
 use std::path::{Path, PathBuf};
