@@ -20,9 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{DEFAULT_REPOSITORY_NAME, EXAMPLE_REPOSITORY_NAME, REPOSITORY_NAME_REGEX};
-use anyhow::{bail, Error};
+use crate::error::IsopyPythonError;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -49,9 +50,9 @@ impl RepositoryName {
 }
 
 impl FromStr for RepositoryName {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         if s.eq_ignore_ascii_case(DEFAULT_REPOSITORY_NAME) {
             return Ok(Self::Default);
         }
@@ -64,7 +65,7 @@ impl FromStr for RepositoryName {
             return Ok(Self::Named(String::from(s)));
         }
 
-        bail!("invalid repository name \"{}\"", s)
+        Err(IsopyPythonError::InvalidRepositoryName(String::from(s)))
     }
 }
 

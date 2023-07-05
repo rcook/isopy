@@ -1,3 +1,4 @@
+use crate::error::IsopyPythonError;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -24,7 +25,8 @@ use crate::python_standalone_builds::api::{
 };
 use crate::python_version::PythonVersion;
 use crate::tag::Tag;
-use anyhow::{bail, Error, Result};
+use anyhow::{bail, Result};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -54,9 +56,9 @@ impl AssetMeta {
 }
 
 impl FromStr for AssetMeta {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
             match result {
                 Some(value) => Ok(value),

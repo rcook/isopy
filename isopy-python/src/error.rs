@@ -19,42 +19,46 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use std::result::Result as StdResult;
-use std::str::FromStr;
+use std::error::Error as StdError;
+use thiserror::Error;
 
-#[derive(Debug, PartialEq)]
-pub enum OS {
-    Darwin,
-    Linux,
-    Windows,
+#[derive(Debug, Error)]
+pub enum IsopyPythonError {
+    #[error("invalid repository name \"{0}\"")]
+    InvalidRepositoryName(String),
+
+    #[error("unsupported architecture \"{0}\"")]
+    UnsupportedArchitecture(String),
+
+    #[error("unsupported archive type \"{0}\"")]
+    UnsupportedArchiveType(String),
+
+    #[error("unsupported family \"{0}\"")]
+    UnsupportedFamily(String),
+
+    #[error("unsupported flavour \"{0}\"")]
+    UnsupportedFlavour(String),
+
+    #[error("unsupported OS \"{0}\"")]
+    UnsupportedOS(String),
+
+    #[error("unsupported platform \"{0}\"")]
+    UnsupportedPlatform(String),
+
+    #[error("unsupported subflavour \"{0}\"")]
+    UnsupportedSubflavour(String),
+
+    #[error("unsupported variant \"{0}\"")]
+    UnsupportedVariant(String),
+
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
 }
 
-impl FromStr for OS {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "darwin" => Ok(Self::Darwin),
-            "linux" => Ok(Self::Linux),
-            "windows" => Ok(Self::Windows),
-            _ => Err(IsopyPythonError::UnsupportedOS(String::from(s))),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::OS;
-    use anyhow::Result;
-    use rstest::rstest;
-
-    #[rstest]
-    #[case(OS::Darwin, "darwin")]
-    #[case(OS::Linux, "linux")]
-    #[case(OS::Windows, "windows")]
-    fn parse_basics(#[case] expected_os: OS, #[case] input: &str) -> Result<()> {
-        assert_eq!(expected_os, input.parse::<OS>()?);
-        Ok(())
-    }
+#[allow(unused)]
+pub fn other_error<E>(error: E) -> IsopyPythonError
+where
+    E: StdError + Send + Sync + 'static,
+{
+    IsopyPythonError::Other(anyhow::Error::new(error))
 }

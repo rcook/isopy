@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -21,6 +19,8 @@ use std::path::PathBuf;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::error::Error as StdError;
+use std::path::PathBuf;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -33,4 +33,11 @@ pub enum IsopyLibError {
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),
+}
+
+pub fn other_error<E>(error: E) -> IsopyLibError
+where
+    E: StdError + Send + Sync + 'static,
+{
+    IsopyLibError::Other(anyhow::Error::new(error))
 }

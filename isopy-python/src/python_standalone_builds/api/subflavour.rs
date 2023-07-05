@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error};
+use crate::error::IsopyPythonError;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -34,19 +35,19 @@ pub enum Subflavour {
 }
 
 impl FromStr for Subflavour {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s {
-            "debug" => Self::Debug,
-            "noopt" => Self::NoOpt,
-            "pgo+lto" => Self::PgoLto,
-            "pgo" => Self::Pgo,
-            "lto" => Self::Lto,
-            "shared" => Self::Shared,
-            "static" => Self::Static,
-            _ => bail!("unsupported subflavour \"{}\"", s),
-        })
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match s {
+            "debug" => Ok(Self::Debug),
+            "noopt" => Ok(Self::NoOpt),
+            "pgo+lto" => Ok(Self::PgoLto),
+            "pgo" => Ok(Self::Pgo),
+            "lto" => Ok(Self::Lto),
+            "shared" => Ok(Self::Shared),
+            "static" => Ok(Self::Static),
+            _ => Err(IsopyPythonError::UnsupportedSubflavour(String::from(s))),
+        }
     }
 }
 

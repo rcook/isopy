@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error};
+use crate::error::IsopyPythonError;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -29,9 +30,9 @@ pub struct ArchiveTypeBaseName {
 }
 
 impl FromStr for ArchiveTypeBaseName {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let s0 = s;
         for (ext, archive_type) in [
             (".tar.gz", ArchiveType::TarGZ),
@@ -47,7 +48,7 @@ impl FromStr for ArchiveTypeBaseName {
             }
         }
 
-        bail!("unsupported archive type \"{}\"", s)
+        Err(IsopyPythonError::UnsupportedArchiveType(String::from(s)))
     }
 }
 

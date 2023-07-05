@@ -20,10 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ENV_DIR;
+use crate::error::{other_error, IsopyOpenJdkError};
 use crate::openjdk_version::OpenJdkVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
-use anyhow::anyhow;
-use isopy_lib::{Descriptor, IsopyLibError, IsopyLibResult, ProjectConfigInfo};
+use isopy_lib::{
+    other_error as isopy_lib_other_error, Descriptor, IsopyLibResult, ProjectConfigInfo,
+};
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -36,11 +38,11 @@ pub struct OpenJdkDescriptor {
 }
 
 impl FromStr for OpenJdkDescriptor {
-    type Err = IsopyLibError;
+    type Err = IsopyOpenJdkError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         s.parse::<OpenJdkVersion>()
-            .map_err(|e| IsopyLibError::Other(anyhow!(e)))
+            .map_err(other_error)
             .map(|version| Self { version })
     }
 }
@@ -67,7 +69,7 @@ impl Descriptor for OpenJdkDescriptor {
             dir: ENV_DIR.clone(),
             version: self.version.clone(),
         })
-        .map_err(|e| IsopyLibError::Other(anyhow!(e)))
+        .map_err(isopy_lib_other_error)
     }
 
     fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo> {
@@ -75,7 +77,7 @@ impl Descriptor for OpenJdkDescriptor {
             value: serde_json::to_value(ProjectConfigRec {
                 version: self.version.clone(),
             })
-            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
+            .map_err(isopy_lib_other_error)?,
         })
     }
 }

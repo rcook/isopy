@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Error;
+use crate::error::IsopyPythonError;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -35,9 +36,9 @@ impl Tag {
 }
 
 impl FromStr for Tag {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(String::from(s)))
     }
 }

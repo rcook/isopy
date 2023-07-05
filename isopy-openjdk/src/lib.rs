@@ -35,10 +35,12 @@
 #![allow(clippy::option_if_let_else)]
 mod adoptium;
 mod constants;
+mod error;
 mod maven_version_range;
 mod openjdk;
 mod openjdk_descriptor;
 mod openjdk_version;
+mod result;
 mod serialization;
 
 pub use self::openjdk::OpenJdk;

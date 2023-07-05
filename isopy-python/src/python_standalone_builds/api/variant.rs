@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error};
+use crate::error::IsopyPythonError;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -29,14 +30,14 @@ pub enum Variant {
 }
 
 impl FromStr for Variant {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s {
-            "install_only" => Self::InstallOnly,
-            "full" => Self::Full,
-            _ => bail!("unsupported variant \"{}\"", s),
-        })
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match s {
+            "install_only" => Ok(Self::InstallOnly),
+            "full" => Ok(Self::Full),
+            _ => Err(IsopyPythonError::UnsupportedVariant(String::from(s))),
+        }
     }
 }
 

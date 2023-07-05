@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error};
+use crate::error::IsopyPythonError;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -30,15 +31,15 @@ pub enum Flavour {
 }
 
 impl FromStr for Flavour {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s {
-            "gnu" => Self::Gnu,
-            "msvc" => Self::Msvc,
-            "musl" => Self::Musl,
-            _ => bail!("unsupported flavour \"{}\"", s),
-        })
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match s {
+            "gnu" => Ok(Self::Gnu),
+            "msvc" => Ok(Self::Msvc),
+            "musl" => Ok(Self::Musl),
+            _ => Err(IsopyPythonError::UnsupportedFlavour(String::from(s))),
+        }
     }
 }
 

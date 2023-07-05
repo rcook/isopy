@@ -23,8 +23,7 @@ use crate::constants::ENV_DIR;
 use crate::python_version::PythonVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
-use anyhow::anyhow;
-use isopy_lib::{Descriptor, IsopyLibError, IsopyLibResult, ProjectConfigInfo};
+use isopy_lib::{other_error, Descriptor, IsopyLibError, IsopyLibResult, ProjectConfigInfo};
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -44,19 +43,16 @@ impl FromStr for PythonDescriptor {
         match s.split_once(':') {
             Some((prefix, suffix)) => prefix
                 .parse::<PythonVersion>()
-                .map_err(|e| IsopyLibError::Other(anyhow!(e)))
+                .map_err(other_error)
                 .and_then(|version| {
-                    suffix
-                        .parse::<Tag>()
-                        .map_err(|e| IsopyLibError::Other(anyhow!(e)))
-                        .map(|tag| Self {
-                            version,
-                            tag: Some(tag),
-                        })
+                    suffix.parse::<Tag>().map_err(other_error).map(|tag| Self {
+                        version,
+                        tag: Some(tag),
+                    })
                 }),
             None => s
                 .parse::<PythonVersion>()
-                .map_err(|e| IsopyLibError::Other(anyhow!(e)))
+                .map_err(other_error)
                 .map(|version| Self { version, tag: None }),
         }
     }
@@ -86,7 +82,7 @@ impl Descriptor for PythonDescriptor {
             version: self.version.clone(),
             tag: self.tag.clone(),
         })
-        .map_err(|e| IsopyLibError::Other(anyhow!(e)))
+        .map_err(other_error)
     }
 
     fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo> {
@@ -95,7 +91,7 @@ impl Descriptor for PythonDescriptor {
                 version: self.version.clone(),
                 tag: self.tag.clone(),
             })
-            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
+            .map_err(other_error)?,
         })
     }
 }

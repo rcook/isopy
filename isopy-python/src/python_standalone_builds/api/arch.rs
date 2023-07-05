@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error};
+use crate::error::IsopyPythonError;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -34,19 +35,19 @@ pub enum Arch {
 }
 
 impl FromStr for Arch {
-    type Err = Error;
+    type Err = IsopyPythonError;
 
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Ok(match s {
-            "aarch64" => Self::AArch64,
-            "i686" => Self::I686,
-            "ppc64le" => Self::PPC64LE,
-            "x86_64" => Self::X86_64,
-            "x86_64_v2" => Self::X86_64V2,
-            "x86_64_v3" => Self::X86_64V3,
-            "x86_64_v4" => Self::X86_64V4,
-            _ => bail!("unsupported architecture \"{}\"", s),
-        })
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        match s {
+            "aarch64" => Ok(Self::AArch64),
+            "i686" => Ok(Self::I686),
+            "ppc64le" => Ok(Self::PPC64LE),
+            "x86_64" => Ok(Self::X86_64),
+            "x86_64_v2" => Ok(Self::X86_64V2),
+            "x86_64_v3" => Ok(Self::X86_64V3),
+            "x86_64_v4" => Ok(Self::X86_64V4),
+            _ => Err(IsopyPythonError::UnsupportedArchitecture(String::from(s))),
+        }
     }
 }
 

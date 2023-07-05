@@ -39,8 +39,8 @@ use crate::traits::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, download_stream, Descriptor, EnvInfo, IsopyLibError, IsopyLibResult, LastModified,
-    PackageInfo, Product,
+    dir_url, download_stream, other_error as isopy_lib_other_error, Descriptor, EnvInfo,
+    IsopyLibResult, LastModified, PackageInfo, Product,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -146,7 +146,7 @@ impl Python {
 
     async fn show_python_index(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
         self.update_index_if_necessary(shared_dir).await?;
-        Self::show_available_downloads(shared_dir).map_err(|e| IsopyLibError::Other(anyhow!(e)))
+        Self::show_available_downloads(shared_dir)
     }
 
     async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {
@@ -176,7 +176,7 @@ impl Python {
         Ok(())
     }
 
-    fn show_available_downloads(shared_dir: &Path) -> Result<Vec<PackageInfo>> {
+    fn show_available_downloads(shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
         fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
             match a.meta.version.cmp(&b.meta.version) {
                 Ordering::Equal => a.tag.cmp(&b.tag),
@@ -271,8 +271,8 @@ impl Product for Python {
     }
 
     fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
-        let project_config_rec = read_yaml_file::<ProjectConfigRec>(path)
-            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
+        let project_config_rec =
+            read_yaml_file::<ProjectConfigRec>(path).map_err(isopy_lib_other_error)?;
 
         Ok(Box::new(PythonDescriptor {
             version: project_config_rec.version,
@@ -283,7 +283,7 @@ impl Product for Python {
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
         Ok(Box::new(
             s.parse::<PythonDescriptor>()
-                .map_err(|e| IsopyLibError::Other(anyhow!(e)))?,
+                .map_err(isopy_lib_other_error)?,
         ))
     }
 
@@ -318,7 +318,7 @@ impl Product for Python {
         }
 
         let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
-            .map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
+            .map_err(isopy_lib_other_error)?;
 
         Ok(EnvInfo {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
@@ -332,8 +332,8 @@ impl Product for Python {
 
     fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
         let mut asset_file_names = Vec::new();
-        for result in read_dir(shared_dir).map_err(|e| IsopyLibError::Other(anyhow!(e)))? {
-            let entry = result.map_err(|e| IsopyLibError::Other(anyhow!(e)))?;
+        for result in read_dir(shared_dir).map_err(isopy_lib_other_error)? {
+            let entry = result.map_err(isopy_lib_other_error)?;
             let asset_file_name = entry.file_name();
             if let Some(asset_file_name) = asset_file_name.to_str() {
                 if asset_file_name.parse::<AssetMeta>().is_ok() {

@@ -19,42 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
+use crate::error::IsopyOpenJdkError;
 use std::result::Result as StdResult;
-use std::str::FromStr;
 
-#[derive(Debug, PartialEq)]
-pub enum OS {
-    Darwin,
-    Linux,
-    Windows,
-}
-
-impl FromStr for OS {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "darwin" => Ok(Self::Darwin),
-            "linux" => Ok(Self::Linux),
-            "windows" => Ok(Self::Windows),
-            _ => Err(IsopyPythonError::UnsupportedOS(String::from(s))),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::OS;
-    use anyhow::Result;
-    use rstest::rstest;
-
-    #[rstest]
-    #[case(OS::Darwin, "darwin")]
-    #[case(OS::Linux, "linux")]
-    #[case(OS::Windows, "windows")]
-    fn parse_basics(#[case] expected_os: OS, #[case] input: &str) -> Result<()> {
-        assert_eq!(expected_os, input.parse::<OS>()?);
-        Ok(())
-    }
-}
+pub type IsopyOpenJdkResult<T> = StdResult<T, IsopyOpenJdkError>;
