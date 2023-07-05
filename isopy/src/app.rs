@@ -79,6 +79,7 @@ impl App {
         }
     }
 
+    #[allow(unused)]
     pub fn read_index_last_modified(
         &self,
         repository_name: &RepositoryName,
@@ -91,6 +92,7 @@ impl App {
         })
     }
 
+    #[allow(unused)]
     pub fn write_index_last_modified(
         &self,
         repository_name: &RepositoryName,
@@ -107,6 +109,7 @@ impl App {
         Ok(())
     }
 
+    #[allow(unused)]
     pub fn releases_path(&self, repository_name: &RepositoryName) -> PathBuf {
         if repository_name.is_default() {
             self.repo.shared_dir().join(RELEASES_FILE_NAME)
@@ -194,6 +197,7 @@ impl App {
         Ok(Some(dir_info))
     }
 
+    #[allow(unused)]
     fn index_path(&self, repository_name: &RepositoryName) -> PathBuf {
         if repository_name.is_default() {
             self.repo.shared_dir().join(INDEX_FILE_NAME)

@@ -19,22 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use isopy_openjdk::OpenJdkDescriptor;
-use isopy_python::PythonDescriptor;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use crate::descriptor::Descriptor;
+use std::path::PathBuf;
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum ProductDescriptor {
-    Python(PythonDescriptor),
-    OpenJdk(OpenJdkDescriptor),
-}
-
-impl Display for ProductDescriptor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match self {
-            Self::Python(d) => write!(f, "{PYTHON_DESCRIPTOR_PREFIX}:{d}"),
-            Self::OpenJdk(d) => write!(f, "{OPENJDK_DESCRIPTOR_PREFIX}:{d}"),
-        }
-    }
+pub struct PackageInfo {
+    pub descriptor: Box<dyn Descriptor>,
+    pub file_name: PathBuf,
 }

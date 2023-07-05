@@ -63,20 +63,8 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    #[command(
-        name = "available",
-        about = "List Python packages available for download"
-    )]
-    Available {
-        #[arg(
-            help = "Package filter",
-            short = 'p',
-            long = "package",
-            default_value_t = PackageFilter::Python,
-            value_enum
-        )]
-        package_filter: PackageFilter,
-    },
+    #[command(name = "available", about = "List packages available for download")]
+    Available,
 
     #[command(
         name = "check",
@@ -206,18 +194,6 @@ impl From<LogLevel> for LevelFilter {
             LogLevel::Trace => Self::Trace,
         }
     }
-}
-
-#[derive(Clone, Debug, ValueEnum)]
-pub enum PackageFilter {
-    #[clap(name = "all")]
-    All,
-
-    #[clap(name = "python")]
-    Python,
-
-    #[clap(name = "openjdk")]
-    OpenJdk,
 }
 
 fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {

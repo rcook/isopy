@@ -26,9 +26,9 @@ use crate::{
 use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
-    Descriptor, DownloadAssetResult, EnvInfo, ParseDescriptorError, ParseDescriptorResult, Product,
-    ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
-    ReadProjectConfigFileResult,
+    Descriptor, DownloadAssetResult, EnvInfo, GetPackageInfosResult, PackageInfo,
+    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
+    ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
 use joatmon::read_yaml_file;
 use std::path::{Path, PathBuf};
@@ -108,5 +108,13 @@ impl Product for Python {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             envs: vec![],
         })
+    }
+
+    async fn get_package_infos(
+        &self,
+        _shared_dir: &Path,
+    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+        //todo!();
+        Ok(Vec::new())
     }
 }

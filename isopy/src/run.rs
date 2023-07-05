@@ -81,7 +81,7 @@ pub async fn run() -> Result<Status> {
 
 async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
-        Command::Available { package_filter } => do_available(&app, package_filter).await,
+        Command::Available => do_available(&app).await,
         Command::Check { clean } => do_check(&app, clean),
         Command::Download { descriptor_id } => do_download(&app, &descriptor_id).await,
         Command::Downloaded => do_downloaded(&app),

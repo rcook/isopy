@@ -21,12 +21,10 @@
 //
 mod descriptor_id;
 mod descriptor_info;
-mod product_descriptor;
 mod product_info;
 mod product_registry;
 
 pub use self::descriptor_id::DescriptorId;
 pub use self::descriptor_info::DescriptorInfo;
-pub use self::product_descriptor::ProductDescriptor;
 pub use self::product_info::ProductInfo;
 pub use self::product_registry::ProductRegistry;

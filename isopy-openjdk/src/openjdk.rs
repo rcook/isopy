@@ -26,8 +26,9 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     verify_sha256_file_checksum, Descriptor, DownloadAssetError, DownloadAssetResult, EnvInfo,
-    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
-    ReadProjectConfigFileError, ReadProjectConfigFileResult,
+    GetPackageInfosResult, PackageInfo, ParseDescriptorError, ParseDescriptorResult, Product,
+    ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
+    ReadProjectConfigFileResult,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -149,5 +150,23 @@ impl Product for OpenJdk {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
         })
+    }
+
+    async fn get_package_infos(
+        &self,
+        shared_dir: &Path,
+    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
+        let manager = AdoptiumIndexManager::new_default(shared_dir);
+        Ok(manager
+            .read_versions()
+            .await?
+            .into_iter()
+            .map(|x| PackageInfo {
+                descriptor: Box::new(OpenJdkDescriptor {
+                    version: x.openjdk_version.clone(),
+                }),
+                file_name: x.file_name,
+            })
+            .collect::<Vec<_>>())
     }
 }

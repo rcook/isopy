@@ -1,4 +1,4 @@
-use crate::EnvInfo;
+use crate::{EnvInfo, PackageInfo};
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -64,6 +64,14 @@ pub enum ReadEnvConfigError {
 
 pub type ReadEnvConfigResult<T> = StdResult<T, ReadEnvConfigError>;
 
+#[derive(Debug, Error)]
+pub enum GetPackageInfosError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type GetPackageInfosResult<T> = StdResult<T, GetPackageInfosError>;
+
 #[async_trait]
 pub trait Product {
     fn name(&self) -> &str;
@@ -88,4 +96,7 @@ pub trait Product {
         data_dir: &Path,
         properties: &serde_json::Value,
     ) -> ReadEnvConfigResult<EnvInfo>;
+
+    async fn get_package_infos(&self, shared_dir: &Path)
+        -> GetPackageInfosResult<Vec<PackageInfo>>;
 }

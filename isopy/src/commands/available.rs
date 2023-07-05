@@ -20,32 +20,44 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::PackageFilter;
-use crate::foo::Foo;
 use crate::print::print;
-use crate::registry::ProductDescriptor;
+use crate::registry::DescriptorInfo;
 use crate::status::Status;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use colored::Colorize;
-use isopy_lib::download_stream;
-use isopy_openjdk::adoptium::AdoptiumIndexManager;
-use isopy_openjdk::OpenJdkDescriptor;
 use isopy_python::constants::RELEASES_URL;
-use isopy_python::{Asset, AssetFilter, PythonDescriptor};
-use std::cmp::Ordering;
+use std::rc::Rc;
 
-pub async fn do_available(app: &App, package_filter: PackageFilter) -> Result<Status> {
-    match package_filter {
-        PackageFilter::All => {
-            show_python_index(app).await?;
-            show_openjdk_index(app).await?;
+pub async fn do_available(app: &App) -> Result<Status> {
+    for product_info in &app.registry.product_infos {
+        let package_infos = product_info
+            .product
+            .get_package_infos(app.repo.shared_dir())
+            .await?;
+        if !package_infos.is_empty() {
+            print(&format!(
+                "{} ({})",
+                product_info.product.name().cyan(),
+                RELEASES_URL.as_str().bright_magenta()
+            ));
+
+            for package_info in package_infos {
+                let descriptor_info = DescriptorInfo {
+                    product_info: Rc::clone(product_info),
+                    descriptor: package_info.descriptor,
+                };
+                print(&format!(
+                    "  {:<30} {}",
+                    format!("{descriptor_info}").bright_yellow(),
+                    package_info.file_name.display()
+                ));
+            }
         }
-        PackageFilter::Python => show_python_index(app).await?,
-        PackageFilter::OpenJdk => show_openjdk_index(app).await?,
     }
     Ok(Status::OK)
 }
 
+/*
 async fn show_python_index(app: &App) -> Result<()> {
     print(&format!(
         "{} ({})",
@@ -55,30 +67,6 @@ async fn show_python_index(app: &App) -> Result<()> {
 
     update_index_if_necessary(app).await?;
     show_available_downloads(app)?;
-
-    Ok(())
-}
-
-async fn show_openjdk_index(app: &App) -> Result<()> {
-    let manager = AdoptiumIndexManager::new_default(app.repo.shared_dir());
-
-    print(&format!(
-        "{} ({})",
-        "OpenJDK".cyan(),
-        manager.server_url().as_str().bright_magenta()
-    ));
-
-    for version in &manager.read_versions().await? {
-        let product_descriptor = ProductDescriptor::OpenJdk(OpenJdkDescriptor {
-            version: version.openjdk_version.clone(),
-        });
-
-        print(&format!(
-            "  {:<30} {}",
-            format!("{product_descriptor}").bright_yellow(),
-            version.file_name.display()
-        ));
-    }
 
     Ok(())
 }
@@ -135,3 +123,4 @@ fn show_available_downloads(app: &App) -> Result<()> {
     }
     Ok(())
 }
+*/
