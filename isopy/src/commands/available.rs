@@ -25,7 +25,6 @@ use crate::registry::DescriptorInfo;
 use crate::status::Status;
 use anyhow::Result;
 use colored::Colorize;
-use isopy_python::constants::RELEASES_URL;
 use std::rc::Rc;
 
 pub async fn do_available(app: &App) -> Result<Status> {
@@ -38,7 +37,7 @@ pub async fn do_available(app: &App) -> Result<Status> {
             print(&format!(
                 "{} ({})",
                 product_info.product.name().cyan(),
-                RELEASES_URL.as_str().bright_magenta()
+                product_info.product.url().as_str().bright_magenta()
             ));
 
             for package_info in package_infos {

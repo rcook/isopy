@@ -20,7 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::asset_filter::AssetFilter;
-use crate::constants::{INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
+use crate::constants::{
+    INDEX_FILE_NAME, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL,
+    REPOSITORIES_FILE_NAME,
+};
 use crate::python_descriptor::PythonDescriptor;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
@@ -41,10 +44,7 @@ use joatmon::read_yaml_file;
 use joatmon::{read_json_file, safe_write_file};
 use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
-
-const NAME: &str = "Python";
-
-pub const PYTHON_PROJECT_CONFIG_FILE_NAME: &str = ".python-version.yaml";
+use url::Url;
 
 pub struct Python;
 
@@ -257,11 +257,15 @@ impl Default for Python {
 #[async_trait]
 impl Product for Python {
     fn name(&self) -> &str {
-        NAME
+        PLUGIN_NAME
+    }
+
+    fn url(&self) -> &Url {
+        &RELEASES_URL
     }
 
     fn project_config_file_name(&self) -> &Path {
-        Path::new(PYTHON_PROJECT_CONFIG_FILE_NAME)
+        &PROJECT_CONFIG_FILE_NAME
     }
 
     fn read_project_config_file(

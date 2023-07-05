@@ -21,10 +21,13 @@
 //
 use lazy_static::lazy_static;
 use reqwest::Url;
+use std::path::PathBuf;
 
 lazy_static! {
     pub static ref ADOPTIUM_SERVER_URL: Url =
         Url::parse("https://api.adoptium.net/").expect("lazy_static: URL must be valid");
+    pub static ref PROJECT_CONFIG_FILE_NAME: PathBuf = PathBuf::from(".openjdk-version.yaml");
+    pub static ref ADOPTIUM_INDEX_FILE_NAME: PathBuf = PathBuf::from("adoptium-index.yaml");
 }
 
-pub const ADOPTIUM_INDEX_FILE_NAME: &str = "adoptium-index.yaml";
+pub const PLUGIN_NAME: &str = "OpenJDK";

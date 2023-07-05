@@ -40,7 +40,7 @@ impl AdoptiumIndexManager {
     pub fn new_default(shared_dir: &Path) -> Self {
         Self::new(
             &ADOPTIUM_SERVER_URL,
-            &shared_dir.join(ADOPTIUM_INDEX_FILE_NAME),
+            &shared_dir.join(&*ADOPTIUM_INDEX_FILE_NAME),
         )
     }
 

@@ -22,6 +22,7 @@ use crate::{EnvInfo, PackageInfo};
 //
 use crate::descriptor::Descriptor;
 use async_trait::async_trait;
+use reqwest::Url;
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use thiserror::Error;
@@ -75,6 +76,8 @@ pub type GetPackageInfosResult<T> = StdResult<T, GetPackageInfosError>;
 #[async_trait]
 pub trait Product {
     fn name(&self) -> &str;
+
+    fn url(&self) -> &Url;
 
     fn project_config_file_name(&self) -> &Path;
 

@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::adoptium::AdoptiumIndexManager;
+use crate::constants::{ADOPTIUM_SERVER_URL, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME};
 use crate::openjdk_descriptor::OpenJdkDescriptor;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
@@ -34,10 +35,7 @@ use joatmon::read_yaml_file;
 use log::info;
 use std::fs::remove_file;
 use std::path::{Path, PathBuf};
-
-const NAME: &str = "OpenJDK";
-
-pub const OPENJDK_PROJECT_CONFIG_FILE_NAME: &str = ".openjdk-version.yaml";
+use url::Url;
 
 pub struct OpenJdk;
 
@@ -90,11 +88,15 @@ impl OpenJdk {
 #[async_trait]
 impl Product for OpenJdk {
     fn name(&self) -> &str {
-        NAME
+        PLUGIN_NAME
+    }
+
+    fn url(&self) -> &Url {
+        &ADOPTIUM_SERVER_URL
     }
 
     fn project_config_file_name(&self) -> &Path {
-        Path::new(OPENJDK_PROJECT_CONFIG_FILE_NAME)
+        &PROJECT_CONFIG_FILE_NAME
     }
 
     fn read_project_config_file(

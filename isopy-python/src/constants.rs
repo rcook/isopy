@@ -22,6 +22,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 use reqwest::Url;
+use std::path::PathBuf;
 
 lazy_static! {
     pub static ref RELEASES_URL: Url =
@@ -29,6 +30,7 @@ lazy_static! {
             .expect("lazy_static: URL must be valid");
     pub static ref REPOSITORY_NAME_REGEX: Regex =
         Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
+    pub static ref PROJECT_CONFIG_FILE_NAME: PathBuf = PathBuf::from(".python-version.yaml");
 }
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";
@@ -42,6 +44,8 @@ pub const RELEASES_FILE_NAME: &str = "releases.json";
 pub const INDEX_FILE_NAME: &str = "index.yaml";
 
 pub const ISOPY_USER_AGENT: &str = "isopy";
+
+pub const PLUGIN_NAME: &str = "Python";
 
 #[cfg(test)]
 mod tests {
