@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use crate::descriptor_id::DescriptorId;
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin::Plugin;
 use crate::serialization::PackageDirRec;
@@ -60,17 +59,13 @@ impl Registry {
         }
     }
 
-    pub fn to_descriptor_info(
-        &self,
-        descriptor_id: &DescriptorId,
-    ) -> ParseDescriptorResult<DescriptorInfo> {
-        let s = descriptor_id.as_str();
-
+    pub fn parse_descriptor(&self, s: &str) -> ParseDescriptorResult<DescriptorInfo> {
         let Some((plugin, tail)) = self.find_plugin(s) else {
             return Err(ParseDescriptorError::Other(anyhow!("unsupported descriptor format {s}")));
         };
 
-        let descriptor = plugin.product.parse_descriptor(tail)?;
+        let descriptor = Arc::new(plugin.product.parse_descriptor(tail)?);
+
         Ok(DescriptorInfo {
             plugin: Arc::clone(plugin),
             descriptor,

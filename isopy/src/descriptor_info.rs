@@ -21,12 +21,23 @@
 //
 use crate::plugin::Plugin;
 use isopy_lib::Descriptor;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct DescriptorInfo {
     pub plugin: Arc<Plugin>,
-    pub descriptor: Box<dyn Descriptor>,
+    pub descriptor: Arc<Box<dyn Descriptor>>,
+}
+
+impl Debug for DescriptorInfo {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(
+            f,
+            "[DescriptorInfo: {}:{}]",
+            self.plugin.prefix, self.descriptor
+        )
+    }
 }
 
 impl Display for DescriptorInfo {

@@ -21,8 +21,9 @@
 //
 use crate::descriptor::Descriptor;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 pub struct PackageInfo {
-    pub descriptor: Box<dyn Descriptor>,
+    pub descriptor: Arc<Box<dyn Descriptor>>,
     pub file_name: PathBuf,
 }

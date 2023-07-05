@@ -50,6 +50,7 @@ use joatmon::{read_json_file, safe_write_file};
 use std::cmp::Ordering;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use url::Url;
 
 pub struct Python;
@@ -196,10 +197,10 @@ impl Python {
             .filter(assets.iter())
             .into_iter()
             .map(|asset| PackageInfo {
-                descriptor: Box::new(PythonDescriptor {
+                descriptor: Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
-                }),
+                })),
                 file_name: PathBuf::from(asset.name.clone()),
             })
             .collect::<Vec<_>>())

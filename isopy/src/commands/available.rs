@@ -44,7 +44,7 @@ pub async fn do_available(app: &App) -> Result<Status> {
             for package_info in package_infos {
                 let descriptor_info = DescriptorInfo {
                     plugin: Arc::clone(plugin),
-                    descriptor: package_info.descriptor,
+                    descriptor: Arc::clone(&package_info.descriptor),
                 };
                 print(&format!(
                     "  {:<30} {}",

@@ -35,6 +35,7 @@ use joatmon::read_yaml_file;
 use log::info;
 use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use url::Url;
 
 pub struct OpenJdk;
@@ -164,9 +165,9 @@ impl Product for OpenJdk {
             .await?
             .into_iter()
             .map(|x| PackageInfo {
-                descriptor: Box::new(OpenJdkDescriptor {
+                descriptor: Arc::new(Box::new(OpenJdkDescriptor {
                     version: x.openjdk_version.clone(),
-                }),
+                })),
                 file_name: x.file_name,
             })
             .collect::<Vec<_>>())

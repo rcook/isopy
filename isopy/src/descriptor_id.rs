@@ -19,31 +19,30 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Error;
+use crate::descriptor_info::DescriptorInfo;
+use crate::registry::Registry;
+use isopy_lib::ParseDescriptorError;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
-pub struct DescriptorId(String);
-
-impl DescriptorId {
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
+pub struct DescriptorId {
+    pub descriptor_info: DescriptorInfo,
 }
 
 impl FromStr for DescriptorId {
-    type Err = Error;
+    type Err = ParseDescriptorError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self(String::from(s)))
+        let descriptor_info = Registry::global().parse_descriptor(s)?;
+        Ok(Self { descriptor_info })
     }
 }
 
 impl Display for DescriptorId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.0)
+        write!(f, "{}", self.descriptor_info)
     }
 }
 
@@ -63,6 +62,6 @@ impl Serialize for DescriptorId {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.0)
+        serializer.serialize_str(&self.descriptor_info.to_string())
     }
 }
