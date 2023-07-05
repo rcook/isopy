@@ -30,7 +30,6 @@ use reqwest::Url;
 use std::path::{Path, PathBuf};
 
 pub struct AdoptiumIndexManager {
-    server_uri: Url,
     client: AdoptiumClient,
     index_path: PathBuf,
 }
@@ -53,15 +52,9 @@ impl AdoptiumIndexManager {
     pub fn new(server_url: &Url, index_path: &Path) -> Self {
         assert!(index_path.is_absolute());
         Self {
-            server_uri: server_url.clone(),
             client: AdoptiumClient::new(server_url),
             index_path: index_path.to_path_buf(),
         }
-    }
-
-    #[must_use]
-    pub const fn server_url(&self) -> &Url {
-        &self.server_uri
     }
 
     pub async fn read_versions(&self) -> Result<Vec<VersionRec>> {

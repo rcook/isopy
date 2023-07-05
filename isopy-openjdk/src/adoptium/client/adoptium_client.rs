@@ -21,9 +21,9 @@
 //
 use super::super::api::{List, Release, VersionData, Versions};
 use super::query::Query;
-use crate::MavenVersionLimit::{Closed, Open};
-use crate::MavenVersionRange::{self, Range};
-use crate::MavenVersionValue;
+use crate::maven_version_range::MavenVersionLimit::{Closed, Open};
+use crate::maven_version_range::MavenVersionRange::{self, Range};
+use crate::maven_version_range::MavenVersionValue;
 use anyhow::Result;
 use isopy_lib::{download_stream, LinkHeader, ReqwestResponse, Response};
 use lazy_static::lazy_static;
@@ -122,9 +122,9 @@ impl AdoptiumClient {
 #[cfg(test)]
 mod tests {
     use super::AdoptiumClient;
-    use crate::MavenVersionLimit::{Closed, Open};
-    use crate::MavenVersionRange::{self, Range, Value};
-    use crate::MavenVersionValue;
+    use crate::maven_version_range::MavenVersionLimit::{Closed, Open};
+    use crate::maven_version_range::MavenVersionRange::{self, Range, Value};
+    use crate::maven_version_range::MavenVersionValue;
     use anyhow::Result;
     use rstest::rstest;
 
