@@ -27,8 +27,8 @@ use anyhow::Result;
 pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
     _ = app
         .download_asset(
-            &descriptor_id.descriptor_info.plugin,
-            descriptor_id.descriptor_info.descriptor.as_ref().as_ref(),
+            &descriptor_id.plugin(),
+            descriptor_id.descriptor(),
             app.repo.shared_dir(),
         )
         .await?;

@@ -20,15 +20,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor_info::DescriptorInfo;
+use crate::plugin::Plugin;
 use crate::registry::Registry;
-use isopy_lib::ParseDescriptorError;
+use isopy_lib::{Descriptor, ParseDescriptorError};
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub struct DescriptorId {
-    pub descriptor_info: DescriptorInfo,
+    descriptor_info: DescriptorInfo,
+}
+
+impl DescriptorId {
+    pub fn plugin(&self) -> &Plugin {
+        &self.descriptor_info.plugin
+    }
+
+    pub fn descriptor(&self) -> &dyn Descriptor {
+        self.descriptor_info.descriptor.as_ref().as_ref()
+    }
 }
 
 impl FromStr for DescriptorId {

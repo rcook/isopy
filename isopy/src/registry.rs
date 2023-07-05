@@ -128,8 +128,7 @@ mod tests {
             },
         ]);
 
-        let descriptor_id = input.parse::<DescriptorId>()?;
-        let descriptor_info = registry.to_descriptor_info(&descriptor_id)?;
+        let descriptor_info = registry.parse_descriptor(input)?;
         assert_eq!(expected_str, descriptor_info.to_string());
         Ok(())
     }

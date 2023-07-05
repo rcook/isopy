@@ -29,11 +29,8 @@ pub async fn do_init(app: &App, descriptor_id: &DescriptorId) -> Result<Status> 
         bail!("Directory {} already has environment", app.cwd.display())
     }
 
-    app.init_project(
-        &descriptor_id.descriptor_info.plugin,
-        descriptor_id.descriptor_info.descriptor.as_ref().as_ref(),
-    )
-    .await?;
+    app.init_project(&descriptor_id.plugin(), descriptor_id.descriptor())
+        .await?;
 
     Ok(Status::OK)
 }

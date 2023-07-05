@@ -27,15 +27,8 @@ use joatmon::safe_write_file;
 use log::info;
 
 pub fn do_gen_config(app: &App, descriptor_id: &DescriptorId, force: bool) -> Result<Status> {
-    let project_config_file_name = descriptor_id
-        .descriptor_info
-        .plugin
-        .product
-        .project_config_file_name();
-    let project_config_info = descriptor_id
-        .descriptor_info
-        .descriptor
-        .get_project_config_info()?;
+    let project_config_file_name = descriptor_id.plugin().product.project_config_file_name();
+    let project_config_info = descriptor_id.descriptor().get_project_config_info()?;
     let project_config_path = app.cwd.join(project_config_file_name);
 
     safe_write_file(
