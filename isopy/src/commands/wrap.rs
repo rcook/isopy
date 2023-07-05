@@ -49,6 +49,7 @@ set -euo pipefail
 PYTHONPATH={base_dir} \
 exec {python_executable_name} {script_path} "$@""#;
 
+#[allow(unused)]
 #[cfg(target_os = "windows")]
 const WRAPPER_TEMPLATE: &str = r#"@echo off
 setlocal
