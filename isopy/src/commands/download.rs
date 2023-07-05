@@ -20,15 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::descriptor_id::DescriptorId;
+use crate::package_id::PackageId;
 use crate::status::Status;
 use anyhow::Result;
 
-pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
+pub async fn do_download(app: &App, package_id: &PackageId) -> Result<Status> {
     _ = app
         .download_asset(
-            &descriptor_id.plugin(),
-            descriptor_id.descriptor(),
+            &package_id.plugin(),
+            package_id.descriptor(),
             app.repo.shared_dir(),
         )
         .await?;

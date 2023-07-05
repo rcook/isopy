@@ -20,15 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::descriptor_id::DescriptorId;
+use crate::package_id::PackageId;
 use crate::status::Status;
 use anyhow::Result;
 use joatmon::safe_write_file;
 use log::info;
 
-pub fn do_gen_config(app: &App, descriptor_id: &DescriptorId, force: bool) -> Result<Status> {
-    let project_config_file_name = descriptor_id.plugin().product.project_config_file_name();
-    let project_config_info = descriptor_id.descriptor().get_project_config_info()?;
+pub fn do_gen_config(app: &App, package_id: &PackageId, force: bool) -> Result<Status> {
+    let project_config_file_name = package_id.plugin().product.project_config_file_name();
+    let project_config_info = package_id.descriptor().get_project_config_info()?;
     let project_config_path = app.cwd.join(project_config_file_name);
 
     safe_write_file(

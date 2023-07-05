@@ -20,16 +20,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::descriptor_id::DescriptorId;
+use crate::package_id::PackageId;
 use crate::status::Status;
 use anyhow::{bail, Result};
 
-pub async fn do_init(app: &App, descriptor_id: &DescriptorId) -> Result<Status> {
+pub async fn do_init(app: &App, package_id: &PackageId) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         bail!("Directory {} already has environment", app.cwd.display())
     }
 
-    app.init_project(&descriptor_id.plugin(), descriptor_id.descriptor())
+    app.init_project(package_id.plugin(), package_id.descriptor())
         .await?;
 
     Ok(Status::OK)

@@ -28,11 +28,11 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
-pub struct DescriptorId {
+pub struct PackageId {
     descriptor_info: DescriptorInfo,
 }
 
-impl DescriptorId {
+impl PackageId {
     pub fn plugin(&self) -> &Plugin {
         &self.descriptor_info.plugin
     }
@@ -42,7 +42,7 @@ impl DescriptorId {
     }
 }
 
-impl FromStr for DescriptorId {
+impl FromStr for PackageId {
     type Err = ParseDescriptorError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -51,13 +51,13 @@ impl FromStr for DescriptorId {
     }
 }
 
-impl Display for DescriptorId {
+impl Display for PackageId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.descriptor_info)
     }
 }
 
-impl<'de> Deserialize<'de> for DescriptorId {
+impl<'de> Deserialize<'de> for PackageId {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -68,7 +68,7 @@ impl<'de> Deserialize<'de> for DescriptorId {
     }
 }
 
-impl Serialize for DescriptorId {
+impl Serialize for PackageId {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,

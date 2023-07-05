@@ -83,15 +83,12 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Command::Available => do_available(&app).await,
         Command::Check { clean } => do_check(&app, clean),
-        Command::Download { descriptor_id } => do_download(&app, &descriptor_id).await,
+        Command::Download { package_id } => do_download(&app, &package_id).await,
         Command::Downloaded => do_downloaded(&app),
         Command::Exec { program, args } => do_exec(app, &program, &args),
-        Command::GenConfig {
-            descriptor_id,
-            force,
-        } => do_gen_config(&app, &descriptor_id, force),
+        Command::GenConfig { package_id, force } => do_gen_config(&app, &package_id, force),
         Command::Info => do_info(&app),
-        Command::Init { descriptor_id } => do_init(&app, &descriptor_id).await,
+        Command::Init { package_id } => do_init(&app, &package_id).await,
         Command::InitConfig => do_init_config(&app).await,
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
