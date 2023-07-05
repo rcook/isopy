@@ -33,103 +33,90 @@ use joatmon::{read_json_file, read_yaml_file, safe_write_file};
 use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
 
-pub struct Foo;
+pub fn read_assets(shared_dir: &Path) -> Result<Vec<Asset>> {
+    let index_json_path = shared_dir.join(RELEASES_FILE_NAME);
+    let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
 
-impl Foo {
-    #[must_use]
-    pub const fn new() -> Self {
-        Self
-    }
-
-    pub fn read_assets(shared_dir: &Path) -> Result<Vec<Asset>> {
-        let index_json_path = shared_dir.join(RELEASES_FILE_NAME);
-        let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
-
-        let mut assets = Vec::new();
-        for package_rec in package_recs {
-            for asset_rec in package_rec.assets {
-                if !AssetMeta::definitely_not_an_asset_name(&asset_rec.name) {
-                    let meta = asset_rec.name.parse::<AssetMeta>()?;
-                    assets.push(Asset {
-                        name: asset_rec.name,
-                        tag: package_rec.tag.clone(),
-                        url: asset_rec.url,
-                        size: asset_rec.size,
-                        meta,
-                    });
-                }
+    let mut assets = Vec::new();
+    for package_rec in package_recs {
+        for asset_rec in package_rec.assets {
+            if !AssetMeta::definitely_not_an_asset_name(&asset_rec.name) {
+                let meta = asset_rec.name.parse::<AssetMeta>()?;
+                assets.push(Asset {
+                    name: asset_rec.name,
+                    tag: package_rec.tag.clone(),
+                    url: asset_rec.url,
+                    size: asset_rec.size,
+                    meta,
+                });
             }
         }
-        Ok(assets)
     }
+    Ok(assets)
+}
 
-    pub fn read_repositories(shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
-        fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
-            match rec {
-                RepositoryRec::GitHub { name, url, enabled } => {
-                    (name, enabled, Box::new(GitHubRepository::new(&url)))
-                }
-                RepositoryRec::Local { name, dir, enabled } => {
-                    (name, enabled, Box::new(LocalRepository::new(dir)))
-                }
+pub fn read_repositories(shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
+    fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
+        match rec {
+            RepositoryRec::GitHub { name, url, enabled } => {
+                (name, enabled, Box::new(GitHubRepository::new(&url)))
+            }
+            RepositoryRec::Local { name, dir, enabled } => {
+                (name, enabled, Box::new(LocalRepository::new(dir)))
             }
         }
+    }
 
-        let repositories_yaml_path = shared_dir.join(REPOSITORIES_FILE_NAME);
-        let repositories_rec = if repositories_yaml_path.is_file() {
-            read_yaml_file::<RepositoriesRec>(&repositories_yaml_path)?
-        } else {
-            let repositories_rec = RepositoriesRec {
-                repositories: vec![
-                    RepositoryRec::GitHub {
-                        name: RepositoryName::Default,
-                        url: dir_url(&RELEASES_URL),
-                        enabled: true,
-                    },
-                    RepositoryRec::Local {
-                        name: RepositoryName::Example,
-                        dir: PathBuf::from("/path/to/local/repository"),
-                        enabled: false,
-                    },
-                ],
-            };
-            safe_write_file(
-                &repositories_yaml_path,
-                serde_yaml::to_string(&repositories_rec)?,
-                false,
-            )?;
-            repositories_rec
+    let repositories_yaml_path = shared_dir.join(REPOSITORIES_FILE_NAME);
+    let repositories_rec = if repositories_yaml_path.is_file() {
+        read_yaml_file::<RepositoriesRec>(&repositories_yaml_path)?
+    } else {
+        let repositories_rec = RepositoriesRec {
+            repositories: vec![
+                RepositoryRec::GitHub {
+                    name: RepositoryName::Default,
+                    url: dir_url(&RELEASES_URL),
+                    enabled: true,
+                },
+                RepositoryRec::Local {
+                    name: RepositoryName::Example,
+                    dir: PathBuf::from("/path/to/local/repository"),
+                    enabled: false,
+                },
+            ],
         };
+        safe_write_file(
+            &repositories_yaml_path,
+            serde_yaml::to_string(&repositories_rec)?,
+            false,
+        )?;
+        repositories_rec
+    };
 
-        let all_repositories = repositories_rec
-            .repositories
-            .into_iter()
-            .map(make_repository);
-        let enabled_repositories = all_repositories
-            .into_iter()
-            .filter(|x| x.1)
-            .map(|x| RepositoryInfo {
-                name: x.0,
-                repository: x.2,
-            })
-            .collect::<Vec<_>>();
-        Ok(enabled_repositories)
-    }
+    let all_repositories = repositories_rec
+        .repositories
+        .into_iter()
+        .map(make_repository);
+    let enabled_repositories = all_repositories
+        .into_iter()
+        .filter(|x| x.1)
+        .map(|x| RepositoryInfo {
+            name: x.0,
+            repository: x.2,
+        })
+        .collect::<Vec<_>>();
+    Ok(enabled_repositories)
+}
 
-    pub async fn download_python(
-        &self,
-        descriptor: &PythonDescriptor,
-        shared_dir: &Path,
-    ) -> Result<PathBuf> {
-        let assets = Self::read_assets(shared_dir)?;
-        let asset = get_asset(&assets, descriptor)?;
-        let repositories = Self::read_repositories(shared_dir)?;
-        let repository = repositories
-            .first()
-            .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
-        let asset_path = download_asset(repository, asset, shared_dir).await?;
-        Ok(asset_path)
-    }
+pub async fn download_python(descriptor: &PythonDescriptor, shared_dir: &Path) -> Result<PathBuf> {
+    let assets = read_assets(shared_dir)?;
+    let asset = get_asset(&assets, descriptor)?;
+    let repositories = read_repositories(shared_dir)?;
+    let repository = repositories
+        .first()
+        .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
+    let asset_path = download_asset(repository, asset, shared_dir).await?;
+    Ok(asset_path)
 }
 
 #[allow(unused)]
@@ -139,7 +126,7 @@ async fn show_python_index(shared_dir: &Path) -> Result<Vec<PackageInfo>> {
 }
 
 async fn update_index_if_necessary(shared_dir: &Path) -> Result<()> {
-    let repositories = Foo::read_repositories(shared_dir)?;
+    let repositories = read_repositories(shared_dir)?;
     let repository = repositories
         .first()
         .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
@@ -173,7 +160,7 @@ fn show_available_downloads(shared_dir: &Path) -> Result<Vec<PackageInfo>> {
         }
     }
 
-    let mut assets = Foo::read_assets(shared_dir)?;
+    let mut assets = read_assets(shared_dir)?;
     assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
     Ok(AssetFilter::default_for_platform()

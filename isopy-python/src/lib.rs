@@ -58,7 +58,7 @@ pub use self::asset_filter::AssetFilter;
 pub use self::asset_helper::{download_asset, get_asset};
 pub use self::asset_meta::AssetMeta;
 pub use self::checksum::validate_sha256_checksum;
-pub use self::foo::Foo;
+pub use self::foo::download_python;
 pub use self::github::GitHubRepository;
 pub use self::local::LocalRepository;
 pub use self::python::Python;
