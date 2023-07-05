@@ -82,7 +82,7 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
 
 #[cfg(test)]
 mod tests {
-    use crate::shell::proc::{CMD, CMD_PATH, POWERSHELL, POWERSHELL_PATH};
+    use crate::shell::windows::{CMD, CMD_PATH, POWERSHELL, POWERSHELL_PATH};
 
     #[test]
     fn cmd() {
