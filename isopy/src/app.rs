@@ -19,15 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
+use crate::constants::ENV_FILE_NAME;
 use crate::plugin::Plugin;
-use crate::registry::Registry;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::Descriptor;
-use isopy_openjdk::OpenJdk;
-use isopy_python::Python;
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::safe_write_file;
 use std::collections::HashMap;
@@ -36,26 +33,11 @@ use std::path::{Path, PathBuf};
 pub struct App {
     pub cwd: PathBuf,
     pub repo: Repo,
-    pub registry: Registry,
 }
 
 impl App {
     pub fn new(cwd: PathBuf, repo: Repo) -> Self {
-        let registry = Registry::new(vec![
-            Plugin {
-                prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
-                product: Box::<Python>::default(),
-            },
-            Plugin {
-                prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
-                product: Box::<OpenJdk>::default(),
-            },
-        ]);
-        Self {
-            cwd,
-            repo,
-            registry,
-        }
+        Self { cwd, repo }
     }
 
     pub async fn download_asset(
