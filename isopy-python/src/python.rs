@@ -34,15 +34,16 @@ use crate::{
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, download_stream, Descriptor, DownloadAssetResult, EnvInfo, GetPackageInfosResult,
-    LastModified, PackageInfo, ParseDescriptorError, ParseDescriptorResult, Product,
-    ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
-    ReadProjectConfigFileResult,
+    dir_url, download_stream, Descriptor, DownloadAssetResult, EnvInfo, GetDownloadedError,
+    GetDownloadedResult, GetPackageInfosResult, LastModified, PackageInfo, ParseDescriptorError,
+    ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
+    ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
 use joatmon::{read_json_file, safe_write_file};
 use std::cmp::Ordering;
+use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -333,5 +334,20 @@ impl Product for Python {
     ) -> GetPackageInfosResult<Vec<PackageInfo>> {
         //todo!();
         Ok(Vec::new())
+    }
+
+    fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
+        let mut asset_file_names = Vec::new();
+        for result in read_dir(shared_dir).map_err(|e| GetDownloadedError::Other(anyhow!(e)))? {
+            let entry = result.map_err(|e| GetDownloadedError::Other(anyhow!(e)))?;
+            let asset_file_name = entry.file_name();
+            if let Some(asset_file_name) = asset_file_name.to_str() {
+                if asset_file_name.parse::<AssetMeta>().is_ok() {
+                    asset_file_names.push(PathBuf::from(asset_file_name));
+                }
+            }
+        }
+
+        Ok(asset_file_names)
     }
 }

@@ -27,13 +27,13 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     verify_sha256_file_checksum, Descriptor, DownloadAssetError, DownloadAssetResult, EnvInfo,
-    GetPackageInfosResult, PackageInfo, ParseDescriptorError, ParseDescriptorResult, Product,
-    ReadEnvConfigError, ReadEnvConfigResult, ReadProjectConfigFileError,
-    ReadProjectConfigFileResult,
+    GetDownloadedError, GetDownloadedResult, GetPackageInfosResult, PackageInfo,
+    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
+    ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
 use joatmon::read_yaml_file;
 use log::info;
-use std::fs::remove_file;
+use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -170,5 +170,20 @@ impl Product for OpenJdk {
                 file_name: x.file_name,
             })
             .collect::<Vec<_>>())
+    }
+
+    fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
+        let mut asset_file_names = Vec::new();
+        for result in read_dir(shared_dir).map_err(|e| GetDownloadedError::Other(anyhow!(e)))? {
+            let entry = result.map_err(|e| GetDownloadedError::Other(anyhow!(e)))?;
+            let asset_file_name = entry.file_name();
+            if let Some(asset_file_name) = asset_file_name.to_str() {
+                if asset_file_name.starts_with("OpenJDK") {
+                    asset_file_names.push(PathBuf::from(asset_file_name));
+                }
+            }
+        }
+
+        Ok(asset_file_names)
     }
 }

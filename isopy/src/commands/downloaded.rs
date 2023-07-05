@@ -23,17 +23,20 @@ use crate::app::App;
 use crate::print::print;
 use crate::status::Status;
 use anyhow::Result;
-use isopy_python::AssetMeta;
-use std::fs::read_dir;
+use colored::Colorize;
 
 pub fn do_downloaded(app: &App) -> Result<Status> {
-    for result in read_dir(app.repo.shared_dir())? {
-        let entry = result?;
-        let file_name = entry.file_name();
+    for product_info in &app.registry.product_infos {
+        let asset_file_names = product_info.product.get_downloaded(app.repo.shared_dir())?;
+        if !asset_file_names.is_empty() {
+            print(&format!(
+                "{} ({})",
+                product_info.product.name().cyan(),
+                product_info.product.url().as_str().bright_magenta()
+            ));
 
-        if let Some(asset_name) = file_name.to_str() {
-            if asset_name.parse::<AssetMeta>().is_ok() {
-                print(asset_name);
+            for asset_file_name in asset_file_names {
+                print(&format!("  {}", asset_file_name.display()));
             }
         }
     }

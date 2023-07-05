@@ -73,6 +73,14 @@ pub enum GetPackageInfosError {
 
 pub type GetPackageInfosResult<T> = StdResult<T, GetPackageInfosError>;
 
+#[derive(Debug, Error)]
+pub enum GetDownloadedError {
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type GetDownloadedResult<T> = StdResult<T, GetDownloadedError>;
+
 #[async_trait]
 pub trait Product {
     fn name(&self) -> &str;
@@ -102,4 +110,6 @@ pub trait Product {
 
     async fn get_package_infos(&self, shared_dir: &Path)
         -> GetPackageInfosResult<Vec<PackageInfo>>;
+
+    fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>>;
 }
