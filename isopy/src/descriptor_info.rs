@@ -19,12 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod descriptor_id;
-mod descriptor_info;
-mod product_info;
-mod product_registry;
+use crate::product_info::ProductInfo;
+use isopy_lib::Descriptor;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::rc::Rc;
 
-pub use self::descriptor_id::DescriptorId;
-pub use self::descriptor_info::DescriptorInfo;
-pub use self::product_info::ProductInfo;
-pub use self::product_registry::ProductRegistry;
+pub struct DescriptorInfo {
+    pub product_info: Rc<ProductInfo>,
+    pub descriptor: Box<dyn Descriptor>,
+}
+
+impl Display for DescriptorInfo {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}:{}", self.product_info.prefix, self.descriptor)
+    }
+}

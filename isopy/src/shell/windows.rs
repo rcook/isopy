@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::proc::{get_parent_pid, get_pid, get_process_from_pid};
+use crate::shell::proc::{get_parent_pid, get_pid, get_process_from_pid};
 use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use same_file::is_same_file;
@@ -82,7 +82,7 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
 
 #[cfg(test)]
 mod tests {
-    use super::{CMD, CMD_PATH, POWERSHELL, POWERSHELL_PATH};
+    use crate::shell::proc::{CMD, CMD_PATH, POWERSHELL, POWERSHELL_PATH};
 
     #[test]
     fn cmd() {

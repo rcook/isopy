@@ -1,5 +1,3 @@
-use crate::serialization::PackageDirRec;
-
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -21,9 +19,10 @@ use crate::serialization::PackageDirRec;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::descriptor_id::DescriptorId;
-use super::descriptor_info::DescriptorInfo;
-use super::product_info::ProductInfo;
+use crate::descriptor_id::DescriptorId;
+use crate::descriptor_info::DescriptorInfo;
+use crate::product_info::ProductInfo;
+use crate::serialization::PackageDirRec;
 use anyhow::{anyhow, Result};
 use isopy_lib::{EnvInfo, ParseDescriptorError, ParseDescriptorResult};
 use std::path::Path;
@@ -89,8 +88,9 @@ impl ProductRegistry {
 
 #[cfg(test)]
 mod tests {
-    use super::{ProductInfo, ProductRegistry};
-    use crate::registry::DescriptorId;
+    use crate::descriptor_id::DescriptorId;
+    use crate::product_info::ProductInfo;
+    use crate::product_registry::ProductRegistry;
     use anyhow::Result;
     use isopy_openjdk::OpenJdk;
     use isopy_python::Python;

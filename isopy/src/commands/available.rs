@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::descriptor_info::DescriptorInfo;
 use crate::print::print;
-use crate::registry::DescriptorInfo;
 use crate::status::Status;
 use anyhow::Result;
 use colored::Colorize;

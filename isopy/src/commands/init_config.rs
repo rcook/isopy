@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::registry::ProductInfo;
-use crate::{app::App, status::Status};
+use crate::app::App;
+use crate::product_info::ProductInfo;
+use crate::status::Status;
 use anyhow::Result;
 use log::error;
 use std::path::PathBuf;

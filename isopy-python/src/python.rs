@@ -150,8 +150,8 @@ impl Python {
         shared_dir: &Path,
     ) -> GetPackageInfosResult<Vec<PackageInfo>> {
         self.update_index_if_necessary(shared_dir).await?;
-        Ok(Self::show_available_downloads(shared_dir)
-            .map_err(|e| GetPackageInfosError::Other(anyhow!(e)))?)
+        Self::show_available_downloads(shared_dir)
+            .map_err(|e| GetPackageInfosError::Other(anyhow!(e)))
     }
 
     async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {

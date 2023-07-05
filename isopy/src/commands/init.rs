@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::registry::DescriptorId;
+use crate::descriptor_id::DescriptorId;
 use crate::status::Status;
 use anyhow::{bail, Result};
 
