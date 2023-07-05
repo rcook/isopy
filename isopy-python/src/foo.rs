@@ -36,6 +36,7 @@ use std::path::{Path, PathBuf};
 pub struct Foo;
 
 impl Foo {
+    #[must_use]
     pub const fn new() -> Self {
         Self
     }
