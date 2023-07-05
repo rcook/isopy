@@ -19,15 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::serialization::{PackageRec, RepositoriesRec, RepositoryRec};
 use anyhow::{anyhow, Result};
-use isopy_lib::dir_url;
+use isopy_lib::{dir_url, download_stream, PackageInfo};
 use isopy_python::constants::{RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME};
+use isopy_python::AssetFilter;
 use isopy_python::{
     download_asset, get_asset, Asset, AssetMeta, GitHubRepository, LocalRepository,
     PythonDescriptor, Repository, RepositoryInfo, RepositoryName,
 };
 use joatmon::{read_json_file, read_yaml_file, safe_write_file};
+use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
 
 pub struct Foo;
@@ -126,4 +129,61 @@ impl Foo {
         let asset_path = download_asset(repository, asset, shared_dir).await?;
         Ok(asset_path)
     }
+}
+
+#[allow(unused)]
+async fn show_python_index(app: &App) -> Result<Vec<PackageInfo>> {
+    update_index_if_necessary(app).await?;
+    show_available_downloads(app)
+}
+
+async fn update_index_if_necessary(app: &App) -> Result<()> {
+    let repositories = Foo::read_repositories(app.repo.shared_dir())?;
+    let repository = repositories
+        .first()
+        .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
+
+    let releases_path = app.releases_path(&repository.name);
+    let current_last_modified = if releases_path.is_file() {
+        app.read_index_last_modified(&repository.name)?
+    } else {
+        None
+    };
+
+    if let Some(mut response) = repository
+        .repository
+        .get_latest_index(&current_last_modified)
+        .await?
+    {
+        download_stream("release index", &mut response, &releases_path).await?;
+        if let Some(last_modified) = response.last_modified() {
+            app.write_index_last_modified(&repository.name, last_modified)?;
+        }
+    }
+
+    Ok(())
+}
+
+fn show_available_downloads(app: &App) -> Result<Vec<PackageInfo>> {
+    fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
+        match a.meta.version.cmp(&b.meta.version) {
+            Ordering::Equal => a.tag.cmp(&b.tag),
+            result => result,
+        }
+    }
+
+    let mut assets = Foo::read_assets(app.repo.shared_dir())?;
+    assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
+
+    Ok(AssetFilter::default_for_platform()
+        .filter(assets.iter())
+        .into_iter()
+        .map(|asset| PackageInfo {
+            descriptor: Box::new(PythonDescriptor {
+                version: asset.meta.version.clone(),
+                tag: Some(asset.tag.clone()),
+            }),
+            file_name: PathBuf::from(asset.name.clone()),
+        })
+        .collect::<Vec<_>>())
 }
