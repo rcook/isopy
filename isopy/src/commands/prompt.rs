@@ -46,21 +46,22 @@ pub fn do_prompt(app: &App) -> Result<Status> {
 
     if isopy_env.is_some() {
         if let Some(env_rec) = env_rec {
-            for package_dir_rec in &env_rec.package_dirs {
-                prompt.push_str(
-                    &package_dir_rec
-                        .properties
-                        .as_object()
-                        .and_then(|x| x.get("version"))
-                        .and_then(serde_json::Value::as_str)
-                        .map_or_else(
-                            || package_dir_rec.id.clone(),
-                            |x| format!("{}-{}", package_dir_rec.id, x),
-                        ),
-                );
-            }
+            prompt.push_str(
+                &env_rec
+                    .package_dirs
+                    .iter()
+                    .map(|p| {
+                        p.properties
+                            .as_object()
+                            .and_then(|x| x.get("version"))
+                            .and_then(serde_json::Value::as_str)
+                            .map_or_else(|| p.id.clone(), |x| format!("{}-{}", p.id, x))
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            );
         } else {
-            prompt.push_str("unknown");
+            prompt.push_str("(isopy error)");
         }
     } else if let Some(env_rec) = env_rec {
         if !env_rec.package_dirs.is_empty() {
