@@ -40,8 +40,8 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, download_stream, Descriptor, DownloadAssetResult, EnvInfo, GetDownloadedError,
-    GetDownloadedResult, GetPackageInfosResult, LastModified, PackageInfo, ParseDescriptorError,
-    ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
+    GetDownloadedResult, GetPackageInfosError, GetPackageInfosResult, LastModified, PackageInfo,
+    ParseDescriptorError, ParseDescriptorResult, Product, ReadEnvConfigError, ReadEnvConfigResult,
     ReadProjectConfigFileError, ReadProjectConfigFileResult,
 };
 use joatmon::label_file_name;
@@ -145,10 +145,13 @@ impl Python {
         Ok(enabled_repositories)
     }
 
-    #[allow(unused)]
-    async fn show_python_index(&self, shared_dir: &Path) -> Result<Vec<PackageInfo>> {
+    async fn show_python_index(
+        &self,
+        shared_dir: &Path,
+    ) -> GetPackageInfosResult<Vec<PackageInfo>> {
         self.update_index_if_necessary(shared_dir).await?;
-        Self::show_available_downloads(shared_dir)
+        Ok(Self::show_available_downloads(shared_dir)
+            .map_err(|e| GetPackageInfosError::Other(anyhow!(e)))?)
     }
 
     async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {
@@ -333,10 +336,9 @@ impl Product for Python {
 
     async fn get_package_infos(
         &self,
-        _shared_dir: &Path,
+        shared_dir: &Path,
     ) -> GetPackageInfosResult<Vec<PackageInfo>> {
-        //todo!();
-        Ok(Vec::new())
+        self.show_python_index(shared_dir).await
     }
 
     fn get_downloaded(&self, shared_dir: &Path) -> GetDownloadedResult<Vec<PathBuf>> {
