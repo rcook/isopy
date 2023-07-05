@@ -68,33 +68,6 @@ impl Serialize for Tag {
     }
 }
 
-pub mod option_tag {
-    use super::Tag;
-    use serde::{Deserialize, Deserializer, Serializer};
-
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Tag>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let opt: Option<String> = Option::deserialize(deserializer)?;
-        if let Some(s) = opt {
-            Ok(Some(s.parse::<Tag>().map_err(serde::de::Error::custom)?))
-        } else {
-            Ok(None)
-        }
-    }
-
-    pub fn serialize<S>(opt: &Option<Tag>, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        if let Some(ref tag) = *opt {
-            return serializer.serialize_str(tag.as_str());
-        }
-        serializer.serialize_none()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::Tag;

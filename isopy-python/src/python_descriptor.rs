@@ -105,7 +105,7 @@ impl Descriptor for PythonDescriptor {
 #[cfg(test)]
 mod tests {
     use super::PythonDescriptor;
-    use crate::PythonVersion;
+    use crate::python_version::PythonVersion;
     use anyhow::Result;
 
     #[test]

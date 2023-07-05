@@ -19,18 +19,23 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::asset::Asset;
 use crate::asset_filter::AssetFilter;
+use crate::asset_helper::{download_asset, get_asset};
+use crate::asset_meta::AssetMeta;
 use crate::constants::{
     INDEX_FILE_NAME, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL,
     REPOSITORIES_FILE_NAME,
 };
+use crate::github::GitHubRepository;
+use crate::local::LocalRepository;
 use crate::python_descriptor::PythonDescriptor;
-use crate::serialization::{EnvConfigRec, ProjectConfigRec};
-use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::{
-    download_asset, get_asset, Asset, AssetMeta, GitHubRepository, LocalRepository, Repository,
-    RepositoryInfo, RepositoryName,
+use crate::repository_info::RepositoryInfo;
+use crate::repository_name::RepositoryName;
+use crate::serialization::{
+    EnvConfigRec, IndexRec, PackageRec, ProjectConfigRec, RepositoriesRec, RepositoryRec,
 };
+use crate::traits::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{

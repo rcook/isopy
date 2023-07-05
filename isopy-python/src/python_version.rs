@@ -32,6 +32,7 @@ pub enum PythonVersionParseError {
     Other(#[from] anyhow::Error),
 }
 
+#[allow(unused)]
 pub type PythonVersionParseResult<T> = StdResult<T, PythonVersionParseError>;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
