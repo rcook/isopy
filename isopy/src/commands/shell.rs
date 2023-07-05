@@ -31,10 +31,10 @@ use log::error;
 use std::env::{var, VarError};
 use std::path::Path;
 
-pub fn do_shell(app: App, package_dir_id: &Option<String>) -> Result<Status> {
+pub fn do_shell(app: App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
-            bail!("You are already in an isopy shell");
+            bail!("you are already in an isopy shell");
         }
         Err(VarError::NotPresent) => {}
         Err(e) => return Err(e)?,
@@ -47,24 +47,18 @@ pub fn do_shell(app: App, package_dir_id: &Option<String>) -> Result<Status> {
 
     let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(ENV_FILE_NAME))?;
 
-    let package_dir_rec = match package_dir_id.as_ref() {
-        Some(id) => env_rec.package_dirs.iter().find(|p| p.id == *id),
-        None => env_rec.package_dirs.first(),
-    };
+    let mut path_dirs = Vec::new();
+    let mut envs = Vec::new();
 
-    let Some(package_dir_rec) = package_dir_rec else {
-        if let Some(package_dir_id) = package_dir_id {
-            error!("could not find package directory with ID {}", package_dir_id);
-        } else {
-            error!("could not find default package directory");
-        }
-        return Ok(Status::Fail);
-    };
+    for package_dir_rec in &env_rec.package_dirs {
+        let Some(env_info) = Registry::global().get_env_info(dir_info.data_dir(), package_dir_rec)? else {
+            error!("could not get environment info");
+            return Ok(Status::Fail);
+        };
 
-    let Some(env_info) = Registry::global().blah(dir_info.data_dir(), package_dir_rec)? else {
-        error!("could not get environment info");
-        return Ok(Status::Fail);
-    };
+        path_dirs.extend(env_info.path_dirs);
+        envs.extend(env_info.envs);
+    }
 
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
@@ -72,13 +66,8 @@ pub fn do_shell(app: App, package_dir_id: &Option<String>) -> Result<Status> {
     Command::new_shell().exec(
         dir_info.link_id(),
         dir_info.meta_id(),
-        &env_info
-            .path_dirs
-            .iter()
-            .map(|p| p as &Path)
-            .collect::<Vec<_>>(),
-        &env_info
-            .envs
+        &path_dirs.iter().map(|p| p as &Path).collect::<Vec<_>>(),
+        &envs
             .iter()
             .map(|(k, v)| (k.as_str(), v.as_str()))
             .collect::<Vec<_>>(),

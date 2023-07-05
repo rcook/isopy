@@ -27,7 +27,7 @@ use anyhow::Result;
 pub async fn do_download(app: &App, package_id: &PackageId) -> Result<Status> {
     _ = app
         .download_asset(
-            &package_id.plugin(),
+            package_id.plugin(),
             package_id.descriptor(),
             app.repo.shared_dir(),
         )

@@ -1,3 +1,4 @@
+use crate::constants::ENV_DIR;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -84,7 +85,7 @@ impl Descriptor for PythonDescriptor {
 
     fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value> {
         serde_json::to_value(EnvConfigRec {
-            dir: PathBuf::from("python"),
+            dir: ENV_DIR.clone(),
             version: self.version.clone(),
             tag: self.tag.clone(),
         })

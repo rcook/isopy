@@ -63,6 +63,18 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    #[command(name = "add", about = "Add package to environment")]
+    AddPackage {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
+    #[command(
+        name = "add-config",
+        about = "Add package defined in configuration file to environment"
+    )]
+    AddPackageFromConfig,
+
     #[command(name = "available", about = "List packages available for download")]
     Available,
 
@@ -113,18 +125,6 @@ pub enum Command {
     #[command(name = "info", about = "Show information")]
     Info,
 
-    #[command(name = "init", about = "Create environment")]
-    Init {
-        #[arg(help = "Python or OpenJDK product descriptor")]
-        package_id: PackageId,
-    },
-
-    #[command(
-        name = "init-config",
-        about = "Create Python environment from .python-version.yaml configuration file"
-    )]
-    InitConfig,
-
     #[command(
         name = "link",
         about = "Use existing Python environment for current directory"
@@ -143,11 +143,8 @@ pub enum Command {
     #[command(name = "scratch", about = "Experimental stuff")]
     Scratch,
 
-    #[command(name = "shell", about = "Start Python environment shell")]
-    Shell {
-        #[arg(help = "Package directory ID")]
-        package_dir_id: Option<String>,
-    },
+    #[command(name = "shell", about = "Start environment shell")]
+    Shell,
 
     #[command(name = "wrap", about = "Generate wrapper script for Python script")]
     Wrap {

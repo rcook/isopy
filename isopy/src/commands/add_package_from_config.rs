@@ -28,7 +28,7 @@ use log::error;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-pub async fn do_init_config(app: &App) -> Result<Status> {
+pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         error!("directory {} already has an environment", app.cwd.display());
         return Ok(Status::Fail);
@@ -43,7 +43,7 @@ pub async fn do_init_config(app: &App) -> Result<Status> {
         .product
         .read_project_config_file(&project_config_path)?;
 
-    app.init_project(&plugin, descriptor.as_ref()).await?;
+    app.add_package(&plugin, descriptor.as_ref()).await?;
 
     Ok(Status::OK)
 }

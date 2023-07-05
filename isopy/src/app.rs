@@ -26,7 +26,7 @@ use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::Descriptor;
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::safe_write_file;
+use joatmon::{read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -36,7 +36,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(cwd: PathBuf, repo: Repo) -> Self {
+    pub const fn new(cwd: PathBuf, repo: Repo) -> Self {
         Self { cwd, repo }
     }
 
@@ -52,30 +52,60 @@ impl App {
             .await?)
     }
 
-    pub async fn init_project(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
+    pub async fn add_package(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
+        let project_dir = self.cwd.clone();
+        let mut package_dirs = Vec::new();
+
+        let (dir_info, env_config_path) = if let Some(dir_info) = self.repo.get(&project_dir)? {
+            let env_config_path = dir_info.data_dir().join(ENV_FILE_NAME);
+            let env_rec = read_yaml_file::<EnvRec>(&env_config_path)?;
+            if env_rec.project_dir != project_dir {
+                bail!(
+                    "environment file {} does not refer to project directory {}",
+                    env_config_path.display(),
+                    project_dir.display()
+                );
+            }
+
+            package_dirs.extend(env_rec.package_dirs);
+            (dir_info, env_config_path)
+        } else {
+            let Some(dir_info) = self.repo.init(&project_dir)? else {
+                bail!(
+                    "could not initialize environment for directory {}",
+                    project_dir.display()
+                )
+            };
+
+            let env_config_path = dir_info.data_dir().join(ENV_FILE_NAME);
+            (dir_info, env_config_path)
+        };
+
+        if package_dirs.iter().any(|p| p.id == plugin.prefix) {
+            bail!(
+                "environment already has a package with ID {} configured",
+                plugin.prefix
+            );
+        }
+
         let asset_path = self
             .download_asset(plugin, descriptor, self.repo.shared_dir())
             .await?;
 
-        let Some(dir_info) = self.repo.init(&self.cwd)? else {
-            bail!(
-                "Could not initialize metadirectory for directory {}",
-                self.cwd.display()
-            )
-        };
-
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
+        package_dirs.push(PackageDirRec {
+            id: plugin.prefix.clone(),
+            properties: descriptor.get_env_config_value()?,
+        });
+
         safe_write_file(
-            &dir_info.data_dir().join(ENV_FILE_NAME),
+            &env_config_path,
             serde_yaml::to_string(&EnvRec {
-                config_path: self.cwd.clone(),
-                package_dirs: vec![PackageDirRec {
-                    id: plugin.prefix.clone(),
-                    properties: descriptor.get_env_config_value()?,
-                }],
+                project_dir,
+                package_dirs,
             })?,
-            false,
+            true,
         )?;
 
         Ok(())

@@ -25,8 +25,8 @@ use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EnvRec {
-    #[serde(rename = "config_path")]
-    pub config_path: PathBuf,
+    #[serde(rename = "project_dir")]
+    pub project_dir: PathBuf,
 
     #[serde(rename = "package_dirs")]
     pub package_dirs: Vec<PackageDirRec>,

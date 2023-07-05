@@ -72,7 +72,7 @@ impl Registry {
         })
     }
 
-    pub fn blah(
+    pub fn get_env_info(
         &self,
         data_dir: &Path,
         package_dir_rec: &PackageDirRec,
@@ -104,7 +104,7 @@ impl Registry {
 
 #[cfg(test)]
 mod tests {
-    use crate::descriptor_id::DescriptorId;
+    use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
     use crate::plugin::Plugin;
     use crate::registry::Registry;
     use anyhow::Result;
@@ -119,11 +119,11 @@ mod tests {
     fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
         let registry = Registry::new(vec![
             Plugin {
-                prefix: String::from("python"),
+                prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
                 product: Box::<Python>::default(),
             },
             Plugin {
-                prefix: String::from("openjdk"),
+                prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
                 product: Box::<OpenJdk>::default(),
             },
         ]);

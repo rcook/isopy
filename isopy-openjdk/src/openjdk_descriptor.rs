@@ -1,3 +1,4 @@
+use crate::constants::ENV_DIR;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -61,12 +62,12 @@ impl Descriptor for OpenJdkDescriptor {
     fn transform_archive_path(&self, path: &Path) -> PathBuf {
         let mut i = path.iter();
         _ = i.next();
-        Path::new("jdk").join(i)
+        ENV_DIR.join(i)
     }
 
     fn get_env_config_value(&self) -> GetEnvConfigValueResult<serde_json::Value> {
         serde_json::to_value(EnvConfigRec {
-            dir: PathBuf::from("openjdk"),
+            dir: ENV_DIR.clone(),
             version: self.version.clone(),
         })
         .map_err(|e| GetEnvConfigValueError::Other(anyhow!(e)))
