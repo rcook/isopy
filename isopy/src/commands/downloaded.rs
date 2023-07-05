@@ -26,13 +26,13 @@ use anyhow::Result;
 use colored::Colorize;
 
 pub fn do_downloaded(app: &App) -> Result<Status> {
-    for product_info in &app.registry.product_infos {
-        let asset_file_names = product_info.product.get_downloaded(app.repo.shared_dir())?;
+    for plugin in &app.registry.plugins {
+        let asset_file_names = plugin.product.get_downloaded(app.repo.shared_dir())?;
         if !asset_file_names.is_empty() {
             print(&format!(
                 "{} ({})",
-                product_info.product.name().cyan(),
-                product_info.product.url().as_str().bright_magenta()
+                plugin.product.name().cyan(),
+                plugin.product.url().as_str().bright_magenta()
             ));
 
             for asset_file_name in asset_file_names {

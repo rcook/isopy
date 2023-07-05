@@ -21,7 +21,7 @@
 //
 use crate::descriptor_id::DescriptorId;
 use crate::descriptor_info::DescriptorInfo;
-use crate::product_info::ProductInfo;
+use crate::plugin::Plugin;
 use crate::serialization::PackageDirRec;
 use anyhow::{anyhow, Result};
 use isopy_lib::{EnvInfo, ParseDescriptorError, ParseDescriptorResult};
@@ -29,13 +29,13 @@ use std::path::Path;
 use std::rc::Rc;
 
 pub struct Registry {
-    pub product_infos: Vec<Rc<ProductInfo>>,
+    pub plugins: Vec<Rc<Plugin>>,
 }
 
 impl Registry {
-    pub fn new(product_infos: Vec<ProductInfo>) -> Self {
+    pub fn new(plugins: Vec<Plugin>) -> Self {
         Self {
-            product_infos: product_infos.into_iter().map(Rc::new).collect::<Vec<_>>(),
+            plugins: plugins.into_iter().map(Rc::new).collect::<Vec<_>>(),
         }
     }
 
@@ -45,13 +45,13 @@ impl Registry {
     ) -> ParseDescriptorResult<DescriptorInfo> {
         let s = descriptor_id.as_str();
 
-        let Some((product_info, tail)) = self.find_product_info(s) else {
+        let Some((plugin, tail)) = self.find_plugin(s) else {
             return Err(ParseDescriptorError::Other(anyhow!("unsupported descriptor format {s}")));
         };
 
-        let descriptor = product_info.product.parse_descriptor(tail)?;
+        let descriptor = plugin.product.parse_descriptor(tail)?;
         Ok(DescriptorInfo {
-            product_info: Rc::clone(product_info),
+            plugin: Rc::clone(plugin),
             descriptor,
         })
     }
@@ -61,36 +61,36 @@ impl Registry {
         data_dir: &Path,
         package_dir_rec: &PackageDirRec,
     ) -> Result<Option<EnvInfo>> {
-        let Some(product_info) = self
-            .product_infos
+        let Some(plugin) = self
+            .plugins
             .iter()
             .find(|p| p.prefix == package_dir_rec.id) else {
             return Ok(None);
         };
 
         Ok(Some(
-            product_info
+            plugin
                 .product
                 .read_env_config(data_dir, &package_dir_rec.properties)?,
         ))
     }
 
-    fn find_product_info<'a>(&self, s: &'a str) -> Option<(&Rc<ProductInfo>, &'a str)> {
+    fn find_plugin<'a>(&self, s: &'a str) -> Option<(&Rc<Plugin>, &'a str)> {
         if let Some((prefix, tail)) = s.split_once(':') {
-            if let Some(product_info) = self.product_infos.iter().find(|p| p.prefix == prefix) {
-                return Some((product_info, tail));
+            if let Some(plugin) = self.plugins.iter().find(|p| p.prefix == prefix) {
+                return Some((plugin, tail));
             }
         }
 
-        self.product_infos.first().map(|p| (p, s))
+        self.plugins.first().map(|p| (p, s))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::descriptor_id::DescriptorId;
-    use crate::product_info::ProductInfo;
-    use crate::product_registry::ProductRegistry;
+    use crate::plugin::Plugin;
+    use crate::registry::Registry;
     use anyhow::Result;
     use isopy_openjdk::OpenJdk;
     use isopy_python::Python;
@@ -101,12 +101,12 @@ mod tests {
     #[case("python:1.2.3:11223344", "python:1.2.3:11223344")]
     #[case("openjdk:19.0.1+10", "openjdk:19.0.1+10")]
     fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
-        let registry = ProductRegistry::new(vec![
-            ProductInfo {
+        let registry = Registry::new(vec![
+            Plugin {
                 prefix: String::from("python"),
                 product: Box::<Python>::default(),
             },
-            ProductInfo {
+            Plugin {
                 prefix: String::from("openjdk"),
                 product: Box::<OpenJdk>::default(),
             },

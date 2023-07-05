@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::product_info::ProductInfo;
+use crate::plugin::Plugin;
 use crate::status::Status;
 use anyhow::Result;
 use log::error;
@@ -33,27 +33,25 @@ pub async fn do_init_config(app: &App) -> Result<Status> {
         return Ok(Status::Fail);
     }
 
-    let Some((product_info, project_config_path)) = get_product_info_and_project_config_path(app) else {
+    let Some((plugin, project_config_path)) = get_plugin_and_project_config_path(app) else {
         error!("no project configuration file was found in {}", app.cwd.display());
         return Ok(Status::Fail)
     };
 
-    let descriptor = product_info
+    let descriptor = plugin
         .product
         .read_project_config_file(&project_config_path)?;
 
-    app.init_project(&product_info, descriptor.as_ref()).await?;
+    app.init_project(&plugin, descriptor.as_ref()).await?;
 
     Ok(Status::OK)
 }
 
-fn get_product_info_and_project_config_path(app: &App) -> Option<(Rc<ProductInfo>, PathBuf)> {
-    for product_info in &app.registry.product_infos {
-        let project_config_path = app
-            .cwd
-            .join(product_info.product.project_config_file_name());
+fn get_plugin_and_project_config_path(app: &App) -> Option<(Rc<Plugin>, PathBuf)> {
+    for plugin in &app.registry.plugins {
+        let project_config_path = app.cwd.join(plugin.product.project_config_file_name());
         if project_config_path.is_file() {
-            return Some((Rc::clone(product_info), project_config_path));
+            return Some((Rc::clone(plugin), project_config_path));
         }
     }
 

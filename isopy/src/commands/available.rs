@@ -28,21 +28,21 @@ use colored::Colorize;
 use std::rc::Rc;
 
 pub async fn do_available(app: &App) -> Result<Status> {
-    for product_info in &app.registry.product_infos {
-        let package_infos = product_info
+    for plugin in &app.registry.plugins {
+        let package_infos = plugin
             .product
             .get_package_infos(app.repo.shared_dir())
             .await?;
         if !package_infos.is_empty() {
             print(&format!(
                 "{} ({})",
-                product_info.product.name().cyan(),
-                product_info.product.url().as_str().bright_magenta()
+                plugin.product.name().cyan(),
+                plugin.product.url().as_str().bright_magenta()
             ));
 
             for package_info in package_infos {
                 let descriptor_info = DescriptorInfo {
-                    product_info: Rc::clone(product_info),
+                    plugin: Rc::clone(plugin),
                     descriptor: package_info.descriptor,
                 };
                 print(&format!(

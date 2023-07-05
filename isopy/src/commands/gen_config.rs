@@ -28,10 +28,7 @@ use log::info;
 
 pub fn do_gen_config(app: &App, descriptor_id: &DescriptorId, force: bool) -> Result<Status> {
     let descriptor_info = app.registry.to_descriptor_info(descriptor_id)?;
-    let project_config_file_name = descriptor_info
-        .product_info
-        .product
-        .project_config_file_name();
+    let project_config_file_name = descriptor_info.plugin.product.project_config_file_name();
     let project_config_info = descriptor_info.descriptor.get_project_config_info()?;
     let project_config_path = app.cwd.join(project_config_file_name);
 

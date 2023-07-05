@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{ENV_FILE_NAME, OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
-use crate::product_info::ProductInfo;
+use crate::plugin::Plugin;
 use crate::registry::Registry;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
@@ -42,11 +42,11 @@ pub struct App {
 impl App {
     pub fn new(cwd: PathBuf, repo: Repo) -> Self {
         let registry = Registry::new(vec![
-            ProductInfo {
+            Plugin {
                 prefix: String::from(PYTHON_DESCRIPTOR_PREFIX),
                 product: Box::<Python>::default(),
             },
-            ProductInfo {
+            Plugin {
                 prefix: String::from(OPENJDK_DESCRIPTOR_PREFIX),
                 product: Box::<OpenJdk>::default(),
             },
@@ -60,23 +60,19 @@ impl App {
 
     pub async fn download_asset(
         &self,
-        product_info: &ProductInfo,
+        plugin: &Plugin,
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        Ok(product_info
+        Ok(plugin
             .product
             .download_asset(descriptor, shared_dir)
             .await?)
     }
 
-    pub async fn init_project(
-        &self,
-        product_info: &ProductInfo,
-        descriptor: &dyn Descriptor,
-    ) -> Result<()> {
+    pub async fn init_project(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
         let asset_path = self
-            .download_asset(product_info, descriptor, self.repo.shared_dir())
+            .download_asset(plugin, descriptor, self.repo.shared_dir())
             .await?;
 
         let Some(dir_info) = self.repo.init(&self.cwd)? else {
@@ -93,7 +89,7 @@ impl App {
             serde_yaml::to_string(&EnvRec {
                 config_path: self.cwd.clone(),
                 package_dirs: vec![PackageDirRec {
-                    id: product_info.prefix.clone(),
+                    id: plugin.prefix.clone(),
                     properties: descriptor.get_env_config_value()?,
                 }],
             })?,

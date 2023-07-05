@@ -21,7 +21,7 @@
 //
 use isopy_lib::Product;
 
-pub struct ProductInfo {
+pub struct Plugin {
     pub prefix: String,
     pub product: Box<dyn Product>,
 }

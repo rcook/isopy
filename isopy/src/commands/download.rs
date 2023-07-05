@@ -29,7 +29,7 @@ pub async fn do_download(app: &App, descriptor_id: &DescriptorId) -> Result<Stat
 
     _ = app
         .download_asset(
-            &descriptor_info.product_info,
+            &descriptor_info.plugin,
             descriptor_info.descriptor.as_ref(),
             app.repo.shared_dir(),
         )
