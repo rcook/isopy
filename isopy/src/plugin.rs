@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, PackageInfo, Product};
+use anyhow::Result;
+use isopy_lib::{Descriptor, EnvInfo, PackageInfo, Product};
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -48,39 +49,39 @@ impl Plugin {
         &self.prefix
     }
 
-    pub fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
-        self.product.get_downloaded(shared_dir)
+    pub fn get_downloaded(&self, shared_dir: &Path) -> Result<Vec<PathBuf>> {
+        Ok(self.product.get_downloaded(shared_dir)?)
     }
 
-    pub async fn get_package_infos(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PackageInfo>> {
-        self.product.get_package_infos(shared_dir).await
+    pub async fn get_package_infos(&self, shared_dir: &Path) -> Result<Vec<PackageInfo>> {
+        Ok(self.product.get_package_infos(shared_dir).await?)
     }
 
-    pub fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
-        self.product.parse_descriptor(s)
+    pub fn parse_descriptor(&self, s: &str) -> Result<Box<dyn Descriptor>> {
+        Ok(self.product.parse_descriptor(s)?)
     }
 
     pub fn project_config_file_name(&self) -> &Path {
         self.product.project_config_file_name()
     }
 
-    pub fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
-        self.product.read_project_config_file(path)
+    pub fn read_project_config_file(&self, path: &Path) -> Result<Box<dyn Descriptor>> {
+        Ok(self.product.read_project_config_file(path)?)
     }
 
     pub fn read_env_config(
         &self,
         data_dir: &Path,
         properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo> {
-        self.product.read_env_config(data_dir, properties)
+    ) -> Result<EnvInfo> {
+        Ok(self.product.read_env_config(data_dir, properties)?)
     }
 
     pub async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
-    ) -> IsopyLibResult<PathBuf> {
-        self.product.download_asset(descriptor, shared_dir).await
+    ) -> Result<PathBuf> {
+        Ok(self.product.download_asset(descriptor, shared_dir).await?)
     }
 }

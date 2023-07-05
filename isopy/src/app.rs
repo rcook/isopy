@@ -46,7 +46,7 @@ impl App {
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        Ok(plugin.download_asset(descriptor, shared_dir).await?)
+        plugin.download_asset(descriptor, shared_dir).await
     }
 
     pub async fn add_package(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
