@@ -25,7 +25,7 @@ use async_trait::async_trait;
 use isopy_lib::{LastModified, Response};
 
 #[async_trait]
-pub trait Repository {
+pub trait Repository: Send + Sync {
     async fn get_latest_index(
         &self,
         last_modified: &Option<LastModified>,

@@ -26,7 +26,7 @@ use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::Descriptor;
 use isopy_openjdk::OpenJdk;
-use isopy_python::{download_python, Python, PythonDescriptor};
+use isopy_python::Python;
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::safe_write_file;
 use std::collections::HashMap;
@@ -63,15 +63,10 @@ impl App {
         descriptor: &dyn Descriptor,
         shared_dir: &Path,
     ) -> Result<PathBuf> {
-        if let Some(d) = descriptor.as_any().downcast_ref::<PythonDescriptor>() {
-            // TBD: Push into Product::download_asset
-            Ok(download_python(d, shared_dir).await?)
-        } else {
-            Ok(product_info
-                .product
-                .download_asset(descriptor, shared_dir)
-                .await?)
-        }
+        Ok(product_info
+            .product
+            .download_asset(descriptor, shared_dir)
+            .await?)
     }
 
     pub async fn init_project(
