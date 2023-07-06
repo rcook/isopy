@@ -20,37 +20,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::descriptor_info::DescriptorInfo;
-use crate::print::print;
+use crate::print::print_packages;
 use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
-use colored::Colorize;
-use std::sync::Arc;
 
 pub async fn list_available_packages(app: &App) -> Result<Status> {
     for plugin in &Registry::global().plugins {
         let plugin_dir = app.repo.shared_dir().join(plugin.prefix());
         let packages = plugin.get_available_packages(&plugin_dir).await?;
-        if !packages.is_empty() {
-            print(&format!(
-                "{} ({})",
-                plugin.name().cyan(),
-                plugin.repository_url().as_str().bright_magenta()
-            ));
-
-            for package in packages {
-                let descriptor_info = DescriptorInfo {
-                    plugin: Arc::clone(plugin),
-                    descriptor: Arc::clone(&package.descriptor),
-                };
-                print(&format!(
-                    "  {:<30} {}",
-                    format!("{descriptor_info}").bright_yellow(),
-                    package.file_name.display()
-                ));
-            }
-        }
+        print_packages(plugin, &packages);
     }
 
     Ok(Status::OK)

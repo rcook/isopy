@@ -20,14 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::plugin::Plugin;
-use isopy_lib::Descriptor;
+use isopy_lib::DescriptorRef;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct DescriptorInfo {
     pub plugin: Arc<Plugin>,
-    pub descriptor: Arc<Box<dyn Descriptor>>,
+    pub descriptor: DescriptorRef,
 }
 
 impl Debug for DescriptorInfo {

@@ -23,6 +23,7 @@ use crate::result::IsopyLibResult;
 use std::any::Any;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct ProjectConfigInfo {
@@ -38,3 +39,5 @@ pub trait Descriptor: Any + Debug + Display + Send + Sync {
 
     fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo>;
 }
+
+pub type DescriptorRef = Arc<Box<dyn Descriptor>>;

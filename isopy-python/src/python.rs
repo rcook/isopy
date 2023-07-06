@@ -46,6 +46,7 @@ use joatmon::label_file_name;
 use joatmon::read_yaml_file;
 use joatmon::{read_json_file, safe_write_file};
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -172,7 +173,7 @@ impl Python {
         Ok(())
     }
 
-    fn show_available_downloads(plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+    fn get_available_packages_helper(plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
         fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
             match a.meta.version.cmp(&b.meta.version) {
                 Ordering::Equal => a.tag.cmp(&b.tag),
@@ -187,11 +188,11 @@ impl Python {
             .filter(assets.iter())
             .into_iter()
             .map(|asset| Package {
-                descriptor: Arc::new(Box::new(PythonDescriptor {
+                file_name: PathBuf::from(asset.name.clone()),
+                descriptor: Some(Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
-                })),
-                file_name: PathBuf::from(asset.name.clone()),
+                }))),
             })
             .collect::<Vec<_>>())
     }
@@ -264,23 +265,37 @@ impl Product for Python {
 
     async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
         self.update_index_if_necessary(plugin_dir).await?;
-        Self::show_available_downloads(plugin_dir)
+        Self::get_available_packages_helper(plugin_dir)
     }
 
-    fn get_downloaded_asset_file_names(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
+    async fn get_downloaded_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+        let package_map = self
+            .get_available_packages(plugin_dir)
+            .await?
+            .into_iter()
+            .map(|p| (p.file_name.as_os_str().to_owned(), p))
+            .collect::<HashMap<_, _>>();
+
         let assets_dir = plugin_dir.join(&*ASSETS_DIR);
-        let mut asset_file_names = Vec::new();
+        let mut packages = Vec::new();
         for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
             let entry = result.map_err(isopy_lib_other_error)?;
             let asset_file_name = entry.file_name();
+            let descriptor = package_map
+                .get(&asset_file_name)
+                .and_then(|package| package.descriptor.as_ref())
+                .cloned();
             if let Some(asset_file_name) = asset_file_name.to_str() {
                 if asset_file_name.parse::<AssetMeta>().is_ok() {
-                    asset_file_names.push(PathBuf::from(asset_file_name));
+                    packages.push(Package {
+                        descriptor,
+                        file_name: PathBuf::from(asset_file_name),
+                    });
                 }
             }
         }
 
-        Ok(asset_file_names)
+        Ok(packages)
     }
 
     async fn download_asset(

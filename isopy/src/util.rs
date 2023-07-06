@@ -19,29 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::print::print;
-use crate::registry::Registry;
-use crate::status::Status;
-use anyhow::Result;
-use colored::Colorize;
+use crate::descriptor_info::DescriptorInfo;
+use crate::plugin::Plugin;
+use isopy_lib::Package;
+use std::sync::Arc;
 
-pub fn do_downloaded(app: &App) -> Result<Status> {
-    for plugin in &Registry::global().plugins {
-        let plugin_dir = app.repo.shared_dir().join(plugin.prefix());
-        let asset_file_names = plugin.get_downloaded_asset_file_names(&plugin_dir)?;
-        if !asset_file_names.is_empty() {
-            print(&format!(
-                "{} ({})",
-                plugin.name().cyan(),
-                plugin.repository_url().as_str().bright_magenta()
-            ));
-
-            for asset_file_name in asset_file_names {
-                print(&format!("  {}", asset_file_name.display()));
-            }
-        }
+pub fn pretty_descriptor(plugin: &Arc<Plugin>, package: &Package) -> String {
+    if let Some(descriptor) = &package.descriptor {
+        let descriptor_info = DescriptorInfo {
+            plugin: Arc::clone(plugin),
+            descriptor: Arc::clone(descriptor),
+        };
+        descriptor_info.to_string()
+    } else {
+        String::from("(unknown)")
     }
-
-    Ok(Status::OK)
 }

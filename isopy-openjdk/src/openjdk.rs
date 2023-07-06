@@ -31,6 +31,7 @@ use isopy_lib::{
 };
 use joatmon::read_yaml_file;
 use log::info;
+use std::collections::HashMap;
 use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -100,26 +101,40 @@ impl Product for OpenJdk {
             .await?
             .into_iter()
             .map(|x| Package {
-                descriptor: Arc::new(Box::new(OpenJdkDescriptor {
-                    version: x.openjdk_version.clone(),
-                })),
                 file_name: x.file_name,
+                descriptor: Some(Arc::new(Box::new(OpenJdkDescriptor {
+                    version: x.openjdk_version,
+                }))),
             })
             .collect::<Vec<_>>())
     }
 
-    fn get_downloaded_asset_file_names(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
+    async fn get_downloaded_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+        let package_map = self
+            .get_available_packages(plugin_dir)
+            .await?
+            .into_iter()
+            .map(|p| (p.file_name.as_os_str().to_owned(), p))
+            .collect::<HashMap<_, _>>();
+
         let assets_dir = plugin_dir.join(&*ASSETS_DIR);
-        let mut asset_file_names = Vec::new();
+        let mut packages = Vec::new();
         for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
             let entry = result.map_err(isopy_lib_other_error)?;
             let asset_file_name = entry.file_name();
+            let descriptor = package_map
+                .get(&asset_file_name)
+                .and_then(|package| package.descriptor.as_ref())
+                .cloned();
             if let Some(asset_file_name) = asset_file_name.to_str() {
-                asset_file_names.push(PathBuf::from(asset_file_name));
+                packages.push(Package {
+                    descriptor,
+                    file_name: PathBuf::from(asset_file_name),
+                });
             }
         }
 
-        Ok(asset_file_names)
+        Ok(packages)
     }
 
     async fn download_asset(

@@ -53,8 +53,8 @@ impl Plugin {
         Ok(self.product.get_available_packages(shared_dir).await?)
     }
 
-    pub fn get_downloaded_asset_file_names(&self, shared_dir: &Path) -> Result<Vec<PathBuf>> {
-        Ok(self.product.get_downloaded_asset_file_names(shared_dir)?)
+    pub async fn get_downloaded_packages(&self, shared_dir: &Path) -> Result<Vec<Package>> {
+        Ok(self.product.get_downloaded_packages(shared_dir).await?)
     }
 
     pub async fn download_asset(

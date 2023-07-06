@@ -19,11 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor::Descriptor;
+use crate::descriptor::DescriptorRef;
 use std::path::PathBuf;
-use std::sync::Arc;
 
 pub struct Package {
-    pub descriptor: Arc<Box<dyn Descriptor>>,
     pub file_name: PathBuf,
+    pub descriptor: Option<DescriptorRef>,
 }

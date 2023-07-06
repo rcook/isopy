@@ -49,6 +49,7 @@ mod shell;
 mod status;
 mod terminal;
 mod unpack;
+mod util;
 
 #[tokio::main]
 async fn main() {

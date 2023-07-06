@@ -23,9 +23,9 @@ use crate::app::App;
 use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
-    do_add_package, do_add_package_from_config, do_check, do_download, do_downloaded, do_exec,
-    do_gen_config, do_info, do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap,
-    list_available_packages,
+    do_add_package, do_add_package_from_config, do_check, do_download, do_exec, do_gen_config,
+    do_info, do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap, list_available_packages,
+    list_downloaded_packages,
 };
 use crate::constants::CACHE_DIR_NAME;
 use crate::status::Status;
@@ -86,13 +86,13 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::AddPackageFromConfig => do_add_package_from_config(&app).await,
         Command::Check { clean } => do_check(&app, clean),
         Command::Download { package_id } => do_download(&app, &package_id).await,
-        Command::Downloaded => do_downloaded(&app),
         Command::Exec { program, args } => do_exec(app, &program, &args),
         Command::GenConfig { package_id, force } => do_gen_config(&app, &package_id, force),
         Command::Info => do_info(&app),
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
         Command::ListAvailablePackages => list_available_packages(&app).await,
+        Command::ListDownloadedPackages => list_downloaded_packages(&app).await,
         Command::Prompt => do_prompt(&app),
         Command::Scratch => do_scratch(&app),
         Command::Shell => do_shell(app),

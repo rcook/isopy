@@ -20,13 +20,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ENV_FILE_NAME;
+use crate::plugin::Plugin;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
+use crate::util::pretty_descriptor;
 use anyhow::Result;
 use colored::Colorize;
+use isopy_lib::Package;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use joatmon::read_yaml_file;
 use std::fmt::Display;
+use std::sync::Arc;
 
 pub fn print(s: &str) {
     println!("{}", s.bright_white());
@@ -136,4 +140,22 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     print_dir_info(dir_info, &env_rec);
 
     Ok(())
+}
+
+pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>) {
+    if !packages.is_empty() {
+        print(&format!(
+            "{} ({})",
+            plugin.name().cyan(),
+            plugin.repository_url().as_str().bright_magenta()
+        ));
+
+        for package in packages {
+            print(&format!(
+                "  {:<30} {}",
+                pretty_descriptor(plugin, package).bright_yellow(),
+                package.file_name.display()
+            ));
+        }
+    }
 }

@@ -19,39 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor::Descriptor;
-use crate::env_info::EnvInfo;
-use crate::package::Package;
-use crate::result::IsopyLibResult;
-use async_trait::async_trait;
-use reqwest::Url;
-use std::path::{Path, PathBuf};
+use crate::app::App;
+use crate::print::print_packages;
+use crate::registry::Registry;
+use crate::status::Status;
+use anyhow::Result;
 
-#[async_trait]
-pub trait Product: Send + Sync {
-    fn name(&self) -> &str;
+pub async fn list_downloaded_packages(app: &App) -> Result<Status> {
+    for plugin in &Registry::global().plugins {
+        let plugin_dir = app.repo.shared_dir().join(plugin.prefix());
+        let packages = plugin.get_downloaded_packages(&plugin_dir).await?;
+        print_packages(plugin, &packages);
+    }
 
-    fn repository_url(&self) -> &Url;
-
-    async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>>;
-
-    async fn get_downloaded_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>>;
-
-    async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        plugin_dir: &Path,
-    ) -> IsopyLibResult<PathBuf>;
-
-    fn project_config_file_name(&self) -> &Path;
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>>;
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
-
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo>;
+    Ok(Status::OK)
 }

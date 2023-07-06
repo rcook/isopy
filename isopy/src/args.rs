@@ -90,9 +90,6 @@ pub enum Command {
         package_id: PackageId,
     },
 
-    #[command(name = "downloaded", about = "List downloaded Python packages")]
-    Downloaded,
-
     #[command(name = "exec", about = "Execute command in Python environment")]
     Exec {
         #[arg(help = "Program to run in environment")]
@@ -136,6 +133,9 @@ pub enum Command {
 
     #[command(name = "available", about = "List packages available for download")]
     ListAvailablePackages,
+
+    #[command(name = "downloaded", about = "List locally downloaded packages")]
+    ListDownloadedPackages,
 
     #[command(name = "prompt", about = "Show brief information in prompt")]
     Prompt,
