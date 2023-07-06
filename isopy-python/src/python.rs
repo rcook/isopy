@@ -47,6 +47,7 @@ use joatmon::read_yaml_file;
 use joatmon::{read_json_file, safe_write_file};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::ffi::{OsStr, OsString};
 use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -188,7 +189,7 @@ impl Python {
             .filter(assets.iter())
             .into_iter()
             .map(|asset| Package {
-                file_name: PathBuf::from(asset.name.clone()),
+                file_name: OsString::from(asset.name.clone()),
                 descriptor: Some(Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
@@ -289,7 +290,7 @@ impl Product for Python {
                 if asset_file_name.parse::<AssetMeta>().is_ok() {
                     packages.push(Package {
                         descriptor,
-                        file_name: PathBuf::from(asset_file_name),
+                        file_name: OsString::from(asset_file_name),
                     });
                 }
             }
@@ -310,7 +311,7 @@ impl Product for Python {
         self.download_python(descriptor, plugin_dir).await
     }
 
-    fn project_config_file_name(&self) -> &Path {
+    fn project_config_file_name(&self) -> &OsStr {
         &PROJECT_CONFIG_FILE_NAME
     }
 

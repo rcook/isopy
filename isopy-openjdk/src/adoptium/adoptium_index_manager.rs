@@ -27,6 +27,7 @@ use anyhow::Result;
 use chrono::{Duration, Utc};
 use joatmon::{read_yaml_file, safe_write_file};
 use reqwest::Url;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 pub struct AdoptiumIndexManager {
@@ -112,7 +113,7 @@ impl AdoptiumIndexManager {
 
             Some(VersionRec {
                 openjdk_version: release.version_data.openjdk_version.clone(),
-                file_name: PathBuf::from(&package.name),
+                file_name: OsString::from(package.name.clone()),
                 url,
                 size,
                 checksum: String::from(checksum),

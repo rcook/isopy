@@ -21,6 +21,7 @@
 //
 use anyhow::Result;
 use isopy_lib::{Descriptor, EnvInfo, Package, Product};
+use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -69,7 +70,7 @@ impl Plugin {
         Ok(self.product.parse_descriptor(s)?)
     }
 
-    pub fn project_config_file_name(&self) -> &Path {
+    pub fn project_config_file_name(&self) -> &OsStr {
         self.product.project_config_file_name()
     }
 

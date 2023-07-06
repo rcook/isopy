@@ -154,7 +154,10 @@ pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>) {
             print(&format!(
                 "  {:<30} {}",
                 pretty_descriptor(plugin, package).bright_yellow(),
-                package.file_name.display()
+                package
+                    .file_name
+                    .to_str()
+                    .expect("unable to translate file name to string")
             ));
         }
     }

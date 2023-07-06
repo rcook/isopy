@@ -20,9 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor::DescriptorRef;
-use std::path::PathBuf;
+use std::ffi::OsString;
 
 pub struct Package {
-    pub file_name: PathBuf,
+    pub file_name: OsString,
     pub descriptor: Option<DescriptorRef>,
 }

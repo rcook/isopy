@@ -25,6 +25,7 @@ use crate::package::Package;
 use crate::result::IsopyLibResult;
 use async_trait::async_trait;
 use reqwest::Url;
+use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
 #[async_trait]
@@ -43,7 +44,7 @@ pub trait Product: Send + Sync {
         plugin_dir: &Path,
     ) -> IsopyLibResult<PathBuf>;
 
-    fn project_config_file_name(&self) -> &Path;
+    fn project_config_file_name(&self) -> &OsStr;
 
     fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>>;
 

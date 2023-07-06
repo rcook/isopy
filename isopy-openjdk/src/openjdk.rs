@@ -32,6 +32,7 @@ use isopy_lib::{
 use joatmon::read_yaml_file;
 use log::info;
 use std::collections::HashMap;
+use std::ffi::{OsStr, OsString};
 use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -63,7 +64,13 @@ impl OpenJdk {
         let assets_dir = plugin_dir.join(&*ASSETS_DIR);
         let asset_path = assets_dir.join(&version.file_name);
         if asset_path.exists() {
-            info!("asset {} already downloaded", version.file_name.display());
+            info!(
+                "asset {} already downloaded",
+                version
+                    .file_name
+                    .to_str()
+                    .expect("unable to translate file name to string")
+            );
             return Ok(asset_path);
         }
 
@@ -129,7 +136,7 @@ impl Product for OpenJdk {
             if let Some(asset_file_name) = asset_file_name.to_str() {
                 packages.push(Package {
                     descriptor,
-                    file_name: PathBuf::from(asset_file_name),
+                    file_name: OsString::from(asset_file_name),
                 });
             }
         }
@@ -149,7 +156,7 @@ impl Product for OpenJdk {
         self.download_openjdk(descriptor, plugin_dir).await
     }
 
-    fn project_config_file_name(&self) -> &Path {
+    fn project_config_file_name(&self) -> &OsStr {
         &PROJECT_CONFIG_FILE_NAME
     }
 
