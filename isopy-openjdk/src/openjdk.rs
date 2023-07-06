@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::adoptium::AdoptiumIndexManager;
-use crate::constants::{ADOPTIUM_SERVER_URL, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME};
+use crate::constants::{ADOPTIUM_SERVER_URL, ASSETS_DIR, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME};
 use crate::openjdk_descriptor::OpenJdkDescriptor;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
@@ -48,9 +48,9 @@ impl OpenJdk {
     async fn download_openjdk(
         &self,
         descriptor: &OpenJdkDescriptor,
-        shared_dir: &Path,
+        plugin_dir: &Path,
     ) -> IsopyLibResult<PathBuf> {
-        let manager = AdoptiumIndexManager::new_default(shared_dir);
+        let manager = AdoptiumIndexManager::new_default(plugin_dir);
 
         let versions = manager.read_versions().await?;
         let Some(version) = versions
@@ -59,9 +59,10 @@ impl OpenJdk {
             return Err(IsopyLibError::VersionNotFound(descriptor.version.to_string()));
         };
 
-        let asset_path = shared_dir.join(&version.file_name);
+        let assets_dir = plugin_dir.join(&*ASSETS_DIR);
+        let asset_path = assets_dir.join(&version.file_name);
         if asset_path.exists() {
-            info!("Asset {} already downloaded", version.file_name.display());
+            info!("asset {} already downloaded", version.file_name.display());
             return Ok(asset_path);
         }
 
@@ -92,8 +93,8 @@ impl Product for OpenJdk {
         &ADOPTIUM_SERVER_URL
     }
 
-    async fn get_available_packages(&self, shared_dir: &Path) -> IsopyLibResult<Vec<Package>> {
-        let manager = AdoptiumIndexManager::new_default(shared_dir);
+    async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+        let manager = AdoptiumIndexManager::new_default(plugin_dir);
         Ok(manager
             .read_versions()
             .await?
@@ -105,6 +106,32 @@ impl Product for OpenJdk {
                 file_name: x.file_name,
             })
             .collect::<Vec<_>>())
+    }
+
+    fn get_downloaded_asset_file_names(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
+        let assets_dir = plugin_dir.join(&*ASSETS_DIR);
+        let mut asset_file_names = Vec::new();
+        for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
+            let entry = result.map_err(isopy_lib_other_error)?;
+            let asset_file_name = entry.file_name();
+            if let Some(asset_file_name) = asset_file_name.to_str() {
+                asset_file_names.push(PathBuf::from(asset_file_name));
+            }
+        }
+
+        Ok(asset_file_names)
+    }
+
+    async fn download_asset(
+        &self,
+        descriptor: &dyn Descriptor,
+        plugin_dir: &Path,
+    ) -> IsopyLibResult<PathBuf> {
+        let descriptor = descriptor
+            .as_any()
+            .downcast_ref::<OpenJdkDescriptor>()
+            .expect("must be OpenJdkDescriptor");
+        self.download_openjdk(descriptor, plugin_dir).await
     }
 
     fn project_config_file_name(&self) -> &Path {
@@ -124,18 +151,6 @@ impl Product for OpenJdk {
             s.parse::<OpenJdkDescriptor>()
                 .map_err(isopy_lib_other_error)?,
         ))
-    }
-
-    async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        shared_dir: &Path,
-    ) -> IsopyLibResult<PathBuf> {
-        let descriptor = descriptor
-            .as_any()
-            .downcast_ref::<OpenJdkDescriptor>()
-            .expect("must be OpenJdkDescriptor");
-        self.download_openjdk(descriptor, shared_dir).await
     }
 
     fn read_env_config(
@@ -171,20 +186,5 @@ impl Product for OpenJdk {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
         })
-    }
-
-    fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
-        let mut asset_file_names = Vec::new();
-        for result in read_dir(shared_dir).map_err(isopy_lib_other_error)? {
-            let entry = result.map_err(isopy_lib_other_error)?;
-            let asset_file_name = entry.file_name();
-            if let Some(asset_file_name) = asset_file_name.to_str() {
-                if asset_file_name.starts_with("OpenJDK") {
-                    asset_file_names.push(PathBuf::from(asset_file_name));
-                }
-            }
-        }
-
-        Ok(asset_file_names)
     }
 }

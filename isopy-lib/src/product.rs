@@ -33,7 +33,15 @@ pub trait Product: Send + Sync {
 
     fn repository_url(&self) -> &Url;
 
-    async fn get_available_packages(&self, shared_dir: &Path) -> IsopyLibResult<Vec<Package>>;
+    async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>>;
+
+    fn get_downloaded_asset_file_names(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<PathBuf>>;
+
+    async fn download_asset(
+        &self,
+        descriptor: &dyn Descriptor,
+        plugin_dir: &Path,
+    ) -> IsopyLibResult<PathBuf>;
 
     fn project_config_file_name(&self) -> &Path;
 
@@ -41,17 +49,9 @@ pub trait Product: Send + Sync {
 
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
 
-    async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        shared_dir: &Path,
-    ) -> IsopyLibResult<PathBuf>;
-
     fn read_env_config(
         &self,
         data_dir: &Path,
         properties: &serde_json::Value,
     ) -> IsopyLibResult<EnvInfo>;
-
-    fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>>;
 }

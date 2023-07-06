@@ -30,7 +30,8 @@ use std::sync::Arc;
 
 pub async fn list_available_packages(app: &App) -> Result<Status> {
     for plugin in &Registry::global().plugins {
-        let packages = plugin.get_available_packages(app.repo.shared_dir()).await?;
+        let plugin_dir = app.repo.shared_dir().join(plugin.prefix());
+        let packages = plugin.get_available_packages(&plugin_dir).await?;
         if !packages.is_empty() {
             print(&format!(
                 "{} ({})",

@@ -65,11 +65,11 @@ pub fn get_asset<'a>(assets: &'a [Asset], descriptor: &PythonDescriptor) -> Resu
 pub async fn download_asset(
     repository: &RepositoryInfo,
     asset: &Asset,
-    shared_dir: &Path,
+    assets_dir: &Path,
 ) -> Result<PathBuf> {
-    let asset_path = shared_dir.join(&asset.name);
+    let asset_path = assets_dir.join(&asset.name);
     if asset_path.exists() {
-        info!("Asset {} already downloaded", asset_path.display());
+        info!("asset {} already downloaded", asset_path.display());
         return Ok(asset_path);
     }
 

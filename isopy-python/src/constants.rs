@@ -32,6 +32,7 @@ lazy_static! {
         Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
     pub static ref PROJECT_CONFIG_FILE_NAME: PathBuf = PathBuf::from(".python-version.yaml");
     pub static ref ENV_DIR: PathBuf = PathBuf::from("python");
+    pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
 }
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";

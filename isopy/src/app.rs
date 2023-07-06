@@ -44,9 +44,9 @@ impl App {
         &self,
         plugin: &Plugin,
         descriptor: &dyn Descriptor,
-        shared_dir: &Path,
     ) -> Result<PathBuf> {
-        plugin.download_asset(descriptor, shared_dir).await
+        let plugin_dir = self.repo.shared_dir().join(plugin.prefix());
+        plugin.download_asset(descriptor, &plugin_dir).await
     }
 
     pub async fn add_package(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
@@ -85,9 +85,7 @@ impl App {
             );
         }
 
-        let asset_path = self
-            .download_asset(plugin, descriptor, self.repo.shared_dir())
-            .await?;
+        let asset_path = self.download_asset(plugin, descriptor).await?;
 
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 

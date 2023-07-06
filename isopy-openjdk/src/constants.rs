@@ -29,6 +29,7 @@ lazy_static! {
     pub static ref PROJECT_CONFIG_FILE_NAME: PathBuf = PathBuf::from(".openjdk-version.yaml");
     pub static ref ADOPTIUM_INDEX_FILE_NAME: PathBuf = PathBuf::from("adoptium-index.yaml");
     pub static ref ENV_DIR: PathBuf = PathBuf::from("openjdk");
+    pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
 }
 
 pub const PLUGIN_NAME: &str = "OpenJDK";

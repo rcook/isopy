@@ -53,8 +53,16 @@ impl Plugin {
         Ok(self.product.get_available_packages(shared_dir).await?)
     }
 
-    pub fn get_downloaded(&self, shared_dir: &Path) -> Result<Vec<PathBuf>> {
-        Ok(self.product.get_downloaded(shared_dir)?)
+    pub fn get_downloaded_asset_file_names(&self, shared_dir: &Path) -> Result<Vec<PathBuf>> {
+        Ok(self.product.get_downloaded_asset_file_names(shared_dir)?)
+    }
+
+    pub async fn download_asset(
+        &self,
+        descriptor: &dyn Descriptor,
+        plugin_dir: &Path,
+    ) -> Result<PathBuf> {
+        Ok(self.product.download_asset(descriptor, plugin_dir).await?)
     }
 
     pub fn parse_descriptor(&self, s: &str) -> Result<Box<dyn Descriptor>> {
@@ -75,13 +83,5 @@ impl Plugin {
         properties: &serde_json::Value,
     ) -> Result<EnvInfo> {
         Ok(self.product.read_env_config(data_dir, properties)?)
-    }
-
-    pub async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        shared_dir: &Path,
-    ) -> Result<PathBuf> {
-        Ok(self.product.download_asset(descriptor, shared_dir).await?)
     }
 }

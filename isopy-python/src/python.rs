@@ -24,8 +24,8 @@ use crate::asset_filter::AssetFilter;
 use crate::asset_helper::{download_asset, get_asset};
 use crate::asset_meta::AssetMeta;
 use crate::constants::{
-    INDEX_FILE_NAME, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL,
-    REPOSITORIES_FILE_NAME,
+    ASSETS_DIR, INDEX_FILE_NAME, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME, RELEASES_FILE_NAME,
+    RELEASES_URL, REPOSITORIES_FILE_NAME,
 };
 use crate::github::GitHubRepository;
 use crate::local::LocalRepository;
@@ -57,21 +57,22 @@ impl Python {
     async fn download_python(
         &self,
         descriptor: &PythonDescriptor,
-        shared_dir: &Path,
+        plugin_dir: &Path,
     ) -> IsopyLibResult<PathBuf> {
-        let assets = Self::read_assets(shared_dir)?;
+        let assets = Self::read_assets(plugin_dir)?;
         let asset = get_asset(&assets, descriptor)?;
-        let repositories = Self::read_repositories(shared_dir)?;
+        let repositories = Self::read_repositories(plugin_dir)?;
         let repository = repositories
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
-        let asset_path = download_asset(repository, asset, shared_dir).await?;
+        let assets_dir = plugin_dir.join(&*ASSETS_DIR);
+        let asset_path = download_asset(repository, asset, &assets_dir).await?;
         Ok(asset_path)
     }
 
-    fn read_assets(shared_dir: &Path) -> Result<Vec<Asset>> {
-        let index_json_path = shared_dir.join(RELEASES_FILE_NAME);
-        let package_recs = read_json_file::<Vec<PackageRec>>(&index_json_path)?;
+    fn read_assets(plugin_dir: &Path) -> Result<Vec<Asset>> {
+        let index_path = plugin_dir.join(RELEASES_FILE_NAME);
+        let package_recs = read_json_file::<Vec<PackageRec>>(&index_path)?;
 
         let mut assets = Vec::new();
         for package_rec in package_recs {
@@ -91,7 +92,7 @@ impl Python {
         Ok(assets)
     }
 
-    fn read_repositories(shared_dir: &Path) -> Result<Vec<RepositoryInfo>> {
+    fn read_repositories(plugin_dir: &Path) -> Result<Vec<RepositoryInfo>> {
         fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
             match rec {
                 RepositoryRec::GitHub { name, url, enabled } => {
@@ -103,7 +104,7 @@ impl Python {
             }
         }
 
-        let repositories_yaml_path = shared_dir.join(REPOSITORIES_FILE_NAME);
+        let repositories_yaml_path = plugin_dir.join(REPOSITORIES_FILE_NAME);
         let repositories_rec = if repositories_yaml_path.is_file() {
             read_yaml_file::<RepositoriesRec>(&repositories_yaml_path)?
         } else {
@@ -144,15 +145,15 @@ impl Python {
         Ok(enabled_repositories)
     }
 
-    async fn update_index_if_necessary(&self, shared_dir: &Path) -> Result<()> {
-        let repositories = Self::read_repositories(shared_dir)?;
+    async fn update_index_if_necessary(&self, plugin_dir: &Path) -> Result<()> {
+        let repositories = Self::read_repositories(plugin_dir)?;
         let repository = repositories
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
 
-        let releases_path = Self::releases_path(&repository.name, shared_dir);
+        let releases_path = Self::releases_path(&repository.name, plugin_dir);
         let current_last_modified = if releases_path.is_file() {
-            Self::read_index_last_modified(&repository.name, shared_dir)?
+            Self::read_index_last_modified(&repository.name, plugin_dir)?
         } else {
             None
         };
@@ -164,14 +165,14 @@ impl Python {
         {
             download_stream("release index", &mut response, &releases_path).await?;
             if let Some(last_modified) = response.last_modified() {
-                Self::write_index_last_modified(&repository.name, last_modified, shared_dir)?;
+                Self::write_index_last_modified(&repository.name, last_modified, plugin_dir)?;
             }
         }
 
         Ok(())
     }
 
-    fn show_available_downloads(shared_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+    fn show_available_downloads(plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
         fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
             match a.meta.version.cmp(&b.meta.version) {
                 Ordering::Equal => a.tag.cmp(&b.tag),
@@ -179,7 +180,7 @@ impl Python {
             }
         }
 
-        let mut assets = Self::read_assets(shared_dir)?;
+        let mut assets = Self::read_assets(plugin_dir)?;
         assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
 
         Ok(AssetFilter::default_for_platform()
@@ -195,12 +196,12 @@ impl Python {
             .collect::<Vec<_>>())
     }
 
-    fn releases_path(repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
+    fn releases_path(repository_name: &RepositoryName, plugin_dir: &Path) -> PathBuf {
         if repository_name.is_default() {
-            shared_dir.join(RELEASES_FILE_NAME)
+            plugin_dir.join(RELEASES_FILE_NAME)
         } else {
             label_file_name(
-                &shared_dir.join(RELEASES_FILE_NAME),
+                &plugin_dir.join(RELEASES_FILE_NAME),
                 repository_name.as_str(),
             )
             .expect("must be valid")
@@ -209,9 +210,9 @@ impl Python {
 
     fn read_index_last_modified(
         repository_name: &RepositoryName,
-        shared_dir: &Path,
+        plugin_dir: &Path,
     ) -> Result<Option<LastModified>> {
-        let index_path = Self::index_path(repository_name, shared_dir);
+        let index_path = Self::index_path(repository_name, plugin_dir);
         Ok(if index_path.is_file() {
             Some(read_yaml_file::<IndexRec>(&index_path)?.last_modified)
         } else {
@@ -222,9 +223,9 @@ impl Python {
     fn write_index_last_modified(
         repository_name: &RepositoryName,
         last_modified: &LastModified,
-        shared_dir: &Path,
+        plugin_dir: &Path,
     ) -> Result<()> {
-        let index_yaml_path = Self::index_path(repository_name, shared_dir);
+        let index_yaml_path = Self::index_path(repository_name, plugin_dir);
         safe_write_file(
             &index_yaml_path,
             serde_yaml::to_string(&IndexRec {
@@ -235,11 +236,11 @@ impl Python {
         Ok(())
     }
 
-    fn index_path(repository_name: &RepositoryName, shared_dir: &Path) -> PathBuf {
+    fn index_path(repository_name: &RepositoryName, plugin_dir: &Path) -> PathBuf {
         if repository_name.is_default() {
-            shared_dir.join(INDEX_FILE_NAME)
+            plugin_dir.join(INDEX_FILE_NAME)
         } else {
-            label_file_name(&shared_dir.join(INDEX_FILE_NAME), repository_name.as_str())
+            label_file_name(&plugin_dir.join(INDEX_FILE_NAME), repository_name.as_str())
                 .expect("must be valid")
         }
     }
@@ -261,9 +262,37 @@ impl Product for Python {
         &RELEASES_URL
     }
 
-    async fn get_available_packages(&self, shared_dir: &Path) -> IsopyLibResult<Vec<Package>> {
-        self.update_index_if_necessary(shared_dir).await?;
-        Self::show_available_downloads(shared_dir)
+    async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
+        self.update_index_if_necessary(plugin_dir).await?;
+        Self::show_available_downloads(plugin_dir)
+    }
+
+    fn get_downloaded_asset_file_names(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
+        let assets_dir = plugin_dir.join(&*ASSETS_DIR);
+        let mut asset_file_names = Vec::new();
+        for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
+            let entry = result.map_err(isopy_lib_other_error)?;
+            let asset_file_name = entry.file_name();
+            if let Some(asset_file_name) = asset_file_name.to_str() {
+                if asset_file_name.parse::<AssetMeta>().is_ok() {
+                    asset_file_names.push(PathBuf::from(asset_file_name));
+                }
+            }
+        }
+
+        Ok(asset_file_names)
+    }
+
+    async fn download_asset(
+        &self,
+        descriptor: &dyn Descriptor,
+        plugin_dir: &Path,
+    ) -> IsopyLibResult<PathBuf> {
+        let descriptor = descriptor
+            .as_any()
+            .downcast_ref::<PythonDescriptor>()
+            .expect("must be PythonDescriptor");
+        self.download_python(descriptor, plugin_dir).await
     }
 
     fn project_config_file_name(&self) -> &Path {
@@ -285,18 +314,6 @@ impl Product for Python {
             s.parse::<PythonDescriptor>()
                 .map_err(isopy_lib_other_error)?,
         ))
-    }
-
-    async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        shared_dir: &Path,
-    ) -> IsopyLibResult<PathBuf> {
-        let descriptor = descriptor
-            .as_any()
-            .downcast_ref::<PythonDescriptor>()
-            .expect("must be PythonDescriptor");
-        self.download_python(descriptor, shared_dir).await
     }
 
     fn read_env_config(
@@ -324,20 +341,5 @@ impl Product for Python {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             envs: vec![],
         })
-    }
-
-    fn get_downloaded(&self, shared_dir: &Path) -> IsopyLibResult<Vec<PathBuf>> {
-        let mut asset_file_names = Vec::new();
-        for result in read_dir(shared_dir).map_err(isopy_lib_other_error)? {
-            let entry = result.map_err(isopy_lib_other_error)?;
-            let asset_file_name = entry.file_name();
-            if let Some(asset_file_name) = asset_file_name.to_str() {
-                if asset_file_name.parse::<AssetMeta>().is_ok() {
-                    asset_file_names.push(PathBuf::from(asset_file_name));
-                }
-            }
-        }
-
-        Ok(asset_file_names)
     }
 }
