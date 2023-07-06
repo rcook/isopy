@@ -32,7 +32,7 @@ use std::path::{Path, PathBuf};
 pub trait Product: Send + Sync {
     fn name(&self) -> &str;
 
-    fn repository_url(&self) -> &Url;
+    fn source_url(&self) -> &Url;
 
     async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>>;
 

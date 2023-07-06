@@ -97,7 +97,7 @@ impl Product for OpenJdk {
         PLUGIN_NAME
     }
 
-    fn repository_url(&self) -> &Url {
+    fn source_url(&self) -> &Url {
         &ADOPTIUM_SERVER_URL
     }
 

@@ -42,8 +42,8 @@ impl Plugin {
         self.product.name()
     }
 
-    pub fn repository_url(&self) -> &Url {
-        self.product.repository_url()
+    pub fn source_url(&self) -> &Url {
+        self.product.source_url()
     }
 
     pub fn prefix(&self) -> &str {

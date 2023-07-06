@@ -260,7 +260,7 @@ impl Product for Python {
         PLUGIN_NAME
     }
 
-    fn repository_url(&self) -> &Url {
+    fn source_url(&self) -> &Url {
         &RELEASES_URL
     }
 

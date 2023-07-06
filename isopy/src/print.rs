@@ -147,7 +147,7 @@ pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>) {
         print(&format!(
             "{} ({})",
             plugin.name().cyan(),
-            plugin.repository_url().as_str().bright_magenta()
+            plugin.source_url().as_str().bright_magenta()
         ));
 
         for package in packages {
