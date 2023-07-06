@@ -132,10 +132,16 @@ pub enum Command {
     List,
 
     #[command(name = "available", about = "List packages available for download")]
-    ListAvailablePackages,
+    ListAvailablePackages {
+        #[arg(long = "verbose", default_value = "false", help = "Show more detail")]
+        verbose: bool,
+    },
 
     #[command(name = "downloaded", about = "List locally downloaded packages")]
-    ListDownloadedPackages,
+    ListDownloadedPackages {
+        #[arg(long = "verbose", default_value = "false", help = "Show more detail")]
+        verbose: bool,
+    },
 
     #[command(name = "prompt", about = "Show brief information in prompt")]
     Prompt,

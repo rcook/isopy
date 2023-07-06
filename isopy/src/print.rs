@@ -143,7 +143,7 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     Ok(())
 }
 
-pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>) {
+pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>, verbose: bool) {
     if !packages.is_empty() {
         print(&format!(
             "{} ({})",
@@ -152,15 +152,23 @@ pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>) {
         ));
 
         for package in packages {
-            print(&format!(
-                "  {:<30} {}",
-                pretty_descriptor(plugin, package).bright_yellow(),
-                package
-                    .asset_path
-                    .file_name()
-                    .and_then(OsStr::to_str)
-                    .expect("must be valid")
-            ));
+            if verbose {
+                print(&format!(
+                    "  {:<30} {}",
+                    pretty_descriptor(plugin, package).bright_yellow(),
+                    package.asset_path.display()
+                ));
+            } else {
+                print(&format!(
+                    "  {:<30} {}",
+                    pretty_descriptor(plugin, package).bright_yellow(),
+                    package
+                        .asset_path
+                        .file_name()
+                        .and_then(OsStr::to_str)
+                        .expect("must be valid")
+                ));
+            }
         }
     }
 }

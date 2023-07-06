@@ -25,11 +25,11 @@ use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
 
-pub async fn list_available_packages(app: &App) -> Result<Status> {
+pub async fn list_available_packages(app: &App, verbose: bool) -> Result<Status> {
     for plugin in &Registry::global().plugins {
         let plugin_dir = app.repo.shared_dir().join(plugin.prefix());
         let packages = plugin.get_available_packages(&plugin_dir).await?;
-        print_packages(plugin, &packages);
+        print_packages(plugin, &packages, verbose);
     }
 
     Ok(Status::OK)

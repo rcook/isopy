@@ -91,8 +91,10 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::Info => do_info(&app),
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),
-        Command::ListAvailablePackages => list_available_packages(&app).await,
-        Command::ListDownloadedPackages => list_downloaded_packages(&app).await,
+        Command::ListAvailablePackages { verbose } => list_available_packages(&app, verbose).await,
+        Command::ListDownloadedPackages { verbose } => {
+            list_downloaded_packages(&app, verbose).await
+        }
         Command::Prompt => do_prompt(&app),
         Command::Scratch => do_scratch(&app),
         Command::Shell => do_shell(app),
