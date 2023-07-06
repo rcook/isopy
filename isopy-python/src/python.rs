@@ -62,6 +62,14 @@ impl Default for PythonPluginFactory {
 }
 
 impl PluginFactory for PythonPluginFactory {
+    fn name(&self) -> &str {
+        PLUGIN_NAME
+    }
+
+    fn source_url(&self) -> &Url {
+        &RELEASES_URL
+    }
+
     fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
         Box::new(Python2::new(dir))
     }
@@ -289,23 +297,6 @@ impl Python {
                 .expect("must be valid")
         }
     }
-}
-
-impl Default for Python {
-    fn default() -> Self {
-        Self
-    }
-}
-
-#[async_trait]
-impl Product for Python {
-    fn name(&self) -> &str {
-        PLUGIN_NAME
-    }
-
-    fn source_url(&self) -> &Url {
-        &RELEASES_URL
-    }
 
     async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
         self.update_index_if_necessary(plugin_dir).await?;
@@ -341,7 +332,16 @@ impl Product for Python {
 
         Ok(packages)
     }
+}
 
+impl Default for Python {
+    fn default() -> Self {
+        Self
+    }
+}
+
+#[async_trait]
+impl Product for Python {
     async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,

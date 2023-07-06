@@ -29,6 +29,8 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
 pub trait PluginFactory: Send + Sync {
+    fn name(&self) -> &str;
+    fn source_url(&self) -> &Url;
     fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG>;
 }
 
@@ -41,14 +43,6 @@ pub trait PluginTNG {
 
 #[async_trait]
 pub trait Product: Send + Sync {
-    fn name(&self) -> &str;
-
-    fn source_url(&self) -> &Url;
-
-    async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>>;
-
-    async fn get_downloaded_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>>;
-
     async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,

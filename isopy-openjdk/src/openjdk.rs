@@ -47,6 +47,14 @@ impl Default for OpenJdkPluginFactory {
 }
 
 impl PluginFactory for OpenJdkPluginFactory {
+    fn name(&self) -> &str {
+        PLUGIN_NAME
+    }
+
+    fn source_url(&self) -> &Url {
+        &ADOPTIUM_SERVER_URL
+    }
+
     fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
         Box::new(OpenJdk2::new(dir))
     }
@@ -126,17 +134,6 @@ impl OpenJdk {
 
         Ok(asset_path)
     }
-}
-
-#[async_trait]
-impl Product for OpenJdk {
-    fn name(&self) -> &str {
-        PLUGIN_NAME
-    }
-
-    fn source_url(&self) -> &Url {
-        &ADOPTIUM_SERVER_URL
-    }
 
     async fn get_available_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
         let manager = AdoptiumIndexManager::new_default(plugin_dir);
@@ -178,7 +175,10 @@ impl Product for OpenJdk {
 
         Ok(packages)
     }
+}
 
+#[async_trait]
+impl Product for OpenJdk {
     async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,

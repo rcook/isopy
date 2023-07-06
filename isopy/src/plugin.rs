@@ -44,16 +44,16 @@ impl Plugin {
         }
     }
 
+    pub fn prefix(&self) -> &str {
+        &self.prefix
+    }
+
     pub fn name(&self) -> &str {
-        self.product.name()
+        self.plugin_factory.name()
     }
 
     pub fn source_url(&self) -> &Url {
-        self.product.source_url()
-    }
-
-    pub fn prefix(&self) -> &str {
-        &self.prefix
+        self.plugin_factory.source_url()
     }
 
     pub fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
