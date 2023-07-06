@@ -22,7 +22,6 @@
 use crate::openjdk_version::OpenJdkVersion;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use std::ffi::OsString;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct VersionRec {
@@ -30,7 +29,7 @@ pub struct VersionRec {
     pub openjdk_version: OpenJdkVersion,
 
     #[serde(rename = "file_name")]
-    pub file_name: OsString,
+    pub file_name: String,
 
     #[serde(rename = "url")]
     pub url: Url,

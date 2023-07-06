@@ -29,6 +29,7 @@ use colored::Colorize;
 use isopy_lib::Package;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use joatmon::read_yaml_file;
+use std::ffi::OsStr;
 use std::fmt::Display;
 use std::sync::Arc;
 
@@ -155,9 +156,10 @@ pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>) {
                 "  {:<30} {}",
                 pretty_descriptor(plugin, package).bright_yellow(),
                 package
-                    .file_name
-                    .to_str()
-                    .expect("unable to translate file name to string")
+                    .asset_path
+                    .file_name()
+                    .and_then(OsStr::to_str)
+                    .expect("must be valid")
             ));
         }
     }

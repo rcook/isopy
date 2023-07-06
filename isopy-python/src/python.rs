@@ -189,11 +189,11 @@ impl Python {
             .filter(assets.iter())
             .into_iter()
             .map(|asset| Package {
-                file_name: OsString::from(asset.name.clone()),
                 descriptor: Some(Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
                 }))),
+                asset_path: plugin_dir.join(&*ASSETS_DIR).join(asset.name.clone()),
             })
             .collect::<Vec<_>>())
     }
@@ -270,17 +270,17 @@ impl Product for Python {
     }
 
     async fn get_downloaded_packages(&self, plugin_dir: &Path) -> IsopyLibResult<Vec<Package>> {
-        let package_map = self
-            .get_available_packages(plugin_dir)
-            .await?
-            .into_iter()
-            .map(|p| (p.file_name.as_os_str().to_owned(), p))
+        let packages = self.get_available_packages(plugin_dir).await?;
+        let package_map = packages
+            .iter()
+            .filter_map(|p| p.asset_path.file_name().map(OsString::from).map(|f| (f, p)))
             .collect::<HashMap<_, _>>();
 
         let assets_dir = plugin_dir.join(&*ASSETS_DIR);
         let mut packages = Vec::new();
         for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
             let entry = result.map_err(isopy_lib_other_error)?;
+            let asset_path = entry.path();
             let asset_file_name = entry.file_name();
             let descriptor = package_map
                 .get(&asset_file_name)
@@ -289,8 +289,8 @@ impl Product for Python {
             if let Some(asset_file_name) = asset_file_name.to_str() {
                 if asset_file_name.parse::<AssetMeta>().is_ok() {
                     packages.push(Package {
+                        asset_path,
                         descriptor,
-                        file_name: OsString::from(asset_file_name),
                     });
                 }
             }
