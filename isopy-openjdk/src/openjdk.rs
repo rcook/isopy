@@ -102,10 +102,10 @@ impl Product for OpenJdk {
             .await?
             .into_iter()
             .map(|x| Package {
+                asset_path: plugin_dir.join(&*ASSETS_DIR).join(x.file_name),
                 descriptor: Some(Arc::new(Box::new(OpenJdkDescriptor {
                     version: x.openjdk_version,
                 }))),
-                asset_path: plugin_dir.join(&*ASSETS_DIR).join(x.file_name),
             })
             .collect::<Vec<_>>())
     }
