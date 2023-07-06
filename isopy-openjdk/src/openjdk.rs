@@ -69,7 +69,7 @@ impl OpenJdk2 {
 #[async_trait]
 impl PluginTNG for OpenJdk2 {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        todo!();
+        self.openjdk.get_available_packages(&self.dir).await
     }
 
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
