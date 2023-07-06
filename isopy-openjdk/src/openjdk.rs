@@ -143,6 +143,16 @@ impl Product for OpenJdk {
         data_dir: &Path,
         properties: &serde_json::Value,
     ) -> IsopyLibResult<EnvInfo> {
+        #[cfg(target_os = "macos")]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![data_dir
+                .join(&env_config_rec.dir)
+                .join("Contents")
+                .join("Home")
+                .join("bin")]
+        }
+
+        #[cfg(any(target_os = "linux", target_os = "windows"))]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![data_dir.join(&env_config_rec.dir).join("bin")]
         }
