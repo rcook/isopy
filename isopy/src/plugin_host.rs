@@ -22,7 +22,7 @@
 use anyhow::Result;
 use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory, Product};
 use std::ffi::OsStr;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use url::Url;
 
 pub struct PluginHost {
@@ -58,14 +58,6 @@ impl PluginHost {
 
     pub fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
         self.plugin_factory.make_plugin(dir)
-    }
-
-    pub async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        plugin_dir: &Path,
-    ) -> Result<PathBuf> {
-        Ok(self.product.download_asset(descriptor, plugin_dir).await?)
     }
 
     pub fn parse_descriptor(&self, s: &str) -> Result<Box<dyn Descriptor>> {

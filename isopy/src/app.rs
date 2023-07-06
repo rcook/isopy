@@ -40,15 +40,6 @@ impl App {
         Self { cwd, repo }
     }
 
-    pub async fn download_asset(
-        &self,
-        plugin_host: &PluginHost,
-        descriptor: &dyn Descriptor,
-    ) -> Result<PathBuf> {
-        let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
-        plugin_host.download_asset(descriptor, &plugin_dir).await
-    }
-
     pub async fn add_package(
         &self,
         plugin_host: &PluginHost,
@@ -89,7 +80,9 @@ impl App {
             );
         }
 
-        let asset_path = self.download_asset(plugin_host, descriptor).await?;
+        let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
+        let plugin = plugin_host.make_plugin(&plugin_dir);
+        let asset_path = plugin.download_asset(descriptor).await?;
 
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
