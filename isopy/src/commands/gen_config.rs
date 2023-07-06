@@ -27,7 +27,7 @@ use joatmon::safe_write_file;
 use log::info;
 
 pub fn do_gen_config(app: &App, package_id: &PackageId, force: bool) -> Result<Status> {
-    let project_config_file_name = package_id.plugin().project_config_file_name();
+    let project_config_file_name = package_id.plugin_host().project_config_file_name();
     let project_config_info = package_id.descriptor().get_project_config_info()?;
     let project_config_path = app.cwd.join(project_config_file_name);
 

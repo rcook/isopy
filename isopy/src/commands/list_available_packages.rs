@@ -26,11 +26,11 @@ use crate::status::Status;
 use anyhow::Result;
 
 pub async fn list_available_packages(app: &App, verbose: bool) -> Result<Status> {
-    for plugin_manager in &Registry::global().plugins {
-        let plugin_dir = app.repo.shared_dir().join(plugin_manager.prefix());
-        let plugin = plugin_manager.make_plugin(&plugin_dir);
+    for plugin_host in &Registry::global().plugin_hosts {
+        let plugin_dir = app.repo.shared_dir().join(plugin_host.prefix());
+        let plugin = plugin_host.make_plugin(&plugin_dir);
         let packages = plugin.get_available_packages().await?;
-        print_packages(plugin_manager, &packages, verbose);
+        print_packages(plugin_host, &packages, verbose);
     }
 
     Ok(Status::OK)

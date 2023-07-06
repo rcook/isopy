@@ -19,14 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::plugin::Plugin;
+use crate::plugin_host::PluginHost;
 use isopy_lib::DescriptorRef;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct DescriptorInfo {
-    pub plugin: Arc<Plugin>,
+    pub plugin_host: Arc<PluginHost>,
     pub descriptor: DescriptorRef,
 }
 
@@ -35,7 +35,7 @@ impl Debug for DescriptorInfo {
         write!(
             f,
             "[DescriptorInfo: {}:{}]",
-            self.plugin.prefix(),
+            self.plugin_host.prefix(),
             self.descriptor
         )
     }
@@ -43,6 +43,6 @@ impl Debug for DescriptorInfo {
 
 impl Display for DescriptorInfo {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}:{}", self.plugin.prefix(), self.descriptor)
+        write!(f, "{}:{}", self.plugin_host.prefix(), self.descriptor)
     }
 }

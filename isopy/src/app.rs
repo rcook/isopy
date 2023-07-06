@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ENV_FILE_NAME;
-use crate::plugin::Plugin;
+use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
@@ -42,14 +42,18 @@ impl App {
 
     pub async fn download_asset(
         &self,
-        plugin: &Plugin,
+        plugin_host: &PluginHost,
         descriptor: &dyn Descriptor,
     ) -> Result<PathBuf> {
-        let plugin_dir = self.repo.shared_dir().join(plugin.prefix());
-        plugin.download_asset(descriptor, &plugin_dir).await
+        let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
+        plugin_host.download_asset(descriptor, &plugin_dir).await
     }
 
-    pub async fn add_package(&self, plugin: &Plugin, descriptor: &dyn Descriptor) -> Result<()> {
+    pub async fn add_package(
+        &self,
+        plugin_host: &PluginHost,
+        descriptor: &dyn Descriptor,
+    ) -> Result<()> {
         let project_dir = self.cwd.clone();
         let mut package_dirs = Vec::new();
 
@@ -78,19 +82,19 @@ impl App {
             (dir_info, env_config_path)
         };
 
-        if package_dirs.iter().any(|p| p.id == plugin.prefix()) {
+        if package_dirs.iter().any(|p| p.id == plugin_host.prefix()) {
             bail!(
                 "environment already has a package with ID {} configured",
-                plugin.prefix()
+                plugin_host.prefix()
             );
         }
 
-        let asset_path = self.download_asset(plugin, descriptor).await?;
+        let asset_path = self.download_asset(plugin_host, descriptor).await?;
 
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
         package_dirs.push(PackageDirRec {
-            id: String::from(plugin.prefix()),
+            id: String::from(plugin_host.prefix()),
             properties: descriptor.get_env_config_value()?,
         });
 

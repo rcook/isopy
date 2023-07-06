@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::plugin::Plugin;
+use crate::plugin_host::PluginHost;
 use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
@@ -34,23 +34,23 @@ pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
         return Ok(Status::Fail);
     }
 
-    let Some((plugin, project_config_path)) = get_plugin_and_project_config_path(app) else {
+    let Some((plugin_host, project_config_path)) = get_plugin_host_and_project_config_path(app) else {
         error!("no project configuration file was found in {}", app.cwd.display());
         return Ok(Status::Fail)
     };
 
-    let descriptor = plugin.read_project_config_file(&project_config_path)?;
+    let descriptor = plugin_host.read_project_config_file(&project_config_path)?;
 
-    app.add_package(&plugin, descriptor.as_ref()).await?;
+    app.add_package(&plugin_host, descriptor.as_ref()).await?;
 
     Ok(Status::OK)
 }
 
-fn get_plugin_and_project_config_path(app: &App) -> Option<(Arc<Plugin>, PathBuf)> {
-    for plugin in &Registry::global().plugins {
-        let project_config_path = app.cwd.join(plugin.project_config_file_name());
+fn get_plugin_host_and_project_config_path(app: &App) -> Option<(Arc<PluginHost>, PathBuf)> {
+    for plugin_host in &Registry::global().plugin_hosts {
+        let project_config_path = app.cwd.join(plugin_host.project_config_file_name());
         if project_config_path.is_file() {
-            return Some((Arc::clone(plugin), project_config_path));
+            return Some((Arc::clone(plugin_host), project_config_path));
         }
     }
 

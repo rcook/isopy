@@ -21,7 +21,7 @@
 //
 use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::descriptor_info::DescriptorInfo;
-use crate::plugin::Plugin;
+use crate::plugin_host::PluginHost;
 use crate::serialization::PackageDirRec;
 use anyhow::{bail, Result};
 use isopy_lib::EnvInfo;
@@ -33,12 +33,12 @@ use std::sync::Arc;
 
 lazy_static! {
     static ref GLOBAL: Registry = Registry::new(vec![
-        Plugin::new(
+        PluginHost::new(
             PYTHON_DESCRIPTOR_PREFIX,
             Box::<PythonPluginFactory>::default(),
             Box::<Python>::default()
         ),
-        Plugin::new(
+        PluginHost::new(
             OPENJDK_DESCRIPTOR_PREFIX,
             Box::<OpenJdkPluginFactory>::default(),
             Box::<OpenJdk>::default()
@@ -47,7 +47,7 @@ lazy_static! {
 }
 
 pub struct Registry {
-    pub plugins: Vec<Arc<Plugin>>,
+    pub plugin_hosts: Vec<Arc<PluginHost>>,
 }
 
 impl Registry {
@@ -55,21 +55,21 @@ impl Registry {
         &GLOBAL
     }
 
-    pub fn new(plugins: Vec<Plugin>) -> Self {
+    pub fn new(plugin_hosts: Vec<PluginHost>) -> Self {
         Self {
-            plugins: plugins.into_iter().map(Arc::new).collect::<Vec<_>>(),
+            plugin_hosts: plugin_hosts.into_iter().map(Arc::new).collect::<Vec<_>>(),
         }
     }
 
     pub fn parse_descriptor(&self, s: &str) -> Result<DescriptorInfo> {
-        let Some((plugin, tail)) = self.find_plugin(s) else {
+        let Some((plugin_host, tail)) = self.find_plugin_host(s) else {
             bail!("unsupported descriptor format {s}");
         };
 
-        let descriptor = Arc::new(plugin.parse_descriptor(tail)?);
+        let descriptor = Arc::new(plugin_host.parse_descriptor(tail)?);
 
         Ok(DescriptorInfo {
-            plugin: Arc::clone(plugin),
+            plugin_host: Arc::clone(plugin_host),
             descriptor,
         })
     }
@@ -79,26 +79,26 @@ impl Registry {
         data_dir: &Path,
         package_dir_rec: &PackageDirRec,
     ) -> Result<Option<EnvInfo>> {
-        let Some(plugin) = self
-            .plugins
+        let Some(plugin_host) = self
+            .plugin_hosts
             .iter()
             .find(|p| p.prefix() == package_dir_rec.id) else {
             return Ok(None);
         };
 
         Ok(Some(
-            plugin.read_env_config(data_dir, &package_dir_rec.properties)?,
+            plugin_host.read_env_config(data_dir, &package_dir_rec.properties)?,
         ))
     }
 
-    fn find_plugin<'a>(&self, s: &'a str) -> Option<(&Arc<Plugin>, &'a str)> {
+    fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&Arc<PluginHost>, &'a str)> {
         if let Some((prefix, tail)) = s.split_once(':') {
-            if let Some(plugin) = self.plugins.iter().find(|p| p.prefix() == prefix) {
-                return Some((plugin, tail));
+            if let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == prefix) {
+                return Some((plugin_host, tail));
             }
         }
 
-        self.plugins.first().map(|p| (p, s))
+        self.plugin_hosts.first().map(|p| (p, s))
     }
 }
 

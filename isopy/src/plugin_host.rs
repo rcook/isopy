@@ -25,13 +25,13 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use url::Url;
 
-pub struct Plugin {
+pub struct PluginHost {
     prefix: String,
     plugin_factory: Box<dyn PluginFactory>,
     product: Box<dyn Product>,
 }
 
-impl Plugin {
+impl PluginHost {
     pub fn new(
         prefix: &str,
         plugin_factory: Box<dyn PluginFactory>,

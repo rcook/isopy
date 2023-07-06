@@ -40,7 +40,7 @@ mod commands;
 mod constants;
 mod descriptor_info;
 mod package_id;
-mod plugin;
+mod plugin_host;
 mod print;
 mod registry;
 mod run;

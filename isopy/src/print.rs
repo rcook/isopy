@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ENV_FILE_NAME;
-use crate::plugin::Plugin;
+use crate::plugin_host::PluginHost;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use crate::util::pretty_descriptor;
@@ -143,25 +143,25 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     Ok(())
 }
 
-pub fn print_packages(plugin: &Arc<Plugin>, packages: &Vec<Package>, verbose: bool) {
+pub fn print_packages(plugin_host: &Arc<PluginHost>, packages: &Vec<Package>, verbose: bool) {
     if !packages.is_empty() {
         print(&format!(
             "{} ({})",
-            plugin.name().cyan(),
-            plugin.source_url().as_str().bright_magenta()
+            plugin_host.name().cyan(),
+            plugin_host.source_url().as_str().bright_magenta()
         ));
 
         for package in packages {
             if verbose {
                 print(&format!(
                     "  {:<30} {}",
-                    pretty_descriptor(plugin, package).bright_yellow(),
+                    pretty_descriptor(plugin_host, package).bright_yellow(),
                     package.asset_path.display()
                 ));
             } else {
                 print(&format!(
                     "  {:<30} {}",
-                    pretty_descriptor(plugin, package).bright_yellow(),
+                    pretty_descriptor(plugin_host, package).bright_yellow(),
                     package
                         .asset_path
                         .file_name()

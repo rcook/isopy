@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor_info::DescriptorInfo;
-use crate::plugin::Plugin;
+use crate::plugin_host::PluginHost;
 use crate::registry::Registry;
 use isopy_lib::Descriptor;
 use serde::{Deserialize, Serialize};
@@ -33,8 +33,8 @@ pub struct PackageId {
 }
 
 impl PackageId {
-    pub fn plugin(&self) -> &Plugin {
-        &self.descriptor_info.plugin
+    pub fn plugin_host(&self) -> &PluginHost {
+        &self.descriptor_info.plugin_host
     }
 
     pub fn descriptor(&self) -> &dyn Descriptor {
