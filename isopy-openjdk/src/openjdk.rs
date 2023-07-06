@@ -75,6 +75,10 @@ impl PluginTNG for OpenJdk2 {
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
         self.openjdk.get_downloaded_packages(&self.dir).await
     }
+
+    async fn download_asset(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf> {
+        self.openjdk.download_asset(descriptor, &self.dir).await
+    }
 }
 
 pub struct OpenJdk;

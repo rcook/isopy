@@ -36,6 +36,7 @@ pub trait PluginFactory: Send + Sync {
 pub trait PluginTNG {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
+    async fn download_asset(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf>;
 }
 
 #[async_trait]

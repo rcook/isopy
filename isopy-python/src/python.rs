@@ -90,6 +90,10 @@ impl PluginTNG for Python2 {
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
         self.python.get_downloaded_packages(&self.dir).await
     }
+
+    async fn download_asset(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf> {
+        self.python.download_asset(descriptor, &self.dir).await
+    }
 }
 
 pub struct Python;
