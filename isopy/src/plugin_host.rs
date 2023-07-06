@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory, Product};
+use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory};
 use std::ffi::OsStr;
 use std::path::Path;
 use url::Url;
@@ -28,19 +28,13 @@ use url::Url;
 pub struct PluginHost {
     prefix: String,
     plugin_factory: Box<dyn PluginFactory>,
-    product: Box<dyn Product>,
 }
 
 impl PluginHost {
-    pub fn new(
-        prefix: &str,
-        plugin_factory: Box<dyn PluginFactory>,
-        product: Box<dyn Product>,
-    ) -> Self {
+    pub fn new(prefix: &str, plugin_factory: Box<dyn PluginFactory>) -> Self {
         Self {
             prefix: String::from(prefix),
             plugin_factory,
-            product,
         }
     }
 
@@ -56,20 +50,16 @@ impl PluginHost {
         self.plugin_factory.source_url()
     }
 
-    pub fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
-        self.plugin_factory.make_plugin(dir)
-    }
-
     pub fn parse_descriptor(&self, s: &str) -> Result<Box<dyn Descriptor>> {
-        Ok(self.product.parse_descriptor(s)?)
+        Ok(self.plugin_factory.parse_descriptor(s)?)
     }
 
     pub fn project_config_file_name(&self) -> &OsStr {
-        self.product.project_config_file_name()
+        self.plugin_factory.project_config_file_name()
     }
 
     pub fn read_project_config_file(&self, path: &Path) -> Result<Box<dyn Descriptor>> {
-        Ok(self.product.read_project_config_file(path)?)
+        Ok(self.plugin_factory.read_project_config_file(path)?)
     }
 
     pub fn read_env_config(
@@ -77,6 +67,10 @@ impl PluginHost {
         data_dir: &Path,
         properties: &serde_json::Value,
     ) -> Result<EnvInfo> {
-        Ok(self.product.read_env_config(data_dir, properties)?)
+        Ok(self.plugin_factory.read_env_config(data_dir, properties)?)
+    }
+
+    pub fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
+        self.plugin_factory.make_plugin(dir)
     }
 }

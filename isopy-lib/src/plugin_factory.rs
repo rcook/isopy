@@ -19,12 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::plugin::Plugin;
+use crate::{plugin::Plugin, Descriptor, EnvInfo, IsopyLibResult};
 use reqwest::Url;
-use std::path::Path;
+use std::{ffi::OsStr, path::Path};
 
 pub trait PluginFactory: Send + Sync {
     fn name(&self) -> &str;
     fn source_url(&self) -> &Url;
+    fn project_config_file_name(&self) -> &OsStr;
+    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>>;
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
+    fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> IsopyLibResult<EnvInfo>;
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin>;
 }

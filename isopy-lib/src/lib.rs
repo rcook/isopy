@@ -43,7 +43,6 @@ mod link_header;
 mod package;
 mod plugin;
 mod plugin_factory;
-mod product;
 mod reqwest_response;
 mod response;
 mod result;
@@ -59,7 +58,6 @@ pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErr
 pub use self::package::Package;
 pub use self::plugin::Plugin;
 pub use self::plugin_factory::PluginFactory;
-pub use self::product::Product;
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
 pub use self::result::IsopyLibResult;

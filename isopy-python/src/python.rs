@@ -40,7 +40,7 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, download_stream, other_error as isopy_lib_other_error, Descriptor, EnvInfo,
-    IsopyLibResult, LastModified, Package, Plugin, PluginFactory, Product,
+    IsopyLibResult, LastModified, Package, Plugin, PluginFactory,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -68,6 +68,54 @@ impl PluginFactory for PythonPluginFactory {
 
     fn source_url(&self) -> &Url {
         &RELEASES_URL
+    }
+
+    fn project_config_file_name(&self) -> &OsStr {
+        &PROJECT_CONFIG_FILE_NAME
+    }
+
+    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
+        let project_config_rec =
+            read_yaml_file::<ProjectConfigRec>(path).map_err(isopy_lib_other_error)?;
+
+        Ok(Box::new(PythonDescriptor {
+            version: project_config_rec.version,
+            tag: project_config_rec.tag,
+        }))
+    }
+
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
+        Ok(Box::new(
+            s.parse::<PythonDescriptor>()
+                .map_err(isopy_lib_other_error)?,
+        ))
+    }
+
+    fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> IsopyLibResult<EnvInfo> {
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_config_rec.dir).join("bin")]
+        }
+
+        #[cfg(target_os = "windows")]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![
+                data_dir.join(&env_config_rec.dir).join("bin"),
+                data_dir.join(&env_config_rec.dir).join("Scripts"),
+            ]
+        }
+
+        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
+            .map_err(isopy_lib_other_error)?;
+
+        Ok(EnvInfo {
+            path_dirs: make_path_dirs(data_dir, &env_config_rec),
+            envs: vec![],
+        })
     }
 
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
@@ -332,16 +380,7 @@ impl Python {
 
         Ok(packages)
     }
-}
 
-impl Default for Python {
-    fn default() -> Self {
-        Self
-    }
-}
-
-#[async_trait]
-impl Product for Python {
     async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,
@@ -353,52 +392,10 @@ impl Product for Python {
             .expect("must be PythonDescriptor");
         self.download_python(descriptor, plugin_dir).await
     }
+}
 
-    fn project_config_file_name(&self) -> &OsStr {
-        &PROJECT_CONFIG_FILE_NAME
-    }
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
-        let project_config_rec =
-            read_yaml_file::<ProjectConfigRec>(path).map_err(isopy_lib_other_error)?;
-
-        Ok(Box::new(PythonDescriptor {
-            version: project_config_rec.version,
-            tag: project_config_rec.tag,
-        }))
-    }
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<PythonDescriptor>()
-                .map_err(isopy_lib_other_error)?,
-        ))
-    }
-
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo> {
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
-            vec![data_dir.join(&env_config_rec.dir).join("bin")]
-        }
-
-        #[cfg(target_os = "windows")]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
-            vec![
-                data_dir.join(&env_config_rec.dir).join("bin"),
-                data_dir.join(&env_config_rec.dir).join("Scripts"),
-            ]
-        }
-
-        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
-            .map_err(isopy_lib_other_error)?;
-
-        Ok(EnvInfo {
-            path_dirs: make_path_dirs(data_dir, &env_config_rec),
-            envs: vec![],
-        })
+impl Default for Python {
+    fn default() -> Self {
+        Self
     }
 }

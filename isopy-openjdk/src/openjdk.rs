@@ -27,7 +27,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, EnvInfo,
-    IsopyLibError, IsopyLibResult, Package, Plugin, PluginFactory, Product,
+    IsopyLibError, IsopyLibResult, Package, Plugin, PluginFactory,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -53,6 +53,60 @@ impl PluginFactory for OpenJdkPluginFactory {
 
     fn source_url(&self) -> &Url {
         &ADOPTIUM_SERVER_URL
+    }
+
+    fn project_config_file_name(&self) -> &OsStr {
+        &PROJECT_CONFIG_FILE_NAME
+    }
+
+    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
+        Ok(Box::new(OpenJdkDescriptor {
+            version: read_yaml_file::<ProjectConfigRec>(path)
+                .map_err(isopy_lib_other_error)?
+                .version,
+        }))
+    }
+
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
+        Ok(Box::new(
+            s.parse::<OpenJdkDescriptor>()
+                .map_err(isopy_lib_other_error)?,
+        ))
+    }
+
+    fn read_env_config(
+        &self,
+        data_dir: &Path,
+        properties: &serde_json::Value,
+    ) -> IsopyLibResult<EnvInfo> {
+        #[cfg(target_os = "macos")]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![data_dir
+                .join(&env_config_rec.dir)
+                .join("Contents")
+                .join("Home")
+                .join("bin")]
+        }
+
+        #[cfg(any(target_os = "linux", target_os = "windows"))]
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_config_rec.dir).join("bin")]
+        }
+
+        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
+            .map_err(isopy_lib_other_error)?;
+
+        let openjdk_dir = data_dir.join(&env_config_rec.dir);
+        let openjdk_dir_str = String::from(
+            openjdk_dir
+                .to_str()
+                .ok_or_else(|| anyhow!("could not convert path to string"))?,
+        );
+
+        Ok(EnvInfo {
+            path_dirs: make_path_dirs(data_dir, &env_config_rec),
+            envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
+        })
     }
 
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
@@ -175,10 +229,7 @@ impl OpenJdk {
 
         Ok(packages)
     }
-}
 
-#[async_trait]
-impl Product for OpenJdk {
     async fn download_asset(
         &self,
         descriptor: &dyn Descriptor,
@@ -189,59 +240,5 @@ impl Product for OpenJdk {
             .downcast_ref::<OpenJdkDescriptor>()
             .expect("must be OpenJdkDescriptor");
         self.download_openjdk(descriptor, plugin_dir).await
-    }
-
-    fn project_config_file_name(&self) -> &OsStr {
-        &PROJECT_CONFIG_FILE_NAME
-    }
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
-        Ok(Box::new(OpenJdkDescriptor {
-            version: read_yaml_file::<ProjectConfigRec>(path)
-                .map_err(isopy_lib_other_error)?
-                .version,
-        }))
-    }
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<OpenJdkDescriptor>()
-                .map_err(isopy_lib_other_error)?,
-        ))
-    }
-
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo> {
-        #[cfg(target_os = "macos")]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
-            vec![data_dir
-                .join(&env_config_rec.dir)
-                .join("Contents")
-                .join("Home")
-                .join("bin")]
-        }
-
-        #[cfg(any(target_os = "linux", target_os = "windows"))]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
-            vec![data_dir.join(&env_config_rec.dir).join("bin")]
-        }
-
-        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
-            .map_err(isopy_lib_other_error)?;
-
-        let openjdk_dir = data_dir.join(&env_config_rec.dir);
-        let openjdk_dir_str = String::from(
-            openjdk_dir
-                .to_str()
-                .ok_or_else(|| anyhow!("could not convert path to string"))?,
-        );
-
-        Ok(EnvInfo {
-            path_dirs: make_path_dirs(data_dir, &env_config_rec),
-            envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
-        })
     }
 }
