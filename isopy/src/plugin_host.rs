@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use isopy_lib::{Descriptor, EnvInfo, PluginFactory, PluginTNG, Product};
+use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory, Product};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use url::Url;
@@ -56,7 +56,7 @@ impl PluginHost {
         self.plugin_factory.source_url()
     }
 
-    pub fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
+    pub fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
         self.plugin_factory.make_plugin(dir)
     }
 

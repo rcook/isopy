@@ -40,7 +40,7 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, download_stream, other_error as isopy_lib_other_error, Descriptor, EnvInfo,
-    IsopyLibResult, LastModified, Package, PluginFactory, PluginTNG, Product,
+    IsopyLibResult, LastModified, Package, Plugin, PluginFactory, Product,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -70,7 +70,7 @@ impl PluginFactory for PythonPluginFactory {
         &RELEASES_URL
     }
 
-    fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
+    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
         Box::new(Python2::new(dir))
     }
 }
@@ -90,7 +90,7 @@ impl Python2 {
 }
 
 #[async_trait]
-impl PluginTNG for Python2 {
+impl Plugin for Python2 {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
         self.python.get_available_packages(&self.dir).await
     }

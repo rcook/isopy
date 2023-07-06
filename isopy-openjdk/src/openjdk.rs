@@ -27,7 +27,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, EnvInfo,
-    IsopyLibError, IsopyLibResult, Package, PluginFactory, PluginTNG, Product,
+    IsopyLibError, IsopyLibResult, Package, Plugin, PluginFactory, Product,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -55,7 +55,7 @@ impl PluginFactory for OpenJdkPluginFactory {
         &ADOPTIUM_SERVER_URL
     }
 
-    fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
+    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
         Box::new(OpenJdk2::new(dir))
     }
 }
@@ -75,7 +75,7 @@ impl OpenJdk2 {
 }
 
 #[async_trait]
-impl PluginTNG for OpenJdk2 {
+impl Plugin for OpenJdk2 {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
         self.openjdk.get_available_packages(&self.dir).await
     }

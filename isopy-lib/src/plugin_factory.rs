@@ -19,30 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor::Descriptor;
-use crate::env_info::EnvInfo;
-use crate::result::IsopyLibResult;
-use async_trait::async_trait;
-use std::ffi::OsStr;
-use std::path::{Path, PathBuf};
+use crate::plugin::Plugin;
+use reqwest::Url;
+use std::path::Path;
 
-#[async_trait]
-pub trait Product: Send + Sync {
-    async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        plugin_dir: &Path,
-    ) -> IsopyLibResult<PathBuf>;
-
-    fn project_config_file_name(&self) -> &OsStr;
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>>;
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
-
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo>;
+pub trait PluginFactory: Send + Sync {
+    fn name(&self) -> &str;
+    fn source_url(&self) -> &Url;
+    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin>;
 }

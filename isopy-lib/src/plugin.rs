@@ -20,29 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor::Descriptor;
-use crate::env_info::EnvInfo;
+use crate::package::Package;
 use crate::result::IsopyLibResult;
 use async_trait::async_trait;
-use std::ffi::OsStr;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[async_trait]
-pub trait Product: Send + Sync {
-    async fn download_asset(
-        &self,
-        descriptor: &dyn Descriptor,
-        plugin_dir: &Path,
-    ) -> IsopyLibResult<PathBuf>;
-
-    fn project_config_file_name(&self) -> &OsStr;
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>>;
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
-
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo>;
+pub trait Plugin {
+    async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
+    async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
+    async fn download_asset(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf>;
 }
