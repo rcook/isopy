@@ -20,20 +20,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use isopy_lib::{Descriptor, EnvInfo, Package, Product};
+use isopy_lib::{Descriptor, EnvInfo, PluginFactory, PluginTNG, Product};
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use url::Url;
 
 pub struct Plugin {
     prefix: String,
+    plugin_factory: Box<dyn PluginFactory>,
     product: Box<dyn Product>,
 }
 
 impl Plugin {
-    pub fn new(prefix: &str, product: Box<dyn Product>) -> Self {
+    pub fn new(
+        prefix: &str,
+        plugin_factory: Box<dyn PluginFactory>,
+        product: Box<dyn Product>,
+    ) -> Self {
         Self {
             prefix: String::from(prefix),
+            plugin_factory,
             product,
         }
     }
@@ -50,12 +56,8 @@ impl Plugin {
         &self.prefix
     }
 
-    pub async fn get_available_packages(&self, shared_dir: &Path) -> Result<Vec<Package>> {
-        Ok(self.product.get_available_packages(shared_dir).await?)
-    }
-
-    pub async fn get_downloaded_packages(&self, shared_dir: &Path) -> Result<Vec<Package>> {
-        Ok(self.product.get_downloaded_packages(shared_dir).await?)
+    pub fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
+        self.plugin_factory.make_plugin(dir)
     }
 
     pub async fn download_asset(

@@ -43,4 +43,4 @@ mod openjdk_version;
 mod result;
 mod serialization;
 
-pub use self::openjdk::OpenJdk;
+pub use self::openjdk::{OpenJdk, OpenJdkPluginFactory};

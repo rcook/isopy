@@ -28,6 +28,16 @@ use reqwest::Url;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
+pub trait PluginFactory: Send + Sync {
+    fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG>;
+}
+
+#[async_trait]
+pub trait PluginTNG {
+    async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
+    async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
+}
+
 #[async_trait]
 pub trait Product: Send + Sync {
     fn name(&self) -> &str;

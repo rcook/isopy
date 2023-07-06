@@ -26,10 +26,11 @@ use crate::status::Status;
 use anyhow::Result;
 
 pub async fn list_downloaded_packages(app: &App, verbose: bool) -> Result<Status> {
-    for plugin in &Registry::global().plugins {
-        let plugin_dir = app.repo.shared_dir().join(plugin.prefix());
-        let packages = plugin.get_downloaded_packages(&plugin_dir).await?;
-        print_packages(plugin, &packages, verbose);
+    for plugin_manager in &Registry::global().plugins {
+        let plugin_dir = app.repo.shared_dir().join(plugin_manager.prefix());
+        let plugin = plugin_manager.make_plugin(&plugin_dir);
+        let packages = plugin.get_downloaded_packages().await?;
+        print_packages(plugin_manager, &packages, verbose);
     }
 
     Ok(Status::OK)

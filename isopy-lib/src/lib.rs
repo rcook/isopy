@@ -55,7 +55,7 @@ pub use self::error::{other_error, IsopyLibError};
 pub use self::last_modified::LastModified;
 pub use self::link_header::{LinkHeader, LinkHeaderParseError, LinkHeaderParseErrorResult};
 pub use self::package::Package;
-pub use self::product::Product;
+pub use self::product::{PluginFactory, PluginTNG, Product};
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
 pub use self::result::IsopyLibResult;

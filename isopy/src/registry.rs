@@ -25,16 +25,24 @@ use crate::plugin::Plugin;
 use crate::serialization::PackageDirRec;
 use anyhow::{bail, Result};
 use isopy_lib::EnvInfo;
-use isopy_openjdk::OpenJdk;
-use isopy_python::Python;
+use isopy_openjdk::{OpenJdk, OpenJdkPluginFactory};
+use isopy_python::{Python, PythonPluginFactory};
 use lazy_static::lazy_static;
 use std::path::Path;
 use std::sync::Arc;
 
 lazy_static! {
     static ref GLOBAL: Registry = Registry::new(vec![
-        Plugin::new(PYTHON_DESCRIPTOR_PREFIX, Box::<Python>::default()),
-        Plugin::new(OPENJDK_DESCRIPTOR_PREFIX, Box::<OpenJdk>::default())
+        Plugin::new(
+            PYTHON_DESCRIPTOR_PREFIX,
+            Box::<PythonPluginFactory>::default(),
+            Box::<Python>::default()
+        ),
+        Plugin::new(
+            OPENJDK_DESCRIPTOR_PREFIX,
+            Box::<OpenJdkPluginFactory>::default(),
+            Box::<OpenJdk>::default()
+        )
     ]);
 }
 
@@ -100,8 +108,8 @@ mod tests {
     use crate::plugin::Plugin;
     use crate::registry::Registry;
     use anyhow::Result;
-    use isopy_openjdk::OpenJdk;
-    use isopy_python::Python;
+    use isopy_openjdk::{OpenJdk, OpenJdkPluginFactory};
+    use isopy_python::{Python, PythonPluginFactory};
     use rstest::rstest;
 
     #[rstest]
@@ -110,8 +118,16 @@ mod tests {
     #[case("openjdk:19.0.1+10", "openjdk:19.0.1+10")]
     fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
         let registry = Registry::new(vec![
-            Plugin::new(PYTHON_DESCRIPTOR_PREFIX, Box::<Python>::default()),
-            Plugin::new(OPENJDK_DESCRIPTOR_PREFIX, Box::<OpenJdk>::default()),
+            Plugin::new(
+                PYTHON_DESCRIPTOR_PREFIX,
+                Box::<PythonPluginFactory>::default(),
+                Box::<Python>::default(),
+            ),
+            Plugin::new(
+                OPENJDK_DESCRIPTOR_PREFIX,
+                Box::<OpenJdkPluginFactory>::default(),
+                Box::<OpenJdk>::default(),
+            ),
         ]);
 
         let descriptor_info = registry.parse_descriptor(input)?;

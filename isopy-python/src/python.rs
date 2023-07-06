@@ -40,7 +40,7 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, download_stream, other_error as isopy_lib_other_error, Descriptor, EnvInfo,
-    IsopyLibResult, LastModified, Package, Product,
+    IsopyLibResult, LastModified, Package, PluginFactory, PluginTNG, Product,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -52,6 +52,45 @@ use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use url::Url;
+
+pub struct PythonPluginFactory;
+
+impl Default for PythonPluginFactory {
+    fn default() -> Self {
+        Self
+    }
+}
+
+impl PluginFactory for PythonPluginFactory {
+    fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
+        Box::new(Python2::new(dir))
+    }
+}
+
+pub struct Python2 {
+    dir: PathBuf,
+    python: Python,
+}
+
+impl Python2 {
+    fn new(dir: &Path) -> Self {
+        Self {
+            dir: dir.to_path_buf(),
+            python: Python::default(),
+        }
+    }
+}
+
+#[async_trait]
+impl PluginTNG for Python2 {
+    async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
+        self.python.get_available_packages(&self.dir).await
+    }
+
+    async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
+        self.python.get_downloaded_packages(&self.dir).await
+    }
+}
 
 pub struct Python;
 

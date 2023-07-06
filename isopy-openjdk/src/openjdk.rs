@@ -27,7 +27,7 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use isopy_lib::{
     other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, EnvInfo,
-    IsopyLibError, IsopyLibResult, Package, Product,
+    IsopyLibError, IsopyLibResult, Package, PluginFactory, PluginTNG, Product,
 };
 use joatmon::read_yaml_file;
 use log::info;
@@ -37,6 +37,45 @@ use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use url::Url;
+
+pub struct OpenJdkPluginFactory;
+
+impl Default for OpenJdkPluginFactory {
+    fn default() -> Self {
+        Self
+    }
+}
+
+impl PluginFactory for OpenJdkPluginFactory {
+    fn make_plugin(&self, dir: &Path) -> Box<dyn PluginTNG> {
+        Box::new(OpenJdk2::new(dir))
+    }
+}
+
+pub struct OpenJdk2 {
+    dir: PathBuf,
+    openjdk: OpenJdk,
+}
+
+impl OpenJdk2 {
+    fn new(dir: &Path) -> Self {
+        Self {
+            dir: dir.to_path_buf(),
+            openjdk: OpenJdk::default(),
+        }
+    }
+}
+
+#[async_trait]
+impl PluginTNG for OpenJdk2 {
+    async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
+        todo!();
+    }
+
+    async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
+        self.openjdk.get_downloaded_packages(&self.dir).await
+    }
+}
 
 pub struct OpenJdk;
 

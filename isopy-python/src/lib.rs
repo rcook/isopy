@@ -53,4 +53,4 @@ mod serialization;
 mod tag;
 mod traits;
 
-pub use self::python::Python;
+pub use self::python::{Python, PythonPluginFactory};
