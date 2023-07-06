@@ -42,8 +42,9 @@ mod constants;
 mod error;
 mod github;
 mod local;
-mod python;
 mod python_descriptor;
+mod python_plugin;
+mod python_plugin_factory;
 mod python_standalone_builds;
 mod python_version;
 mod repository_info;
@@ -53,4 +54,4 @@ mod serialization;
 mod tag;
 mod traits;
 
-pub use self::python::PythonPluginFactory;
+pub use self::python_plugin_factory::PythonPluginFactory;
