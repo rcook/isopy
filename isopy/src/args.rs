@@ -86,11 +86,11 @@ pub enum Command {
 
     #[command(name = "download", about = "Download product")]
     Download {
-        #[arg(help = "Python or OpenJDK product descriptor")]
+        #[arg(help = "Package ID")]
         package_id: PackageId,
     },
 
-    #[command(name = "exec", about = "Execute command in Python environment")]
+    #[command(name = "exec", about = "Execute command in environment")]
     Exec {
         #[arg(help = "Program to run in environment")]
         program: String,
@@ -100,18 +100,15 @@ pub enum Command {
         args: Vec<String>,
     },
 
-    #[command(
-        name = "gen-config",
-        about = "Generate .python-version.yaml or .openjdk-version.yaml configuration file"
-    )]
+    #[command(name = "gen-config", about = "Generate configuration file")]
     GenConfig {
-        #[arg(help = "Python or OpenJDK product descriptor")]
+        #[arg(help = "Package ID")]
         package_id: PackageId,
 
         #[arg(
             short = 'f',
             long = "force",
-            help = "Force overwrite of .python-version.yaml file"
+            help = "Force overwrite of configuration file"
         )]
         force: bool,
     },
@@ -121,14 +118,14 @@ pub enum Command {
 
     #[command(
         name = "link",
-        about = "Use existing Python environment for current directory"
+        about = "Use existing environment for current directory"
     )]
     Link {
         #[arg(help = "Meta ID", value_parser = parse_meta_id)]
         meta_id: MetaId,
     },
 
-    #[command(name = "list", about = "List Python environments")]
+    #[command(name = "list", about = "List environments")]
     List,
 
     #[command(name = "available", about = "List packages available for download")]
@@ -152,7 +149,7 @@ pub enum Command {
     #[command(name = "shell", about = "Start environment shell")]
     Shell,
 
-    #[command(name = "wrap", about = "Generate wrapper script for Python script")]
+    #[command(name = "wrap", about = "Generate wrapper script for script")]
     Wrap {
         #[arg(help = "Wrapper path", value_parser = parse_absolute_path)]
         wrapper_path: PathBuf,
