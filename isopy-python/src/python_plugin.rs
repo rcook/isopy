@@ -51,13 +51,14 @@ use std::sync::Arc;
 
 pub struct PythonPlugin {
     dir: PathBuf,
+    assets_dir: PathBuf,
 }
 
 impl PythonPlugin {
     pub fn new(dir: &Path) -> Self {
-        Self {
-            dir: dir.to_path_buf(),
-        }
+        let dir = dir.to_path_buf();
+        let assets_dir = dir.join(&*ASSETS_DIR);
+        Self { dir, assets_dir }
     }
 
     fn read_assets(&self) -> Result<Vec<Asset>> {
@@ -89,7 +90,7 @@ impl PythonPlugin {
                     (name, enabled, Box::new(GitHubRepository::new(&url)))
                 }
                 RepositoryRec::Local { name, dir, enabled } => {
-                    (name, enabled, Box::new(LocalRepository::new(dir)))
+                    (name, enabled, Box::new(LocalRepository::new(&dir)))
                 }
             }
         }
@@ -232,7 +233,7 @@ impl Plugin for PythonPlugin {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
                 }))),
-                asset_path: self.dir.join(&*ASSETS_DIR).join(asset.name.clone()),
+                asset_path: self.assets_dir.join(asset.name.clone()),
             })
             .collect::<Vec<_>>())
     }
@@ -244,9 +245,8 @@ impl Plugin for PythonPlugin {
             .filter_map(|p| p.asset_path.file_name().map(OsString::from).map(|f| (f, p)))
             .collect::<HashMap<_, _>>();
 
-        let assets_dir = self.dir.join(&*ASSETS_DIR);
         let mut packages = Vec::new();
-        for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
+        for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
             let entry = result.map_err(isopy_lib_other_error)?;
             let asset_path = entry.path();
             let asset_file_name = entry.file_name();
@@ -278,8 +278,7 @@ impl Plugin for PythonPlugin {
         let repository = repositories
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
-        let assets_dir = self.dir.join(&*ASSETS_DIR);
-        let asset_path = download_asset(repository, asset, &assets_dir).await?;
+        let asset_path = download_asset(repository, asset, &self.assets_dir).await?;
         Ok(asset_path)
     }
 }

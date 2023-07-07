@@ -36,13 +36,14 @@ use std::sync::Arc;
 
 pub struct OpenJdkPlugin {
     dir: PathBuf,
+    assets_dir: PathBuf,
 }
 
 impl OpenJdkPlugin {
     pub fn new(dir: &Path) -> Self {
-        Self {
-            dir: dir.to_path_buf(),
-        }
+        let dir = dir.to_path_buf();
+        let assets_dir = dir.join(&*ASSETS_DIR);
+        Self { dir, assets_dir }
     }
 }
 
@@ -55,7 +56,7 @@ impl Plugin for OpenJdkPlugin {
             .await?
             .into_iter()
             .map(|x| Package {
-                asset_path: self.dir.join(&*ASSETS_DIR).join(x.file_name),
+                asset_path: self.assets_dir.join(x.file_name),
                 descriptor: Some(Arc::new(Box::new(OpenJdkDescriptor {
                     version: x.openjdk_version,
                 }))),
@@ -70,9 +71,8 @@ impl Plugin for OpenJdkPlugin {
             .filter_map(|p| p.asset_path.file_name().map(OsString::from).map(|f| (f, p)))
             .collect::<HashMap<_, _>>();
 
-        let assets_dir = self.dir.join(&*ASSETS_DIR);
         let mut packages = Vec::new();
-        for result in read_dir(assets_dir).map_err(isopy_lib_other_error)? {
+        for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
             let entry = result.map_err(isopy_lib_other_error)?;
             let asset_path = entry.path();
             let asset_file_name = entry.file_name();
@@ -104,8 +104,7 @@ impl Plugin for OpenJdkPlugin {
             return Err(IsopyLibError::VersionNotFound(descriptor.version.to_string()));
         };
 
-        let assets_dir = self.dir.join(&*ASSETS_DIR);
-        let asset_path = assets_dir.join(&version.file_name);
+        let asset_path = self.assets_dir.join(&version.file_name);
         if asset_path.exists() {
             info!("asset {} already downloaded", version.file_name);
             return Ok(asset_path);

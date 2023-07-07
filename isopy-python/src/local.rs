@@ -28,17 +28,20 @@ use bytes::Bytes;
 use isopy_lib::{ContentLength, LastModified, Response, Stream};
 use std::fs::{metadata, File};
 use std::io::Read;
+use std::path::Path;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
 pub struct LocalRepository {
-    dir: PathBuf,
+    assets_dir: PathBuf,
 }
 
 impl LocalRepository {
     #[must_use]
-    pub const fn new(dir: PathBuf) -> Self {
-        Self { dir }
+    pub fn new(dir: &Path) -> Self {
+        Self {
+            assets_dir: dir.join(&*ASSETS_DIR),
+        }
     }
 }
 
@@ -48,7 +51,7 @@ impl Repository for LocalRepository {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>> {
-        let index_path = self.dir.join(&*ASSETS_DIR).join(RELEASES_FILE_NAME);
+        let index_path = self.assets_dir.join(RELEASES_FILE_NAME);
 
         let m = metadata(&index_path)?;
 
@@ -70,7 +73,7 @@ impl Repository for LocalRepository {
     }
 
     async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
-        let asset_path = self.dir.join(&*ASSETS_DIR).join(&asset.name);
+        let asset_path = self.assets_dir.join(&asset.name);
         let m = metadata(&asset_path)?;
         let last_modified = LastModified::try_from(&m.modified()?)?;
         let content_length = m.len();
