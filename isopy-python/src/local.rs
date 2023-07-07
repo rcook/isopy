@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::asset::Asset;
-use crate::constants::RELEASES_FILE_NAME;
+use crate::constants::{ASSETS_DIR, RELEASES_FILE_NAME};
 use crate::traits::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -48,9 +48,9 @@ impl Repository for LocalRepository {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>> {
-        let index_json_path = self.dir.join("assets").join(RELEASES_FILE_NAME);
+        let index_path = self.dir.join(&*ASSETS_DIR).join(RELEASES_FILE_NAME);
 
-        let m = metadata(&index_json_path)?;
+        let m = metadata(&index_path)?;
 
         let modified = m.modified()?;
 
@@ -65,12 +65,12 @@ impl Repository for LocalRepository {
         Ok(Some(Box::new(LocalResponse::new(
             Some(new_last_modified),
             content_length,
-            index_json_path,
+            index_path,
         ))))
     }
 
     async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
-        let asset_path = self.dir.join("assets").join(&asset.name);
+        let asset_path = self.dir.join(&*ASSETS_DIR).join(&asset.name);
         let m = metadata(&asset_path)?;
         let last_modified = LastModified::try_from(&m.modified()?)?;
         let content_length = m.len();
