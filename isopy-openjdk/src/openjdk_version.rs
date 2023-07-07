@@ -21,6 +21,7 @@
 //
 use crate::error::{other_error, IsopyOpenJdkError};
 use crate::result::IsopyOpenJdkResult;
+use serde::de::Error;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
@@ -47,6 +48,29 @@ pub struct OpenJdkVersion {
 type VersionQuad = (u32, Option<u32>, Option<u32>, Option<u32>);
 
 impl OpenJdkVersion {
+    #![allow(clippy::too_many_arguments)]
+    pub fn new(
+        kind: OpenJdkVersionKind,
+        major: u32,
+        minor: Option<u32>,
+        patch: Option<u32>,
+        build: Option<u32>,
+        qualifier1: u32,
+        qualifier2: Option<String>,
+        raw: &str,
+    ) -> Self {
+        Self {
+            kind,
+            major,
+            minor,
+            patch,
+            build,
+            qualifier1,
+            qualifier2,
+            raw: String::from(raw),
+        }
+    }
+
     fn to_u32(s: &str) -> IsopyOpenJdkResult<u32> {
         s.parse::<u32>().map_err(other_error)
     }
@@ -85,16 +109,16 @@ impl FromStr for OpenJdkVersion {
         if let Some((prefix, suffix)) = s.split_once('+') {
             let (major, minor, patch, build) = Self::parse_dotted(s, prefix)?;
             let qualifier1 = Self::to_u32(suffix)?;
-            return Ok(Self {
-                kind: OpenJdkVersionKind::V2,
+            return Ok(Self::new(
+                OpenJdkVersionKind::V2,
                 major,
                 minor,
                 patch,
                 build,
                 qualifier1,
-                qualifier2: None,
-                raw: String::from(s),
-            });
+                None,
+                s,
+            ));
         }
 
         if let Some((prefix, suffix)) = s.split_once('_') {
@@ -104,16 +128,16 @@ impl FromStr for OpenJdkVersion {
             };
             let qualifier1 = Self::to_u32(q1)?;
             let qualifier2 = Some(String::from(q2));
-            return Ok(Self {
-                kind: OpenJdkVersionKind::V1,
+            return Ok(Self::new(
+                OpenJdkVersionKind::V1,
                 major,
                 minor,
                 patch,
                 build,
                 qualifier1,
                 qualifier2,
-                raw: String::from(s),
-            });
+                s,
+            ));
         }
 
         Err(IsopyOpenJdkError::InvalidFormat(String::from(s)))
@@ -133,7 +157,7 @@ impl<'de> Deserialize<'de> for OpenJdkVersion {
     {
         String::deserialize(deserializer)?
             .parse::<Self>()
-            .map_err(serde::de::Error::custom)
+            .map_err(Error::custom)
     }
 }
 

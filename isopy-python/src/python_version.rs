@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use anyhow::anyhow;
+use crate::error::{other_error, IsopyPythonError};
+use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
@@ -35,19 +35,13 @@ pub struct PythonVersion {
 }
 
 impl PythonVersion {
-    #[must_use]
-    pub fn new(major: i32, minor: i32, build: i32) -> Self {
+    pub fn new(major: i32, minor: i32, build: i32, raw: &str) -> Self {
         Self {
             major,
             minor,
             build,
-            raw: format!("{major}.{minor}.{build}"),
+            raw: String::from(raw),
         }
-    }
-
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.raw
     }
 }
 
@@ -60,17 +54,17 @@ impl FromStr for PythonVersion {
             return Err(IsopyPythonError::InvalidVersion(String::from(s)));
         }
 
-        let major = parts[0].parse::<i32>().map_err(|e| anyhow!(e))?;
-        let minor = parts[1].parse::<i32>().map_err(|e| anyhow!(e))?;
-        let build = parts[2].parse::<i32>().map_err(|e| anyhow!(e))?;
+        let major = parts[0].parse::<i32>().map_err(other_error)?;
+        let minor = parts[1].parse::<i32>().map_err(other_error)?;
+        let build = parts[2].parse::<i32>().map_err(other_error)?;
 
-        Ok(Self::new(major, minor, build))
+        Ok(Self::new(major, minor, build, s))
     }
 }
 
 impl Display for PythonVersion {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.build)
+        write!(f, "{}", self.raw)
     }
 }
 
@@ -81,7 +75,7 @@ impl<'de> Deserialize<'de> for PythonVersion {
     {
         String::deserialize(deserializer)?
             .parse::<Self>()
-            .map_err(serde::de::Error::custom)
+            .map_err(Error::custom)
     }
 }
 
@@ -90,7 +84,7 @@ impl Serialize for PythonVersion {
     where
         S: Serializer,
     {
-        serializer.serialize_str(self.as_str())
+        serializer.serialize_str(&self.raw)
     }
 }
 
@@ -102,7 +96,7 @@ mod tests {
     #[test]
     fn parse() -> Result<()> {
         assert_eq!(
-            PythonVersion::new(1, 2, 3),
+            PythonVersion::new(1, 2, 3, "1.2.3"),
             "1.2.3".parse::<PythonVersion>()?
         );
         Ok(())

@@ -180,7 +180,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
-            version: PythonVersion::new(3, 10, 9),
+            version: PythonVersion::new(3, 10, 9, "3.10.9"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -196,7 +196,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: PythonVersion::new(3, 10, 9),
+            version: PythonVersion::new(3, 10, 9, "3.10.9"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -212,7 +212,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarZST,
             family: Family::CPython,
-            version: PythonVersion::new(3, 10, 2),
+            version: PythonVersion::new(3, 10, 2, "3.10.2"),
             arch: Arch::AArch64,
             platform: Platform::Apple,
             os: OS::Darwin,
@@ -228,7 +228,7 @@ mod tests {
         AssetMeta {
             archive_type: ArchiveType::TarGZ,
             family: Family::CPython,
-            version: PythonVersion::new(3, 9, 6),
+            version: PythonVersion::new(3, 9, 6, "3.9.6"),
             arch: Arch::X86_64,
             platform: Platform::Apple,
             os: OS::Darwin,

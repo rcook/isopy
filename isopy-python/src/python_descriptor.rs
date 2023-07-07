@@ -105,7 +105,7 @@ mod tests {
     #[test]
     fn basics() -> Result<()> {
         let descriptor = "3.11.1:20230702".parse::<PythonDescriptor>()?;
-        assert_eq!(PythonVersion::new(3, 11, 1), descriptor.version);
+        assert_eq!(PythonVersion::new(3, 11, 1, "3.11.1"), descriptor.version);
         assert_eq!("20230702", descriptor.tag.unwrap().as_str());
         Ok(())
     }
@@ -113,7 +113,7 @@ mod tests {
     #[test]
     fn basics_no_tag() -> Result<()> {
         let descriptor = "3.11.2".parse::<PythonDescriptor>()?;
-        assert_eq!(PythonVersion::new(3, 11, 2), descriptor.version);
+        assert_eq!(PythonVersion::new(3, 11, 2, "3.11.2"), descriptor.version);
         assert!(descriptor.tag.is_none());
         Ok(())
     }
