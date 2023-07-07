@@ -246,20 +246,23 @@ impl Plugin for PythonPlugin {
             .collect::<HashMap<_, _>>();
 
         let mut packages = Vec::new();
-        for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
-            let entry = result.map_err(isopy_lib_other_error)?;
-            let asset_path = entry.path();
-            let asset_file_name = entry.file_name();
-            let descriptor = package_map
-                .get(&asset_file_name)
-                .and_then(|package| package.descriptor.as_ref())
-                .cloned();
-            if let Some(asset_file_name) = asset_file_name.to_str() {
-                if asset_file_name.parse::<AssetMeta>().is_ok() {
-                    packages.push(Package {
-                        asset_path,
-                        descriptor,
-                    });
+
+        if self.assets_dir.exists() {
+            for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
+                let entry = result.map_err(isopy_lib_other_error)?;
+                let asset_path = entry.path();
+                let asset_file_name = entry.file_name();
+                let descriptor = package_map
+                    .get(&asset_file_name)
+                    .and_then(|package| package.descriptor.as_ref())
+                    .cloned();
+                if let Some(asset_file_name) = asset_file_name.to_str() {
+                    if asset_file_name.parse::<AssetMeta>().is_ok() {
+                        packages.push(Package {
+                            asset_path,
+                            descriptor,
+                        });
+                    }
                 }
             }
         }

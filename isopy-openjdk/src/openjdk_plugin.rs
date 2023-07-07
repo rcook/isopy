@@ -72,18 +72,21 @@ impl Plugin for OpenJdkPlugin {
             .collect::<HashMap<_, _>>();
 
         let mut packages = Vec::new();
-        for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
-            let entry = result.map_err(isopy_lib_other_error)?;
-            let asset_path = entry.path();
-            let asset_file_name = entry.file_name();
-            let descriptor = package_map
-                .get(&asset_file_name)
-                .and_then(|package| package.descriptor.as_ref())
-                .cloned();
-            packages.push(Package {
-                asset_path,
-                descriptor,
-            });
+
+        if self.assets_dir.exists() {
+            for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
+                let entry = result.map_err(isopy_lib_other_error)?;
+                let asset_path = entry.path();
+                let asset_file_name = entry.file_name();
+                let descriptor = package_map
+                    .get(&asset_file_name)
+                    .and_then(|package| package.descriptor.as_ref())
+                    .cloned();
+                packages.push(Package {
+                    asset_path,
+                    descriptor,
+                });
+            }
         }
 
         Ok(packages)

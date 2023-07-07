@@ -144,7 +144,13 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
 }
 
 pub fn print_packages(plugin_host: &Arc<PluginHost>, packages: &Vec<Package>, verbose: bool) {
-    if !packages.is_empty() {
+    if packages.is_empty() {
+        print(&format!(
+            "No packages found for {} ({})",
+            plugin_host.name().cyan(),
+            plugin_host.source_url().as_str().bright_magenta()
+        ));
+    } else {
         print(&format!(
             "{} ({})",
             plugin_host.name().cyan(),
