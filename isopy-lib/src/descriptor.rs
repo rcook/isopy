@@ -32,11 +32,8 @@ pub struct ProjectConfigInfo {
 
 pub trait Descriptor: Any + Debug + Display + Send + Sync {
     fn as_any(&self) -> &dyn Any;
-
     fn transform_archive_path(&self, path: &Path) -> PathBuf;
-
     fn get_env_config_value(&self) -> IsopyLibResult<serde_json::Value>;
-
     fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo>;
 }
 
