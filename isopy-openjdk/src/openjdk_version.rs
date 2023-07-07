@@ -105,7 +105,6 @@ impl FromStr for OpenJdkVersion {
             let qualifier1 = Self::to_u32(q1)?;
             let qualifier2 = Some(String::from(q2));
             return Ok(Self {
-                raw: String::from(s),
                 kind: OpenJdkVersionKind::V1,
                 major,
                 minor,
@@ -113,6 +112,7 @@ impl FromStr for OpenJdkVersion {
                 build,
                 qualifier1,
                 qualifier2,
+                raw: String::from(s),
             });
         }
 
