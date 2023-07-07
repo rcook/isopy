@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::{plugin::Plugin, Descriptor, EnvInfo, IsopyLibResult};
+use crate::plugin::Plugin;
+use crate::{Descriptor, EnvInfo, IsopyLibResult};
 use reqwest::Url;
 use std::{ffi::OsStr, path::Path};
 

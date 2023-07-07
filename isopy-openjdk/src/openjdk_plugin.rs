@@ -99,10 +99,10 @@ impl Plugin for OpenJdkPlugin {
 
         let versions = manager.read_versions().await?;
         let Some(version) = versions
-                    .iter()
-                    .find(|x| x.openjdk_version == descriptor.version) else {
-                    return Err(IsopyLibError::VersionNotFound(descriptor.version.to_string()));
-                };
+            .iter()
+            .find(|x| x.openjdk_version == descriptor.version) else {
+            return Err(IsopyLibError::VersionNotFound(descriptor.version.to_string()));
+        };
 
         let assets_dir = self.dir.join(&*ASSETS_DIR);
         let asset_path = assets_dir.join(&version.file_name);
