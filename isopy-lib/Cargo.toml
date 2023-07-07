@@ -8,7 +8,7 @@ keywords = ["general"]
 license = "MIT"
 name = "isopy-lib"
 repository = "https://rcook.github.io/isopy"
-version = "0.2.0"
+version = "0.2.1"
 
 [dependencies]
 anyhow = "1.0.71"
