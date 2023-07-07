@@ -31,7 +31,7 @@ pub struct PythonVersion {
     major: i32,
     minor: i32,
     build: i32,
-    value: String,
+    raw: String,
 }
 
 impl PythonVersion {
@@ -41,13 +41,13 @@ impl PythonVersion {
             major,
             minor,
             build,
-            value: format!("{major}.{minor}.{build}"),
+            raw: format!("{major}.{minor}.{build}"),
         }
     }
 
     #[must_use]
     pub fn as_str(&self) -> &str {
-        &self.value
+        &self.raw
     }
 }
 

@@ -34,14 +34,14 @@ pub enum OpenJdkVersionKind {
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct OpenJdkVersion {
-    pub raw: String,
-    pub kind: OpenJdkVersionKind,
-    pub major: u32,
-    pub minor: Option<u32>,
-    pub patch: Option<u32>,
-    pub build: Option<u32>,
-    pub qualifier1: u32,
-    pub qualifier2: Option<String>,
+    kind: OpenJdkVersionKind,
+    major: u32,
+    minor: Option<u32>,
+    patch: Option<u32>,
+    build: Option<u32>,
+    qualifier1: u32,
+    qualifier2: Option<String>,
+    raw: String,
 }
 
 type VersionQuad = (u32, Option<u32>, Option<u32>, Option<u32>);
@@ -86,7 +86,6 @@ impl FromStr for OpenJdkVersion {
             let (major, minor, patch, build) = Self::parse_dotted(s, prefix)?;
             let qualifier1 = Self::to_u32(suffix)?;
             return Ok(Self {
-                raw: String::from(s),
                 kind: OpenJdkVersionKind::V2,
                 major,
                 minor,
@@ -94,6 +93,7 @@ impl FromStr for OpenJdkVersion {
                 build,
                 qualifier1,
                 qualifier2: None,
+                raw: String::from(s),
             });
         }
 
