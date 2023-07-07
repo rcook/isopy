@@ -25,6 +25,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum IsopyLibError {
+    #[error("invalid URL {0}: {1}")]
+    InvalidUrl(String, anyhow::Error),
+
     #[error("checksum for file {0} is invalid")]
     ChecksumValidationFailed(PathBuf),
 

@@ -19,23 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::{IsopyLibError, IsopyLibResult};
 use anyhow::anyhow;
 use reqwest::{Response, Url};
 use std::collections::HashMap;
 use std::result::Result as StdResult;
 use std::str::FromStr;
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-pub enum LinkHeaderParseError {
-    #[error("invalid URL {0}: {1}")]
-    InvalidUrl(String, anyhow::Error),
-
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-pub type LinkHeaderParseErrorResult<T> = StdResult<T, LinkHeaderParseError>;
 
 #[derive(Debug)]
 pub struct LinkHeader {
@@ -46,7 +35,7 @@ pub struct LinkHeader {
 
 impl LinkHeader {
     #[allow(unused)]
-    pub fn from_response(response: &Response) -> LinkHeaderParseErrorResult<Option<Self>> {
+    pub fn from_response(response: &Response) -> IsopyLibResult<Option<Self>> {
         let Some(link_header) = response.headers().get("link") else {
             return Ok(None)
         };
@@ -78,22 +67,19 @@ impl LinkHeader {
             .collect::<HashMap<_, _>>()
     }
 
-    fn get_link_url(
-        links: &HashMap<String, String>,
-        k: &str,
-    ) -> LinkHeaderParseErrorResult<Option<Url>> {
+    fn get_link_url(links: &HashMap<String, String>, k: &str) -> IsopyLibResult<Option<Url>> {
         let Some(s) = links.get(k) else {
             return Ok(None)
         };
 
         Ok(Some(s.parse::<Url>().map_err(|e| {
-            LinkHeaderParseError::InvalidUrl(s.clone(), anyhow!(e))
+            IsopyLibError::InvalidUrl(s.clone(), anyhow!(e))
         })?))
     }
 }
 
 impl FromStr for LinkHeader {
-    type Err = LinkHeaderParseError;
+    type Err = IsopyLibError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let links = Self::parse_link_header(s);

@@ -24,16 +24,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
-use thiserror::Error;
 
-#[derive(Debug, Error)]
-pub enum PythonVersionParseError {
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
-}
-
-#[allow(unused)]
-pub type PythonVersionParseResult<T> = StdResult<T, PythonVersionParseError>;
+use crate::error::IsopyPythonError;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct PythonVersion {
@@ -61,15 +53,12 @@ impl PythonVersion {
 }
 
 impl FromStr for PythonVersion {
-    type Err = PythonVersionParseError;
+    type Err = IsopyPythonError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let parts = s.split('.').collect::<Vec<_>>();
         if parts.len() != 3 {
-            return Err(PythonVersionParseError::Other(anyhow!(
-                "invalid version \"{}\"",
-                s
-            )));
+            return Err(IsopyPythonError::InvalidVersion(String::from(s)));
         }
 
         let major = parts[0].parse::<i32>().map_err(|e| anyhow!(e))?;

@@ -24,6 +24,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum IsopyPythonError {
+    #[error("invalid version \"{0}\"")]
+    InvalidVersion(String),
+
     #[error("invalid repository name \"{0}\"")]
     InvalidRepositoryName(String),
 
