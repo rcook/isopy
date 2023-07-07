@@ -21,7 +21,7 @@
 //
 use crate::asset::Asset;
 use crate::constants::ISOPY_USER_AGENT;
-use crate::traits::Repository;
+use crate::repository::Repository;
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{dir_url, file_url, LastModified, ReqwestResponse, Response};

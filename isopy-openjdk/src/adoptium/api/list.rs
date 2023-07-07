@@ -35,21 +35,3 @@ where
         self.clone()
     }
 }
-
-pub trait Singleton {
-    type Item;
-
-    fn single(&self) -> Option<&Self::Item>;
-}
-
-impl<T> Singleton for Vec<T> {
-    type Item = T;
-
-    fn single(&self) -> Option<&Self::Item> {
-        if self.len() == 1 {
-            self.first()
-        } else {
-            None
-        }
-    }
-}

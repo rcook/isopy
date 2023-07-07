@@ -21,7 +21,7 @@
 //
 use crate::asset::Asset;
 use crate::constants::{ASSETS_DIR, RELEASES_FILE_NAME};
-use crate::traits::Repository;
+use crate::repository::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;

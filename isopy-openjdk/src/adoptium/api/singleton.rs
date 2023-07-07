@@ -19,21 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::adoptium::api::list::List;
-use crate::adoptium::api::version_data::VersionData;
-use serde::Deserialize;
+pub trait Singleton {
+    type Item;
 
-#[derive(Debug, Deserialize)]
-#[allow(unused)]
-pub struct Versions {
-    #[serde(rename = "versions")]
-    pub versions: Vec<VersionData>,
+    fn single(&self) -> Option<&Self::Item>;
 }
 
-impl List for Versions {
-    type Item = VersionData;
+impl<T> Singleton for Vec<T> {
+    type Item = T;
 
-    fn items(&self) -> Vec<Self::Item> {
-        self.versions.clone()
+    fn single(&self) -> Option<&Self::Item> {
+        if self.len() == 1 {
+            self.first()
+        } else {
+            None
+        }
     }
 }

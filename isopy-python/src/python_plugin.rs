@@ -29,10 +29,10 @@ use crate::constants::{
 use crate::github::GitHubRepository;
 use crate::local::LocalRepository;
 use crate::python_descriptor::PythonDescriptor;
+use crate::repository::Repository;
 use crate::repository_info::RepositoryInfo;
 use crate::repository_name::RepositoryName;
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
-use crate::traits::Repository;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{

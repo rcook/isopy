@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::repository::Repository;
 use crate::repository_name::RepositoryName;
-use crate::traits::Repository;
 
 pub struct RepositoryInfo {
     pub name: RepositoryName,

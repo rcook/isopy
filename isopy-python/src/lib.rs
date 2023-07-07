@@ -47,11 +47,11 @@ mod python_plugin;
 mod python_plugin_factory;
 mod python_standalone_builds;
 mod python_version;
+mod repository;
 mod repository_info;
 mod repository_name;
 mod result;
 mod serialization;
 mod tag;
-mod traits;
 
 pub use self::python_plugin_factory::PythonPluginFactory;
