@@ -63,12 +63,14 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    // TBD: Rename to "install"
     #[command(name = "add", about = "Add package to environment")]
     AddPackage {
         #[arg(help = "Package ID")]
         package_id: PackageId,
     },
 
+    // TBD: Make this is option of "install"
     #[command(
         name = "add-config",
         about = "Add packages defined in project configuration file to environment"
@@ -100,6 +102,7 @@ pub enum Command {
         args: Vec<String>,
     },
 
+    // TBD: Come up with a better name, maybe "config"
     #[command(name = "gen-config", about = "Generate configuration file")]
     GenConfig {
         #[arg(help = "Package ID")]

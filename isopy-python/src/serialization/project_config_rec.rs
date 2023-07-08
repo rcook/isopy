@@ -19,15 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_version::PythonVersion;
-use crate::tag::Tag;
+use crate::python_descriptor::PythonDescriptor;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectConfigRec {
-    #[serde(rename = "version")]
-    pub version: PythonVersion,
-
-    #[serde(rename = "tag", skip_serializing_if = "Option::is_none")]
-    pub tag: Option<Tag>,
+    #[serde(rename = "descriptor")]
+    pub descriptor: PythonDescriptor,
 }

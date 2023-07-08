@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::openjdk_version::OpenJdkVersion;
+use crate::openjdk_descriptor::OpenJdkDescriptor;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -28,6 +28,6 @@ pub struct EnvConfigRec {
     #[serde(rename = "dir")]
     pub dir: PathBuf,
 
-    #[serde(rename = "version")]
-    pub version: OpenJdkVersion,
+    #[serde(rename = "descriptor")]
+    pub descriptor: OpenJdkDescriptor,
 }

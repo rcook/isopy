@@ -24,6 +24,7 @@ use crate::error::{other_error, IsopyOpenJdkError};
 use crate::openjdk_version::OpenJdkVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibResult};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -52,6 +53,26 @@ impl Display for OpenJdkDescriptor {
     }
 }
 
+impl<'de> Deserialize<'de> for OpenJdkDescriptor {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+impl Serialize for OpenJdkDescriptor {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
 impl Descriptor for OpenJdkDescriptor {
     fn as_any(&self) -> &dyn Any {
         self
@@ -66,14 +87,14 @@ impl Descriptor for OpenJdkDescriptor {
     fn get_env_props(&self) -> IsopyLibResult<Value> {
         serde_json::to_value(EnvConfigRec {
             dir: ENV_DIR.clone(),
-            version: self.version.clone(),
+            descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)
     }
 
     fn get_project_props(&self) -> IsopyLibResult<Value> {
         serde_json::to_value(ProjectConfigRec {
-            version: self.version.clone(),
+            descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)
     }

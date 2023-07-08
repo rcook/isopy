@@ -51,10 +51,7 @@ impl PluginFactory for PythonPluginFactory {
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
         let project_config_rec = serde_json::from_value::<ProjectConfigRec>(props.clone())
             .map_err(isopy_lib_other_error)?;
-        Ok(Box::new(PythonDescriptor {
-            version: project_config_rec.version,
-            tag: project_config_rec.tag,
-        }))
+        Ok(Box::new(project_config_rec.descriptor))
     }
 
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {

@@ -24,6 +24,7 @@ use crate::python_version::PythonVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
 use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibError, IsopyLibResult};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -71,6 +72,26 @@ impl Display for PythonDescriptor {
     }
 }
 
+impl<'de> Deserialize<'de> for PythonDescriptor {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse::<Self>()
+            .map_err(serde::de::Error::custom)
+    }
+}
+
+impl Serialize for PythonDescriptor {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
 impl Descriptor for PythonDescriptor {
     fn as_any(&self) -> &dyn Any {
         self
@@ -83,16 +104,14 @@ impl Descriptor for PythonDescriptor {
     fn get_env_props(&self) -> IsopyLibResult<Value> {
         serde_json::to_value(EnvConfigRec {
             dir: ENV_DIR.clone(),
-            version: self.version.clone(),
-            tag: self.tag.clone(),
+            descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)
     }
 
     fn get_project_props(&self) -> IsopyLibResult<Value> {
         serde_json::to_value(ProjectConfigRec {
-            version: self.version.clone(),
-            tag: self.tag.clone(),
+            descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)
     }

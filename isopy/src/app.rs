@@ -24,7 +24,7 @@ use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
-use isopy_lib::Descriptor;
+use isopy_lib::{Descriptor, Package};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file};
 use std::collections::HashMap;
@@ -82,9 +82,19 @@ impl App {
 
         let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
         let plugin = plugin_host.make_plugin(&plugin_dir);
-        let asset_path = plugin.download_package(descriptor).await?;
+        let Package {
+            asset_path,
+            descriptor,
+        } = plugin.download_package(descriptor).await?;
 
-        unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
+        // TBD: Introduce a new Package struct where descriptor is not Option
+        let descriptor = descriptor.expect("must be valid");
+
+        unpack_file(
+            descriptor.as_ref().as_ref(),
+            &asset_path,
+            dir_info.data_dir(),
+        )?;
 
         packages.push(PackageRec {
             id: String::from(plugin_host.prefix()),

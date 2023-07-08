@@ -229,11 +229,11 @@ impl Plugin for PythonPlugin {
             .filter(assets.iter())
             .into_iter()
             .map(|asset| Package {
+                asset_path: self.assets_dir.join(asset.name.clone()),
                 descriptor: Some(Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
                 }))),
-                asset_path: self.assets_dir.join(asset.name.clone()),
             })
             .collect::<Vec<_>>())
     }
@@ -270,7 +270,7 @@ impl Plugin for PythonPlugin {
         Ok(packages)
     }
 
-    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf> {
+    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
         let descriptor = descriptor
             .as_any()
             .downcast_ref::<PythonDescriptor>()
@@ -282,6 +282,13 @@ impl Plugin for PythonPlugin {
             .first()
             .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
         let asset_path = download_asset(repository, asset, &self.assets_dir).await?;
-        Ok(asset_path)
+
+        Ok(Package {
+            asset_path,
+            descriptor: Some(Arc::new(Box::new(PythonDescriptor {
+                version: descriptor.version.clone(),
+                tag: Some(asset.tag.clone()),
+            }))),
+        })
     }
 }

@@ -92,7 +92,7 @@ impl Plugin for OpenJdkPlugin {
         Ok(packages)
     }
 
-    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf> {
+    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
         let descriptor = descriptor
             .as_any()
             .downcast_ref::<OpenJdkDescriptor>()
@@ -110,7 +110,10 @@ impl Plugin for OpenJdkPlugin {
         let asset_path = self.assets_dir.join(&version.file_name);
         if asset_path.exists() {
             info!("asset {} already downloaded", version.file_name);
-            return Ok(asset_path);
+            return Ok(Package {
+                asset_path,
+                descriptor: Some(Arc::new(Box::new(descriptor.clone()))),
+            });
         }
 
         manager.download_asset(&version.url, &asset_path).await?;
@@ -126,6 +129,9 @@ impl Plugin for OpenJdkPlugin {
             asset_path.display()
         );
 
-        Ok(asset_path)
+        Ok(Package {
+            asset_path,
+            descriptor: Some(Arc::new(Box::new(descriptor.clone()))),
+        })
     }
 }
