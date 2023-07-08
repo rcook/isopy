@@ -96,7 +96,7 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
 
         for package_rec in &env_rec.packages {
             if let Ok(Some(env_info)) =
-                Registry::global().get_env_info(dir_info.data_dir(), package_rec)
+                Registry::global().make_env_info(dir_info.data_dir(), package_rec)
             {
                 print_value("Package", &package_rec.id);
                 if let Ok(s) = serde_yaml::to_string(&package_rec.props) {

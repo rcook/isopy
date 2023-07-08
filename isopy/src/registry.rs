@@ -72,7 +72,7 @@ impl Registry {
         })
     }
 
-    pub fn get_env_info(
+    pub fn make_env_info(
         &self,
         data_dir: &Path,
         package_rec: &PackageRec,
