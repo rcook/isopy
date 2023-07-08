@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::result::IsopyLibResult;
+use serde_json::Value;
 use std::any::Any;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};
@@ -28,8 +29,8 @@ use std::sync::Arc;
 pub trait Descriptor: Any + Debug + Display + Send + Sync {
     fn as_any(&self) -> &dyn Any;
     fn transform_archive_path(&self, path: &Path) -> PathBuf;
-    fn get_env_config(&self) -> IsopyLibResult<serde_json::Value>;
-    fn get_project_config(&self) -> IsopyLibResult<serde_json::Value>;
+    fn get_env_props(&self) -> IsopyLibResult<Value>;
+    fn get_project_props(&self) -> IsopyLibResult<Value>;
 }
 
 pub type DescriptorRef = Arc<Box<dyn Descriptor>>;

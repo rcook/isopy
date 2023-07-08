@@ -88,7 +88,7 @@ impl App {
 
         packages.push(PackageRec {
             id: String::from(plugin_host.prefix()),
-            properties: descriptor.get_env_config()?,
+            props: descriptor.get_env_props()?,
         });
 
         safe_write_file(

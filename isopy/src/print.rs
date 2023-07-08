@@ -72,7 +72,7 @@ pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>) {
 
         for package_rec in &env_rec.packages {
             print_value("Package", &package_rec.id);
-            if let Ok(s) = serde_yaml::to_string(&package_rec.properties) {
+            if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
                 for line in s.lines() {
                     println!("    {line}");
                 }
@@ -99,7 +99,7 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
                 Registry::global().get_env_info(dir_info.data_dir(), package_rec)
             {
                 print_value("Package", &package_rec.id);
-                if let Ok(s) = serde_yaml::to_string(&package_rec.properties) {
+                if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
                     for line in s.lines() {
                         println!("    {line}");
                     }

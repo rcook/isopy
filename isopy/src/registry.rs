@@ -85,7 +85,7 @@ impl Registry {
         };
 
         Ok(Some(
-            plugin_host.read_env_config(data_dir, &package_rec.properties)?,
+            plugin_host.make_env_info(data_dir, &package_rec.props)?,
         ))
     }
 

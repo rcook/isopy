@@ -28,6 +28,7 @@ use isopy_lib::{
     other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
     PluginFactory,
 };
+use serde_json::Value;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -48,11 +49,8 @@ impl PluginFactory for OpenJdkPluginFactory {
         &ADOPTIUM_SERVER_URL
     }
 
-    fn read_project_config(
-        &self,
-        value: &serde_json::Value,
-    ) -> IsopyLibResult<Box<dyn Descriptor>> {
-        let project_config_rec = serde_json::from_value::<ProjectConfigRec>(value.clone())
+    fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
+        let project_config_rec = serde_json::from_value::<ProjectConfigRec>(props.clone())
             .map_err(isopy_lib_other_error)?;
         Ok(Box::new(OpenJdkDescriptor {
             version: project_config_rec.version,
@@ -66,11 +64,7 @@ impl PluginFactory for OpenJdkPluginFactory {
         ))
     }
 
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo> {
+    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo> {
         #[cfg(target_os = "macos")]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![data_dir
@@ -85,8 +79,8 @@ impl PluginFactory for OpenJdkPluginFactory {
             vec![data_dir.join(&env_config_rec.dir).join("bin")]
         }
 
-        let env_config_rec = serde_json::from_value::<EnvConfigRec>(properties.clone())
-            .map_err(isopy_lib_other_error)?;
+        let env_config_rec =
+            serde_json::from_value::<EnvConfigRec>(props.clone()).map_err(isopy_lib_other_error)?;
 
         let openjdk_dir = data_dir.join(&env_config_rec.dir);
         let openjdk_dir_str = String::from(

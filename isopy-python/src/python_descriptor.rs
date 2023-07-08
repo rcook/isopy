@@ -24,6 +24,7 @@ use crate::python_version::PythonVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
 use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibError, IsopyLibResult};
+use serde_json::Value;
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -79,7 +80,7 @@ impl Descriptor for PythonDescriptor {
         path.to_path_buf()
     }
 
-    fn get_env_config(&self) -> IsopyLibResult<serde_json::Value> {
+    fn get_env_props(&self) -> IsopyLibResult<Value> {
         serde_json::to_value(EnvConfigRec {
             dir: ENV_DIR.clone(),
             version: self.version.clone(),
@@ -88,7 +89,7 @@ impl Descriptor for PythonDescriptor {
         .map_err(isopy_lib_other_error)
     }
 
-    fn get_project_config(&self) -> IsopyLibResult<serde_json::Value> {
+    fn get_project_props(&self) -> IsopyLibResult<Value> {
         serde_json::to_value(ProjectConfigRec {
             version: self.version.clone(),
             tag: self.tag.clone(),

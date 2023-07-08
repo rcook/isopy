@@ -63,7 +63,7 @@ pub async fn add_packages_from_project_config(app: &App) -> Result<Status> {
 
         descriptors.push((
             *plugin_host,
-            plugin_host.read_project_config(&package_rec.properties)?,
+            plugin_host.read_project_config(&package_rec.props)?,
         ));
     }
 

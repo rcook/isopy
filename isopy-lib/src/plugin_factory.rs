@@ -22,18 +22,14 @@
 use crate::plugin::Plugin;
 use crate::{Descriptor, EnvInfo, IsopyLibResult};
 use reqwest::Url;
+use serde_json::Value;
 use std::path::Path;
 
 pub trait PluginFactory: Send + Sync {
     fn name(&self) -> &str;
     fn source_url(&self) -> &Url;
-    fn read_project_config(&self, value: &serde_json::Value)
-        -> IsopyLibResult<Box<dyn Descriptor>>;
+    fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>>;
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
-    fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> IsopyLibResult<EnvInfo>;
+    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo>;
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin>;
 }

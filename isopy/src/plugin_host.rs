@@ -21,6 +21,7 @@
 //
 use anyhow::Result;
 use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory};
+use serde_json::Value;
 use std::path::Path;
 use url::Url;
 
@@ -53,16 +54,12 @@ impl PluginHost {
         Ok(self.plugin_factory.parse_descriptor(s)?)
     }
 
-    pub fn read_project_config(&self, value: &serde_json::Value) -> Result<Box<dyn Descriptor>> {
-        Ok(self.plugin_factory.read_project_config(value)?)
+    pub fn read_project_config(&self, props: &Value) -> Result<Box<dyn Descriptor>> {
+        Ok(self.plugin_factory.read_project_config(props)?)
     }
 
-    pub fn read_env_config(
-        &self,
-        data_dir: &Path,
-        properties: &serde_json::Value,
-    ) -> Result<EnvInfo> {
-        Ok(self.plugin_factory.read_env_config(data_dir, properties)?)
+    pub fn make_env_info(&self, data_dir: &Path, props: &Value) -> Result<EnvInfo> {
+        Ok(self.plugin_factory.make_env_info(data_dir, props)?)
     }
 
     pub fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {

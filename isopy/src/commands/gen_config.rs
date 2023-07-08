@@ -45,7 +45,7 @@ pub fn do_gen_config(app: &App, package_id: &PackageId) -> Result<Status> {
 
     packages.push(PackageRec {
         id: String::from(id),
-        properties: package_id.descriptor().get_project_config()?,
+        props: package_id.descriptor().get_project_props()?,
     });
 
     safe_write_file(

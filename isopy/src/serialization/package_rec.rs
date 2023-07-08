@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PackageRec {
@@ -27,5 +28,5 @@ pub struct PackageRec {
     pub id: String,
 
     #[serde(flatten)]
-    pub properties: serde_json::Value,
+    pub props: Value,
 }

@@ -26,6 +26,7 @@ use crate::status::Status;
 use anyhow::Result;
 use colored::Colorize;
 use joatmon::read_yaml_file;
+use serde_json::Value;
 use std::env::{var, VarError};
 
 pub fn do_prompt(app: &App) -> Result<Status> {
@@ -51,10 +52,10 @@ pub fn do_prompt(app: &App) -> Result<Status> {
                     .packages
                     .iter()
                     .map(|p| {
-                        p.properties
+                        p.props
                             .as_object()
                             .and_then(|x| x.get("version"))
-                            .and_then(serde_json::Value::as_str)
+                            .and_then(Value::as_str)
                             .map_or_else(|| p.id.clone(), |x| format!("{}-{}", p.id, x))
                     })
                     .collect::<Vec<_>>()
