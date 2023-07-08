@@ -20,7 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod env_rec;
-mod package_dir_rec;
+mod package_rec;
+mod project_rec;
 
 pub use self::env_rec::EnvRec;
-pub use self::package_dir_rec::PackageDirRec;
+pub use self::package_rec::PackageRec;
+pub use self::project_rec::ProjectRec;

@@ -20,25 +20,42 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::package_id::PackageId;
+use crate::serialization::{PackageRec, ProjectRec};
 use crate::status::Status;
 use anyhow::Result;
-use joatmon::safe_write_file;
-use log::info;
+use joatmon::{read_yaml_file, safe_write_file};
+use log::{error, info};
 
-pub fn do_gen_config(app: &App, package_id: &PackageId, force: bool) -> Result<Status> {
-    let project_config_file_name = package_id.plugin_host().project_config_file_name();
-    let project_config_info = package_id.descriptor().get_project_config_info()?;
-    let project_config_path = app.cwd.join(project_config_file_name);
+pub fn do_gen_config(app: &App, package_id: &PackageId) -> Result<Status> {
+    let project_config_path = app.cwd.join(&*PROJECT_CONFIG_FILE_NAME);
+
+    let mut packages = if project_config_path.is_file() {
+        read_yaml_file::<ProjectRec>(&project_config_path)?.packages
+    } else {
+        Vec::new()
+    };
+
+    let id = package_id.plugin_host().prefix();
+    if packages.iter().any(|p| p.id == id) {
+        error!("environment already has a package with ID \"{id}\" configured");
+        return Ok(Status::Fail);
+    }
+
+    packages.push(PackageRec {
+        id: String::from(id),
+        properties: package_id.descriptor().get_project_config()?,
+    });
 
     safe_write_file(
         &project_config_path,
-        serde_yaml::to_string(&project_config_info.value)?,
-        force,
+        serde_yaml::to_string(&ProjectRec { packages })?,
+        true,
     )?;
 
     info!(
-        "generated project configuration file {}",
+        "added package \"{id}\" to project configuration file {}",
         project_config_path.display()
     );
 

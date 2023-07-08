@@ -1,4 +1,3 @@
-use crate::constants::ENV_DIR;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -20,10 +19,11 @@ use crate::constants::ENV_DIR;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::ENV_DIR;
 use crate::python_version::PythonVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
-use isopy_lib::{other_error, Descriptor, IsopyLibError, IsopyLibResult, ProjectConfigInfo};
+use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibError, IsopyLibResult};
 use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::{Path, PathBuf};
@@ -43,16 +43,19 @@ impl FromStr for PythonDescriptor {
         match s.split_once(':') {
             Some((prefix, suffix)) => prefix
                 .parse::<PythonVersion>()
-                .map_err(other_error)
+                .map_err(isopy_lib_other_error)
                 .and_then(|version| {
-                    suffix.parse::<Tag>().map_err(other_error).map(|tag| Self {
-                        version,
-                        tag: Some(tag),
-                    })
+                    suffix
+                        .parse::<Tag>()
+                        .map_err(isopy_lib_other_error)
+                        .map(|tag| Self {
+                            version,
+                            tag: Some(tag),
+                        })
                 }),
             None => s
                 .parse::<PythonVersion>()
-                .map_err(other_error)
+                .map_err(isopy_lib_other_error)
                 .map(|version| Self { version, tag: None }),
         }
     }
@@ -76,23 +79,21 @@ impl Descriptor for PythonDescriptor {
         path.to_path_buf()
     }
 
-    fn get_env_config_value(&self) -> IsopyLibResult<serde_json::Value> {
+    fn get_env_config(&self) -> IsopyLibResult<serde_json::Value> {
         serde_json::to_value(EnvConfigRec {
             dir: ENV_DIR.clone(),
             version: self.version.clone(),
             tag: self.tag.clone(),
         })
-        .map_err(other_error)
+        .map_err(isopy_lib_other_error)
     }
 
-    fn get_project_config_info(&self) -> IsopyLibResult<ProjectConfigInfo> {
-        Ok(ProjectConfigInfo {
-            value: serde_json::to_value(ProjectConfigRec {
-                version: self.version.clone(),
-                tag: self.tag.clone(),
-            })
-            .map_err(other_error)?,
+    fn get_project_config(&self) -> IsopyLibResult<serde_json::Value> {
+        serde_json::to_value(ProjectConfigRec {
+            version: self.version.clone(),
+            tag: self.tag.clone(),
         })
+        .map_err(isopy_lib_other_error)
     }
 }
 

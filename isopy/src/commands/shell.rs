@@ -50,8 +50,8 @@ pub fn do_shell(app: App) -> Result<Status> {
     let mut path_dirs = Vec::new();
     let mut envs = Vec::new();
 
-    for package_dir_rec in &env_rec.package_dirs {
-        let Some(env_info) = Registry::global().get_env_info(dir_info.data_dir(), package_dir_rec)? else {
+    for package_rec in &env_rec.packages {
+        let Some(env_info) = Registry::global().get_env_info(dir_info.data_dir(), package_rec)? else {
             error!("could not get environment info");
             return Ok(Status::Fail);
         };

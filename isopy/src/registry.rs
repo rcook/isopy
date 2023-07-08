@@ -22,7 +22,7 @@
 use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::PluginHost;
-use crate::serialization::PackageDirRec;
+use crate::serialization::PackageRec;
 use anyhow::{bail, Result};
 use isopy_lib::EnvInfo;
 use isopy_openjdk::OpenJdkPluginFactory;
@@ -75,17 +75,17 @@ impl Registry {
     pub fn get_env_info(
         &self,
         data_dir: &Path,
-        package_dir_rec: &PackageDirRec,
+        package_rec: &PackageRec,
     ) -> Result<Option<EnvInfo>> {
         let Some(plugin_host) = self
             .plugin_hosts
             .iter()
-            .find(|p| p.prefix() == package_dir_rec.id) else {
+            .find(|p| p.prefix() == package_rec.id) else {
             return Ok(None);
         };
 
         Ok(Some(
-            plugin_host.read_env_config(data_dir, &package_dir_rec.properties)?,
+            plugin_host.read_env_config(data_dir, &package_rec.properties)?,
         ))
     }
 

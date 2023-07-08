@@ -19,17 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::result::IsopyLibResult;
-use std::any::Any;
-use std::fmt::{Debug, Display};
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use serde::{Deserialize, Serialize};
 
-pub trait Descriptor: Any + Debug + Display + Send + Sync {
-    fn as_any(&self) -> &dyn Any;
-    fn transform_archive_path(&self, path: &Path) -> PathBuf;
-    fn get_env_config(&self) -> IsopyLibResult<serde_json::Value>;
-    fn get_project_config(&self) -> IsopyLibResult<serde_json::Value>;
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PackageRec {
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(flatten)]
+    pub properties: serde_json::Value,
 }
-
-pub type DescriptorRef = Arc<Box<dyn Descriptor>>;

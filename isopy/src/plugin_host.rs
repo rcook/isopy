@@ -21,7 +21,6 @@
 //
 use anyhow::Result;
 use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory};
-use std::ffi::OsStr;
 use std::path::Path;
 use url::Url;
 
@@ -54,12 +53,8 @@ impl PluginHost {
         Ok(self.plugin_factory.parse_descriptor(s)?)
     }
 
-    pub fn project_config_file_name(&self) -> &OsStr {
-        self.plugin_factory.project_config_file_name()
-    }
-
-    pub fn read_project_config_file(&self, path: &Path) -> Result<Box<dyn Descriptor>> {
-        Ok(self.plugin_factory.read_project_config_file(path)?)
+    pub fn read_project_config(&self, value: &serde_json::Value) -> Result<Box<dyn Descriptor>> {
+        Ok(self.plugin_factory.read_project_config(value)?)
     }
 
     pub fn read_env_config(

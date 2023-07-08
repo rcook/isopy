@@ -104,13 +104,6 @@ pub enum Command {
     GenConfig {
         #[arg(help = "Package ID")]
         package_id: PackageId,
-
-        #[arg(
-            short = 'f',
-            long = "force",
-            help = "Force overwrite of configuration file"
-        )]
-        force: bool,
     },
 
     #[command(name = "info", about = "Show information")]

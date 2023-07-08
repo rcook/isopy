@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME, RELEASES_URL};
+use crate::constants::{PLUGIN_NAME, RELEASES_URL};
 use crate::python_descriptor::PythonDescriptor;
 use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
@@ -27,8 +27,6 @@ use isopy_lib::{
     other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
     PluginFactory,
 };
-use joatmon::read_yaml_file;
-use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -49,14 +47,12 @@ impl PluginFactory for PythonPluginFactory {
         &RELEASES_URL
     }
 
-    fn project_config_file_name(&self) -> &OsStr {
-        &PROJECT_CONFIG_FILE_NAME
-    }
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
-        let project_config_rec =
-            read_yaml_file::<ProjectConfigRec>(path).map_err(isopy_lib_other_error)?;
-
+    fn read_project_config(
+        &self,
+        value: &serde_json::Value,
+    ) -> IsopyLibResult<Box<dyn Descriptor>> {
+        let project_config_rec = serde_json::from_value::<ProjectConfigRec>(value.clone())
+            .map_err(isopy_lib_other_error)?;
         Ok(Box::new(PythonDescriptor {
             version: project_config_rec.version,
             tag: project_config_rec.tag,

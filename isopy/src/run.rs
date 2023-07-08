@@ -87,7 +87,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Command::Check { clean } => do_check(&app, clean),
         Command::Download { package_id } => do_download(&app, &package_id).await,
         Command::Exec { program, args } => do_exec(app, &program, &args),
-        Command::GenConfig { package_id, force } => do_gen_config(&app, &package_id, force),
+        Command::GenConfig { package_id } => do_gen_config(&app, &package_id),
         Command::Info => do_info(&app),
         Command::Link { meta_id } => do_link(&app, &meta_id),
         Command::List => do_list(&app),

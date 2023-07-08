@@ -26,6 +26,7 @@ use std::path::PathBuf;
 lazy_static! {
     pub static ref CACHE_DIR: PathBuf = PathBuf::from(".isopy");
     pub static ref ENV_CONFIG_FILE_NAME: OsString = OsString::from("env.yaml");
+    pub static ref PROJECT_CONFIG_FILE_NAME: OsString = OsString::from(".isopy.yaml");
 }
 
 pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";

@@ -70,9 +70,9 @@ pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>) {
     if let Some(env_rec) = env_rec {
         print_value("Project directory", env_rec.project_dir.display());
 
-        for package_dir_rec in &env_rec.package_dirs {
-            print_value("Package", &package_dir_rec.id);
-            if let Ok(s) = serde_yaml::to_string(&package_dir_rec.properties) {
+        for package_rec in &env_rec.packages {
+            print_value("Package", &package_rec.id);
+            if let Ok(s) = serde_yaml::to_string(&package_rec.properties) {
                 for line in s.lines() {
                     println!("    {line}");
                 }
@@ -94,12 +94,12 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
     if let Some(env_rec) = env_rec {
         print_value("Project directory", env_rec.project_dir.display());
 
-        for package_dir_rec in &env_rec.package_dirs {
+        for package_rec in &env_rec.packages {
             if let Ok(Some(env_info)) =
-                Registry::global().get_env_info(dir_info.data_dir(), package_dir_rec)
+                Registry::global().get_env_info(dir_info.data_dir(), package_rec)
             {
-                print_value("Package", &package_dir_rec.id);
-                if let Ok(s) = serde_yaml::to_string(&package_dir_rec.properties) {
+                print_value("Package", &package_rec.id);
+                if let Ok(s) = serde_yaml::to_string(&package_rec.properties) {
                     for line in s.lines() {
                         println!("    {line}");
                     }

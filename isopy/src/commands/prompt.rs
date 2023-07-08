@@ -48,7 +48,7 @@ pub fn do_prompt(app: &App) -> Result<Status> {
         if let Some(env_rec) = env_rec {
             prompt.push_str(
                 &env_rec
-                    .package_dirs
+                    .packages
                     .iter()
                     .map(|p| {
                         p.properties
@@ -64,7 +64,7 @@ pub fn do_prompt(app: &App) -> Result<Status> {
             prompt.push_str("(isopy error)");
         }
     } else if let Some(env_rec) = env_rec {
-        if !env_rec.package_dirs.is_empty() {
+        if !env_rec.packages.is_empty() {
             prompt.push_str("Run \"isopy shell\"");
         }
     }

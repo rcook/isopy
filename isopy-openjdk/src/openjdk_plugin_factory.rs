@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{ADOPTIUM_SERVER_URL, PLUGIN_NAME, PROJECT_CONFIG_FILE_NAME};
+use crate::constants::{ADOPTIUM_SERVER_URL, PLUGIN_NAME};
 use crate::openjdk_descriptor::OpenJdkDescriptor;
 use crate::openjdk_plugin::OpenJdkPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
@@ -28,8 +28,6 @@ use isopy_lib::{
     other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
     PluginFactory,
 };
-use joatmon::read_yaml_file;
-use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -50,15 +48,14 @@ impl PluginFactory for OpenJdkPluginFactory {
         &ADOPTIUM_SERVER_URL
     }
 
-    fn project_config_file_name(&self) -> &OsStr {
-        &PROJECT_CONFIG_FILE_NAME
-    }
-
-    fn read_project_config_file(&self, path: &Path) -> IsopyLibResult<Box<dyn Descriptor>> {
+    fn read_project_config(
+        &self,
+        value: &serde_json::Value,
+    ) -> IsopyLibResult<Box<dyn Descriptor>> {
+        let project_config_rec = serde_json::from_value::<ProjectConfigRec>(value.clone())
+            .map_err(isopy_lib_other_error)?;
         Ok(Box::new(OpenJdkDescriptor {
-            version: read_yaml_file::<ProjectConfigRec>(path)
-                .map_err(isopy_lib_other_error)?
-                .version,
+            version: project_config_rec.version,
         }))
     }
 

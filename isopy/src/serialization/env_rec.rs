@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::PackageDirRec;
+use crate::serialization::PackageRec;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -28,6 +28,6 @@ pub struct EnvRec {
     #[serde(rename = "project_dir")]
     pub project_dir: PathBuf,
 
-    #[serde(rename = "package_dirs")]
-    pub package_dirs: Vec<PackageDirRec>,
+    #[serde(rename = "packages")]
+    pub packages: Vec<PackageRec>,
 }

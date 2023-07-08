@@ -20,13 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::plugin_host::PluginHost;
+use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::registry::Registry;
+use crate::serialization::ProjectRec;
 use crate::status::Status;
 use anyhow::Result;
+use joatmon::read_yaml_file;
 use log::error;
-use std::path::PathBuf;
-use std::sync::Arc;
+use std::collections::HashMap;
 
 pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
@@ -34,25 +35,41 @@ pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
         return Ok(Status::Fail);
     }
 
-    let Some((plugin_host, project_config_path)) = get_plugin_host_and_project_config_path(app) else {
-        error!("no project configuration file was found in {}", app.cwd.display());
-        return Ok(Status::Fail)
-    };
-
-    let descriptor = plugin_host.read_project_config_file(&project_config_path)?;
-
-    app.add_package(&plugin_host, descriptor.as_ref()).await?;
-
-    Ok(Status::OK)
-}
-
-fn get_plugin_host_and_project_config_path(app: &App) -> Option<(Arc<PluginHost>, PathBuf)> {
-    for plugin_host in &Registry::global().plugin_hosts {
-        let project_config_path = app.cwd.join(plugin_host.project_config_file_name());
-        if project_config_path.is_file() {
-            return Some((Arc::clone(plugin_host), project_config_path));
-        }
+    let project_config_path = app.cwd.join(&*PROJECT_CONFIG_FILE_NAME);
+    if !project_config_path.is_file() {
+        error!(
+            "no project configuration file in directory {}",
+            app.cwd.display()
+        );
+        return Ok(Status::Fail);
     }
 
-    None
+    let plugin_hosts = Registry::global()
+        .plugin_hosts
+        .iter()
+        .map(|h| (String::from(h.prefix()), h))
+        .collect::<HashMap<_, _>>();
+
+    let mut descriptors = Vec::new();
+    let project_rec = read_yaml_file::<ProjectRec>(&project_config_path)?;
+    for package_rec in project_rec.packages {
+        let Some(plugin_host) = plugin_hosts.get(&package_rec.id) else {
+            error!(
+                "no project configuration file in directory {}",
+                app.cwd.display()
+            );
+            return Ok(Status::Fail);
+        };
+
+        descriptors.push((
+            *plugin_host,
+            plugin_host.read_project_config(&package_rec.properties)?,
+        ));
+    }
+
+    for (plugin_host, descriptor) in descriptors {
+        app.add_package(plugin_host, descriptor.as_ref()).await?;
+    }
+
+    Ok(Status::OK)
 }

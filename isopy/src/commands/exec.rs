@@ -44,14 +44,14 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
 
     let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME))?;
 
-    let package_dir_rec = env_rec.package_dirs.first();
+    let package_rec = env_rec.packages.first();
 
-    let Some(package_dir_rec) = package_dir_rec else {
+    let Some(package_rec) = package_rec else {
         error!("could not find default package directory");
         return Ok(Status::Fail);
     };
 
-    let Some(env_info) = &Registry::global().get_env_info(dir_info.data_dir(), package_dir_rec)? else {
+    let Some(env_info) = &Registry::global().get_env_info(dir_info.data_dir(), package_rec)? else {
         error!("could not get environment info");
         return Ok(Status::Fail);
     };

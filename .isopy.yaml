@@ -1,0 +1,6 @@
+packages:
+- id: python
+  tag: '20230507'
+  version: 3.11.3
+- id: openjdk
+  version: 20.0.1+9

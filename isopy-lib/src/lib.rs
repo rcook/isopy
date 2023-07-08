@@ -49,7 +49,7 @@ mod result;
 mod url;
 
 pub use self::checksum::verify_sha256_file_checksum;
-pub use self::descriptor::{Descriptor, DescriptorRef, ProjectConfigInfo};
+pub use self::descriptor::{Descriptor, DescriptorRef};
 pub use self::download::download_stream;
 pub use self::env_info::EnvInfo;
 pub use self::error::{other_error, IsopyLibError};

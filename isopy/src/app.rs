@@ -21,7 +21,7 @@
 //
 use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::plugin_host::PluginHost;
-use crate::serialization::{EnvRec, PackageDirRec};
+use crate::serialization::{EnvRec, PackageRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::Descriptor;
@@ -46,7 +46,7 @@ impl App {
         descriptor: &dyn Descriptor,
     ) -> Result<()> {
         let project_dir = self.cwd.clone();
-        let mut package_dirs = Vec::new();
+        let mut packages = Vec::new();
 
         let (dir_info, env_config_path) = if let Some(dir_info) = self.repo.get(&project_dir)? {
             let env_config_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
@@ -59,7 +59,7 @@ impl App {
                 );
             }
 
-            package_dirs.extend(env_rec.package_dirs);
+            packages.extend(env_rec.packages);
             (dir_info, env_config_path)
         } else {
             let Some(dir_info) = self.repo.init(&project_dir)? else {
@@ -73,7 +73,7 @@ impl App {
             (dir_info, env_config_path)
         };
 
-        if package_dirs.iter().any(|p| p.id == plugin_host.prefix()) {
+        if packages.iter().any(|p| p.id == plugin_host.prefix()) {
             bail!(
                 "environment already has a package with ID {} configured",
                 plugin_host.prefix()
@@ -86,16 +86,16 @@ impl App {
 
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 
-        package_dirs.push(PackageDirRec {
+        packages.push(PackageRec {
             id: String::from(plugin_host.prefix()),
-            properties: descriptor.get_env_config_value()?,
+            properties: descriptor.get_env_config()?,
         });
 
         safe_write_file(
             &env_config_path,
             serde_yaml::to_string(&EnvRec {
                 project_dir,
-                package_dirs,
+                packages,
             })?,
             true,
         )?;
