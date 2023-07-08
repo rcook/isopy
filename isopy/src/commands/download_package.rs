@@ -24,10 +24,10 @@ use crate::package_id::PackageId;
 use crate::status::Status;
 use anyhow::Result;
 
-pub async fn do_download(app: &App, package_id: &PackageId) -> Result<Status> {
+pub async fn download_package(app: &App, package_id: &PackageId) -> Result<Status> {
     let plugin_host = package_id.plugin_host();
     let plugin_dir = app.repo.shared_dir().join(plugin_host.prefix());
     let plugin = plugin_host.make_plugin(&plugin_dir);
-    _ = plugin.download_asset(package_id.descriptor()).await?;
+    _ = plugin.download_package(package_id.descriptor()).await?;
     Ok(Status::OK)
 }

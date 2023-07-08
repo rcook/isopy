@@ -92,7 +92,7 @@ impl Plugin for OpenJdkPlugin {
         Ok(packages)
     }
 
-    async fn download_asset(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf> {
+    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf> {
         let descriptor = descriptor
             .as_any()
             .downcast_ref::<OpenJdkDescriptor>()

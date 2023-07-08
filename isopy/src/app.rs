@@ -82,7 +82,7 @@ impl App {
 
         let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
         let plugin = plugin_host.make_plugin(&plugin_dir);
-        let asset_path = plugin.download_asset(descriptor).await?;
+        let asset_path = plugin.download_package(descriptor).await?;
 
         unpack_file(descriptor, &asset_path, dir_info.data_dir())?;
 

@@ -84,8 +84,8 @@ pub enum Command {
         clean: bool,
     },
 
-    #[command(name = "download", about = "Download product")]
-    Download {
+    #[command(name = "download", about = "Download package")]
+    DownloadPackage {
         #[arg(help = "Package ID")]
         package_id: PackageId,
     },

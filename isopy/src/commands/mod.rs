@@ -22,7 +22,7 @@
 mod add_package;
 mod add_packages_from_project_config;
 mod check;
-mod download;
+mod download_package;
 mod exec;
 mod gen_config;
 mod info;
@@ -38,7 +38,7 @@ mod wrap;
 pub use self::add_package::do_add_package;
 pub use self::add_packages_from_project_config::add_packages_from_project_config;
 pub use self::check::do_check;
-pub use self::download::do_download;
+pub use self::download_package::download_package;
 pub use self::exec::do_exec;
 pub use self::gen_config::do_gen_config;
 pub use self::info::do_info;

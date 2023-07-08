@@ -29,5 +29,5 @@ use std::path::PathBuf;
 pub trait Plugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
-    async fn download_asset(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf>;
+    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<PathBuf>;
 }
