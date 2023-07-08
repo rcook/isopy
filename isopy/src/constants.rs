@@ -19,6 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use lazy_static::lazy_static;
+use std::ffi::OsString;
+use std::path::PathBuf;
+
+lazy_static! {
+    pub static ref CACHE_DIR: PathBuf = PathBuf::from(".isopy");
+    pub static ref ENV_CONFIG_FILE_NAME: OsString = OsString::from("env.yaml");
+}
+
 pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
 pub const OPENJDK_DESCRIPTOR_PREFIX: &str = "openjdk";
@@ -28,9 +37,5 @@ pub type ExitCode = i32;
 pub const OK: ExitCode = 0;
 
 pub const ERROR: ExitCode = 1;
-
-pub const CACHE_DIR_NAME: &str = ".isopy";
-
-pub const ENV_FILE_NAME: &str = "env.yaml";
 
 pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";

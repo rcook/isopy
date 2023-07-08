@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ENV_FILE_NAME;
+use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageDirRec};
 use crate::unpack::unpack_file;
@@ -49,7 +49,7 @@ impl App {
         let mut package_dirs = Vec::new();
 
         let (dir_info, env_config_path) = if let Some(dir_info) = self.repo.get(&project_dir)? {
-            let env_config_path = dir_info.data_dir().join(ENV_FILE_NAME);
+            let env_config_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
             let env_rec = read_yaml_file::<EnvRec>(&env_config_path)?;
             if env_rec.project_dir != project_dir {
                 bail!(
@@ -69,7 +69,7 @@ impl App {
                 )
             };
 
-            let env_config_path = dir_info.data_dir().join(ENV_FILE_NAME);
+            let env_config_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
             (dir_info, env_config_path)
         };
 

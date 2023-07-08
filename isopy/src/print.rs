@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ENV_FILE_NAME;
+use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::plugin_host::PluginHost;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
@@ -131,7 +131,7 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
 pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     print_title("Environment info");
 
-    let env_yaml_path = dir_info.data_dir().join(ENV_FILE_NAME);
+    let env_yaml_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
     let env_rec = if env_yaml_path.is_file() {
         Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
     } else {

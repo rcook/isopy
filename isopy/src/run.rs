@@ -27,7 +27,7 @@ use crate::commands::{
     do_info, do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap, list_available_packages,
     list_downloaded_packages,
 };
-use crate::constants::CACHE_DIR_NAME;
+use crate::constants::CACHE_DIR;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
@@ -48,7 +48,7 @@ fn set_up() -> Result<()> {
 
 fn default_cache_dir() -> Option<PathBuf> {
     let home_dir = home::home_dir()?;
-    let isopy_dir = home_dir.join(CACHE_DIR_NAME);
+    let isopy_dir = home_dir.join(&*CACHE_DIR);
     Some(isopy_dir)
 }
 

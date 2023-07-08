@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::{ENV_FILE_NAME, ISOPY_ENV_NAME};
+use crate::constants::{ENV_CONFIG_FILE_NAME, ISOPY_ENV_NAME};
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
@@ -45,7 +45,7 @@ pub fn do_shell(app: App) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(ENV_FILE_NAME))?;
+    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME))?;
 
     let mut path_dirs = Vec::new();
     let mut envs = Vec::new();

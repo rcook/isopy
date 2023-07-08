@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ENV_FILE_NAME;
+use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use crate::shell::Command;
@@ -42,7 +42,7 @@ pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(ENV_FILE_NAME))?;
+    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME))?;
 
     let package_dir_rec = env_rec.package_dirs.first();
 

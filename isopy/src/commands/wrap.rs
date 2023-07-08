@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ENV_FILE_NAME;
+use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::serialization::EnvRec;
 use crate::status::Status;
 use anyhow::{bail, Result};
@@ -77,7 +77,7 @@ pub fn do_wrap(
     };
 
     let data_dir = dir_info.data_dir();
-    let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(ENV_FILE_NAME))?;
+    let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(&*ENV_CONFIG_FILE_NAME))?;
 
     todo!()
     /*

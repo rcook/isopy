@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::{ENV_FILE_NAME, ISOPY_ENV_NAME};
+use crate::constants::{ENV_CONFIG_FILE_NAME, ISOPY_ENV_NAME};
 use crate::serialization::EnvRec;
 use crate::status::Status;
 use anyhow::Result;
@@ -37,7 +37,7 @@ pub fn do_prompt(app: &App) -> Result<Status> {
 
     let env_rec = app
         .find_dir_info(&app.cwd, isopy_env.clone())?
-        .map(|d| d.data_dir().join(ENV_FILE_NAME))
+        .map(|d| d.data_dir().join(&*ENV_CONFIG_FILE_NAME))
         .filter(|p| p.is_file())
         .map(|p| read_yaml_file::<EnvRec>(&p))
         .transpose()?;
