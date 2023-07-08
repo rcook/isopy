@@ -71,9 +71,9 @@ pub enum Command {
 
     #[command(
         name = "add-config",
-        about = "Add package defined in configuration file to environment"
+        about = "Add packages defined in project configuration file to environment"
     )]
-    AddPackageFromConfig,
+    AddPackagesFromProjectConfig,
 
     #[command(
         name = "check",

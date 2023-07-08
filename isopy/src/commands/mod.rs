@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod add_package;
-mod add_package_from_config;
+mod add_packages_from_project_config;
 mod check;
 mod download;
 mod exec;
@@ -36,7 +36,7 @@ mod shell;
 mod wrap;
 
 pub use self::add_package::do_add_package;
-pub use self::add_package_from_config::do_add_package_from_config;
+pub use self::add_packages_from_project_config::add_packages_from_project_config;
 pub use self::check::do_check;
 pub use self::download::do_download;
 pub use self::exec::do_exec;

@@ -23,9 +23,9 @@ use crate::app::App;
 use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
-    do_add_package, do_add_package_from_config, do_check, do_download, do_exec, do_gen_config,
-    do_info, do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap, list_available_packages,
-    list_downloaded_packages,
+    add_packages_from_project_config, do_add_package, do_check, do_download, do_exec,
+    do_gen_config, do_info, do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap,
+    list_available_packages, list_downloaded_packages,
 };
 use crate::constants::CACHE_DIR;
 use crate::status::Status;
@@ -83,7 +83,7 @@ pub async fn run() -> Result<Status> {
 async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Command::AddPackage { package_id } => do_add_package(&app, &package_id).await,
-        Command::AddPackageFromConfig => do_add_package_from_config(&app).await,
+        Command::AddPackagesFromProjectConfig => add_packages_from_project_config(&app).await,
         Command::Check { clean } => do_check(&app, clean),
         Command::Download { package_id } => do_download(&app, &package_id).await,
         Command::Exec { program, args } => do_exec(app, &program, &args),

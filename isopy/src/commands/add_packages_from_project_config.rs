@@ -29,7 +29,7 @@ use joatmon::read_yaml_file;
 use log::error;
 use std::collections::HashMap;
 
-pub async fn do_add_package_from_config(app: &App) -> Result<Status> {
+pub async fn add_packages_from_project_config(app: &App) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         error!("directory {} already has an environment", app.cwd.display());
         return Ok(Status::Fail);
