@@ -26,6 +26,7 @@ use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::{bail, Result};
+use colored::Colorize;
 use joatmon::read_yaml_file;
 use log::error;
 use std::env::{var, VarError};
@@ -55,6 +56,14 @@ pub fn shell(app: App) -> Result<Status> {
             error!("could not get environment info");
             return Ok(Status::Fail);
         };
+
+        println!("{}", package_rec.id.green());
+        for path_dir in &env_info.path_dirs {
+            println!("  {}", format!("{}", path_dir.display()).yellow());
+        }
+        for (k, v) in &env_info.envs {
+            println!("  {}", format!("{} = {}", k, v).yellow());
+        }
 
         path_dirs.extend(env_info.path_dirs);
         envs.extend(env_info.envs);
