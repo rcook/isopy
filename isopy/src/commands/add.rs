@@ -28,7 +28,7 @@ use anyhow::Result;
 use joatmon::{read_yaml_file, safe_write_file};
 use log::{error, info};
 
-pub fn do_gen_config(app: &App, package_id: &PackageId) -> Result<Status> {
+pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
     let project_config_path = app.cwd.join(&*PROJECT_CONFIG_FILE_NAME);
 
     let mut packages = if project_config_path.is_file() {

@@ -19,34 +19,34 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod add_package;
-mod add_packages_from_project_config;
+mod add;
 mod check;
-mod download_package;
-mod exec;
-mod gen_config;
+mod download;
 mod info;
+mod install;
+mod install_project;
 mod link;
 mod list;
 mod list_available_packages;
 mod list_downloaded_packages;
 mod prompt;
+mod run;
 mod scratch;
 mod shell;
 mod wrap;
 
-pub use self::add_package::do_add_package;
-pub use self::add_packages_from_project_config::add_packages_from_project_config;
-pub use self::check::do_check;
-pub use self::download_package::download_package;
-pub use self::exec::do_exec;
-pub use self::gen_config::do_gen_config;
-pub use self::info::do_info;
-pub use self::link::do_link;
-pub use self::list::do_list;
+pub use self::add::add;
+pub use self::check::check;
+pub use self::download::download;
+pub use self::info::info;
+pub use self::install::install;
+pub use self::install_project::install_project;
+pub use self::link::link;
+pub use self::list::list;
 pub use self::list_available_packages::list_available_packages;
 pub use self::list_downloaded_packages::list_downloaded_packages;
-pub use self::prompt::do_prompt;
-pub use self::scratch::do_scratch;
-pub use self::shell::do_shell;
-pub use self::wrap::do_wrap;
+pub use self::prompt::prompt;
+pub use self::run::run;
+pub use self::scratch::scratch;
+pub use self::shell::shell;
+pub use self::wrap::wrap;

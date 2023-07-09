@@ -23,9 +23,8 @@ use crate::app::App;
 use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
-    add_packages_from_project_config, do_add_package, do_check, do_exec, do_gen_config, do_info,
-    do_link, do_list, do_prompt, do_scratch, do_shell, do_wrap, download_package,
-    list_available_packages, list_downloaded_packages,
+    add, check, download, info, install, install_project, link, list, list_available_packages,
+    list_downloaded_packages, prompt, run as run_command, scratch, shell, wrap,
 };
 use crate::constants::CACHE_DIR;
 use crate::status::Status;
@@ -82,26 +81,26 @@ pub async fn run() -> Result<Status> {
 
 async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
-        Command::AddPackage { package_id } => do_add_package(&app, &package_id).await,
-        Command::AddPackagesFromProjectConfig => add_packages_from_project_config(&app).await,
-        Command::Check { clean } => do_check(&app, clean),
-        Command::DownloadPackage { package_id } => download_package(&app, &package_id).await,
-        Command::Exec { program, args } => do_exec(app, &program, &args),
-        Command::GenConfig { package_id } => do_gen_config(&app, &package_id),
-        Command::Info => do_info(&app),
-        Command::Link { meta_id } => do_link(&app, &meta_id),
-        Command::List => do_list(&app),
+        Command::Add { package_id } => add(&app, &package_id),
+        Command::Check { clean } => check(&app, clean),
+        Command::Download { package_id } => download(&app, &package_id).await,
+        Command::Info => info(&app),
+        Command::Install { package_id } => install(&app, &package_id).await,
+        Command::InstallProject => install_project(&app).await,
+        Command::List => list(&app),
         Command::ListAvailablePackages { verbose } => list_available_packages(&app, verbose).await,
         Command::ListDownloadedPackages { verbose } => {
             list_downloaded_packages(&app, verbose).await
         }
-        Command::Prompt => do_prompt(&app),
-        Command::Scratch => do_scratch(&app),
-        Command::Shell => do_shell(app),
+        Command::Link { dir_id } => link(&app, &dir_id),
+        Command::Prompt => prompt(&app),
+        Command::Run { program, args } => run_command(app, &program, &args),
+        Command::Scratch => scratch(&app),
+        Command::Shell => shell(app),
         Command::Wrap {
             wrapper_path,
             script_path,
             base_dir,
-        } => do_wrap(&app, &wrapper_path, &script_path, &base_dir),
+        } => wrap(&app, &wrapper_path, &script_path, &base_dir),
     }
 }

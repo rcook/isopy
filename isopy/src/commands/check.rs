@@ -26,7 +26,7 @@ use anyhow::Result;
 use joat_repo::Trash;
 use log::info;
 
-pub fn do_check(app: &App, clean: bool) -> Result<Status> {
+pub fn check(app: &App, clean: bool) -> Result<Status> {
     let mut trash = Trash::compute(&app.repo)?;
 
     if trash.is_empty() {

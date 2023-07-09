@@ -31,7 +31,7 @@ use log::error;
 use std::ffi::OsString;
 use std::path::Path;
 
-pub fn do_exec(app: App, program: &str, args: &[String]) -> Result<Status> {
+pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
     let mut command = Command::new(OsString::from(program));
     for arg in args {
         command.arg(OsString::from(arg));

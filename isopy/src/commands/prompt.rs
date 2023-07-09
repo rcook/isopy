@@ -29,7 +29,7 @@ use joatmon::read_yaml_file;
 use serde_json::Value;
 use std::env::{var, VarError};
 
-pub fn do_prompt(app: &App) -> Result<Status> {
+pub fn prompt(app: &App) -> Result<Status> {
     let isopy_env = match var(ISOPY_ENV_NAME) {
         Ok(s) => Some(s),
         Err(VarError::NotPresent) => None,

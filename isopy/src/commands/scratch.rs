@@ -24,7 +24,7 @@ use crate::status::Status;
 use anyhow::Result;
 
 #[allow(clippy::unnecessary_wraps)]
-pub fn do_scratch(_app: &App) -> Result<Status> {
+pub fn scratch(_app: &App) -> Result<Status> {
     println!("SCRATCH");
     Ok(Status::OK)
 }

@@ -63,48 +63,23 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    // TBD: Rename to "install"
-    #[command(name = "add", about = "Add package to environment")]
-    AddPackage {
+    #[command(name = "add", about = "Add package to project")]
+    Add {
         #[arg(help = "Package ID")]
         package_id: PackageId,
     },
-
-    // TBD: Make this is option of "install"
-    #[command(
-        name = "add-config",
-        about = "Add packages defined in project configuration file to environment"
-    )]
-    AddPackagesFromProjectConfig,
 
     #[command(
         name = "check",
         about = "Check integrity of repository and optionally clean up"
     )]
     Check {
-        #[arg(long = "clean", default_value = "false", help = "Clean up")]
+        #[arg(help = "Clean up", long = "clean", default_value_t = false)]
         clean: bool,
     },
 
     #[command(name = "download", about = "Download package")]
-    DownloadPackage {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
-    #[command(name = "exec", about = "Execute command in environment")]
-    Exec {
-        #[arg(help = "Program to run in environment")]
-        program: String,
-
-        #[arg(help = "Zero or more arguments to pass to program")]
-        #[clap(trailing_var_arg = true, allow_hyphen_values = true)]
-        args: Vec<String>,
-    },
-
-    // TBD: Come up with a better name, maybe "config"
-    #[command(name = "gen-config", about = "Generate configuration file")]
-    GenConfig {
+    Download {
         #[arg(help = "Package ID")]
         package_id: PackageId,
     },
@@ -112,13 +87,25 @@ pub enum Command {
     #[command(name = "info", about = "Show information")]
     Info,
 
+    #[command(name = "install", about = "Install package into environment")]
+    Install {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
+    #[command(
+        name = "install-project",
+        about = "Install project packages into environment"
+    )]
+    InstallProject,
+
     #[command(
         name = "link",
         about = "Use existing environment for current directory"
     )]
     Link {
-        #[arg(help = "Meta ID", value_parser = parse_meta_id)]
-        meta_id: MetaId,
+        #[arg(help = "Directory ID", value_parser = parse_meta_id)]
+        dir_id: MetaId,
     },
 
     #[command(name = "list", about = "List environments")]
@@ -126,18 +113,31 @@ pub enum Command {
 
     #[command(name = "available", about = "List packages available for download")]
     ListAvailablePackages {
-        #[arg(long = "verbose", default_value = "false", help = "Show more detail")]
+        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
         verbose: bool,
     },
 
     #[command(name = "downloaded", about = "List locally downloaded packages")]
     ListDownloadedPackages {
-        #[arg(long = "verbose", default_value = "false", help = "Show more detail")]
+        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
         verbose: bool,
     },
 
-    #[command(name = "prompt", about = "Show brief information in prompt")]
+    #[command(name = "prompt", about = "Show brief information in shell prompt")]
     Prompt,
+
+    #[command(name = "run", about = "Run command in environment")]
+    Run {
+        #[arg(help = "Program")]
+        program: String,
+
+        #[arg(
+            help = "Arguments",
+            trailing_var_arg = true,
+            allow_hyphen_values = true
+        )]
+        args: Vec<String>,
+    },
 
     #[command(name = "scratch", about = "Experimental stuff")]
     Scratch,

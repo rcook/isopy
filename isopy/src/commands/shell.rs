@@ -31,7 +31,7 @@ use log::error;
 use std::env::{var, VarError};
 use std::path::Path;
 
-pub fn do_shell(app: App) -> Result<Status> {
+pub fn shell(app: App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             bail!("you are already in an isopy shell");
