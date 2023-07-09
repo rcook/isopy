@@ -20,15 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod add;
+mod available;
 mod check;
 mod download;
+mod downloaded;
 mod info;
 mod install;
 mod install_project;
 mod link;
 mod list;
-mod list_available_packages;
-mod list_downloaded_packages;
 mod prompt;
 mod run;
 mod scratch;
@@ -36,15 +36,15 @@ mod shell;
 mod wrap;
 
 pub use self::add::add;
+pub use self::available::available;
 pub use self::check::check;
 pub use self::download::download;
+pub use self::downloaded::downloaded;
 pub use self::info::info;
 pub use self::install::install;
 pub use self::install_project::install_project;
 pub use self::link::link;
 pub use self::list::list;
-pub use self::list_available_packages::list_available_packages;
-pub use self::list_downloaded_packages::list_downloaded_packages;
 pub use self::prompt::prompt;
 pub use self::run::run;
 pub use self::scratch::scratch;

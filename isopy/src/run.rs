@@ -23,8 +23,8 @@ use crate::app::App;
 use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
-    add, check, download, info, install, install_project, link, list, list_available_packages,
-    list_downloaded_packages, prompt, run as run_command, scratch, shell, wrap,
+    add, available, check, download, downloaded, info, install, install_project, link, list,
+    prompt, run as run_command, scratch, shell, wrap,
 };
 use crate::constants::CACHE_DIR;
 use crate::status::Status;
@@ -80,24 +80,24 @@ pub async fn run() -> Result<Status> {
 }
 
 async fn do_it(app: App, command: Command) -> Result<Status> {
+    use crate::args::Command::*;
+
     match command {
-        Command::Add { package_id } => add(&app, &package_id),
-        Command::Check { clean } => check(&app, clean),
-        Command::Download { package_id } => download(&app, &package_id).await,
-        Command::Info => info(&app),
-        Command::Install { package_id } => install(&app, &package_id).await,
-        Command::InstallProject => install_project(&app).await,
-        Command::List => list(&app),
-        Command::ListAvailablePackages { verbose } => list_available_packages(&app, verbose).await,
-        Command::ListDownloadedPackages { verbose } => {
-            list_downloaded_packages(&app, verbose).await
-        }
-        Command::Link { dir_id } => link(&app, &dir_id),
-        Command::Prompt => prompt(&app),
-        Command::Run { program, args } => run_command(app, &program, &args),
-        Command::Scratch => scratch(&app),
-        Command::Shell => shell(app),
-        Command::Wrap {
+        Add { package_id } => add(&app, &package_id),
+        Available { verbose } => available(&app, verbose).await,
+        Check { clean } => check(&app, clean),
+        Download { package_id } => download(&app, &package_id).await,
+        Downloaded { verbose } => downloaded(&app, verbose).await,
+        Info => info(&app),
+        Install { package_id } => install(&app, &package_id).await,
+        InstallProject => install_project(&app).await,
+        List => list(&app),
+        Link { dir_id } => link(&app, &dir_id),
+        Prompt => prompt(&app),
+        Run { program, args } => run_command(app, &program, &args),
+        Scratch => scratch(&app),
+        Shell => shell(app),
+        Wrap {
             wrapper_path,
             script_path,
             base_dir,

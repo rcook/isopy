@@ -69,6 +69,12 @@ pub enum Command {
         package_id: PackageId,
     },
 
+    #[command(name = "available", about = "List packages available for download")]
+    Available {
+        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
+        verbose: bool,
+    },
+
     #[command(
         name = "check",
         about = "Check integrity of repository and optionally clean up"
@@ -82,6 +88,12 @@ pub enum Command {
     Download {
         #[arg(help = "Package ID")]
         package_id: PackageId,
+    },
+
+    #[command(name = "downloaded", about = "List locally downloaded packages")]
+    Downloaded {
+        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
+        verbose: bool,
     },
 
     #[command(name = "info", about = "Show information")]
@@ -110,18 +122,6 @@ pub enum Command {
 
     #[command(name = "list", about = "List environments")]
     List,
-
-    #[command(name = "available", about = "List packages available for download")]
-    ListAvailablePackages {
-        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
-        verbose: bool,
-    },
-
-    #[command(name = "downloaded", about = "List locally downloaded packages")]
-    ListDownloadedPackages {
-        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
-        verbose: bool,
-    },
 
     #[command(name = "prompt", about = "Show brief information in shell prompt")]
     Prompt,
