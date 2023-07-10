@@ -62,7 +62,7 @@ pub fn shell(app: App) -> Result<Status> {
             println!("  {}", format!("{}", path_dir.display()).yellow());
         }
         for (k, v) in &env_info.envs {
-            println!("  {}", format!("{} = {}", k, v).yellow());
+            println!("  {}", format!("{k} = {v}").yellow());
         }
 
         path_dirs.extend(env_info.path_dirs);
