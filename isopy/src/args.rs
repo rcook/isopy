@@ -41,10 +41,23 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
     after_help = format!("{}\nhttps://github.com/rcook/isopy{}", PACKAGE_HOME_PAGE, PACKAGE_BUILD_VERSION.map(|x| format!("\n\n{}", x)).unwrap_or(String::from("")))
 )]
 pub struct Args {
-    #[arg(global = true, help = "Path to isopy cache directory", short = 'd', long = "cache-dir", value_parser = parse_absolute_path, env = "ISOPY_CACHE_DIR")]
+    #[arg(
+        global = true,
+        help = "Path to isopy cache directory",
+        short = 'd',
+        long = "cache-dir",
+        value_parser = parse_absolute_path,
+        env = "ISOPY_CACHE_DIR"
+    )]
     pub cache_dir: Option<PathBuf>,
 
-    #[arg(global = true, help = "Path to working directory", short = 'c', long = "cwd", value_parser = parse_absolute_path)]
+    #[arg(
+        global = true,
+        help = "Path to working directory",
+        short = 'c',
+        long = "cwd",
+        value_parser = parse_absolute_path
+    )]
     pub cwd: Option<PathBuf>,
 
     #[arg(
