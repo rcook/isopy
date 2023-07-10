@@ -1,7 +1,7 @@
 ## Global options
 
-| Argument      | Description                                        |
-| ------------- | -------------------------------------------------- |
-| `--cache-dir` | Specify alternative isopy cache directory          |
-| `--cwd`       | Run commands as if shell is in specified directory |
-| `--level`     | Set log level                                      |
+| Argument      | Short | Environment       | Description                                        |
+| ------------- | ----- | ----------------- | -------------------------------------------------- |
+| `--cache-dir` | `-d`  | `ISOPY_CACHE_DIR` | Specify alternative isopy cache directory          |
+| `--cwd`       | `-c`  |                   | Run commands as if shell is in specified directory |
+| `--level`     | `-l`  | `ISOPY_LOG_LEVEL` | Set log level                                      |
