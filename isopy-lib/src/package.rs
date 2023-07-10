@@ -24,7 +24,5 @@ use std::path::PathBuf;
 
 pub struct Package {
     pub asset_path: PathBuf,
-
-    // TBD: This should not be an Option really
-    pub descriptor: Option<DescriptorRef>,
+    pub descriptor: DescriptorRef,
 }

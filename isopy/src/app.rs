@@ -87,9 +87,6 @@ impl App {
             descriptor,
         } = plugin.download_package(descriptor).await?;
 
-        // TBD: Introduce a new Package struct where descriptor is not Option
-        let descriptor = descriptor.expect("must be valid");
-
         unpack_file(
             descriptor.as_ref().as_ref(),
             &asset_path,

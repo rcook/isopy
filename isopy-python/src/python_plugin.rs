@@ -230,10 +230,10 @@ impl Plugin for PythonPlugin {
             .into_iter()
             .map(|asset| Package {
                 asset_path: self.assets_dir.join(asset.name.clone()),
-                descriptor: Some(Arc::new(Box::new(PythonDescriptor {
+                descriptor: Arc::new(Box::new(PythonDescriptor {
                     version: asset.meta.version.clone(),
                     tag: Some(asset.tag.clone()),
-                }))),
+                })),
             })
             .collect::<Vec<_>>())
     }
@@ -252,16 +252,17 @@ impl Plugin for PythonPlugin {
                 let entry = result.map_err(isopy_lib_other_error)?;
                 let asset_path = entry.path();
                 let asset_file_name = entry.file_name();
-                let descriptor = package_map
+                if let Some(descriptor) = package_map
                     .get(&asset_file_name)
-                    .and_then(|package| package.descriptor.as_ref())
-                    .cloned();
-                if let Some(asset_file_name) = asset_file_name.to_str() {
-                    if asset_file_name.parse::<AssetMeta>().is_ok() {
-                        packages.push(Package {
-                            asset_path,
-                            descriptor,
-                        });
+                    .map(|package| Arc::clone(&package.descriptor))
+                {
+                    if let Some(s) = asset_file_name.to_str() {
+                        if s.parse::<AssetMeta>().is_ok() {
+                            packages.push(Package {
+                                asset_path,
+                                descriptor,
+                            });
+                        }
                     }
                 }
             }
@@ -285,10 +286,10 @@ impl Plugin for PythonPlugin {
 
         Ok(Package {
             asset_path,
-            descriptor: Some(Arc::new(Box::new(PythonDescriptor {
+            descriptor: Arc::new(Box::new(PythonDescriptor {
                 version: descriptor.version.clone(),
                 tag: Some(asset.tag.clone()),
-            }))),
+            })),
         })
     }
 }

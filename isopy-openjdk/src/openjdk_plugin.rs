@@ -57,9 +57,9 @@ impl Plugin for OpenJdkPlugin {
             .into_iter()
             .map(|x| Package {
                 asset_path: self.assets_dir.join(x.file_name),
-                descriptor: Some(Arc::new(Box::new(OpenJdkDescriptor {
+                descriptor: Arc::new(Box::new(OpenJdkDescriptor {
                     version: x.openjdk_version,
-                }))),
+                })),
             })
             .collect::<Vec<_>>())
     }
@@ -78,14 +78,15 @@ impl Plugin for OpenJdkPlugin {
                 let entry = result.map_err(isopy_lib_other_error)?;
                 let asset_path = entry.path();
                 let asset_file_name = entry.file_name();
-                let descriptor = package_map
+                if let Some(descriptor) = package_map
                     .get(&asset_file_name)
-                    .and_then(|package| package.descriptor.as_ref())
-                    .cloned();
-                packages.push(Package {
-                    asset_path,
-                    descriptor,
-                });
+                    .map(|package| Arc::clone(&package.descriptor))
+                {
+                    packages.push(Package {
+                        asset_path,
+                        descriptor,
+                    });
+                }
             }
         }
 
@@ -112,7 +113,7 @@ impl Plugin for OpenJdkPlugin {
             info!("asset {} already downloaded", version.file_name);
             return Ok(Package {
                 asset_path,
-                descriptor: Some(Arc::new(Box::new(descriptor.clone()))),
+                descriptor: Arc::new(Box::new(descriptor.clone())),
             });
         }
 
@@ -131,7 +132,7 @@ impl Plugin for OpenJdkPlugin {
 
         Ok(Package {
             asset_path,
-            descriptor: Some(Arc::new(Box::new(descriptor.clone()))),
+            descriptor: Arc::new(Box::new(descriptor.clone())),
         })
     }
 }
