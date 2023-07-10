@@ -1,9 +1,9 @@
 ## `download` command
 
-Downloads a Python distribution from
-[Python Standalone Builds][python-build-standalone-releases] optionally filtered
-by Python version and/or tag without extracting it to an environment.
+_Downloads packages_
 
+Downloads package from sources such as [Python Standalone Builds][python-build-standalone-releases]
+or [Adoptium][adoptium].
 
-[issues]: https://github.com/rcook/isopy/issues
+[adoptium]: https://adoptium.net/
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases

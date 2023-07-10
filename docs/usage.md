@@ -1,15 +1,17 @@
 ## Usage
 
+* [add](add-command.md)
 * [available](available-command.md)
+* [check](check-command.md)
 * [download](download-command.md)
 * [downloaded](downloaded-command.md)
-* [exec](exec-command.md)
-* [gen-config](gen-config-command.md)
 * [info](info-command.md)
-* [init](init-command.md)
-* [init-config](init-config-command.md)
+* [install](install-command.md)
+* [install-project](install-project-command.md)
 * [link](link-command.md)
 * [list](list-command.md)
+* [prompt](prompt-command.md)
+* [run](run-command.md)
 * [shell](shell-command.md)
 * [wrap](wrap-command.md)
 

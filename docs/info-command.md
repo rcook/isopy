@@ -1,6 +1,6 @@
 ## `info` command
 
-Shows information about the current environment as well as isopy
-cache directory.
+_Shows information_
 
-[issues]: https://github.com/rcook/isopy/issues
+Shows information about the current environment as well as isopy cache
+directory.

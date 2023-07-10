@@ -1,5 +1,3 @@
 ## `downloaded` command
 
-Lists locally downloaded Python distributions.
-
-[issues]: https://github.com/rcook/isopy/issues
+_Lists locally downloaded packages_

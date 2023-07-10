@@ -1,5 +1,3 @@
 ## `wrap` command
 
-> **Work in progress**: Not implemented yet!
-
-[issues]: https://github.com/rcook/isopy/issues
+_Generates wrapper script for script_

@@ -77,7 +77,7 @@ pub enum Command {
 
     #[command(
         name = "check",
-        about = "Check integrity of repository and optionally clean up"
+        about = "Check integrity of metadata directory and optionally clean up"
     )]
     Check {
         #[arg(help = "Clean up", long = "clean", default_value_t = false)]

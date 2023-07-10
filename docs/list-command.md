@@ -1,5 +1,3 @@
 ## `list` command
 
-Lists environments.
-
-[issues]: https://github.com/rcook/isopy/issues
+_Lists environments_
