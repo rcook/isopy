@@ -29,10 +29,12 @@ use crate::constants::{
 use crate::github::GitHubRepository;
 use crate::local::LocalRepository;
 use crate::python_descriptor::PythonDescriptor;
+use crate::python_version::PythonVersion;
 use crate::repository::Repository;
 use crate::repository_info::RepositoryInfo;
 use crate::repository_name::RepositoryName;
 use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
+use crate::tag::Tag;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -208,67 +210,100 @@ impl PythonPlugin {
                 .expect("must be valid")
         }
     }
+
+    async fn get_available_packages_extended(
+        &self,
+    ) -> IsopyLibResult<Vec<(Package, PythonVersion, Tag)>> {
+        self.update_index_if_necessary().await?;
+
+        let mut assets = self.read_assets()?;
+        assets.sort_by(|a, b| Self::compare_assets_by_version_and_tag(b, a));
+
+        let packages_with_version = AssetFilter::default_for_platform()
+            .filter(assets.iter())
+            .into_iter()
+            .map(|asset| {
+                (
+                    Package {
+                        asset_path: self.assets_dir.join(asset.name.clone()),
+                        descriptor: Arc::new(Box::new(PythonDescriptor {
+                            version: asset.meta.version.clone(),
+                            tag: Some(asset.tag.clone()),
+                        })),
+                    },
+                    asset.meta.version.clone(),
+                    asset.tag.clone(),
+                )
+            })
+            .collect::<Vec<_>>();
+
+        Ok(packages_with_version)
+    }
+
+    fn compare_assets_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
+        Self::compare_by_version_and_tag((&a.meta.version, &a.tag), (&b.meta.version, &b.tag))
+    }
+
+    fn compare_by_version_and_tag(
+        a: (&PythonVersion, &Tag),
+        b: (&PythonVersion, &Tag),
+    ) -> Ordering {
+        match a.0.cmp(b.0) {
+            Ordering::Equal => a.1.cmp(b.1),
+            result => result,
+        }
+    }
 }
 
 #[async_trait]
 impl Plugin for PythonPlugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        fn compare_by_version_and_tag(a: &Asset, b: &Asset) -> Ordering {
-            match a.meta.version.cmp(&b.meta.version) {
-                Ordering::Equal => a.tag.cmp(&b.tag),
-                result => result,
-            }
-        }
-
-        self.update_index_if_necessary().await?;
-
-        let mut assets = self.read_assets()?;
-        assets.sort_by(|a, b| compare_by_version_and_tag(b, a));
-
-        Ok(AssetFilter::default_for_platform()
-            .filter(assets.iter())
-            .into_iter()
-            .map(|asset| Package {
-                asset_path: self.assets_dir.join(asset.name.clone()),
-                descriptor: Arc::new(Box::new(PythonDescriptor {
-                    version: asset.meta.version.clone(),
-                    tag: Some(asset.tag.clone()),
-                })),
-            })
-            .collect::<Vec<_>>())
+        let items = self.get_available_packages_extended().await?;
+        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let packages = self.get_available_packages().await?;
-        let package_map = packages
+        let packages_with_version = self.get_available_packages_extended().await?;
+        let map = packages_with_version
             .iter()
-            .filter_map(|p| p.asset_path.file_name().map(OsString::from).map(|f| (f, p)))
+            .filter_map(|p| {
+                p.0.asset_path
+                    .file_name()
+                    .map(OsString::from)
+                    .map(|f| (f, p))
+            })
             .collect::<HashMap<_, _>>();
 
-        let mut packages = Vec::new();
+        let mut items = Vec::new();
 
         if self.assets_dir.exists() {
             for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
                 let entry = result.map_err(isopy_lib_other_error)?;
                 let asset_path = entry.path();
                 let asset_file_name = entry.file_name();
-                if let Some(descriptor) = package_map
+                if let Some(p) = map
                     .get(&asset_file_name)
-                    .map(|package| Arc::clone(&package.descriptor))
+                    .map(|p| (Arc::clone(&p.0.descriptor), &p.1, &p.2))
                 {
                     if let Some(s) = asset_file_name.to_str() {
                         if s.parse::<AssetMeta>().is_ok() {
-                            packages.push(Package {
-                                asset_path,
-                                descriptor,
-                            });
+                            items.push((
+                                Package {
+                                    asset_path,
+                                    descriptor: p.0,
+                                },
+                                p.1,
+                                p.2,
+                            ));
                         }
                     }
                 }
             }
         }
 
-        Ok(packages)
+        items.sort_by(|a, b| Self::compare_by_version_and_tag((b.1, b.2), (a.1, a.2)));
+
+        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {

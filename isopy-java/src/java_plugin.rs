@@ -23,6 +23,7 @@ use crate::adoptium::api::ImageType;
 use crate::adoptium::AdoptiumIndexManager;
 use crate::constants::ASSETS_DIR;
 use crate::java_descriptor::JavaDescriptor;
+use crate::java_version::JavaVersion;
 use async_trait::async_trait;
 use isopy_lib::{
     other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, IsopyLibError,
@@ -51,52 +52,73 @@ impl JavaPlugin {
             assets_dir,
         }
     }
+
+    async fn get_available_packages_extended(&self) -> IsopyLibResult<Vec<(Package, JavaVersion)>> {
+        Ok(
+            AdoptiumIndexManager::new_default(self.image_type.clone(), &self.dir)
+                .read_versions()
+                .await?
+                .into_iter()
+                .map(|x| {
+                    (
+                        Package {
+                            asset_path: self.assets_dir.join(x.file_name),
+                            descriptor: Arc::new(Box::new(JavaDescriptor {
+                                version: x.openjdk_version.clone(),
+                            })),
+                        },
+                        x.openjdk_version,
+                    )
+                })
+                .collect::<Vec<_>>(),
+        )
+    }
 }
 
 #[async_trait]
 impl Plugin for JavaPlugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let manager = AdoptiumIndexManager::new_default(self.image_type.clone(), &self.dir);
-        Ok(manager
-            .read_versions()
-            .await?
-            .into_iter()
-            .map(|x| Package {
-                asset_path: self.assets_dir.join(x.file_name),
-                descriptor: Arc::new(Box::new(JavaDescriptor {
-                    version: x.openjdk_version,
-                })),
-            })
-            .collect::<Vec<_>>())
+        let items = self.get_available_packages_extended().await?;
+        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let packages = self.get_available_packages().await?;
-        let package_map = packages
+        let packages_with_version = self.get_available_packages_extended().await?;
+        let map = packages_with_version
             .iter()
-            .filter_map(|p| p.asset_path.file_name().map(OsString::from).map(|f| (f, p)))
+            .filter_map(|p| {
+                p.0.asset_path
+                    .file_name()
+                    .map(OsString::from)
+                    .map(|f| (f, p))
+            })
             .collect::<HashMap<_, _>>();
 
-        let mut packages = Vec::new();
+        let mut items = Vec::new();
 
         if self.assets_dir.exists() {
             for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
                 let entry = result.map_err(isopy_lib_other_error)?;
                 let asset_path = entry.path();
                 let asset_file_name = entry.file_name();
-                if let Some(descriptor) = package_map
+                if let Some(p) = map
                     .get(&asset_file_name)
-                    .map(|package| Arc::clone(&package.descriptor))
+                    .map(|p| (Arc::clone(&p.0.descriptor), &p.1))
                 {
-                    packages.push(Package {
-                        asset_path,
-                        descriptor,
-                    });
+                    items.push((
+                        Package {
+                            asset_path,
+                            descriptor: p.0,
+                        },
+                        p.1,
+                    ));
                 }
             }
         }
 
-        Ok(packages)
+        items.sort_by(|a, b| b.1.cmp(a.1));
+
+        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
