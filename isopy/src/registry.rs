@@ -21,7 +21,7 @@
 //
 use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::descriptor_info::DescriptorInfo;
-use crate::plugin_host::PluginHost;
+use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::PackageRec;
 use anyhow::{bail, Result};
 use isopy_lib::{EnvInfo, PluginFactory};
@@ -45,7 +45,7 @@ lazy_static! {
 }
 
 pub struct Registry {
-    pub plugin_hosts: Vec<Arc<PluginHost>>,
+    pub plugin_hosts: Vec<PluginHostRef>,
 }
 
 impl Registry {
@@ -89,7 +89,7 @@ impl Registry {
         ))
     }
 
-    fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&Arc<PluginHost>, &'a str)> {
+    fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&PluginHostRef, &'a str)> {
         if let Some((prefix, tail)) = s.split_once(':') {
             if let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == prefix) {
                 return Some((plugin_host, tail));

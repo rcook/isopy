@@ -19,14 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::plugin_host::PluginHost;
+use crate::plugin_host::PluginHostRef;
 use isopy_lib::DescriptorRef;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct DescriptorInfo {
-    pub plugin_host: Arc<PluginHost>,
+    pub plugin_host: PluginHostRef,
     pub descriptor: DescriptorRef,
 }
 

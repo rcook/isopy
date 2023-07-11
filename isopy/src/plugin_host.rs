@@ -22,12 +22,15 @@
 use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Plugin, PluginFactory};
 use serde_json::Value;
 use std::path::Path;
+use std::sync::Arc;
 use url::Url;
 
 pub struct PluginHost {
     prefix: String,
     plugin_factory: Box<dyn PluginFactory>,
 }
+
+pub type PluginHostRef = Arc<PluginHost>;
 
 impl PluginHost {
     pub fn new(prefix: &str, plugin_factory: Box<dyn PluginFactory>) -> Self {

@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ENV_CONFIG_FILE_NAME;
-use crate::plugin_host::PluginHost;
+use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use crate::util::pretty_descriptor;
@@ -31,7 +31,6 @@ use joat_repo::{DirInfo, Link, Manifest, Repo};
 use joatmon::read_yaml_file;
 use std::ffi::OsStr;
 use std::fmt::Display;
-use std::sync::Arc;
 
 pub fn print(s: &str) {
     println!("{}", s.bright_white());
@@ -143,7 +142,7 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     Ok(())
 }
 
-pub fn print_packages(plugin_host: &Arc<PluginHost>, packages: &Vec<Package>, verbose: bool) {
+pub fn print_packages(plugin_host: &PluginHostRef, packages: &Vec<Package>, verbose: bool) {
     if packages.is_empty() {
         print(&format!(
             "No packages found for {} ({})",

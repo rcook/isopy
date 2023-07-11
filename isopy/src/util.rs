@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::descriptor_info::DescriptorInfo;
-use crate::plugin_host::PluginHost;
+use crate::plugin_host::PluginHostRef;
 use isopy_lib::Package;
 use std::sync::Arc;
 
-pub fn pretty_descriptor(plugin_host: &Arc<PluginHost>, package: &Package) -> String {
+pub fn pretty_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
     let descriptor_info = DescriptorInfo {
         plugin_host: Arc::clone(plugin_host),
         descriptor: Arc::clone(&package.descriptor),
