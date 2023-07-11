@@ -31,7 +31,7 @@ pub async fn available(app: &App, verbose: bool) -> Result<Status> {
         let plugin_dir = app.repo.shared_dir().join(plugin_host.prefix());
         let plugin = plugin_host.make_plugin(&plugin_dir);
         let packages = plugin.get_available_packages().await?;
-        print_packages(plugin_host, &packages, verbose);
+        print_packages(plugin_host, &packages, verbose)?;
     }
 
     Ok(Status::OK)
