@@ -25,6 +25,7 @@ use crate::registry::Registry;
 use crate::serialization::ProjectRec;
 use crate::status::Status;
 use anyhow::Result;
+use isopy_lib::PluginFactory;
 use joatmon::read_yaml_file;
 use log::error;
 use std::collections::HashMap;

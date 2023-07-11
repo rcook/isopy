@@ -19,8 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
-use isopy_lib::{Descriptor, EnvInfo, Plugin, PluginFactory};
+use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Plugin, PluginFactory};
 use serde_json::Value;
 use std::path::Path;
 use url::Url;
@@ -41,28 +40,30 @@ impl PluginHost {
     pub fn prefix(&self) -> &str {
         &self.prefix
     }
+}
 
-    pub fn name(&self) -> &str {
+impl PluginFactory for PluginHost {
+    fn name(&self) -> &str {
         self.plugin_factory.name()
     }
 
-    pub fn source_url(&self) -> &Url {
+    fn source_url(&self) -> &Url {
         self.plugin_factory.source_url()
     }
 
-    pub fn parse_descriptor(&self, s: &str) -> Result<Box<dyn Descriptor>> {
-        Ok(self.plugin_factory.parse_descriptor(s)?)
+    fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
+        self.plugin_factory.read_project_config(props)
     }
 
-    pub fn read_project_config(&self, props: &Value) -> Result<Box<dyn Descriptor>> {
-        Ok(self.plugin_factory.read_project_config(props)?)
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
+        self.plugin_factory.parse_descriptor(s)
     }
 
-    pub fn make_env_info(&self, data_dir: &Path, props: &Value) -> Result<EnvInfo> {
-        Ok(self.plugin_factory.make_env_info(data_dir, props)?)
+    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo> {
+        self.plugin_factory.make_env_info(data_dir, props)
     }
 
-    pub fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
+    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
         self.plugin_factory.make_plugin(dir)
     }
 }

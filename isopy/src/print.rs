@@ -26,7 +26,7 @@ use crate::serialization::EnvRec;
 use crate::util::pretty_descriptor;
 use anyhow::Result;
 use colored::Colorize;
-use isopy_lib::Package;
+use isopy_lib::{Package, PluginFactory};
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use joatmon::read_yaml_file;
 use std::ffi::OsStr;

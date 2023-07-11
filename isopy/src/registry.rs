@@ -24,7 +24,7 @@ use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::PluginHost;
 use crate::serialization::PackageRec;
 use anyhow::{bail, Result};
-use isopy_lib::EnvInfo;
+use isopy_lib::{EnvInfo, PluginFactory};
 use isopy_openjdk::OpenJdkPluginFactory;
 use isopy_python::PythonPluginFactory;
 use lazy_static::lazy_static;

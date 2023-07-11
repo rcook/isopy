@@ -24,6 +24,7 @@ use crate::print::print_packages;
 use crate::registry::Registry;
 use crate::status::Status;
 use anyhow::Result;
+use isopy_lib::PluginFactory;
 
 pub async fn downloaded(app: &App, verbose: bool) -> Result<Status> {
     for plugin_host in &Registry::global().plugin_hosts {

@@ -23,6 +23,7 @@ use crate::app::App;
 use crate::package_id::PackageId;
 use crate::status::Status;
 use anyhow::Result;
+use isopy_lib::PluginFactory;
 
 pub async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
     let plugin_host = package_id.plugin_host();

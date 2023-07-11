@@ -24,7 +24,7 @@ use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
-use isopy_lib::{Descriptor, Package};
+use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file};
 use std::collections::HashMap;
