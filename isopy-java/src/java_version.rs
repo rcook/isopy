@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::{other_error, IsopyOpenJdkError};
-use crate::result::IsopyOpenJdkResult;
+use crate::error::{other_error, IsopyJavaError};
+use crate::result::IsopyJavaResult;
 use serde::de::Error;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -28,14 +28,14 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub enum OpenJdkVersionKind {
+pub enum JavaVersionKind {
     V1,
     V2,
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct OpenJdkVersion {
-    kind: OpenJdkVersionKind,
+pub struct JavaVersion {
+    kind: JavaVersionKind,
     major: u32,
     minor: Option<u32>,
     patch: Option<u32>,
@@ -47,10 +47,10 @@ pub struct OpenJdkVersion {
 
 type VersionQuad = (u32, Option<u32>, Option<u32>, Option<u32>);
 
-impl OpenJdkVersion {
+impl JavaVersion {
     #![allow(clippy::too_many_arguments)]
     pub fn new(
-        kind: OpenJdkVersionKind,
+        kind: JavaVersionKind,
         major: u32,
         minor: Option<u32>,
         patch: Option<u32>,
@@ -71,11 +71,11 @@ impl OpenJdkVersion {
         }
     }
 
-    fn to_u32(s: &str) -> IsopyOpenJdkResult<u32> {
+    fn to_u32(s: &str) -> IsopyJavaResult<u32> {
         s.parse::<u32>().map_err(other_error)
     }
 
-    fn parse_dotted(input: &str, s: &str) -> IsopyOpenJdkResult<VersionQuad> {
+    fn parse_dotted(input: &str, s: &str) -> IsopyJavaResult<VersionQuad> {
         let parts = s.split('.').collect::<Vec<_>>();
         match parts.len() {
             1 => Ok((Self::to_u32(parts[0])?, None, None, None)),
@@ -97,20 +97,20 @@ impl OpenJdkVersion {
                 Some(Self::to_u32(parts[2])?),
                 Some(Self::to_u32(parts[3])?),
             )),
-            _ => Err(IsopyOpenJdkError::InvalidFormat(String::from(input))),
+            _ => Err(IsopyJavaError::InvalidFormat(String::from(input))),
         }
     }
 }
 
-impl FromStr for OpenJdkVersion {
-    type Err = IsopyOpenJdkError;
+impl FromStr for JavaVersion {
+    type Err = IsopyJavaError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         if let Some((prefix, suffix)) = s.split_once('+') {
             let (major, minor, patch, build) = Self::parse_dotted(s, prefix)?;
             let qualifier1 = Self::to_u32(suffix)?;
             return Ok(Self::new(
-                OpenJdkVersionKind::V2,
+                JavaVersionKind::V2,
                 major,
                 minor,
                 patch,
@@ -124,12 +124,12 @@ impl FromStr for OpenJdkVersion {
         if let Some((prefix, suffix)) = s.split_once('_') {
             let (major, minor, patch, build) = Self::parse_dotted(s, prefix)?;
             let Some((q1, q2)) = suffix.split_once('-') else {
-                return Err(IsopyOpenJdkError::InvalidFormat(String::from(s)))
+                return Err(IsopyJavaError::InvalidFormat(String::from(s)))
             };
             let qualifier1 = Self::to_u32(q1)?;
             let qualifier2 = Some(String::from(q2));
             return Ok(Self::new(
-                OpenJdkVersionKind::V1,
+                JavaVersionKind::V1,
                 major,
                 minor,
                 patch,
@@ -140,17 +140,17 @@ impl FromStr for OpenJdkVersion {
             ));
         }
 
-        Err(IsopyOpenJdkError::InvalidFormat(String::from(s)))
+        Err(IsopyJavaError::InvalidFormat(String::from(s)))
     }
 }
 
-impl Display for OpenJdkVersion {
+impl Display for JavaVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.raw)
     }
 }
 
-impl<'de> Deserialize<'de> for OpenJdkVersion {
+impl<'de> Deserialize<'de> for JavaVersion {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -161,7 +161,7 @@ impl<'de> Deserialize<'de> for OpenJdkVersion {
     }
 }
 
-impl Serialize for OpenJdkVersion {
+impl Serialize for JavaVersion {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -173,8 +173,8 @@ impl Serialize for OpenJdkVersion {
 #[cfg(test)]
 mod tests {
     #![allow(clippy::too_many_arguments)]
-    use super::OpenJdkVersionKind::{V1, V2};
-    use super::{IsopyOpenJdkResult, OpenJdkVersion, OpenJdkVersionKind};
+    use super::JavaVersionKind::{V1, V2};
+    use super::{IsopyJavaResult, JavaVersion, JavaVersionKind};
     use anyhow::Result;
     use rstest::rstest;
 
@@ -215,7 +215,7 @@ mod tests {
     #[case(V1, 1, Some(8), Some(0), None, 312, Some("b07"), "1.8.0_312-b07")]
     #[case(V1, 1, Some(8), Some(0), None, 302, Some("b08"), "1.8.0_302-b08")]
     fn basics(
-        #[case] expected_kind: OpenJdkVersionKind,
+        #[case] expected_kind: JavaVersionKind,
         #[case] expected_major: u32,
         #[case] expected_minor: Option<u32>,
         #[case] expected_patch: Option<u32>,
@@ -224,7 +224,7 @@ mod tests {
         #[case] expected_qualifier2: Option<&str>,
         #[case] input: &str,
     ) -> Result<()> {
-        let version = input.parse::<OpenJdkVersion>()?;
+        let version = input.parse::<JavaVersion>()?;
         assert_eq!(expected_kind, version.kind);
         assert_eq!(expected_major, version.major);
         assert_eq!(expected_minor, version.minor);
@@ -276,8 +276,8 @@ mod tests {
             "1.8.0_302-b08",
         ]
         .iter()
-        .map(|s| s.parse::<OpenJdkVersion>())
-        .collect::<IsopyOpenJdkResult<Vec<_>>>()?;
+        .map(|s| s.parse::<JavaVersion>())
+        .collect::<IsopyJavaResult<Vec<_>>>()?;
         versions.sort();
 
         let versions_in_order = vec![
@@ -318,8 +318,8 @@ mod tests {
             "20.0.1+9",
         ]
         .iter()
-        .map(|s| s.parse::<OpenJdkVersion>())
-        .collect::<IsopyOpenJdkResult<Vec<_>>>()?;
+        .map(|s| s.parse::<JavaVersion>())
+        .collect::<IsopyJavaResult<Vec<_>>>()?;
 
         assert_eq!(versions_in_order, versions);
         Ok(())
@@ -327,6 +327,6 @@ mod tests {
 
     #[test]
     fn error() {
-        assert!("garbage".parse::<OpenJdkVersion>().is_err());
+        assert!("garbage".parse::<JavaVersion>().is_err());
     }
 }

@@ -21,7 +21,7 @@
 //
 use crate::adoptium::AdoptiumIndexManager;
 use crate::constants::ASSETS_DIR;
-use crate::openjdk_descriptor::OpenJdkDescriptor;
+use crate::java_descriptor::JavaDescriptor;
 use async_trait::async_trait;
 use isopy_lib::{
     other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, IsopyLibError,
@@ -34,12 +34,12 @@ use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-pub struct OpenJdkPlugin {
+pub struct JavaPlugin {
     dir: PathBuf,
     assets_dir: PathBuf,
 }
 
-impl OpenJdkPlugin {
+impl JavaPlugin {
     pub fn new(dir: &Path) -> Self {
         let dir = dir.to_path_buf();
         let assets_dir = dir.join(&*ASSETS_DIR);
@@ -48,7 +48,7 @@ impl OpenJdkPlugin {
 }
 
 #[async_trait]
-impl Plugin for OpenJdkPlugin {
+impl Plugin for JavaPlugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
         let manager = AdoptiumIndexManager::new_default(&self.dir);
         Ok(manager
@@ -57,7 +57,7 @@ impl Plugin for OpenJdkPlugin {
             .into_iter()
             .map(|x| Package {
                 asset_path: self.assets_dir.join(x.file_name),
-                descriptor: Arc::new(Box::new(OpenJdkDescriptor {
+                descriptor: Arc::new(Box::new(JavaDescriptor {
                     version: x.openjdk_version,
                 })),
             })
@@ -96,8 +96,8 @@ impl Plugin for OpenJdkPlugin {
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
         let descriptor = descriptor
             .as_any()
-            .downcast_ref::<OpenJdkDescriptor>()
-            .expect("must be OpenJdkDescriptor");
+            .downcast_ref::<JavaDescriptor>()
+            .expect("must be JavaDescriptor");
 
         let manager = AdoptiumIndexManager::new_default(&self.dir);
 

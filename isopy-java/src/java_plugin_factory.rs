@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{ADOPTIUM_SERVER_URL, PLUGIN_NAME};
-use crate::openjdk_descriptor::OpenJdkDescriptor;
-use crate::openjdk_plugin::OpenJdkPlugin;
+use crate::java_descriptor::JavaDescriptor;
+use crate::java_plugin::JavaPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
 use isopy_lib::{
@@ -32,15 +32,15 @@ use serde_json::Value;
 use std::path::{Path, PathBuf};
 use url::Url;
 
-pub struct OpenJdkPluginFactory;
+pub struct JavaPluginFactory;
 
-impl Default for OpenJdkPluginFactory {
+impl Default for JavaPluginFactory {
     fn default() -> Self {
         Self
     }
 }
 
-impl PluginFactory for OpenJdkPluginFactory {
+impl PluginFactory for JavaPluginFactory {
     fn name(&self) -> &str {
         PLUGIN_NAME
     }
@@ -57,8 +57,7 @@ impl PluginFactory for OpenJdkPluginFactory {
 
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
         Ok(Box::new(
-            s.parse::<OpenJdkDescriptor>()
-                .map_err(isopy_lib_other_error)?,
+            s.parse::<JavaDescriptor>().map_err(isopy_lib_other_error)?,
         ))
     }
 
@@ -94,6 +93,6 @@ impl PluginFactory for OpenJdkPluginFactory {
     }
 
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
-        Box::new(OpenJdkPlugin::new(dir))
+        Box::new(JavaPlugin::new(dir))
     }
 }

@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::ENV_DIR;
-use crate::error::{other_error, IsopyOpenJdkError};
-use crate::openjdk_version::OpenJdkVersion;
+use crate::error::{other_error, IsopyJavaError};
+use crate::java_version::JavaVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibResult};
 use serde::{Deserialize, Serialize};
@@ -33,27 +33,27 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpenJdkDescriptor {
-    pub version: OpenJdkVersion,
+pub struct JavaDescriptor {
+    pub version: JavaVersion,
 }
 
-impl FromStr for OpenJdkDescriptor {
-    type Err = IsopyOpenJdkError;
+impl FromStr for JavaDescriptor {
+    type Err = IsopyJavaError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        s.parse::<OpenJdkVersion>()
+        s.parse::<JavaVersion>()
             .map_err(other_error)
             .map(|version| Self { version })
     }
 }
 
-impl Display for OpenJdkDescriptor {
+impl Display for JavaDescriptor {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.version)
     }
 }
 
-impl<'de> Deserialize<'de> for OpenJdkDescriptor {
+impl<'de> Deserialize<'de> for JavaDescriptor {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -64,7 +64,7 @@ impl<'de> Deserialize<'de> for OpenJdkDescriptor {
     }
 }
 
-impl Serialize for OpenJdkDescriptor {
+impl Serialize for JavaDescriptor {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -73,7 +73,7 @@ impl Serialize for OpenJdkDescriptor {
     }
 }
 
-impl Descriptor for OpenJdkDescriptor {
+impl Descriptor for JavaDescriptor {
     fn as_any(&self) -> &dyn Any {
         self
     }

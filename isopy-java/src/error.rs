@@ -23,7 +23,7 @@ use std::error::Error as StdError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum IsopyOpenJdkError {
+pub enum IsopyJavaError {
     #[error("invalid format {0}")]
     InvalidFormat(String),
 
@@ -31,9 +31,9 @@ pub enum IsopyOpenJdkError {
     Other(#[from] anyhow::Error),
 }
 
-pub fn other_error<E>(error: E) -> IsopyOpenJdkError
+pub fn other_error<E>(error: E) -> IsopyJavaError
 where
     E: StdError + Send + Sync + 'static,
 {
-    IsopyOpenJdkError::Other(anyhow::Error::new(error))
+    IsopyJavaError::Other(anyhow::Error::new(error))
 }

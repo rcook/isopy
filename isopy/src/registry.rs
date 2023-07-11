@@ -24,7 +24,7 @@ use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::PackageRec;
 use anyhow::{bail, Result};
-use isopy_java::OpenJdkPluginFactory;
+use isopy_java::JavaPluginFactory;
 use isopy_lib::{EnvInfo, PluginFactory};
 use isopy_python::PythonPluginFactory;
 use lazy_static::lazy_static;
@@ -39,7 +39,7 @@ lazy_static! {
         ),
         PluginHost::new(
             OPENJDK_DESCRIPTOR_PREFIX,
-            Box::<OpenJdkPluginFactory>::default(),
+            Box::<JavaPluginFactory>::default(),
         )
     ]);
 }
@@ -106,7 +106,7 @@ mod tests {
     use crate::plugin_host::PluginHost;
     use crate::registry::Registry;
     use anyhow::Result;
-    use isopy_openjdk::OpenJdkPluginFactory;
+    use isopy_java::JavaPluginFactory;
     use isopy_python::PythonPluginFactory;
     use rstest::rstest;
 
@@ -122,7 +122,7 @@ mod tests {
             ),
             PluginHost::new(
                 OPENJDK_DESCRIPTOR_PREFIX,
-                Box::<OpenJdkPluginFactory>::default(),
+                Box::<JavaPluginFactory>::default(),
             ),
         ]);
 

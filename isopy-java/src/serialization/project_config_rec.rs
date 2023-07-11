@@ -19,11 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::openjdk_descriptor::OpenJdkDescriptor;
+use crate::java_descriptor::JavaDescriptor;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ProjectConfigRec {
     #[serde(rename = "descriptor")]
-    pub descriptor: OpenJdkDescriptor,
+    pub descriptor: JavaDescriptor,
 }

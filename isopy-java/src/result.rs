@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyOpenJdkError;
+use crate::error::IsopyJavaError;
 use std::result::Result as StdResult;
 
-pub type IsopyOpenJdkResult<T> = StdResult<T, IsopyOpenJdkError>;
+pub type IsopyJavaResult<T> = StdResult<T, IsopyJavaError>;

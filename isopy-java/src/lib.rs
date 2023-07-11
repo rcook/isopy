@@ -36,12 +36,12 @@
 mod adoptium;
 mod constants;
 mod error;
+mod java_descriptor;
+mod java_plugin;
+mod java_plugin_factory;
+mod java_version;
 mod maven_version_range;
-mod openjdk_descriptor;
-mod openjdk_plugin;
-mod openjdk_plugin_factory;
-mod openjdk_version;
 mod result;
 mod serialization;
 
-pub use self::openjdk_plugin_factory::OpenJdkPluginFactory;
+pub use self::java_plugin_factory::JavaPluginFactory;

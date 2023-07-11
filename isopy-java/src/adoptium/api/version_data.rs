@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::openjdk_version::OpenJdkVersion;
+use crate::java_version::JavaVersion;
 use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct VersionData {
     #[serde(rename = "openjdk_version")]
-    pub openjdk_version: OpenJdkVersion,
+    pub openjdk_version: JavaVersion,
 
     #[serde(rename = "semver")]
     pub semver: String,
