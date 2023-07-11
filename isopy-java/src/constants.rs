@@ -28,8 +28,11 @@ lazy_static! {
     pub static ref ADOPTIUM_SERVER_URL: Url =
         Url::parse("https://api.adoptium.net/").expect("lazy_static: URL must be valid");
     pub static ref ADOPTIUM_INDEX_FILE_NAME: OsString = OsString::from("adoptium-index.yaml");
-    pub static ref ENV_DIR: PathBuf = PathBuf::from("openjdk");
     pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
 }
 
 pub const PLUGIN_NAME: &str = "OpenJDK";
+
+pub const JDK_PLUGIN_TYPE: &str = "JDK";
+
+pub const JRE_PLUGIN_TYPE: &str = "JRE";

@@ -30,7 +30,6 @@ lazy_static! {
             .expect("lazy_static: URL must be valid");
     pub static ref REPOSITORY_NAME_REGEX: Regex =
         Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
-    pub static ref ENV_DIR: PathBuf = PathBuf::from("python");
     pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
 }
 

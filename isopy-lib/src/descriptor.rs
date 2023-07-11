@@ -28,8 +28,8 @@ use std::sync::Arc;
 
 pub trait Descriptor: Any + Debug + Display + Send + Sync {
     fn as_any(&self) -> &dyn Any;
-    fn transform_archive_path(&self, path: &Path) -> PathBuf;
-    fn get_env_props(&self) -> IsopyLibResult<Value>;
+    fn transform_archive_path(&self, path: &Path, bin_subdir: &Path) -> PathBuf;
+    fn get_env_props(&self, bin_subdir: &Path) -> IsopyLibResult<Value>;
     fn get_project_props(&self) -> IsopyLibResult<Value>;
 }
 

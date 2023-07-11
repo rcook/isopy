@@ -28,7 +28,12 @@ use std::fs::{create_dir_all, File};
 use std::path::Path;
 use tar::{Archive, Entry};
 
-pub fn unpack_file(descriptor: &dyn Descriptor, path: &Path, dir: &Path) -> Result<()> {
+pub fn unpack_file(
+    descriptor: &dyn Descriptor,
+    path: &Path,
+    dir: &Path,
+    bin_subdir: &Path,
+) -> Result<()> {
     fn unpack_entry(entry: &mut Entry<GzDecoder<File>>, path: &Path) -> Result<()> {
         let dir = path
             .parent()
@@ -57,7 +62,7 @@ pub fn unpack_file(descriptor: &dyn Descriptor, path: &Path, dir: &Path) -> Resu
         .filter_map(std::result::Result::ok)
         .enumerate()
     {
-        let rel_path = descriptor.transform_archive_path(&entry.path()?);
+        let rel_path = descriptor.transform_archive_path(&entry.path()?, bin_subdir);
         let path = dir.join(rel_path);
         unpack_entry(&mut entry, &path)?;
         op.set_progress(idx as OpProgress);

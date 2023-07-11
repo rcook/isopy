@@ -1,3 +1,4 @@
+use crate::adoptium::api::ImageType;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,7 +20,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{ADOPTIUM_SERVER_URL, PLUGIN_NAME};
+use crate::constants::{ADOPTIUM_SERVER_URL, JDK_PLUGIN_TYPE, JRE_PLUGIN_TYPE, PLUGIN_NAME};
 use crate::java_descriptor::JavaDescriptor;
 use crate::java_plugin::JavaPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
@@ -32,17 +33,32 @@ use serde_json::Value;
 use std::path::{Path, PathBuf};
 use url::Url;
 
-pub struct JavaPluginFactory;
+pub struct JavaPluginFactory {
+    name: String,
+    image_type: ImageType,
+}
 
-impl Default for JavaPluginFactory {
-    fn default() -> Self {
-        Self
+impl JavaPluginFactory {
+    #[must_use]
+    pub fn new_jdk() -> Self {
+        Self {
+            name: format!("{PLUGIN_NAME} ({JDK_PLUGIN_TYPE})"),
+            image_type: ImageType::Jdk,
+        }
+    }
+
+    #[must_use]
+    pub fn new_jre() -> Self {
+        Self {
+            name: format!("{PLUGIN_NAME} ({JRE_PLUGIN_TYPE})"),
+            image_type: ImageType::Jre,
+        }
     }
 }
 
 impl PluginFactory for JavaPluginFactory {
     fn name(&self) -> &str {
-        PLUGIN_NAME
+        &self.name
     }
 
     fn source_url(&self) -> &Url {
@@ -93,6 +109,6 @@ impl PluginFactory for JavaPluginFactory {
     }
 
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
-        Box::new(JavaPlugin::new(dir))
+        Box::new(JavaPlugin::new(self.image_type.clone(), dir))
     }
 }

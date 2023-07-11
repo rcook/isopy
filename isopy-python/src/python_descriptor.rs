@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ENV_DIR;
 use crate::python_version::PythonVersion;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use crate::tag::Tag;
@@ -97,13 +96,13 @@ impl Descriptor for PythonDescriptor {
         self
     }
 
-    fn transform_archive_path(&self, path: &Path) -> PathBuf {
+    fn transform_archive_path(&self, path: &Path, _bin_subdir: &Path) -> PathBuf {
         path.to_path_buf()
     }
 
-    fn get_env_props(&self) -> IsopyLibResult<Value> {
+    fn get_env_props(&self, bin_subdir: &Path) -> IsopyLibResult<Value> {
         serde_json::to_value(EnvConfigRec {
-            dir: ENV_DIR.clone(),
+            dir: bin_subdir.to_path_buf(),
             descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)

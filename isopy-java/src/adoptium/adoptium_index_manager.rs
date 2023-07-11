@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::api::{Release, Singleton};
+use super::api::{ImageType, Release, Singleton};
 use super::client::{all_versions, AdoptiumClient, Query};
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
 use crate::serialization::{IndexRec, VersionRec};
@@ -30,14 +30,16 @@ use reqwest::Url;
 use std::path::{Path, PathBuf};
 
 pub struct AdoptiumIndexManager {
+    image_type: ImageType,
     client: AdoptiumClient,
     index_path: PathBuf,
 }
 
 impl AdoptiumIndexManager {
     #[must_use]
-    pub fn new_default(shared_dir: &Path) -> Self {
+    pub fn new_default(image_type: ImageType, shared_dir: &Path) -> Self {
         Self::new(
+            image_type,
             &ADOPTIUM_SERVER_URL,
             &shared_dir.join(&*ADOPTIUM_INDEX_FILE_NAME),
         )
@@ -49,9 +51,10 @@ impl AdoptiumIndexManager {
     ///
     /// Panics if `index_path` is not absolute.
     #[must_use]
-    pub fn new(server_url: &Url, index_path: &Path) -> Self {
+    pub fn new(image_type: ImageType, server_url: &Url, index_path: &Path) -> Self {
         assert!(index_path.is_absolute());
         Self {
+            image_type,
             client: AdoptiumClient::new(server_url),
             index_path: index_path.to_path_buf(),
         }
@@ -123,7 +126,7 @@ impl AdoptiumIndexManager {
 
         let versions = self
             .client
-            .get_releases(all_versions(), &Query::default())
+            .get_releases(all_versions(), &Query::new(self.image_type.clone()))
             .await?
             .iter()
             .filter_map(make_version)

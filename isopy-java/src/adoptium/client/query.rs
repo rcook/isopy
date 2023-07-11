@@ -89,15 +89,15 @@ impl Query {
     }
 }
 
-impl Default for Query {
-    fn default() -> Self {
+impl Query {
+    pub const fn new(image_type: ImageType) -> Self {
         Self {
             #[cfg(target_arch = "aarch64")]
             architecture: Some(Architecture::AArch64),
             #[cfg(target_arch = "x86_64")]
             architecture: Some(Architecture::X64),
             heap_size: Some(HeapSize::Normal),
-            image_type: Some(ImageType::Jre),
+            image_type: Some(image_type),
             jvm_impl: Some(AdoptiumJvmImpl::Hotspot),
             #[cfg(target_os = "linux")]
             os: Some(OperatingSystem::Linux),

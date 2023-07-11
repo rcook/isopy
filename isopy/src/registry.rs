@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
+use crate::constants::{JDK_DESCRIPTOR_PREFIX, JRE_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::PackageRec;
@@ -38,8 +38,12 @@ lazy_static! {
             Box::<PythonPluginFactory>::default(),
         ),
         PluginHost::new(
-            OPENJDK_DESCRIPTOR_PREFIX,
-            Box::<JavaPluginFactory>::default(),
+            JDK_DESCRIPTOR_PREFIX,
+            Box::new(JavaPluginFactory::new_jdk())
+        ),
+        PluginHost::new(
+            JRE_DESCRIPTOR_PREFIX,
+            Box::new(JavaPluginFactory::new_jre())
         )
     ]);
 }
@@ -102,7 +106,9 @@ impl Registry {
 
 #[cfg(test)]
 mod tests {
-    use crate::constants::{OPENJDK_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
+    use crate::constants::{
+        JDK_DESCRIPTOR_PREFIX, JRE_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX,
+    };
     use crate::plugin_host::PluginHost;
     use crate::registry::Registry;
     use anyhow::Result;
@@ -113,7 +119,8 @@ mod tests {
     #[rstest]
     #[case("python:1.2.3:11223344", "1.2.3:11223344")]
     #[case("python:1.2.3:11223344", "python:1.2.3:11223344")]
-    #[case("openjdk:19.0.1+10", "openjdk:19.0.1+10")]
+    #[case("jdk:19.0.1+10", "jdk:19.0.1+10")]
+    #[case("jre:19.0.1+10", "jre:19.0.1+10")]
     fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
         let registry = Registry::new(vec![
             PluginHost::new(
@@ -121,8 +128,12 @@ mod tests {
                 Box::<PythonPluginFactory>::default(),
             ),
             PluginHost::new(
-                OPENJDK_DESCRIPTOR_PREFIX,
-                Box::<JavaPluginFactory>::default(),
+                JDK_DESCRIPTOR_PREFIX,
+                Box::new(JavaPluginFactory::new_jdk()),
+            ),
+            PluginHost::new(
+                JRE_DESCRIPTOR_PREFIX,
+                Box::new(JavaPluginFactory::new_jre()),
             ),
         ]);
 

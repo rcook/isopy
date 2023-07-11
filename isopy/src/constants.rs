@@ -31,7 +31,9 @@ lazy_static! {
 
 pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
-pub const OPENJDK_DESCRIPTOR_PREFIX: &str = "openjdk";
+pub const JDK_DESCRIPTOR_PREFIX: &str = "jdk";
+
+pub const JRE_DESCRIPTOR_PREFIX: &str = "jre";
 
 pub type ExitCode = i32;
 

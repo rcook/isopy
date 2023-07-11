@@ -87,15 +87,18 @@ impl App {
             descriptor,
         } = plugin.download_package(descriptor).await?;
 
+        let bin_subdir = Path::new(plugin_host.prefix());
+
         unpack_file(
             descriptor.as_ref().as_ref(),
             &asset_path,
             dir_info.data_dir(),
+            bin_subdir,
         )?;
 
         packages.push(PackageRec {
             id: String::from(plugin_host.prefix()),
-            props: descriptor.get_env_props()?,
+            props: descriptor.get_env_props(bin_subdir)?,
         });
 
         safe_write_file(

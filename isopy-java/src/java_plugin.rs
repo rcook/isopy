@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::adoptium::api::ImageType;
 use crate::adoptium::AdoptiumIndexManager;
 use crate::constants::ASSETS_DIR;
 use crate::java_descriptor::JavaDescriptor;
@@ -35,22 +36,27 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 pub struct JavaPlugin {
+    image_type: ImageType,
     dir: PathBuf,
     assets_dir: PathBuf,
 }
 
 impl JavaPlugin {
-    pub fn new(dir: &Path) -> Self {
+    pub fn new(image_type: ImageType, dir: &Path) -> Self {
         let dir = dir.to_path_buf();
         let assets_dir = dir.join(&*ASSETS_DIR);
-        Self { dir, assets_dir }
+        Self {
+            image_type,
+            dir,
+            assets_dir,
+        }
     }
 }
 
 #[async_trait]
 impl Plugin for JavaPlugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let manager = AdoptiumIndexManager::new_default(&self.dir);
+        let manager = AdoptiumIndexManager::new_default(self.image_type.clone(), &self.dir);
         Ok(manager
             .read_versions()
             .await?
@@ -99,7 +105,7 @@ impl Plugin for JavaPlugin {
             .downcast_ref::<JavaDescriptor>()
             .expect("must be JavaDescriptor");
 
-        let manager = AdoptiumIndexManager::new_default(&self.dir);
+        let manager = AdoptiumIndexManager::new_default(self.image_type.clone(), &self.dir);
 
         let versions = manager.read_versions().await?;
         let Some(version) = versions
