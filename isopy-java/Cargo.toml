@@ -1,12 +1,12 @@
 [package]
 authors = ["Richard Cook"]
 categories = ["development-tools"]
-description = "Isolated Python Tool - OpenJDK Support"
+description = "Isolated Python Tool - Java Support"
 edition = "2021"
 homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
-name = "isopy-openjdk"
+name = "isopy-java"
 repository = "https://rcook.github.io/isopy"
 version = "0.2.2"
 
