@@ -87,7 +87,7 @@ impl AdoptiumClient {
         let request = self.client.get(url.clone());
         let response = request.send().await?;
         let mut wrapped: Box<dyn Response> = Box::new(ReqwestResponse::new(None, response));
-        download_stream("JDK asset", &mut wrapped, output_path).await
+        download_stream("OpenJDK asset", &mut wrapped, output_path).await
     }
 
     async fn get_list<R>(&self, mut request_builder: RequestBuilder) -> Result<Vec<R::Item>>
