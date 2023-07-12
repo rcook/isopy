@@ -24,9 +24,10 @@ use crate::status::Status;
 use anyhow::anyhow;
 use anyhow::Result;
 use joatmon::safe_write_file;
-use log::error;
+use log::{error, info};
 use serde::Serialize;
 use std::env::join_paths;
+use std::ffi::OsStr;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use tinytemplate::TinyTemplate;
@@ -59,7 +60,12 @@ struct Context {
     script_path: PathBuf,
 }
 
-pub fn wrap(app: &App, wrapper_path: &Path, script_path: &Path, base_dir: &Path) -> Result<Status> {
+pub fn wrap(
+    app: &App,
+    wrapper_name: &OsStr,
+    script_path: &Path,
+    base_dir: &Path,
+) -> Result<Status> {
     let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
         error!("could not find environment for directory {}", app.cwd.display());
         return Ok(Status::Fail);
@@ -85,6 +91,8 @@ pub fn wrap(app: &App, wrapper_path: &Path, script_path: &Path, base_dir: &Path)
         .map(|(k, v)| format!("{k}={v} \\\n"))
         .collect::<String>();
 
+    let wrapper_path = app.cache_dir.join("bin").join(wrapper_name);
+
     let s = template.render(
         "WRAPPER",
         &Context {
@@ -95,10 +103,9 @@ pub fn wrap(app: &App, wrapper_path: &Path, script_path: &Path, base_dir: &Path)
         },
     )?;
 
-    safe_write_file(wrapper_path, s, false)?;
-
-    set_file_attributes(wrapper_path)?;
-
+    safe_write_file(&wrapper_path, s, false)?;
+    set_file_attributes(&wrapper_path)?;
+    info!("wrapper created at {}", wrapper_path.display());
     Ok(Status::OK)
 }
 

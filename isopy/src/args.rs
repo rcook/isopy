@@ -24,6 +24,7 @@ use clap::{Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
+use std::ffi::OsString;
 use std::path::PathBuf;
 use std::result::Result;
 
@@ -161,8 +162,8 @@ pub enum Command {
 
     #[command(name = "wrap", about = "Generate wrapper script for script")]
     Wrap {
-        #[arg(help = "Wrapper path", value_parser = parse_absolute_path)]
-        wrapper_path: PathBuf,
+        #[arg(help = "Wrapper name")]
+        wrapper_name: OsString,
 
         #[arg(help = "Script path", value_parser = parse_absolute_path)]
         script_path: PathBuf,

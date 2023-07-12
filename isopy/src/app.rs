@@ -33,6 +33,7 @@ use std::path::{Path, PathBuf};
 
 pub struct App {
     pub cwd: PathBuf,
+    pub cache_dir: PathBuf,
     pub repo: Repo,
 }
 
@@ -57,8 +58,12 @@ impl App {
         Ok(Some(all_env_info))
     }
 
-    pub const fn new(cwd: PathBuf, repo: Repo) -> Self {
-        Self { cwd, repo }
+    pub fn new(cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Self {
+        Self {
+            cwd,
+            cache_dir: cache_dir.to_path_buf(),
+            repo,
+        }
     }
 
     pub async fn add_package(

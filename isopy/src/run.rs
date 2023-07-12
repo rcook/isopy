@@ -75,7 +75,7 @@ pub async fn run() -> Result<Status> {
         None => current_dir()?,
     };
 
-    let app = App::new(cwd, repo);
+    let app = App::new(cwd, &cache_dir, repo);
     do_it(app, args.command).await
 }
 
@@ -98,9 +98,9 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Scratch => scratch(&app),
         Shell => shell(app),
         Wrap {
-            wrapper_path,
+            wrapper_name,
             script_path,
             base_dir,
-        } => wrap(&app, &wrapper_path, &script_path, &base_dir),
+        } => wrap(&app, &wrapper_name, &script_path, &base_dir),
     }
 }
