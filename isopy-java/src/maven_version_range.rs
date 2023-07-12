@@ -24,15 +24,15 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 const MAVEN_VERSION: &AsciiSet = &CONTROLS.add(b'(').add(b')').add(b',').add(b'[').add(b']');
 
-#[allow(unused)]
 pub enum MavenVersionRange {
+    #[allow(unused)]
     OpenJdkVersion(String),
+    #[allow(unused)]
     Value(MavenVersionValue),
     Range(MavenVersionLimit, MavenVersionLimit),
 }
 
 impl MavenVersionRange {
-    #[allow(unused)]
     #[must_use]
     pub fn to_path_segment(&self) -> String {
         utf8_percent_encode(&self.to_string(), MAVEN_VERSION).to_string()
@@ -87,7 +87,6 @@ pub struct MavenVersionValue {
 }
 
 impl MavenVersionValue {
-    #[allow(unused)]
     #[must_use]
     pub const fn new(major: u32, minor: Option<u32>) -> Self {
         Self { major, minor }
@@ -104,7 +103,6 @@ impl Display for MavenVersionValue {
     }
 }
 
-#[allow(unused)]
 pub enum MavenVersionLimit {
     Open(Option<MavenVersionValue>),
     Closed(Option<MavenVersionValue>),

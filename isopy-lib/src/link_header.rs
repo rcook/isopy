@@ -34,7 +34,6 @@ pub struct LinkHeader {
 }
 
 impl LinkHeader {
-    #[allow(unused)]
     pub fn from_response(response: &Response) -> IsopyLibResult<Option<Self>> {
         let Some(link_header) = response.headers().get("link") else {
             return Ok(None)

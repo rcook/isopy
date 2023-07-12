@@ -24,7 +24,6 @@ use crate::adoptium::api::version_data::VersionData;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-#[allow(unused)]
 pub struct Versions {
     #[serde(rename = "versions")]
     pub versions: Vec<VersionData>,

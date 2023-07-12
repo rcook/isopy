@@ -58,7 +58,6 @@ pub enum IsopyPythonError {
     Other(#[from] anyhow::Error),
 }
 
-#[allow(unused)]
 pub fn other_error<E>(error: E) -> IsopyPythonError
 where
     E: StdError + Send + Sync + 'static,

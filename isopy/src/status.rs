@@ -21,6 +21,5 @@
 //
 pub enum Status {
     OK,
-    #[allow(unused)]
     Fail,
 }

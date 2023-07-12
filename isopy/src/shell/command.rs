@@ -34,7 +34,6 @@ pub struct Command {
 }
 
 impl Command {
-    #[allow(unused)]
     pub const fn new(program: OsString) -> Self {
         Self {
             program: Some(program),
@@ -49,7 +48,6 @@ impl Command {
         }
     }
 
-    #[allow(unused)]
     pub fn arg(&mut self, arg: OsString) -> &mut Self {
         self.args.push(arg);
         self
