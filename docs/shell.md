@@ -10,6 +10,7 @@ function __temp_isopy {
       isopy prompt
     }
     alias cd='cd_isopy'
+    export PATH=$HOME/.isopy/bin:$PATH
   fi
 }
 __temp_isopy
