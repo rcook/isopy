@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::dir_info_ext::DirInfoExt;
 use crate::status::Status;
 use anyhow::anyhow;
 use anyhow::Result;
@@ -71,7 +72,7 @@ pub fn wrap(
         return Ok(Status::Fail);
     };
 
-    let Some(env_info) = App::make_env_info(dir_info.data_dir(), Some(base_dir))? else {
+    let Some(env_info) = dir_info.make_env_info(Some(base_dir))? else {
         error!("could not get environment info");
         return Ok(Status::Fail);
     };

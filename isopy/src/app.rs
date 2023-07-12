@@ -19,15 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ENV_CONFIG_FILE_NAME;
+use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHost;
-use crate::registry::Registry;
 use crate::serialization::{EnvRec, PackageRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
-use isopy_lib::{Descriptor, EnvInfo, Package, PluginFactory};
+use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::{read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -38,26 +36,6 @@ pub struct App {
 }
 
 impl App {
-    pub fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-        let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(&*ENV_CONFIG_FILE_NAME))?;
-
-        let mut all_env_info = EnvInfo {
-            path_dirs: Vec::new(),
-            vars: Vec::new(),
-        };
-
-        for package_rec in &env_rec.packages {
-            let Some(env_info) = Registry::global().make_env_info(data_dir, package_rec,base_dir)? else {
-                return Ok(None);
-            };
-
-            all_env_info.path_dirs.extend(env_info.path_dirs);
-            all_env_info.vars.extend(env_info.vars);
-        }
-
-        Ok(Some(all_env_info))
-    }
-
     pub fn new(cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Self {
         Self {
             cwd,
@@ -74,19 +52,18 @@ impl App {
         let project_dir = self.cwd.clone();
         let mut packages = Vec::new();
 
-        let (dir_info, env_config_path) = if let Some(dir_info) = self.repo.get(&project_dir)? {
-            let env_config_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
-            let env_rec = read_yaml_file::<EnvRec>(&env_config_path)?;
+        let dir_info = if let Some(dir_info) = self.repo.get(&project_dir)? {
+            let env_rec = dir_info.read_env_config()?;
             if env_rec.project_dir != project_dir {
                 bail!(
-                    "environment file {} does not refer to project directory {}",
-                    env_config_path.display(),
+                    "environment directory {} does not correspond to project directory {}",
+                    dir_info.data_dir().display(),
                     project_dir.display()
                 );
             }
 
             packages.extend(env_rec.packages);
-            (dir_info, env_config_path)
+            dir_info
         } else {
             let Some(dir_info) = self.repo.init(&project_dir)? else {
                 bail!(
@@ -95,8 +72,7 @@ impl App {
                 )
             };
 
-            let env_config_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
-            (dir_info, env_config_path)
+            dir_info
         };
 
         if packages.iter().any(|p| p.id == plugin_host.prefix()) {
@@ -127,12 +103,11 @@ impl App {
             props: descriptor.get_env_props(bin_subdir)?,
         });
 
-        safe_write_file(
-            &env_config_path,
-            serde_yaml::to_string(&EnvRec {
+        dir_info.write_env_config(
+            &EnvRec {
                 project_dir,
                 packages,
-            })?,
+            },
             true,
         )?;
 

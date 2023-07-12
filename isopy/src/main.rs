@@ -39,6 +39,7 @@ mod backtrace;
 mod commands;
 mod constants;
 mod descriptor_info;
+mod dir_info_ext;
 mod package_id;
 mod plugin_host;
 mod print;

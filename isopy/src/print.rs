@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ENV_CONFIG_FILE_NAME;
+use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
@@ -28,7 +28,6 @@ use anyhow::{anyhow, Result};
 use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
 use joat_repo::{DirInfo, Link, Manifest, Repo};
-use joatmon::read_yaml_file;
 use std::ffi::OsStr;
 use std::fmt::Display;
 use std::fs::metadata;
@@ -131,9 +130,8 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
 pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     print_title("Environment info");
 
-    let env_yaml_path = dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME);
-    let env_rec = if env_yaml_path.is_file() {
-        Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
+    let env_rec = if dir_info.has_env_config() {
+        Some(dir_info.read_env_config()?)
     } else {
         None
     };

@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ENV_CONFIG_FILE_NAME;
+use crate::dir_info_ext::make_env_config_path;
 use crate::print::{print, print_link, print_metadir, print_title};
 use crate::serialization::EnvRec;
 use crate::status::Status;
@@ -34,7 +34,7 @@ pub fn list(app: &App) -> Result<Status> {
         for (idx, manifest) in manifests.iter().enumerate() {
             print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
 
-            let env_yaml_path = manifest.data_dir().join(&*ENV_CONFIG_FILE_NAME);
+            let env_yaml_path = make_env_config_path(manifest.data_dir());
             let rec_opt = if env_yaml_path.is_file() {
                 Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
             } else {

@@ -21,6 +21,7 @@
 //
 use crate::app::App;
 use crate::constants::ISOPY_ENV_NAME;
+use crate::dir_info_ext::DirInfoExt;
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::{bail, Result};
@@ -42,7 +43,7 @@ pub fn shell(app: App, verbose: bool) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    let Some(env_info) = App::make_env_info(dir_info.data_dir(), None)? else {
+    let Some(env_info) = dir_info.make_env_info(None)? else {
         error!("could not get environment info");
         return Ok(Status::Fail);
     };
