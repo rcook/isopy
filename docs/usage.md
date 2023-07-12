@@ -13,6 +13,7 @@
 * [prompt](prompt-command.md)
 * [run](run-command.md)
 * [shell](shell-command.md)
-* [wrap](wrap-command.md)
+* [wrap-command](wrap-command-command.md)
+* [wrap-script](wrap-script-command.md)
 
 See also [global options](globals.md).

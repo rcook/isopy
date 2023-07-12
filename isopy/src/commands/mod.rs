@@ -49,4 +49,4 @@ pub use self::prompt::prompt;
 pub use self::run::run;
 pub use self::scratch::scratch;
 pub use self::shell::shell;
-pub use self::wrap::wrap;
+pub use self::wrap::{wrap, WrapTarget};

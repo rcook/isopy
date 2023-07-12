@@ -23,7 +23,6 @@ use crate::constants::{PLUGIN_NAME, RELEASES_URL};
 use crate::python_descriptor::PythonDescriptor;
 use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
-use anyhow::anyhow;
 use isopy_lib::{
     other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
     PluginFactory,
@@ -66,7 +65,7 @@ impl PluginFactory for PythonPluginFactory {
         &self,
         data_dir: &Path,
         props: &Value,
-        base_dir: Option<&Path>,
+        _base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo> {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
@@ -85,6 +84,7 @@ impl PluginFactory for PythonPluginFactory {
             serde_json::from_value::<EnvConfigRec>(props.clone()).map_err(isopy_lib_other_error)?;
 
         let path_dirs = make_path_dirs(data_dir, &env_config_rec);
+        /*
         let vars = if let Some(d) = base_dir {
             vec![(
                 String::from("PYTHONPATH"),
@@ -96,6 +96,8 @@ impl PluginFactory for PythonPluginFactory {
         } else {
             vec![]
         };
+        */
+        let vars = vec![];
 
         Ok(EnvInfo { path_dirs, vars })
     }

@@ -33,38 +33,38 @@ use std::path::{Path, PathBuf};
 use tinytemplate::TinyTemplate;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-const PYTHON_EXECUTABLE_NAME: &str = "python3";
-
-#[cfg(target_os = "windows")]
-const PYTHON_EXECUTABLE_NAME: &str = "python";
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
 const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
 set -euo pipefail
 {path_env} \
-{vars}exec {python_executable_name} {script_path} "$@"
+{vars}exec {command} "$@"
 "#;
 
 #[cfg(target_os = "windows")]
 const WRAPPER_TEMPLATE: &str = r#"@echo off
 setlocal
 {path_env}
-set PYTHONPATH={base_dir}
-{python_executable_name} "{script_path}" %*"#;
+{vars}
+"{command}" %*
+"#;
 
 #[derive(Serialize)]
-struct Context {
+struct TemplateContext {
     path_env: String,
     vars: String,
-    python_executable_name: PathBuf,
-    script_path: PathBuf,
+    command: String,
+}
+
+pub enum WrapTarget {
+    Command(String),
+    Script(PathBuf),
 }
 
 pub fn wrap(
     app: &App,
-    wrapper_name: &OsStr,
-    script_path: &Path,
+    wrapper_file_name: &OsStr,
+    target: &WrapTarget,
     base_dir: &Path,
+    force: bool,
 ) -> Result<Status> {
     let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
         error!("could not find environment for directory {}", app.cwd.display());
@@ -91,19 +91,25 @@ pub fn wrap(
         .map(|(k, v)| format!("{k}={v} \\\n"))
         .collect::<String>();
 
-    let wrapper_path = app.cache_dir.join("bin").join(wrapper_name);
+    let wrapper_path = app.cache_dir.join("bin").join(wrapper_file_name);
+
+    let command = match target {
+        WrapTarget::Command(s) => s.clone(),
+        WrapTarget::Script(p) => {
+            String::from(p.to_str().ok_or_else(|| anyhow!("cannot convert path"))?)
+        }
+    };
 
     let s = template.render(
         "WRAPPER",
-        &Context {
+        &TemplateContext {
             path_env,
             vars,
-            python_executable_name: PathBuf::from(PYTHON_EXECUTABLE_NAME),
-            script_path: script_path.to_path_buf(),
+            command,
         },
     )?;
 
-    safe_write_file(&wrapper_path, s, false)?;
+    safe_write_file(&wrapper_path, s, force)?;
     set_file_attributes(&wrapper_path)?;
     info!("wrapper created at {}", wrapper_path.display());
     Ok(Status::OK)

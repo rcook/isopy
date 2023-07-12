@@ -24,7 +24,7 @@ use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::{
     add, available, check, download, downloaded, info, install, install_project, link, list,
-    prompt, run as run_command, scratch, shell, wrap,
+    prompt, run as run_command, scratch, shell, wrap, WrapTarget,
 };
 use crate::constants::CACHE_DIR;
 use crate::status::Status;
@@ -97,10 +97,31 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app),
         Shell => shell(app),
-        Wrap {
-            wrapper_name,
+        WrapCommand {
+            wrapper_file_name,
+            command,
+            base_dir,
+            force,
+            _no_force,
+        } => wrap(
+            &app,
+            &wrapper_file_name,
+            &WrapTarget::Command(command),
+            &base_dir,
+            force,
+        ),
+        WrapScript {
+            wrapper_file_name,
             script_path,
             base_dir,
-        } => wrap(&app, &wrapper_name, &script_path, &base_dir),
+            force,
+            _no_force,
+        } => wrap(
+            &app,
+            &wrapper_file_name,
+            &WrapTarget::Script(script_path),
+            &base_dir,
+            force,
+        ),
     }
 }
