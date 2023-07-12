@@ -28,7 +28,7 @@ use colored::Colorize;
 use log::error;
 use std::env::{var, VarError};
 
-pub fn shell(app: App) -> Result<Status> {
+pub fn shell(app: App, verbose: bool) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
             bail!("you are already in an isopy shell");
@@ -47,12 +47,22 @@ pub fn shell(app: App) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    for path_dir in &env_info.path_dirs {
-        println!("  {}", format!("{}", path_dir.display()).yellow());
-    }
+    if verbose {
+        println!("Starting isopy environment shell");
 
-    for (k, v) in &env_info.vars {
-        println!("  {}", format!("{k} = {v}").yellow());
+        if !env_info.path_dirs.is_empty() {
+            println!("{}", "Path directories:".green());
+            for path_dir in &env_info.path_dirs {
+                println!("  {}", format!("{}", path_dir.display()).yellow());
+            }
+        }
+
+        if !env_info.vars.is_empty() {
+            println!("{}", "Additional environment variables:".green());
+            for (k, v) in &env_info.vars {
+                println!("  {}", format!("{k} = {v}").yellow());
+            }
+        }
     }
 
     // Explicitly drop app so that repository is unlocked in shell

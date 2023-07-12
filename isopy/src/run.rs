@@ -84,10 +84,10 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
 
     match command {
         Add { package_id } => add(&app, &package_id),
-        Available { verbose } => available(&app, verbose).await,
-        Check { clean } => check(&app, clean),
+        Available { verbose, .. } => available(&app, verbose).await,
+        Check { clean, .. } => check(&app, clean),
         Download { package_id } => download(&app, &package_id).await,
-        Downloaded { verbose } => downloaded(&app, verbose).await,
+        Downloaded { verbose, .. } => downloaded(&app, verbose).await,
         Info => info(&app),
         Install { package_id } => install(&app, &package_id).await,
         InstallProject => install_project(&app).await,
@@ -96,13 +96,13 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Prompt => prompt(&app),
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app),
-        Shell => shell(app),
+        Shell { verbose, .. } => shell(app, verbose),
         WrapCommand {
             wrapper_file_name,
             command,
             base_dir,
             force,
-            _no_force,
+            ..
         } => wrap(
             &app,
             &wrapper_file_name,
@@ -115,7 +115,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             script_path,
             base_dir,
             force,
-            _no_force,
+            ..
         } => wrap(
             &app,
             &wrapper_file_name,

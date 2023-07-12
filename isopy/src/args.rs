@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::package_id::PackageId;
-use clap::{Parser, Subcommand, ValueEnum};
+use clap::{ArgAction, Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
@@ -86,8 +86,18 @@ pub enum Command {
 
     #[command(name = "available", about = "List packages available for download")]
     Available {
-        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
         verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
     },
 
     #[command(
@@ -95,8 +105,18 @@ pub enum Command {
         about = "Check integrity of metadata directory and optionally clean up"
     )]
     Check {
-        #[arg(help = "Clean up", long = "clean", default_value_t = false)]
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --clean/--no-clean with default of "false"
+        #[arg(
+            help = "Clean up cache directory",
+            long = "clean",
+            overrides_with = "_no_clean",
+            default_value_t = false
+        )]
         clean: bool,
+
+        #[arg(help = "Do not clean up cache directory", long = "no-clean")]
+        _no_clean: bool,
     },
 
     #[command(name = "download", about = "Download package")]
@@ -107,8 +127,18 @@ pub enum Command {
 
     #[command(name = "downloaded", about = "List locally downloaded packages")]
     Downloaded {
-        #[arg(help = "Show more detail", long = "verbose", default_value_t = false)]
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
         verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
     },
 
     #[command(name = "info", about = "Show information")]
@@ -158,7 +188,24 @@ pub enum Command {
     Scratch,
 
     #[command(name = "shell", about = "Start environment shell")]
-    Shell,
+    Shell {
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "true"
+        #[arg(
+            help = "Show detailed output",
+            long = "no-verbose",
+            default_value_t = true,
+            action = ArgAction::SetFalse
+        )]
+        verbose: bool,
+
+        #[arg(
+            help = "Show brief output",
+            long = "verbose",
+            overrides_with = "verbose"
+        )]
+        _no_verbose: bool,
+    },
 
     #[command(
         name = "wrap-command",
@@ -175,15 +222,17 @@ pub enum Command {
         base_dir: PathBuf,
 
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --force/--no-force with default of "false"
         #[arg(
             help = "Force overwrite of output file",
             short = 'f',
             long = "force",
-            overrides_with = "_no_force"
+            overrides_with = "_no_force",
+            default_value_t = false
         )]
         force: bool,
 
-        #[arg(help = "Dot not force overwrite of output file", long = "no-force")]
+        #[arg(help = "Do not force overwrite of output file", long = "no-force")]
         _no_force: bool,
     },
 
