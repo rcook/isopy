@@ -1,19 +1,26 @@
 # Cookbook
 
-## "What versions of Python are availabe?"
+## "What packages are available for download?"
 
 ```bash
 isopy available
 ```
 
+## "What packages have I downloaded locally?"
+
+```bash
+isopy downloaded
+```
+
 ## "I'd like to set up my current project to use Python 3.11.1"
 
 ```bash
-cd /path/to/project
+# Creates an .isopy.yaml configuration file
+isopy add python:3.11.1
 
-# Create an .isopy.yaml configuration file
-isopy init 3.11.1 -t 20230116
+# Installs the package into an environment associated with this directory
+isopy install-project
 
-# Start a shell
+# Start a shell in this environment
 isopy shell
 ```
