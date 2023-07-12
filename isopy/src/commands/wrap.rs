@@ -20,36 +20,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ENV_CONFIG_FILE_NAME;
-use crate::serialization::EnvRec;
 use crate::status::Status;
-use anyhow::{bail, Result};
-#[allow(unused)]
-use joatmon::{read_yaml_file, safe_write_file};
+use anyhow::anyhow;
+use anyhow::Result;
+use joatmon::safe_write_file;
+use log::error;
 use serde::Serialize;
 use std::env::join_paths;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
-#[allow(unused)]
 use tinytemplate::TinyTemplate;
 
-#[allow(unused)]
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const PYTHON_EXECUTABLE_NAME: &str = "python3";
 
-#[allow(unused)]
 #[cfg(target_os = "windows")]
 const PYTHON_EXECUTABLE_NAME: &str = "python";
 
-#[allow(unused)]
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
 set -euo pipefail
 {path_env} \
-PYTHONPATH={base_dir} \
-exec {python_executable_name} {script_path} "$@""#;
+{vars}exec {python_executable_name} {script_path} "$@"
+"#;
 
-#[allow(unused)]
 #[cfg(target_os = "windows")]
 const WRAPPER_TEMPLATE: &str = r#"@echo off
 setlocal
@@ -60,66 +54,62 @@ set PYTHONPATH={base_dir}
 #[derive(Serialize)]
 struct Context {
     path_env: String,
-    base_dir: PathBuf,
+    vars: String,
     python_executable_name: PathBuf,
     script_path: PathBuf,
 }
 
-#[allow(unused)]
 pub fn wrap(app: &App, wrapper_path: &Path, script_path: &Path, base_dir: &Path) -> Result<Status> {
     let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
-        bail!("Could not find environment for directory {}", app.cwd.display())
+        error!("could not find environment for directory {}", app.cwd.display());
+        return Ok(Status::Fail);
     };
 
-    let data_dir = dir_info.data_dir();
-    let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(&*ENV_CONFIG_FILE_NAME))?;
-
-    todo!()
-    /*
-    let python_dir = data_dir.join(rec.dir);
+    let Some(env_info) = App::make_env_info(dir_info.data_dir(), Some(base_dir))? else {
+        error!("could not get environment info");
+        return Ok(Status::Fail);
+    };
 
     let mut template = TinyTemplate::new();
     template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    let path_env = make_path_env(&[&python_dir.join("bin")])?;
+    let path_env = String::from(
+        make_path_env(&env_info.path_dirs)?
+            .to_str()
+            .ok_or_else(|| anyhow!("failed to generate PATH environment variable"))?,
+    );
 
-    #[cfg(any(target_os = "windows"))]
-    let path_env = make_path_env(&[&python_dir, &python_dir.join("Scripts")])?;
+    let vars = env_info
+        .vars
+        .iter()
+        .map(|(k, v)| format!("{k}={v} \\\n"))
+        .collect::<String>();
 
-    let Some(path_env_str) = path_env.to_str() else {
-        bail!("failed to generate PATH environment variable");
-    };
-
-    safe_write_file(
-        wrapper_path,
-        template.render(
-            "WRAPPER",
-            &Context {
-                path_env: String::from(path_env_str),
-                base_dir: base_dir.to_path_buf(),
-                python_executable_name: PathBuf::from(PYTHON_EXECUTABLE_NAME),
-                script_path: script_path.to_path_buf(),
-            },
-        )?,
-        false,
+    let s = template.render(
+        "WRAPPER",
+        &Context {
+            path_env,
+            vars,
+            python_executable_name: PathBuf::from(PYTHON_EXECUTABLE_NAME),
+            script_path: script_path.to_path_buf(),
+        },
     )?;
+
+    safe_write_file(wrapper_path, s, false)?;
 
     set_file_attributes(wrapper_path)?;
 
     Ok(Status::OK)
-    */
 }
 
-#[allow(unused)]
-fn make_path_env(paths: &[&Path]) -> Result<OsString> {
-    let mut new_paths = paths.to_vec();
+fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {
+    let mut new_paths = paths.to_owned();
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    new_paths.push(Path::new("$PATH"));
+    new_paths.push(PathBuf::from("$PATH"));
 
     #[cfg(any(target_os = "windows"))]
-    new_paths.push(Path::new("%PATH%"));
+    new_paths.push(PathBuf::from("%PATH%"));
 
     let mut s = OsString::new();
     s.push("PATH=");
@@ -127,7 +117,6 @@ fn make_path_env(paths: &[&Path]) -> Result<OsString> {
     Ok(s)
 }
 
-#[allow(unused)]
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
     use std::fs::{metadata, set_permissions};
@@ -139,7 +128,6 @@ fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
     Ok(())
 }
 
-#[allow(unused)]
 #[cfg(target_os = "windows")]
 fn set_file_attributes(_wrapper_path: &Path) -> Result<()> {
     Ok(())

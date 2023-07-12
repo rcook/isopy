@@ -1,4 +1,3 @@
-use crate::adoptium::api::ImageType;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -20,6 +19,7 @@ use crate::adoptium::api::ImageType;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::adoptium::api::ImageType;
 use crate::constants::{ADOPTIUM_SERVER_URL, JDK_PLUGIN_TYPE, JRE_PLUGIN_TYPE, PLUGIN_NAME};
 use crate::java_descriptor::JavaDescriptor;
 use crate::java_plugin::JavaPlugin;
@@ -77,7 +77,12 @@ impl PluginFactory for JavaPluginFactory {
         ))
     }
 
-    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo> {
+    fn make_env_info(
+        &self,
+        data_dir: &Path,
+        props: &Value,
+        _base_dir: Option<&Path>,
+    ) -> IsopyLibResult<EnvInfo> {
         #[cfg(target_os = "macos")]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![data_dir
@@ -104,7 +109,7 @@ impl PluginFactory for JavaPluginFactory {
 
         Ok(EnvInfo {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
-            envs: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
+            vars: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
         })
     }
 

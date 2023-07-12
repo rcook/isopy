@@ -30,6 +30,11 @@ pub trait PluginFactory: Send + Sync {
     fn source_url(&self) -> &Url;
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>>;
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>>;
-    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo>;
+    fn make_env_info(
+        &self,
+        data_dir: &Path,
+        props: &Value,
+        base_dir: Option<&Path>,
+    ) -> IsopyLibResult<EnvInfo>;
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin>;
 }

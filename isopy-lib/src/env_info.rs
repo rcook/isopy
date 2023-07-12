@@ -24,5 +24,5 @@ use std::path::PathBuf;
 #[derive(Debug)]
 pub struct EnvInfo {
     pub path_dirs: Vec<PathBuf>,
-    pub envs: Vec<(String, String)>,
+    pub vars: Vec<(String, String)>,
 }

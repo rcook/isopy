@@ -80,6 +80,7 @@ impl Registry {
         &self,
         data_dir: &Path,
         package_rec: &PackageRec,
+        base_dir: Option<&Path>,
     ) -> Result<Option<EnvInfo>> {
         let Some(plugin_host) = self
             .plugin_hosts
@@ -88,9 +89,11 @@ impl Registry {
             return Ok(None);
         };
 
-        Ok(Some(
-            plugin_host.make_env_info(data_dir, &package_rec.props)?,
-        ))
+        Ok(Some(plugin_host.make_env_info(
+            data_dir,
+            &package_rec.props,
+            base_dir,
+        )?))
     }
 
     fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&PluginHostRef, &'a str)> {

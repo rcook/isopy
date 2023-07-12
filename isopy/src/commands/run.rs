@@ -20,16 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ENV_CONFIG_FILE_NAME;
-use crate::registry::Registry;
-use crate::serialization::EnvRec;
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::Result;
-use joatmon::read_yaml_file;
 use log::error;
 use std::ffi::OsString;
-use std::path::Path;
 
 pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
     let mut command = Command::new(OsString::from(program));
@@ -42,37 +37,13 @@ pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME))?;
-
-    let package_rec = env_rec.packages.first();
-
-    let Some(package_rec) = package_rec else {
-        error!("could not find default package directory");
-        return Ok(Status::Fail);
-    };
-
-    let Some(env_info) = &Registry::global().make_env_info(dir_info.data_dir(), package_rec)? else {
+    let Some(env_info) = App::make_env_info(dir_info.data_dir(),None)? else {
         error!("could not get environment info");
         return Ok(Status::Fail);
     };
 
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
-
-    command.exec(
-        dir_info.link_id(),
-        dir_info.meta_id(),
-        &env_info
-            .path_dirs
-            .iter()
-            .map(|p| p as &Path)
-            .collect::<Vec<_>>(),
-        &env_info
-            .envs
-            .iter()
-            .map(|(k, v)| (k.as_str(), v.as_str()))
-            .collect::<Vec<_>>(),
-    )?;
-
+    command.exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
     Ok(Status::OK)
 }

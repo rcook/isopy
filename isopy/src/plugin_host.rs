@@ -62,8 +62,13 @@ impl PluginFactory for PluginHost {
         self.plugin_factory.parse_descriptor(s)
     }
 
-    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo> {
-        self.plugin_factory.make_env_info(data_dir, props)
+    fn make_env_info(
+        &self,
+        data_dir: &Path,
+        props: &Value,
+        base_dir: Option<&Path>,
+    ) -> IsopyLibResult<EnvInfo> {
+        self.plugin_factory.make_env_info(data_dir, props, base_dir)
     }
 
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {

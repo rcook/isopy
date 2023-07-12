@@ -21,10 +21,11 @@
 //
 use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::plugin_host::PluginHost;
+use crate::registry::Registry;
 use crate::serialization::{EnvRec, PackageRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
-use isopy_lib::{Descriptor, Package, PluginFactory};
+use isopy_lib::{Descriptor, EnvInfo, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file};
 use std::collections::HashMap;
@@ -36,6 +37,26 @@ pub struct App {
 }
 
 impl App {
+    pub fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+        let env_rec = read_yaml_file::<EnvRec>(&data_dir.join(&*ENV_CONFIG_FILE_NAME))?;
+
+        let mut all_env_info = EnvInfo {
+            path_dirs: Vec::new(),
+            vars: Vec::new(),
+        };
+
+        for package_rec in &env_rec.packages {
+            let Some(env_info) = Registry::global().make_env_info(data_dir, package_rec,base_dir)? else {
+                return Ok(None);
+            };
+
+            all_env_info.path_dirs.extend(env_info.path_dirs);
+            all_env_info.vars.extend(env_info.vars);
+        }
+
+        Ok(Some(all_env_info))
+    }
+
     pub const fn new(cwd: PathBuf, repo: Repo) -> Self {
         Self { cwd, repo }
     }

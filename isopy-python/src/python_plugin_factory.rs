@@ -23,6 +23,7 @@ use crate::constants::{PLUGIN_NAME, RELEASES_URL};
 use crate::python_descriptor::PythonDescriptor;
 use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
+use anyhow::anyhow;
 use isopy_lib::{
     other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
     PluginFactory,
@@ -61,7 +62,12 @@ impl PluginFactory for PythonPluginFactory {
         ))
     }
 
-    fn make_env_info(&self, data_dir: &Path, props: &Value) -> IsopyLibResult<EnvInfo> {
+    fn make_env_info(
+        &self,
+        data_dir: &Path,
+        props: &Value,
+        base_dir: Option<&Path>,
+    ) -> IsopyLibResult<EnvInfo> {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![data_dir.join(&env_config_rec.dir).join("bin")]
@@ -78,10 +84,20 @@ impl PluginFactory for PythonPluginFactory {
         let env_config_rec =
             serde_json::from_value::<EnvConfigRec>(props.clone()).map_err(isopy_lib_other_error)?;
 
-        Ok(EnvInfo {
-            path_dirs: make_path_dirs(data_dir, &env_config_rec),
-            envs: vec![],
-        })
+        let path_dirs = make_path_dirs(data_dir, &env_config_rec);
+        let vars = if let Some(d) = base_dir {
+            vec![(
+                String::from("PYTHONPATH"),
+                String::from(
+                    d.to_str()
+                        .ok_or_else(|| anyhow!("could not convert directory"))?,
+                ),
+            )]
+        } else {
+            vec![]
+        };
+
+        Ok(EnvInfo { path_dirs, vars })
     }
 
     fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {

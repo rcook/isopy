@@ -96,7 +96,7 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
 
         for package_rec in &env_rec.packages {
             if let Ok(Some(env_info)) =
-                Registry::global().make_env_info(dir_info.data_dir(), package_rec)
+                Registry::global().make_env_info(dir_info.data_dir(), package_rec, None)
             {
                 print_value("Package", &package_rec.id);
                 if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
@@ -107,7 +107,7 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
                 for p in env_info.path_dirs {
                     println!("    {}", p.display());
                 }
-                for (k, v) in env_info.envs {
+                for (k, v) in env_info.vars {
                     println!("    {k} = {v}");
                 }
             };
@@ -164,13 +164,11 @@ pub fn print_packages(
         for package in packages {
             let asset_pretty = if verbose && package.asset_path.is_file() {
                 let m = metadata(&package.asset_path)?;
-                format!(
-                    "{} ({})",
-                    format!("{}", package.asset_path.display()).bright_white(),
-                    format!("{}", humanize_size_base_2(m.len()).cyan())
-                )
-                .bright_white()
-                .bold()
+                let asset_path_pretty = format!("{}", package.asset_path.display()).bright_white();
+                let size_pretty = format!("{}", humanize_size_base_2(m.len()).cyan());
+                format!("{asset_path_pretty} ({size_pretty})")
+                    .bright_white()
+                    .bold()
             } else {
                 package
                     .asset_path

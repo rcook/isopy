@@ -21,10 +21,11 @@
 //
 use crate::constants::ISOPY_ENV_NAME;
 use anyhow::Result;
+use isopy_lib::EnvInfo;
 use joat_repo::{LinkId, MetaId};
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitStatus;
 
 pub struct Command {
@@ -58,13 +59,12 @@ impl Command {
         &self,
         link_id: &LinkId,
         meta_id: &MetaId,
-        path_dirs: &[&Path],
-        envs: &[(&str, &str)],
+        env_info: &EnvInfo,
     ) -> Result<ExitStatus> {
-        prepend_paths(path_dirs)?;
+        prepend_paths(&env_info.path_dirs)?;
 
         set_var(ISOPY_ENV_NAME, format!("{meta_id}-{link_id}"));
-        for (key, value) in envs {
+        for (key, value) in &env_info.vars {
             set_var(key, value);
         }
 
@@ -130,18 +130,13 @@ impl Command {
     }
 }
 
-fn prepend_paths(paths: &[&Path]) -> Result<()> {
-    let mut new_paths = paths.to_vec();
-    let mut existing_paths = Vec::new();
+fn prepend_paths(paths: &[PathBuf]) -> Result<()> {
+    let mut new_paths = paths.to_owned();
     if let Some(path) = var_os("PATH") {
-        existing_paths = split_paths(&path).collect();
-        new_paths.extend(existing_paths.iter().map(PathBuf::as_path));
+        new_paths.extend(split_paths(&path).collect::<Vec<_>>());
     }
 
     set_var("PATH", join_paths(new_paths)?);
-
-    // Prevent false-positive regarding unused variable
-    drop(existing_paths);
 
     Ok(())
 }

@@ -20,17 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::{ENV_CONFIG_FILE_NAME, ISOPY_ENV_NAME};
-use crate::registry::Registry;
-use crate::serialization::EnvRec;
+use crate::constants::ISOPY_ENV_NAME;
 use crate::shell::Command;
 use crate::status::Status;
 use anyhow::{bail, Result};
 use colored::Colorize;
-use joatmon::read_yaml_file;
 use log::error;
 use std::env::{var, VarError};
-use std::path::Path;
 
 pub fn shell(app: App) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
@@ -46,41 +42,21 @@ pub fn shell(app: App) -> Result<Status> {
         return Ok(Status::Fail);
     };
 
-    let env_rec = read_yaml_file::<EnvRec>(&dir_info.data_dir().join(&*ENV_CONFIG_FILE_NAME))?;
+    let Some(env_info) = App::make_env_info(dir_info.data_dir(), None)? else {
+        error!("could not get environment info");
+        return Ok(Status::Fail);
+    };
 
-    let mut path_dirs = Vec::new();
-    let mut envs = Vec::new();
+    for path_dir in &env_info.path_dirs {
+        println!("  {}", format!("{}", path_dir.display()).yellow());
+    }
 
-    for package_rec in &env_rec.packages {
-        let Some(env_info) = Registry::global().make_env_info(dir_info.data_dir(), package_rec)? else {
-            error!("could not get environment info");
-            return Ok(Status::Fail);
-        };
-
-        println!("{}", package_rec.id.green());
-        for path_dir in &env_info.path_dirs {
-            println!("  {}", format!("{}", path_dir.display()).yellow());
-        }
-        for (k, v) in &env_info.envs {
-            println!("  {}", format!("{k} = {v}").yellow());
-        }
-
-        path_dirs.extend(env_info.path_dirs);
-        envs.extend(env_info.envs);
+    for (k, v) in &env_info.vars {
+        println!("  {}", format!("{k} = {v}").yellow());
     }
 
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
-
-    Command::new_shell().exec(
-        dir_info.link_id(),
-        dir_info.meta_id(),
-        &path_dirs.iter().map(|p| p as &Path).collect::<Vec<_>>(),
-        &envs
-            .iter()
-            .map(|(k, v)| (k.as_str(), v.as_str()))
-            .collect::<Vec<_>>(),
-    )?;
-
+    Command::new_shell().exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
     Ok(Status::OK)
 }
