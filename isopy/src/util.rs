@@ -27,6 +27,7 @@ use isopy_lib::Package;
 use joatmon::{FileReadError, HasOtherError, YamlError};
 use std::ffi::OsStr;
 use std::fs::metadata;
+use std::path::Path;
 use std::sync::Arc;
 
 pub fn prettify_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
@@ -127,4 +128,22 @@ mod tests {
     fn test_humanize_size_base_2(#[case] expected_str: &str, #[case] input: u64) {
         assert_eq!(expected_str, &humanize_size_base_2(input));
     }
+}
+
+pub fn set_file_mode(path: &Path, mode: u32) -> Result<()> {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn inner(path: &Path, mode: u32) -> Result<()> {
+        use std::fs::{set_permissions, Permissions};
+        use std::os::unix::fs::PermissionsExt;
+        set_permissions(path, Permissions::from_mode(mode))?;
+        Ok(())
+    }
+
+    #[cfg(target_os = "windows")]
+    #[allow(clippy::unnecessary_wraps)]
+    const fn inner(_path: &Path, _mode: u32) -> Result<()> {
+        Ok(())
+    }
+
+    inner(path, mode)
 }

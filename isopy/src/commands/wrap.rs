@@ -111,7 +111,7 @@ pub fn wrap(
     )?;
 
     safe_write_file(&wrapper_path, s, force)?;
-    set_file_attributes(&wrapper_path)?;
+    ensure_file_executable_mode(&wrapper_path)?;
     info!("wrapper created at {}", wrapper_path.display());
     Ok(Status::OK)
 }
@@ -131,19 +131,22 @@ fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {
     Ok(s)
 }
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
-    use std::fs::{metadata, set_permissions};
-    use std::os::unix::fs::PermissionsExt;
+fn ensure_file_executable_mode(path: &Path) -> Result<()> {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn inner(path: &Path) -> Result<()> {
+        use std::fs::{metadata, set_permissions};
+        use std::os::unix::fs::PermissionsExt;
+        let mut permissions = metadata(path)?.permissions();
+        permissions.set_mode(permissions.mode() | 0o100);
+        set_permissions(path, permissions)?;
+        Ok(())
+    }
 
-    let mut permissions = metadata(wrapper_path)?.permissions();
-    permissions.set_mode(permissions.mode() | 0o100);
-    set_permissions(wrapper_path, permissions)?;
-    Ok(())
-}
+    #[cfg(target_os = "windows")]
+    #[allow(clippy::unnecessary_wraps)]
+    const fn inner(_path: &Path) -> Result<()> {
+        Ok(())
+    }
 
-#[cfg(target_os = "windows")]
-#[allow(clippy::unnecessary_wraps)]
-const fn set_file_attributes(_wrapper_path: &Path) -> Result<()> {
-    Ok(())
+    inner(path)
 }
