@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn powershell() {
-        _ = format!("{}", POWERSHELL.path.display())
+        _ = format!("{}", POWERSHELL.path.display());
     }
 
     #[test]

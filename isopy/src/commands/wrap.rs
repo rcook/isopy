@@ -143,6 +143,7 @@ fn set_file_attributes(wrapper_path: &Path) -> Result<()> {
 }
 
 #[cfg(target_os = "windows")]
-fn set_file_attributes(_wrapper_path: &Path) -> Result<()> {
+#[allow(clippy::unnecessary_wraps)]
+const fn set_file_attributes(_wrapper_path: &Path) -> Result<()> {
     Ok(())
 }
