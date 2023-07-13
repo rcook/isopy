@@ -23,6 +23,7 @@ use crate::app::App;
 use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::status::Status;
+use crate::util::existing;
 use anyhow::Result;
 use colored::Colorize;
 use serde_json::Value;
@@ -35,11 +36,11 @@ pub fn prompt(app: &App) -> Result<Status> {
         Err(e) => return Err(e)?,
     };
 
-    let env_rec = app
-        .find_dir_info(&app.cwd, isopy_env.clone())?
-        .filter(DirInfoExt::has_env_config)
-        .map(|d| d.read_env_config())
-        .transpose()?;
+    let env_rec = if let Some(d) = app.find_dir_info(&app.cwd, isopy_env.clone())? {
+        existing(d.read_env_config())?
+    } else {
+        None
+    };
 
     let mut prompt = String::new();
 

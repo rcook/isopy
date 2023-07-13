@@ -24,56 +24,77 @@ use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use anyhow::Result;
 use isopy_lib::EnvInfo;
-use joat_repo::DirInfo;
+use joat_repo::{DirInfo, Manifest};
 use joatmon::{read_yaml_file, safe_write_file};
 use std::path::{Path, PathBuf};
 
-pub fn make_env_config_path(data_dir: &Path) -> PathBuf {
-    data_dir.join(&*ENV_CONFIG_FILE_NAME)
-}
-
 pub trait DirInfoExt {
-    fn has_env_config(&self) -> bool;
     fn read_env_config(&self) -> Result<EnvRec>;
     fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()>;
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
 }
 
 impl DirInfoExt for DirInfo {
-    fn has_env_config(&self) -> bool {
-        make_env_config_path(self.data_dir()).is_file()
-    }
-
     fn read_env_config(&self) -> Result<EnvRec> {
-        Ok(read_yaml_file(&make_env_config_path(self.data_dir()))?)
+        read_env_config(self.data_dir())
     }
 
     fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()> {
-        safe_write_file(
-            &make_env_config_path(self.data_dir()),
-            serde_yaml::to_string(env_rec)?,
-            overwrite,
-        )?;
-        Ok(())
+        write_env_config(self.data_dir(), env_rec, overwrite)
     }
 
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-        let env_rec = self.read_env_config()?;
+        make_env_info(self.data_dir(), base_dir)
+    }
+}
 
-        let mut all_env_info = EnvInfo {
-            path_dirs: Vec::new(),
-            vars: Vec::new(),
+impl DirInfoExt for Manifest {
+    fn read_env_config(&self) -> Result<EnvRec> {
+        read_env_config(self.data_dir())
+    }
+
+    fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()> {
+        write_env_config(self.data_dir(), env_rec, overwrite)
+    }
+
+    fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+        make_env_info(self.data_dir(), base_dir)
+    }
+}
+
+pub fn make_env_config_path(data_dir: &Path) -> PathBuf {
+    data_dir.join(&*ENV_CONFIG_FILE_NAME)
+}
+
+fn read_env_config(data_dir: &Path) -> Result<EnvRec> {
+    Ok(read_yaml_file(&make_env_config_path(data_dir))?)
+}
+
+fn write_env_config(data_dir: &Path, env_rec: &EnvRec, overwrite: bool) -> Result<()> {
+    safe_write_file(
+        &make_env_config_path(data_dir),
+        serde_yaml::to_string(env_rec)?,
+        overwrite,
+    )?;
+    Ok(())
+}
+
+fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+    let env_rec = read_env_config(data_dir)?;
+
+    let mut all_env_info = EnvInfo {
+        path_dirs: Vec::new(),
+        vars: Vec::new(),
+    };
+
+    for package_rec in &env_rec.packages {
+        let Some(env_info) = Registry::global().make_env_info(data_dir, package_rec,base_dir)? else {
+            return Ok(None);
         };
 
-        for package_rec in &env_rec.packages {
-            let Some(env_info) = Registry::global().make_env_info(self.data_dir(), package_rec,base_dir)? else {
-                return Ok(None);
-            };
-
-            all_env_info.path_dirs.extend(env_info.path_dirs);
-            all_env_info.vars.extend(env_info.vars);
-        }
-
-        Ok(Some(all_env_info))
+        all_env_info.path_dirs.extend(env_info.path_dirs);
+        all_env_info.vars.extend(env_info.vars);
     }
+
+    Ok(Some(all_env_info))
 }

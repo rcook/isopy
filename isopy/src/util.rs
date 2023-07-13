@@ -21,7 +21,9 @@
 //
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::PluginHostRef;
+use anyhow::Result;
 use isopy_lib::Package;
+use joatmon::{FileReadError, HasOtherError, YamlError};
 use std::sync::Arc;
 
 pub fn pretty_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
@@ -30,4 +32,20 @@ pub fn pretty_descriptor(plugin_host: &PluginHostRef, package: &Package) -> Stri
         descriptor: Arc::clone(&package.descriptor),
     };
     descriptor_info.to_string()
+}
+
+pub fn existing<T>(result: Result<T>) -> Result<Option<T>> {
+    match result {
+        Ok(value) => Ok(Some(value)),
+        Err(e) => {
+            if let Some(e0) = e.downcast_ref::<YamlError>() {
+                if let Some(e1) = e0.downcast_other_ref::<FileReadError>() {
+                    if e1.is_not_found() {
+                        return Ok(None);
+                    }
+                }
+            }
+            Err(e)
+        }
+    }
 }

@@ -23,7 +23,7 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
-use crate::util::pretty_descriptor;
+use crate::util::{existing, pretty_descriptor};
 use anyhow::{anyhow, Result};
 use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
@@ -129,15 +129,8 @@ pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
 
 pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     print_title("Environment info");
-
-    let env_rec = if dir_info.has_env_config() {
-        Some(dir_info.read_env_config()?)
-    } else {
-        None
-    };
-
+    let env_rec = existing(dir_info.read_env_config())?;
     print_dir_info(dir_info, &env_rec);
-
     Ok(())
 }
 

@@ -20,12 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::dir_info_ext::make_env_config_path;
+use crate::dir_info_ext::DirInfoExt;
 use crate::print::{print, print_link, print_metadir, print_title};
-use crate::serialization::EnvRec;
 use crate::status::Status;
+use crate::util::existing;
 use anyhow::Result;
-use joatmon::read_yaml_file;
 
 pub fn list(app: &App) -> Result<Status> {
     let manifests = app.repo.list_manifests()?;
@@ -33,15 +32,8 @@ pub fn list(app: &App) -> Result<Status> {
         print_title("Metadirectories");
         for (idx, manifest) in manifests.iter().enumerate() {
             print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
-
-            let env_yaml_path = make_env_config_path(manifest.data_dir());
-            let rec_opt = if env_yaml_path.is_file() {
-                Some(read_yaml_file::<EnvRec>(&env_yaml_path)?)
-            } else {
-                None
-            };
-
-            print_metadir(manifest, &rec_opt);
+            let env_rec = existing(manifest.read_env_config())?;
+            print_metadir(manifest, &env_rec);
         }
     }
 
