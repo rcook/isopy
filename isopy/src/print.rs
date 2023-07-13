@@ -23,14 +23,12 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
-use crate::util::{existing, pretty_descriptor};
-use anyhow::{anyhow, Result};
+use crate::util::{existing, prettify_descriptor, prettify_package};
+use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
 use joat_repo::{DirInfo, Link, Manifest, Repo};
-use std::ffi::OsStr;
 use std::fmt::Display;
-use std::fs::metadata;
 
 pub fn print(s: &str) {
     println!("{}", s.bright_white());
@@ -153,75 +151,11 @@ pub fn print_packages(
         ));
 
         for package in packages {
-            let asset_pretty = if verbose && package.asset_path.is_file() {
-                let m = metadata(&package.asset_path)?;
-                let asset_path_pretty = format!("{}", package.asset_path.display()).bright_white();
-                let size_pretty = format!("{}", humanize_size_base_2(m.len()).cyan());
-                format!("{asset_path_pretty} ({size_pretty})")
-                    .bright_white()
-                    .bold()
-            } else {
-                package
-                    .asset_path
-                    .file_name()
-                    .and_then(OsStr::to_str)
-                    .ok_or_else(|| anyhow!("cannot convert file name"))?
-                    .white()
-            };
-
-            print(&format!(
-                "  {:<30} {}",
-                pretty_descriptor(plugin_host, package).bright_yellow(),
-                asset_pretty
-            ));
+            let descriptor_pretty = prettify_descriptor(plugin_host, package).bright_yellow();
+            let package_pretty = prettify_package(package, verbose)?;
+            print(&format!("  {descriptor_pretty:<30} {package_pretty}"));
         }
     }
 
     Ok(())
-}
-
-#[allow(clippy::cast_precision_loss)]
-fn humanize_size_base_2(bytes: u64) -> String {
-    const KB: u64 = 1024;
-    const MB: u64 = 1024 * 1024;
-    const GB: u64 = 1024 * 1024 * 1024;
-    const TB: u64 = 1024 * 1024 * 1024 * 1024;
-
-    if bytes < KB {
-        return format!("{bytes} B");
-    }
-
-    if bytes < MB {
-        return format!("{:.1} kB", (bytes as f64) / (KB as f64));
-    }
-
-    if bytes < GB {
-        return format!("{:.1} MB", (bytes as f64) / (MB as f64));
-    }
-
-    if bytes < TB {
-        return format!("{:.1} GB", (bytes as f64) / (GB as f64));
-    }
-
-    format!("{:.1} TB", (bytes as f64) / (TB as f64))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::humanize_size_base_2;
-    use rstest::rstest;
-
-    #[rstest]
-    #[case("100 B", 100u64)]
-    #[case("1023 B", 1023u64)]
-    #[case("1.0 kB", 1024u64)]
-    #[case("1.0 kB", 1025u64)]
-    #[case("2.0 kB", 2048u64)]
-    #[case("1.0 MB", 1_048_576_u64)]
-    #[case("1.0 GB", 1_073_741_824_u64)]
-    #[case("1.0 TB", 1_099_511_627_776_u64)]
-
-    fn test_humanize_size_base_2(#[case] expected_str: &str, #[case] input: u64) {
-        assert_eq!(expected_str, &humanize_size_base_2(input));
-    }
 }
