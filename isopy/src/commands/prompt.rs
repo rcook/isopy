@@ -36,7 +36,7 @@ pub fn prompt(app: &App) -> Result<Status> {
         Err(e) => return Err(e)?,
     };
 
-    let env_rec = if let Some(d) = app.find_dir_info(&app.cwd, isopy_env.clone())? {
+    let env_rec = if let Some(d) = app.find_dir_info(isopy_env.clone())? {
         existing(d.read_env_config())?
     } else {
         None

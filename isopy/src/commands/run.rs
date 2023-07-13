@@ -33,7 +33,7 @@ pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
         command.arg(OsString::from(arg));
     }
 
-    let Some(dir_info) = app.find_dir_info(&app.cwd, None)? else {
+    let Some(dir_info) = app.find_dir_info(None)? else {
         error!("could not find environment for directory {}", app.cwd.display());
         return Ok(Status::Fail);
     };

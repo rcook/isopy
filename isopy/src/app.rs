@@ -132,7 +132,7 @@ impl App {
         Ok(())
     }
 
-    pub fn find_dir_info(&self, cwd: &Path, isopy_env: Option<String>) -> Result<Option<DirInfo>> {
+    pub fn find_dir_info(&self, isopy_env: Option<String>) -> Result<Option<DirInfo>> {
         if let Some(isopy_env_value) = isopy_env {
             // THIS IS A TEMPORARY HACK!
             // joat-repo-rs needs a method to get a DirInfo given a link ID or something
@@ -163,7 +163,7 @@ impl App {
             return Ok(Some(dir_info));
         }
 
-        let Some(link) = self.find_link(cwd)? else {
+        let Some(link) = self.find_link(&self.cwd)? else {
             return Ok(None)
         };
 
