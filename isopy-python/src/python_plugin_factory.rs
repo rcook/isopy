@@ -75,7 +75,7 @@ impl PluginFactory for PythonPluginFactory {
         #[cfg(target_os = "windows")]
         fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
             vec![
-                data_dir.join(&env_config_rec.dir).join("bin"),
+                data_dir.join(&env_config_rec.dir),
                 data_dir.join(&env_config_rec.dir).join("Scripts"),
             ]
         }
