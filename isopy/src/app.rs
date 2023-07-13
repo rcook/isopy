@@ -19,29 +19,47 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHost;
-use crate::serialization::{EnvRec, PackageRec};
+use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
+use joatmon::{read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct App {
     pub cwd: PathBuf,
+    project_config_path: PathBuf,
     pub cache_dir: PathBuf,
     pub repo: Repo,
 }
 
 impl App {
     pub fn new(cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Self {
+        let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         Self {
             cwd,
+            project_config_path,
             cache_dir: cache_dir.to_path_buf(),
             repo,
         }
+    }
+
+    pub fn read_project_config(&self) -> Result<ProjectRec> {
+        Ok(read_yaml_file(&self.project_config_path)?)
+    }
+
+    pub fn write_project_config(&self, project_rec: &ProjectRec, overwrite: bool) -> Result<()> {
+        safe_write_file(
+            &self.project_config_path,
+            serde_yaml::to_string(project_rec)?,
+            overwrite,
+        )?;
+        Ok(())
     }
 
     pub async fn add_package(

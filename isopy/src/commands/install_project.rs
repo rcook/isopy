@@ -20,13 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::registry::Registry;
-use crate::serialization::ProjectRec;
 use crate::status::Status;
+use crate::util::existing;
 use anyhow::Result;
 use isopy_lib::PluginFactory;
-use joatmon::read_yaml_file;
 use log::error;
 use std::collections::HashMap;
 
@@ -36,14 +34,13 @@ pub async fn install_project(app: &App) -> Result<Status> {
         return Ok(Status::Fail);
     }
 
-    let project_config_path = app.cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-    if !project_config_path.is_file() {
+    let Some(project_rec) = existing(app.read_project_config())? else {
         error!(
             "no project configuration file in directory {}",
             app.cwd.display()
         );
         return Ok(Status::Fail);
-    }
+    };
 
     let plugin_hosts = Registry::global()
         .plugin_hosts
@@ -52,7 +49,6 @@ pub async fn install_project(app: &App) -> Result<Status> {
         .collect::<HashMap<_, _>>();
 
     let mut descriptors = Vec::new();
-    let project_rec = read_yaml_file::<ProjectRec>(&project_config_path)?;
     for package_rec in project_rec.packages {
         let Some(plugin_host) = plugin_hosts.get(&package_rec.id) else {
             error!(

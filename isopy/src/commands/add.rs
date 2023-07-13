@@ -20,22 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::package_id::PackageId;
 use crate::serialization::{PackageRec, ProjectRec};
 use crate::status::Status;
+use crate::util::existing;
 use anyhow::Result;
-use joatmon::{read_yaml_file, safe_write_file};
 use log::{error, info};
 
 pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
-    let project_config_path = app.cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-
-    let mut packages = if project_config_path.is_file() {
-        read_yaml_file::<ProjectRec>(&project_config_path)?.packages
-    } else {
-        Vec::new()
-    };
+    let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
 
     let id = package_id.plugin_host().prefix();
     if packages.iter().any(|p| p.id == id) {
@@ -48,16 +41,7 @@ pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
         props: package_id.descriptor().get_project_props()?,
     });
 
-    safe_write_file(
-        &project_config_path,
-        serde_yaml::to_string(&ProjectRec { packages })?,
-        true,
-    )?;
-
-    info!(
-        "added package \"{id}\" to project configuration file {}",
-        project_config_path.display()
-    );
-
+    app.write_project_config(&ProjectRec { packages }, true)?;
+    info!("added package \"{id}\" to project at {}", app.cwd.display());
     Ok(Status::OK)
 }
