@@ -44,6 +44,8 @@ impl FromStr for WrapperFileName {
 
     #[cfg(target_os = "windows")]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use anyhow::bail;
+
         let temp = s.to_lowercase();
 
         #[allow(clippy::case_sensitive_file_extension_comparisons)]
