@@ -11,3 +11,4 @@ members = [
   "isopy-lib",
   "isopy-python",
 ]
+resolver = "2"
