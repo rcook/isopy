@@ -23,13 +23,13 @@ use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::status::Status;
 use crate::util::ensure_file_executable_mode;
+use crate::wrapper_file_name::WrapperFileName;
 use anyhow::anyhow;
 use anyhow::Result;
 use joatmon::safe_write_file;
 use log::{error, info};
 use serde::Serialize;
 use std::env::join_paths;
-use std::ffi::OsStr;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use tinytemplate::TinyTemplate;
@@ -63,7 +63,7 @@ pub enum WrapTarget {
 
 pub fn wrap(
     app: &App,
-    wrapper_file_name: &OsStr,
+    wrapper_file_name: &WrapperFileName,
     target: &WrapTarget,
     base_dir: &Path,
     force: bool,
@@ -87,13 +87,12 @@ pub fn wrap(
             .ok_or_else(|| anyhow!("failed to generate PATH environment variable"))?,
     );
 
-    let vars = env_info
-        .vars
-        .iter()
-        .map(|(k, v)| format!("{k}={v} \\\n"))
-        .collect::<String>();
+    let vars = make_vars(&env_info.vars);
 
-    let wrapper_path = app.cache_dir.join("bin").join(wrapper_file_name);
+    let wrapper_path = app
+        .cache_dir
+        .join("bin")
+        .join(wrapper_file_name.as_os_str());
 
     let command = match target {
         WrapTarget::Command(s) => s.clone(),
@@ -123,11 +122,35 @@ fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     new_paths.push(PathBuf::from("$PATH"));
 
-    #[cfg(any(target_os = "windows"))]
+    #[cfg(target_os = "windows")]
     new_paths.push(PathBuf::from("%PATH%"));
 
     let mut s = OsString::new();
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     s.push("PATH=");
+
+    #[cfg(target_os = "windows")]
+    s.push("set PATH=");
+
     s.push(join_paths(new_paths)?);
     Ok(s)
+}
+
+fn make_vars(vars: &[(String, String)]) -> String {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn inner(vars: &[(String, String)]) -> String {
+        vars.iter()
+            .map(|(k, v)| format!("{k}={v} \\\n"))
+            .collect::<String>()
+    }
+
+    #[cfg(target_os = "windows")]
+    fn inner(vars: &[(String, String)]) -> String {
+        vars.iter()
+            .map(|(k, v)| format!("set {k}={v}\n"))
+            .collect::<String>()
+    }
+
+    inner(vars)
 }

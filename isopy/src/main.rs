@@ -51,6 +51,7 @@ mod status;
 mod terminal;
 mod unpack;
 mod util;
+mod wrapper_file_name;
 
 #[tokio::main]
 async fn main() {

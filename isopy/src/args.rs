@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::package_id::PackageId;
+use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Parser, Subcommand, ValueEnum};
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
-use std::ffi::OsString;
 use std::path::PathBuf;
 use std::result::Result;
 
@@ -213,7 +213,7 @@ pub enum Command {
     )]
     WrapCommand {
         #[arg(help = "Wrapper file name")]
-        wrapper_file_name: OsString,
+        wrapper_file_name: WrapperFileName,
 
         #[arg(help = "Command")]
         command: String,
@@ -242,7 +242,7 @@ pub enum Command {
     )]
     WrapScript {
         #[arg(help = "Wrapper file name")]
-        wrapper_file_name: OsString,
+        wrapper_file_name: WrapperFileName,
 
         #[arg(help = "Script path", value_parser = parse_absolute_path)]
         script_path: PathBuf,
