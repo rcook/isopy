@@ -147,3 +147,23 @@ pub fn set_file_mode(path: &Path, mode: u32) -> Result<()> {
 
     inner(path, mode)
 }
+
+pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn inner(path: &Path) -> Result<()> {
+        use std::fs::{metadata, set_permissions};
+        use std::os::unix::fs::PermissionsExt;
+        let mut permissions = metadata(path)?.permissions();
+        permissions.set_mode(permissions.mode() | 0o100);
+        set_permissions(path, permissions)?;
+        Ok(())
+    }
+
+    #[cfg(target_os = "windows")]
+    #[allow(clippy::unnecessary_wraps)]
+    const fn inner(_path: &Path) -> Result<()> {
+        Ok(())
+    }
+
+    inner(path)
+}

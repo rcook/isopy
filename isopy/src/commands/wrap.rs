@@ -22,6 +22,7 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::status::Status;
+use crate::util::ensure_file_executable_mode;
 use anyhow::anyhow;
 use anyhow::Result;
 use joatmon::safe_write_file;
@@ -129,24 +130,4 @@ fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {
     s.push("PATH=");
     s.push(join_paths(new_paths)?);
     Ok(s)
-}
-
-fn ensure_file_executable_mode(path: &Path) -> Result<()> {
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    fn inner(path: &Path) -> Result<()> {
-        use std::fs::{metadata, set_permissions};
-        use std::os::unix::fs::PermissionsExt;
-        let mut permissions = metadata(path)?.permissions();
-        permissions.set_mode(permissions.mode() | 0o100);
-        set_permissions(path, permissions)?;
-        Ok(())
-    }
-
-    #[cfg(target_os = "windows")]
-    #[allow(clippy::unnecessary_wraps)]
-    const fn inner(_path: &Path) -> Result<()> {
-        Ok(())
-    }
-
-    inner(path)
 }
