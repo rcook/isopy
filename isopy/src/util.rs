@@ -140,8 +140,9 @@ pub fn set_file_mode(path: &Path, mode: u32) -> Result<()> {
     }
 
     #[cfg(target_os = "windows")]
+    #[allow(clippy::missing_const_for_fn)]
     #[allow(clippy::unnecessary_wraps)]
-    const fn inner(_path: &Path, _mode: u32) -> Result<()> {
+    fn inner(_path: &Path, _mode: u32) -> Result<()> {
         Ok(())
     }
 
@@ -160,8 +161,9 @@ pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     }
 
     #[cfg(target_os = "windows")]
+    #[allow(clippy::missing_const_for_fn)]
     #[allow(clippy::unnecessary_wraps)]
-    const fn inner(_path: &Path) -> Result<()> {
+    fn inner(_path: &Path) -> Result<()> {
         Ok(())
     }
 
