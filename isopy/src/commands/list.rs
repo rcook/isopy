@@ -33,7 +33,7 @@ pub fn list(app: &App) -> Result<Status> {
         for (idx, manifest) in manifests.iter().enumerate() {
             print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
             let env_rec = existing(manifest.read_env_config())?;
-            print_metadir(manifest, &env_rec);
+            print_metadir(manifest, &env_rec, None);
         }
     }
 
@@ -47,7 +47,7 @@ pub fn list(app: &App) -> Result<Status> {
                 link.link_id(),
                 link.meta_id()
             ));
-            print_link(link);
+            print_link(link, None);
         }
     }
 

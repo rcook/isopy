@@ -22,9 +22,10 @@
 use crate::app::App;
 use crate::status::Status;
 use anyhow::Result;
+use log::info;
 
 #[allow(clippy::unnecessary_wraps)]
 pub fn scratch(_app: &App) -> Result<Status> {
-    println!("SCRATCH");
+    info!("this is a sample log message");
     Ok(Status::OK)
 }

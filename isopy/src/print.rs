@@ -49,7 +49,11 @@ where
     println!("  {:30}: {}", label.green(), format!("{value}").yellow());
 }
 
-pub fn print_link(link: &Link) {
+pub fn print_link(link: &Link, idx: Option<usize>) {
+    if let Some(i) = idx {
+        println!("({i})");
+    }
+
     print_value("Project directory", link.project_dir().display());
     print_value("Link path", link.link_path().display());
     print_value("Created at", link.created_at());
@@ -63,7 +67,11 @@ pub fn print_repo(repo: &Repo) {
     print_value("Shared directory", repo.shared_dir().display());
 }
 
-pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>) {
+pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>, idx: Option<usize>) {
+    if let Some(i) = idx {
+        println!("({i})");
+    }
+
     if let Some(env_rec) = env_rec {
         print_value("Project directory", env_rec.project_dir.display());
 

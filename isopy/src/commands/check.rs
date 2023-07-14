@@ -45,8 +45,7 @@ pub fn check(app: &App, clean: bool) -> Result<Status> {
         }
 
         for (idx, link) in trash.invalid_links.iter().enumerate() {
-            println!("({})", idx + 1);
-            print_link(link);
+            print_link(link, Some(idx + 1));
         }
     }
 
@@ -63,8 +62,7 @@ pub fn check(app: &App, clean: bool) -> Result<Status> {
         }
 
         for (idx, manifest) in trash.unreferenced_manifests.iter().enumerate() {
-            println!("({})", idx + 1);
-            print_metadir(manifest, &None);
+            print_metadir(manifest, &None, Some(idx + 1));
         }
     }
 
