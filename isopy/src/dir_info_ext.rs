@@ -88,7 +88,8 @@ fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvI
     };
 
     for package_rec in &env_rec.packages {
-        let Some(env_info) = Registry::global().make_env_info(data_dir, package_rec,base_dir)? else {
+        let Some(env_info) = Registry::global().make_env_info(data_dir, package_rec, base_dir)?
+        else {
             return Ok(None);
         };
 

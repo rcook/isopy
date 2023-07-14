@@ -94,23 +94,23 @@ impl AdoptiumIndexManager {
     async fn download_index(&self) -> Result<IndexRec> {
         fn make_version(release: &Release) -> Option<VersionRec> {
             let Some(binary) = release.binaries.single() else {
-                return None
+                return None;
             };
 
             let Some(package) = binary.package.as_ref() else {
-                return None
+                return None;
             };
 
             let Ok(url) = package.link.parse::<Url>() else {
-                return None
+                return None;
             };
 
             let Some(size) = package.size else {
-                return None
+                return None;
             };
 
             let Some(checksum) = package.checksum.as_ref() else {
-                return None
+                return None;
             };
 
             Some(VersionRec {

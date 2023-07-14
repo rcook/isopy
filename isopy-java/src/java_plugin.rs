@@ -132,8 +132,11 @@ impl Plugin for JavaPlugin {
         let versions = manager.read_versions().await?;
         let Some(version) = versions
             .iter()
-            .find(|x| x.openjdk_version == descriptor.version) else {
-            return Err(IsopyLibError::VersionNotFound(descriptor.version.to_string()));
+            .find(|x| x.openjdk_version == descriptor.version)
+        else {
+            return Err(IsopyLibError::VersionNotFound(
+                descriptor.version.to_string(),
+            ));
         };
 
         let asset_path = self.assets_dir.join(&version.file_name);

@@ -100,9 +100,7 @@ impl AdoptiumClient {
             let next_url = LinkHeader::from_response(&response)?.and_then(|x| x.next);
             items.extend(response.json::<R>().await?.items());
 
-            let Some(n) = next_url else {
-                return Ok(items)
-            };
+            let Some(n) = next_url else { return Ok(items) };
 
             request_builder = self.client.get(n);
         }

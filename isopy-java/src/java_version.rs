@@ -124,7 +124,7 @@ impl FromStr for JavaVersion {
         if let Some((prefix, suffix)) = s.split_once('_') {
             let (major, minor, patch, build) = Self::parse_dotted(s, prefix)?;
             let Some((q1, q2)) = suffix.split_once('-') else {
-                return Err(IsopyJavaError::InvalidFormat(String::from(s)))
+                return Err(IsopyJavaError::InvalidFormat(String::from(s)));
             };
             let qualifier1 = Self::to_u32(q1)?;
             let qualifier2 = Some(String::from(q2));

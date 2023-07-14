@@ -36,7 +36,7 @@ pub struct LinkHeader {
 impl LinkHeader {
     pub fn from_response(response: &Response) -> IsopyLibResult<Option<Self>> {
         let Some(link_header) = response.headers().get("link") else {
-            return Ok(None)
+            return Ok(None);
         };
 
         let s = link_header.to_str().map_err(|e| anyhow!(e))?;
@@ -68,7 +68,7 @@ impl LinkHeader {
 
     fn get_link_url(links: &HashMap<String, String>, k: &str) -> IsopyLibResult<Option<Url>> {
         let Some(s) = links.get(k) else {
-            return Ok(None)
+            return Ok(None);
         };
 
         Ok(Some(s.parse::<Url>().map_err(|e| {

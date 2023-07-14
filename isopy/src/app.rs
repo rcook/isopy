@@ -147,28 +147,28 @@ impl App {
             }
 
             let Some((_, link_id_str)) = isopy_env_value.split_once('-') else {
-                return Ok(None)
+                return Ok(None);
             };
 
             let link_id = link_id_str.parse::<LinkId>()?;
 
             let Some(link) = find_link(&self.repo, &link_id)? else {
-                return Ok(None)
+                return Ok(None);
             };
 
             let Some(dir_info) = self.repo.get(link.project_dir())? else {
-                return Ok(None)
+                return Ok(None);
             };
 
             return Ok(Some(dir_info));
         }
 
         let Some(link) = self.find_link(&self.cwd)? else {
-            return Ok(None)
+            return Ok(None);
         };
 
         let Some(dir_info) = self.repo.get(link.project_dir())? else {
-            return Ok(None)
+            return Ok(None);
         };
 
         Ok(Some(dir_info))

@@ -85,7 +85,8 @@ impl Registry {
         let Some(plugin_host) = self
             .plugin_hosts
             .iter()
-            .find(|p| p.prefix() == package_rec.id) else {
+            .find(|p| p.prefix() == package_rec.id)
+        else {
             return Ok(None);
         };
 

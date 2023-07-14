@@ -34,7 +34,10 @@ pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
     }
 
     let Some(dir_info) = app.find_dir_info(None)? else {
-        error!("could not find environment for directory {}", app.cwd.display());
+        error!(
+            "could not find environment for directory {}",
+            app.cwd.display()
+        );
         return Ok(Status::Fail);
     };
 
