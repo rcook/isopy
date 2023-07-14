@@ -131,7 +131,7 @@ impl Command {
 fn prepend_paths(paths: &[PathBuf]) -> Result<()> {
     let mut new_paths = paths.to_owned();
     if let Some(path) = var_os("PATH") {
-        new_paths.extend(split_paths(&path).collect::<Vec<_>>());
+        new_paths.extend(split_paths(&path));
     }
 
     set_var("PATH", join_paths(new_paths)?);
