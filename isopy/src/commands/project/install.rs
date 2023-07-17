@@ -28,7 +28,7 @@ use isopy_lib::PluginFactory;
 use log::error;
 use std::collections::HashMap;
 
-pub async fn install_project(app: &App) -> Result<Status> {
+pub async fn install(app: &App) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
         error!("directory {} already has an environment", app.cwd.display());
         return Ok(Status::Fail);

@@ -34,7 +34,7 @@ const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
 const PACKAGE_HOME_PAGE: &str = env!("CARGO_PKG_HOMEPAGE");
 const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_VERSION");
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[command(
     name = PACKAGE_NAME,
     version = PACKAGE_VERSION,
@@ -78,28 +78,6 @@ pub struct Args {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    #[command(name = "add", about = "Add package to project")]
-    Add {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
-    #[command(name = "available", about = "List packages available for download")]
-    Available {
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
-    },
-
     #[command(
         name = "check",
         about = "Check integrity of metadata directory and optionally clean up"
@@ -119,54 +97,26 @@ pub enum Command {
         _no_clean: bool,
     },
 
-    #[command(name = "download", about = "Download package")]
-    Download {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
-    #[command(name = "downloaded", about = "List locally downloaded packages")]
-    Downloaded {
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
+    #[command(name = "env", about = "Environment commands")]
+    Env {
+        #[command(subcommand)]
+        command: EnvCommand,
     },
 
     #[command(name = "info", about = "Show information")]
     Info,
 
-    #[command(name = "install", about = "Install package into environment")]
-    Install {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
+    #[command(name = "package", about = "Package commands")]
+    Package {
+        #[command(subcommand)]
+        command: PackageCommand,
     },
 
-    #[command(
-        name = "install-project",
-        about = "Install project packages into environment"
-    )]
-    InstallProject,
-
-    #[command(
-        name = "link",
-        about = "Use existing environment for current directory"
-    )]
-    Link {
-        #[arg(help = "Directory ID", value_parser = parse_meta_id)]
-        dir_id: MetaId,
+    #[command(name = "project", about = "Project commands")]
+    Project {
+        #[command(subcommand)]
+        command: ProjectCommand,
     },
-
-    #[command(name = "list", about = "List environments")]
-    List,
 
     #[command(name = "prompt", about = "Show brief information in shell prompt")]
     Prompt,
@@ -207,11 +157,94 @@ pub enum Command {
         _no_verbose: bool,
     },
 
+    #[command(name = "wrap", about = "Wrap commands")]
+    Wrap {
+        #[command(subcommand)]
+        command: WrapCommand,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum EnvCommand {
+    #[command(name = "install", about = "Install package into environment")]
+    Install {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
     #[command(
-        name = "wrap-command",
+        name = "link",
+        about = "Use existing environment for current directory"
+    )]
+    Link {
+        #[arg(help = "Directory ID", value_parser = parse_meta_id)]
+        dir_id: MetaId,
+    },
+
+    #[command(name = "list", about = "List environments")]
+    List,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum PackageCommand {
+    #[command(name = "available", about = "List packages available for download")]
+    Available {
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
+        verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
+    },
+
+    #[command(name = "download", about = "Download package")]
+    Download {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
+    #[command(name = "downloaded", about = "List locally downloaded packages")]
+    Downloaded {
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
+        verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ProjectCommand {
+    #[command(name = "add", about = "Add package to project")]
+    Add {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
+    #[command(name = "install", about = "Install project packages into environment")]
+    Install,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum WrapCommand {
+    #[command(
+        name = "command",
         about = "Generate environment wrapper script in bin directory for command"
     )]
-    WrapCommand {
+    Command {
         #[arg(help = "Wrapper file name")]
         wrapper_file_name: WrapperFileName,
 
@@ -237,10 +270,10 @@ pub enum Command {
     },
 
     #[command(
-        name = "wrap-script",
+        name = "script",
         about = "Generate environment wrapper script in bin directory for script"
     )]
-    WrapScript {
+    Script {
         #[arg(help = "Wrapper file name")]
         wrapper_file_name: WrapperFileName,
 

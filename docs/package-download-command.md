@@ -1,4 +1,4 @@
-## `download` command
+## `package download` command
 
 _Downloads packages_
 

@@ -1,4 +1,4 @@
-## `install-project` command
+## `project install` command
 
 _Install project packages into environment_
 

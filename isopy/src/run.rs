@@ -22,10 +22,13 @@
 use crate::app::App;
 use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
-use crate::commands::{
-    add, available, check, download, downloaded, info, install, install_project, link, list,
-    prompt, run as run_command, scratch, shell, wrap, WrapTarget,
+use crate::commands::env::{install as env_install, link as env_link, list as env_list};
+use crate::commands::package::{
+    available as package_available, download as package_download, downloaded as package_downloaded,
 };
+use crate::commands::project::{add as project_add, install as project_install};
+use crate::commands::wrap::{wrap, WrapTarget};
+use crate::commands::{check, info, prompt, run as run_command, scratch, shell};
 use crate::constants::CACHE_DIR;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
@@ -81,47 +84,59 @@ pub async fn run() -> Result<Status> {
 
 async fn do_it(app: App, command: Command) -> Result<Status> {
     use crate::args::Command::*;
+    use crate::args::EnvCommand;
+    use crate::args::PackageCommand;
+    use crate::args::ProjectCommand;
+    use crate::args::WrapCommand;
 
     match command {
-        Add { package_id } => add(&app, &package_id),
-        Available { verbose, .. } => available(&app, verbose).await,
         Check { clean, .. } => check(&app, clean),
-        Download { package_id } => download(&app, &package_id).await,
-        Downloaded { verbose, .. } => downloaded(&app, verbose).await,
+        Env { command } => match command {
+            EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
+            EnvCommand::List => env_list(&app),
+            EnvCommand::Link { dir_id } => env_link(&app, &dir_id),
+        },
         Info => info(&app),
-        Install { package_id } => install(&app, &package_id).await,
-        InstallProject => install_project(&app).await,
-        List => list(&app),
-        Link { dir_id } => link(&app, &dir_id),
+        Package { command } => match command {
+            PackageCommand::Available { verbose, .. } => package_available(&app, verbose).await,
+            PackageCommand::Download { package_id } => package_download(&app, &package_id).await,
+            PackageCommand::Downloaded { verbose, .. } => package_downloaded(&app, verbose).await,
+        },
+        Project { command } => match command {
+            ProjectCommand::Add { package_id } => project_add(&app, &package_id),
+            ProjectCommand::Install => project_install(&app).await,
+        },
         Prompt => prompt(&app),
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app),
         Shell { verbose, .. } => shell(app, verbose),
-        WrapCommand {
-            wrapper_file_name,
-            command,
-            base_dir,
-            force,
-            ..
-        } => wrap(
-            &app,
-            &wrapper_file_name,
-            &WrapTarget::Command(command),
-            &base_dir,
-            force,
-        ),
-        WrapScript {
-            wrapper_file_name,
-            script_path,
-            base_dir,
-            force,
-            ..
-        } => wrap(
-            &app,
-            &wrapper_file_name,
-            &WrapTarget::Script(script_path),
-            &base_dir,
-            force,
-        ),
+        Wrap { command } => match command {
+            WrapCommand::Command {
+                wrapper_file_name,
+                command,
+                base_dir,
+                force,
+                ..
+            } => wrap(
+                &app,
+                &wrapper_file_name,
+                &WrapTarget::Command(command),
+                &base_dir,
+                force,
+            ),
+            WrapCommand::Script {
+                wrapper_file_name,
+                script_path,
+                base_dir,
+                force,
+                ..
+            } => wrap(
+                &app,
+                &wrapper_file_name,
+                &WrapTarget::Script(script_path),
+                &base_dir,
+                force,
+            ),
+        },
     }
 }

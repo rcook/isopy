@@ -19,21 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod env;
-pub mod package;
-pub mod project;
-pub mod wrap;
+mod available;
+mod download;
+mod downloaded;
 
-mod check;
-mod info;
-mod prompt;
-mod run;
-mod scratch;
-mod shell;
-
-pub use self::check::check;
-pub use self::info::info;
-pub use self::prompt::prompt;
-pub use self::run::run;
-pub use self::scratch::scratch;
-pub use self::shell::shell;
+pub use self::available::available;
+pub use self::download::download;
+pub use self::downloaded::downloaded;

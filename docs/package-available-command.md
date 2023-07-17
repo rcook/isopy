@@ -1,4 +1,4 @@
-## `available` command
+## `package available` command
 
 _List packages available for download_
 
