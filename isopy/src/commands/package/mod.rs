@@ -19,10 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod available;
 mod download;
-mod downloaded;
+mod list;
 
-pub use self::available::available;
 pub use self::download::download;
-pub use self::downloaded::downloaded;
+pub use self::list::{list, ListType};

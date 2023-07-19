@@ -20,13 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::dir_info_ext::DirInfoExt;
-use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
-use crate::util::{existing, prettify_descriptor, prettify_package};
+use crate::util::existing;
 use anyhow::Result;
 use colored::Colorize;
-use isopy_lib::{Package, PluginFactory};
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use std::fmt::Display;
 
@@ -137,33 +135,5 @@ pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
     print_title("Environment info");
     let env_rec = existing(dir_info.read_env_config())?;
     print_dir_info(dir_info, &env_rec);
-    Ok(())
-}
-
-pub fn print_packages(
-    plugin_host: &PluginHostRef,
-    packages: &Vec<Package>,
-    verbose: bool,
-) -> Result<()> {
-    if packages.is_empty() {
-        print(&format!(
-            "No packages found for {} ({})",
-            plugin_host.name().cyan(),
-            plugin_host.source_url().as_str().bright_magenta()
-        ));
-    } else {
-        print(&format!(
-            "{} ({})",
-            plugin_host.name().cyan(),
-            plugin_host.source_url().as_str().bright_magenta()
-        ));
-
-        for package in packages {
-            let descriptor_pretty = prettify_descriptor(plugin_host, package).bright_yellow();
-            let package_pretty = prettify_package(package, verbose)?;
-            print(&format!("  {descriptor_pretty:<30} {package_pretty}"));
-        }
-    }
-
     Ok(())
 }

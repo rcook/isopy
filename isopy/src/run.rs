@@ -23,9 +23,7 @@ use crate::app::App;
 use crate::args::{Args, Command};
 use crate::backtrace::init_backtrace;
 use crate::commands::env::{install as env_install, link as env_link, list as env_list};
-use crate::commands::package::{
-    available as package_available, download as package_download, downloaded as package_downloaded,
-};
+use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::{wrap, WrapTarget};
 use crate::commands::{check, info, prompt, run as run_command, scratch, shell};
@@ -98,9 +96,13 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         },
         Info => info(&app),
         Package { command } => match command {
-            PackageCommand::Available { verbose, .. } => package_available(&app, verbose).await,
+            PackageCommand::Available { verbose, .. } => {
+                package_list(&app, ListType::Available, verbose).await
+            }
             PackageCommand::Download { package_id } => package_download(&app, &package_id).await,
-            PackageCommand::Downloaded { verbose, .. } => package_downloaded(&app, verbose).await,
+            PackageCommand::Downloaded { verbose, .. } => {
+                package_list(&app, ListType::Downloaded, verbose).await
+            }
         },
         Project { command } => match command {
             ProjectCommand::Add { package_id } => project_add(&app, &package_id),

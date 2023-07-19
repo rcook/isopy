@@ -19,53 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-mod app;
-mod args;
-mod backtrace;
-mod commands;
-mod constants;
-mod descriptor_info;
-mod dir_info_ext;
-mod package_id;
-mod plugin_host;
-mod print;
-mod registry;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod table;
-mod terminal;
-mod unpack;
-mod util;
-mod wrapper_file_name;
+use super::internal::Table;
+use colored::Color;
 
-#[tokio::main]
-async fn main() {
-    use crate::constants::{ERROR, OK};
-    use crate::print::print_error;
-    use crate::run::run;
-    use std::process::exit;
+pub struct TableSettings {
+    pub divider_indent: usize,
+    pub columns_indent: usize,
+    pub cell_padding: usize,
+    pub divider_colour: Color,
+    pub default_cell_colour: Color,
+    pub cell_colours: Vec<Color>,
+}
 
-    exit(match run().await {
-        Ok(_) => OK,
-        Err(e) => {
-            print_error(&format!("{e}"));
-            ERROR
+impl TableSettings {
+    pub fn build(&self) -> Table {
+        Table::new(
+            self.divider_indent,
+            self.columns_indent,
+            self.cell_padding,
+            self.divider_colour,
+            self.default_cell_colour,
+            &self.cell_colours,
+        )
+    }
+}
+
+impl Default for TableSettings {
+    fn default() -> Self {
+        Self {
+            divider_indent: 0,
+            columns_indent: 0,
+            cell_padding: 2,
+            divider_colour: Color::BrightYellow,
+            default_cell_colour: Color::BrightWhite,
+            cell_colours: vec![],
         }
-    })
+    }
 }

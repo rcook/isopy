@@ -19,20 +19,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::print::print_packages;
-use crate::registry::Registry;
-use crate::status::Status;
-use anyhow::Result;
-use isopy_lib::PluginFactory;
+use std::fmt::Display;
 
-pub async fn available(app: &App, verbose: bool) -> Result<Status> {
-    for plugin_host in &Registry::global().plugin_hosts {
-        let plugin_dir = app.repo.shared_dir().join(plugin_host.prefix());
-        let plugin = plugin_host.make_plugin(&plugin_dir);
-        let packages = plugin.get_available_packages().await?;
-        print_packages(plugin_host, &packages, verbose)?;
+pub trait Cell {
+    fn render(&self) -> String;
+}
+
+impl<T> Cell for T
+where
+    T: Display,
+{
+    fn render(&self) -> String {
+        self.to_string()
     }
+}
 
-    Ok(Status::OK)
+pub type CellPtr = Box<dyn Cell>;
+
+impl<T> From<T> for CellPtr
+where
+    T: Cell + 'static,
+{
+    fn from(value: T) -> Self {
+        Box::new(value)
+    }
 }
