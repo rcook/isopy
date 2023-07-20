@@ -12,7 +12,10 @@ function __temp_isopy {
     alias cd='cd_isopy'
     export PATH=$HOME/.isopy/bin:$PATH
     if command -v isopy &> /dev/null; then
-      source <(isopy completions --shell bash)
+      local isopy_completions_file=$(mktemp)
+      isopy completions --shell bash > $isopy_completions_file
+      source $isopy_completions_file
+      rm $isopy_completions_file
     fi
   fi
 }
