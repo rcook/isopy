@@ -61,9 +61,10 @@ pub fn print_metadir(
 
         for package_rec in &env_rec.packages {
             row!(table, "Package", &package_rec.id);
-            if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
-                for line in s.lines() {
-                    table.add_line(line.trim());
+
+            if let Some(obj) = package_rec.props.as_object() {
+                for (k, v) in obj {
+                    table.add_line(&format!("{k}: {v}"));
                 }
             }
         }
@@ -89,14 +90,17 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
                 Registry::global().make_env_info(dir_info.data_dir(), package_rec, None)
             {
                 row!(table, "Package", &package_rec.id);
-                if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
-                    for line in s.lines() {
-                        table.add_line(line.trim());
+
+                if let Some(obj) = package_rec.props.as_object() {
+                    for (k, v) in obj {
+                        table.add_line(&format!("{k}: {v}"));
                     }
                 }
+
                 for p in env_info.path_dirs {
                     table.add_line(&p.display().to_string());
                 }
+
                 for (k, v) in env_info.vars {
                     table.add_line(&format!("{k} = {v}"));
                 }
