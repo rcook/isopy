@@ -23,7 +23,7 @@ use super::row::Row;
 use super::settings::TableSettings;
 use colored::Colorize;
 
-macro_rules! row {
+macro_rules! table_row {
     ($table: expr, $c0: expr) => {{
         $table.add_row(&[&format!("{}", $c0)]);
     }};
@@ -60,7 +60,7 @@ macro_rules! row {
     }};
 }
 
-pub(crate) use row;
+pub(crate) use table_row;
 
 pub struct Table {
     settings: TableSettings,

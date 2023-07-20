@@ -26,4 +26,4 @@ mod settings;
 pub use self::internal::Table;
 pub use self::settings::TableSettings;
 
-pub(crate) use self::internal::row;
+pub(crate) use self::internal::table_row;

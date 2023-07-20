@@ -24,7 +24,7 @@ use crate::plugin_host::PluginHostRef;
 use crate::print::make_list_table;
 use crate::registry::Registry;
 use crate::status::Status;
-use crate::table::{row, Table};
+use crate::table::{table_row, Table};
 use crate::util::{prettify_descriptor, prettify_package};
 use anyhow::Result;
 use colored::Colorize;
@@ -77,7 +77,7 @@ fn add_plugin_rows(
         for package in packages {
             let descriptor_pretty = prettify_descriptor(plugin_host, package);
             let package_pretty = prettify_package(package, verbose)?;
-            row!(table, descriptor_pretty, package_pretty);
+            table_row!(table, descriptor_pretty, package_pretty);
         }
     }
 

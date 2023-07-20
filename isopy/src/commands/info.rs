@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
 use crate::status::Status;
-use crate::table::row;
+use crate::table::table_row;
 use anyhow::Result;
 
 pub fn info(app: &App) -> Result<Status> {
@@ -30,7 +30,7 @@ pub fn info(app: &App) -> Result<Status> {
 
     table.add_title("Current directory");
 
-    row!(table, "Working directory", app.cwd.display());
+    table_row!(table, "Working directory", app.cwd.display());
 
     if let Some(dir_info) = app.find_dir_info(None)? {
         print_dir_info_and_env(&mut table, &dir_info)?;
