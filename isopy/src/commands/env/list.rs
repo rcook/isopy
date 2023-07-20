@@ -23,6 +23,7 @@ use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::Status;
+use crate::table::{table_divider, table_title};
 use crate::util::existing;
 use anyhow::Result;
 
@@ -31,9 +32,9 @@ pub fn list(app: &App) -> Result<Status> {
 
     let manifests = app.repo.list_manifests()?;
     if !manifests.is_empty() {
-        table.add_title("Metadirectories");
+        table_title!(table, "Metadirectories");
         for (idx, manifest) in manifests.iter().enumerate() {
-            table.add_divider(&format!("({}) {}", idx + 1, manifest.meta_id()));
+            table_divider!(table, "({}) {}", idx + 1, manifest.meta_id());
             let env_rec = existing(manifest.read_env_config())?;
             print_metadir(&mut table, manifest, &env_rec, None);
         }
@@ -41,15 +42,16 @@ pub fn list(app: &App) -> Result<Status> {
 
     let links = app.repo.list_links()?;
     if !links.is_empty() {
-        table.add_title("Links");
+        table_title!(table, "Links");
 
         for (idx, link) in links.iter().enumerate() {
-            table.add_divider(&format!(
+            table_divider!(
+                table,
                 "({}) {} -> {}",
                 idx + 1,
                 link.link_id(),
                 link.meta_id()
-            ));
+            );
 
             print_link(&mut table, link, None);
         }

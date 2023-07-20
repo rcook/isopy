@@ -24,6 +24,7 @@ use crate::plugin_host::PluginHostRef;
 use crate::print::make_list_table;
 use crate::registry::Registry;
 use crate::status::Status;
+use crate::table::table_divider;
 use crate::table::{table_row, Table};
 use crate::util::{prettify_descriptor, prettify_package};
 use anyhow::Result;
@@ -62,17 +63,19 @@ fn add_plugin_rows(
     verbose: bool,
 ) -> Result<()> {
     if packages.is_empty() {
-        table.add_divider(&format!(
+        table_divider!(
+            table,
             "No packages found for {} ({})",
             plugin_host.name().cyan(),
             plugin_host.source_url().as_str().bright_magenta()
-        ));
+        );
     } else {
-        table.add_divider(&format!(
+        table_divider!(
+            table,
             "{} ({})",
             plugin_host.name().cyan(),
             plugin_host.source_url().as_str().bright_magenta()
-        ));
+        );
 
         for package in packages {
             let descriptor_pretty = prettify_descriptor(plugin_host, package);

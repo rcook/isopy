@@ -22,7 +22,7 @@
 use crate::dir_info_ext::DirInfoExt;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
-use crate::table::{table_row, Table, TableSettings};
+use crate::table::{table_divider, table_line, table_row, table_title, Table, TableSettings};
 use crate::util::existing;
 use anyhow::Result;
 use colored::Color;
@@ -30,7 +30,7 @@ use joat_repo::{DirInfo, Link, Manifest, Repo};
 
 pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
-        table.add_divider(&format!("({i})"));
+        table_divider!(table, "({i})");
     }
 
     table_row!(table, "Project directory", link.project_dir().display());
@@ -53,7 +53,7 @@ pub fn print_metadir(
     idx: Option<usize>,
 ) {
     if let Some(i) = idx {
-        table.add_divider(&format!("({i})"));
+        table_divider!(table, "({i})");
     }
 
     if let Some(env_rec) = env_rec {
@@ -64,7 +64,7 @@ pub fn print_metadir(
 
             if let Some(obj) = package_rec.props.as_object() {
                 for (k, v) in obj {
-                    table.add_line(&format!("{k}: {v}"));
+                    table_line!(table, "{k}: {v}");
                 }
             }
         }
@@ -93,16 +93,16 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
 
                 if let Some(obj) = package_rec.props.as_object() {
                     for (k, v) in obj {
-                        table.add_line(&format!("{k}: {v}"));
+                        table_line!(table, "{k}: {v}");
                     }
                 }
 
                 for p in env_info.path_dirs {
-                    table.add_line(&p.display().to_string());
+                    table_line!(table, "{}", p.display());
                 }
 
                 for (k, v) in env_info.vars {
-                    table.add_line(&format!("{k} = {v}"));
+                    table_line!(table, "{k} = {v}");
                 }
             };
         }
@@ -124,7 +124,7 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
 }
 
 pub fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {
-    table.add_title("Environment info");
+    table_title!(table, "Environment info");
     let env_rec = existing(dir_info.read_env_config())?;
     print_dir_info(table, dir_info, &env_rec);
     Ok(())

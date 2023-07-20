@@ -22,6 +22,7 @@
 use crate::app::App;
 use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::Status;
+use crate::table::table_divider;
 use anyhow::Result;
 use joat_repo::Trash;
 use log::info;
@@ -39,13 +40,12 @@ pub fn check(app: &App, clean: bool) -> Result<Status> {
     let invalid_link_count = trash.invalid_links.len();
     if invalid_link_count > 0 {
         if clean {
-            table.add_divider(&format!(
+            table_divider!(
+                table,
                 "The following {invalid_link_count} links are invalid and will be removed:"
-            ));
+            );
         } else {
-            table.add_divider(&format!(
-                "The following {invalid_link_count} links are invalid and can be removed with the --clean option:"
-            ));
+            table_divider!(table,"The following {invalid_link_count} links are invalid and can be removed with the --clean option:");
         }
 
         for (idx, link) in trash.invalid_links.iter().enumerate() {
@@ -58,13 +58,9 @@ pub fn check(app: &App, clean: bool) -> Result<Status> {
     let unreferenced_manifest_count = trash.unreferenced_manifests.len();
     if unreferenced_manifest_count > 0 {
         if clean {
-            table.add_divider(&format!(
-                "The following {unreferenced_manifest_count} metadirectories are unreferenced and will be removed:"
-            ));
+            table_divider!(table, "The following {unreferenced_manifest_count} metadirectories are unreferenced and will be removed:");
         } else {
-            table.add_divider(&format!(
-                "The following {unreferenced_manifest_count} metadirectories are unreferenced and can be removed with the --clean option:"
-            ));
+            table_divider!(table, "The following {unreferenced_manifest_count} metadirectories are unreferenced and can be removed with the --clean option:");
         }
 
         for (idx, manifest) in trash.unreferenced_manifests.iter().enumerate() {

@@ -22,13 +22,13 @@
 use crate::app::App;
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
 use crate::status::Status;
-use crate::table::table_row;
+use crate::table::{table_row, table_title};
 use anyhow::Result;
 
 pub fn info(app: &App) -> Result<Status> {
     let mut table = make_prop_table();
 
-    table.add_title("Current directory");
+    table_title!(table, "Current directory");
 
     table_row!(table, "Working directory", app.cwd.display());
 
@@ -36,7 +36,7 @@ pub fn info(app: &App) -> Result<Status> {
         print_dir_info_and_env(&mut table, &dir_info)?;
     }
 
-    table.add_title("Repository information");
+    table_title!(table, "Repository information");
     print_repo(&mut table, &app.repo);
 
     table.print();

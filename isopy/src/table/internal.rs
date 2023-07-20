@@ -23,6 +23,20 @@ use super::row::Row;
 use super::settings::TableSettings;
 use colored::Colorize;
 
+macro_rules! table_title {
+    ($table: expr, $($arg: tt)*) => {{
+        $table.add_title(&std::fmt::format(format_args!($($arg)*)));
+    }}
+}
+pub(crate) use table_title;
+
+macro_rules! table_divider {
+    ($table: expr, $($arg: tt)*) => {{
+        $table.add_divider(&std::fmt::format(format_args!($($arg)*)));
+    }}
+}
+pub(crate) use table_divider;
+
 macro_rules! table_row {
     ($table: expr, $c0: expr) => {{
         $table.add_row(&[&format!("{}", $c0)]);
@@ -59,8 +73,14 @@ macro_rules! table_row {
         ]);
     }};
 }
-
 pub(crate) use table_row;
+
+macro_rules! table_line {
+    ($table: expr, $($arg: tt)*) => {{
+        $table.add_line(&std::fmt::format(format_args!($($arg)*)));
+    }}
+}
+pub(crate) use table_line;
 
 pub struct Table {
     settings: TableSettings,
