@@ -15,7 +15,7 @@ anyhow = "1.0.72"
 async-trait = "0.1.71"
 bytes = "1.4.0"
 chrono = { version = "0.4.26", features = ["serde"] }
-clap = { version = "4.3.12", features = ["derive", "env"] }
+clap = { version = "4.3.17", features = ["derive", "env"] }
 clap_complete = "4.3.2"
 color-backtrace = "0.5.1"
 colored = "2.0.4"
@@ -36,16 +36,16 @@ md5 = "0.7.0"
 path-absolutize = "3.1.0"
 regex = "1.9.1"
 reqwest = { version = "0.11.18", features = ["json", "stream"] }
-serde = { version = "1.0.171", features = ["derive"] }
+serde = { version = "1.0.173", features = ["derive"] }
 serde_json = "1.0.103"
-serde_yaml = "0.9.23"
+serde_yaml = "0.9.24"
 tar = "0.4.39"
 thiserror = "1.0.43"
 time = "0.3.23"
 tinytemplate = "1.2.1"
 tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
-uuid = { version = "1.4.0", features = ["v4"] }
+uuid = { version = "1.4.1", features = ["v4"] }
 zip = "0.6.6"
 
 [target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
@@ -56,7 +56,7 @@ openssl-sys = { version = "0.9.90", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
-sysinfo = "0.29.4"
+sysinfo = "0.29.5"
 
 [dev-dependencies]
 rstest = "0.18.1"
