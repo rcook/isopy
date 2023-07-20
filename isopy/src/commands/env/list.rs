@@ -21,13 +21,13 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::print::{make_list_table, print_link, print_metadir};
+use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::Status;
 use crate::util::existing;
 use anyhow::Result;
 
 pub fn list(app: &App) -> Result<Status> {
-    let mut table = make_list_table();
+    let mut table = make_prop_table();
 
     let manifests = app.repo.list_manifests()?;
     if !manifests.is_empty() {
