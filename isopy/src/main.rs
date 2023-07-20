@@ -57,14 +57,14 @@ mod wrapper_file_name;
 #[tokio::main]
 async fn main() {
     use crate::constants::{ERROR, OK};
-    use crate::print::print_error;
     use crate::run::run;
+    use colored::Colorize;
     use std::process::exit;
 
     exit(match run().await {
         Ok(_) => OK,
         Err(e) => {
-            print_error(&format!("{e}"));
+            eprintln!("{}", format!("{e}").bright_red());
             ERROR
         }
     })

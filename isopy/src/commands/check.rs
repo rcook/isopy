@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::print::{print_link, print_metadir};
+use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::Status;
 use anyhow::Result;
 use joat_repo::Trash;
@@ -34,37 +34,45 @@ pub fn check(app: &App, clean: bool) -> Result<Status> {
         return Ok(Status::OK);
     }
 
+    let mut table = make_prop_table();
+
     let invalid_link_count = trash.invalid_links.len();
     if invalid_link_count > 0 {
         if clean {
-            info!("The following {invalid_link_count} links are invalid and will be removed:");
+            table.add_divider(&format!(
+                "The following {invalid_link_count} links are invalid and will be removed:"
+            ));
         } else {
-            info!(
+            table.add_divider(&format!(
                 "The following {invalid_link_count} links are invalid and can be removed with the --clean option:"
-            );
+            ));
         }
 
         for (idx, link) in trash.invalid_links.iter().enumerate() {
-            print_link(link, Some(idx + 1));
+            print_link(&mut table, link, Some(idx + 1));
+
+            table.print();
         }
     }
 
     let unreferenced_manifest_count = trash.unreferenced_manifests.len();
     if unreferenced_manifest_count > 0 {
         if clean {
-            info!(
+            table.add_divider(&format!(
                 "The following {unreferenced_manifest_count} metadirectories are unreferenced and will be removed:"
-            );
+            ));
         } else {
-            info!(
+            table.add_divider(&format!(
                 "The following {unreferenced_manifest_count} metadirectories are unreferenced and can be removed with the --clean option:"
-            );
+            ));
         }
 
         for (idx, manifest) in trash.unreferenced_manifests.iter().enumerate() {
-            print_metadir(manifest, &None, Some(idx + 1));
+            print_metadir(&mut table, manifest, &None, Some(idx + 1));
         }
     }
+
+    table.print();
 
     if clean {
         trash.empty()?;

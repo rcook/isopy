@@ -20,6 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 pub enum Row {
+    Title(String),
     Divider(String),
     Columns(Vec<String>),
+    Line(String),
 }

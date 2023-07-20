@@ -22,37 +22,39 @@
 use super::internal::Table;
 use colored::Color;
 
+#[derive(Clone, Debug)]
 pub struct TableSettings {
+    pub title_indent: usize,
     pub divider_indent: usize,
     pub columns_indent: usize,
-    pub cell_padding: usize,
+    pub line_indent: usize,
+    pub title_colour: Color,
     pub divider_colour: Color,
-    pub default_cell_colour: Color,
-    pub cell_colours: Vec<Color>,
+    pub default_column_colour: Color,
+    pub column_colours: Vec<Color>,
+    pub line_colour: Color,
+    pub column_separator: String,
 }
 
 impl TableSettings {
     pub fn build(&self) -> Table {
-        Table::new(
-            self.divider_indent,
-            self.columns_indent,
-            self.cell_padding,
-            self.divider_colour,
-            self.default_cell_colour,
-            &self.cell_colours,
-        )
+        Table::new(self)
     }
 }
 
 impl Default for TableSettings {
     fn default() -> Self {
         Self {
+            title_indent: 0,
             divider_indent: 0,
             columns_indent: 0,
-            cell_padding: 2,
+            line_indent: 0,
+            title_colour: Color::Cyan,
             divider_colour: Color::BrightYellow,
-            default_cell_colour: Color::BrightWhite,
-            cell_colours: vec![],
+            default_column_colour: Color::BrightWhite,
+            column_colours: vec![],
+            line_colour: Color::BrightWhite,
+            column_separator: String::from("  "),
         }
     }
 }

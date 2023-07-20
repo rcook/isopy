@@ -21,35 +21,41 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::print::{print, print_link, print_metadir, print_title};
+use crate::print::{make_list_table, print_link, print_metadir};
 use crate::status::Status;
 use crate::util::existing;
 use anyhow::Result;
 
 pub fn list(app: &App) -> Result<Status> {
+    let mut table = make_list_table();
+
     let manifests = app.repo.list_manifests()?;
     if !manifests.is_empty() {
-        print_title("Metadirectories");
+        table.add_title("Metadirectories");
         for (idx, manifest) in manifests.iter().enumerate() {
-            print(&format!("  ({}) {}", idx + 1, manifest.meta_id()));
+            table.add_divider(&format!("({}) {}", idx + 1, manifest.meta_id()));
             let env_rec = existing(manifest.read_env_config())?;
-            print_metadir(manifest, &env_rec, None);
+            print_metadir(&mut table, manifest, &env_rec, None);
         }
     }
 
     let links = app.repo.list_links()?;
     if !links.is_empty() {
-        print_title("Links");
+        table.add_title("Links");
+
         for (idx, link) in links.iter().enumerate() {
-            print(&format!(
-                "  ({}) {} -> {}",
+            table.add_divider(&format!(
+                "({}) {} -> {}",
                 idx + 1,
                 link.link_id(),
                 link.meta_id()
             ));
-            print_link(link, None);
+
+            print_link(&mut table, link, None);
         }
     }
+
+    table.print();
 
     Ok(Status::OK)
 }

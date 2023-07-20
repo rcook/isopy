@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::print::make_prop_table;
 use crate::print::print_dir_info_and_env;
 use crate::status::Status;
 use anyhow::{bail, Result};
@@ -30,7 +31,9 @@ pub fn link(app: &App, dir_id: &MetaId) -> Result<Status> {
         bail!("could not create link");
     };
 
-    print_dir_info_and_env(&dir_info)?;
+    let mut table = make_prop_table();
+    print_dir_info_and_env(&mut table, &dir_info)?;
+    table.print();
 
     Ok(Status::OK)
 }

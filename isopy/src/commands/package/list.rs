@@ -21,12 +21,13 @@
 //
 use crate::app::App;
 use crate::plugin_host::PluginHostRef;
+use crate::print::make_list_table;
 use crate::registry::Registry;
 use crate::status::Status;
-use crate::table::{row, Table, TableSettings};
+use crate::table::{row, Table};
 use crate::util::{prettify_descriptor, prettify_package};
 use anyhow::Result;
-use colored::{Color, Colorize};
+use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
 
 pub enum ListType {
@@ -35,14 +36,7 @@ pub enum ListType {
 }
 
 pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Status> {
-    let mut table = TableSettings {
-        divider_indent: 0,
-        columns_indent: 2,
-        cell_padding: 4,
-        cell_colours: vec![Color::BrightYellow, Color::BrightWhite],
-        ..Default::default()
-    }
-    .build();
+    let mut table = make_list_table();
 
     for plugin_host in &Registry::global().plugin_hosts {
         let plugin_dir = app.repo.shared_dir().join(plugin_host.prefix());

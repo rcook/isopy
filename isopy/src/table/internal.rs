@@ -20,33 +20,42 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::row::Row;
-use colored::{Color, Colorize};
-use std::fmt::Display;
+use super::settings::TableSettings;
+use colored::Colorize;
 
 macro_rules! row {
     ($table: expr, $c0: expr) => {{
-        $table.add_row(&[Box::new($c0)]);
+        $table.add_row(&[&format!("{}", $c0)]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr) => {{
-        $table.add_row(&[Box::new($c0), Box::new($c1)]);
+        $table.add_row(&[&format!("{}", $c0), &format!("{}", $c1)]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr, $c2: expr) => {{
-        $table.add_row(&[Box::new($c0), Box::new($c1), Box::new($c2)]);
+        $table.add_row(&[
+            &format!("{}", $c0),
+            &format!("{}", $c1),
+            &format!("{}", $c2),
+        ]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr, $c2: expr, $c3: expr) => {{
-        $table.add_row(&[Box::new($c0), Box::new($c1), Box::new($c2), Box::new($c3)]);
+        $table.add_row(&[
+            &format!("{}", $c0),
+            &format!("{}", $c1),
+            &format!("{}", $c2),
+            &format!("{}", $c3),
+        ]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr, $c2: expr, $c3: expr, $c4: expr) => {{
         $table.add_row(&[
-            Box::new($c0),
-            Box::new($c1),
-            Box::new($c2),
-            Box::new($c3),
-            Box::new($c4),
+            &format!("{}", $c0),
+            &format!("{}", $c1),
+            &format!("{}", $c2),
+            &format!("{}", $c3),
+            &format!("{}", $c4),
         ]);
     }};
 }
@@ -54,42 +63,29 @@ macro_rules! row {
 pub(crate) use row;
 
 pub struct Table {
-    divider_indent: usize,
-    columns_indent: usize,
-    cell_padding: usize,
-    divider_colour: Color,
-    default_cell_colour: Color,
-    cell_colours: Vec<Color>,
+    settings: TableSettings,
     widths: Vec<usize>,
     rows: Vec<Row>,
 }
 
 impl Table {
-    pub fn new(
-        divider_indent: usize,
-        columns_indent: usize,
-        cell_padding: usize,
-        divider_colour: Color,
-        default_cell_colour: Color,
-        cell_colours: &[Color],
-    ) -> Self {
+    pub fn new(settings: &TableSettings) -> Self {
         Self {
-            divider_indent,
-            columns_indent,
-            cell_padding,
-            divider_colour,
-            default_cell_colour,
-            cell_colours: cell_colours.to_vec(),
+            settings: settings.clone(),
             widths: vec![],
             rows: vec![],
         }
+    }
+
+    pub fn add_title(&mut self, s: &str) {
+        self.rows.push(Row::Title(String::from(s)));
     }
 
     pub fn add_divider(&mut self, s: &str) {
         self.rows.push(Row::Divider(String::from(s)));
     }
 
-    pub fn add_row(&mut self, values: &[Box<dyn Display>]) {
+    pub fn add_row(&mut self, values: &[&str]) {
         let values_len = values.len();
         if self.widths.len() < values_len {
             self.widths.resize(values_len, 0);
@@ -97,7 +93,7 @@ impl Table {
 
         let mut strs = Vec::with_capacity(values.len());
         for (idx, value) in values.iter().enumerate() {
-            let s = value.to_string();
+            let s = (*value).to_string();
             self.widths[idx] = self.widths[idx].max(s.len());
             strs.push(s);
         }
@@ -105,27 +101,50 @@ impl Table {
         self.rows.push(Row::Columns(strs));
     }
 
+    pub fn add_line(&mut self, s: &str) {
+        self.rows.push(Row::Line(String::from(s)));
+    }
+
     pub fn print(&self) {
         for row in &self.rows {
             match row {
+                Row::Title(s) => println!(
+                    "{:<width$}{}",
+                    "",
+                    s.color(self.settings.title_colour),
+                    width = self.settings.title_indent
+                ),
                 Row::Divider(s) => println!(
                     "{:<width$}{}",
                     "",
-                    s.color(self.divider_colour),
-                    width = self.divider_indent
+                    s.color(self.settings.divider_colour),
+                    width = self.settings.divider_indent
                 ),
                 Row::Columns(strs) => {
-                    print!("{:<width$}", "", width = self.columns_indent);
-                    for (idx, s) in strs.iter().enumerate() {
-                        let colour = self
-                            .cell_colours
-                            .get(idx)
-                            .unwrap_or(&self.default_cell_colour);
-                        print!("{:<width$}", s.color(*colour), width = self.widths[idx]);
-                        print!("{:<width$}", "", width = self.cell_padding);
+                    if !strs.is_empty() {
+                        print!("{:<width$}", "", width = self.settings.columns_indent);
+
+                        for (idx, s) in strs.iter().enumerate() {
+                            if idx > 0 {
+                                print!("{}", self.settings.column_separator);
+                            }
+
+                            let colour = self
+                                .settings
+                                .column_colours
+                                .get(idx)
+                                .unwrap_or(&self.settings.default_column_colour);
+                            print!("{:<width$}", s.color(*colour), width = self.widths[idx]);
+                        }
+                        println!();
                     }
-                    println!();
                 }
+                Row::Line(s) => println!(
+                    "{:<width$}{}",
+                    "",
+                    s.color(self.settings.line_colour),
+                    width = self.settings.line_indent
+                ),
             }
         }
     }

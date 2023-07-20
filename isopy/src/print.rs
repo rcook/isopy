@@ -22,118 +22,131 @@
 use crate::dir_info_ext::DirInfoExt;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
+use crate::table::{row, Table, TableSettings};
 use crate::util::existing;
 use anyhow::Result;
-use colored::Colorize;
+use colored::Color;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
-use std::fmt::Display;
 
-pub fn print(s: &str) {
-    println!("{}", s.bright_white());
-}
-
-pub fn print_error(s: &str) {
-    println!("{}", s.bright_red());
-}
-
-pub fn print_title(label: &str) {
-    println!("{}", label.cyan());
-}
-
-pub fn print_value<T>(label: &str, value: T)
-where
-    T: Display,
-{
-    println!("  {:30}: {}", label.green(), format!("{value}").yellow());
-}
-
-pub fn print_link(link: &Link, idx: Option<usize>) {
+pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
-        println!("({i})");
+        table.add_divider(&format!("({i})"));
     }
 
-    print_value("Project directory", link.project_dir().display());
-    print_value("Link path", link.link_path().display());
-    print_value("Created at", link.created_at());
+    row!(table, "Project directory", link.project_dir().display());
+    row!(table, "Link path", link.link_path().display());
+    row!(table, "Created at", link.created_at());
 }
 
-pub fn print_repo(repo: &Repo) {
-    print_value("Lock file", repo.lock_path().display());
-    print_value("Configuration file", repo.config_path().display());
-    print_value("Links directory", repo.links_dir().display());
-    print_value("Container directory", repo.container_dir().display());
-    print_value("Shared directory", repo.shared_dir().display());
+pub fn print_repo(table: &mut Table, repo: &Repo) {
+    row!(table, "Lock file", repo.lock_path().display());
+    row!(table, "Configuration file", repo.config_path().display());
+    row!(table, "Links directory", repo.links_dir().display());
+    row!(table, "Container directory", repo.container_dir().display());
+    row!(table, "Shared directory", repo.shared_dir().display());
 }
 
-pub fn print_metadir(manifest: &Manifest, env_rec: &Option<EnvRec>, idx: Option<usize>) {
+pub fn print_metadir(
+    table: &mut Table,
+    manifest: &Manifest,
+    env_rec: &Option<EnvRec>,
+    idx: Option<usize>,
+) {
     if let Some(i) = idx {
-        println!("({i})");
+        table.add_divider(&format!("({i})"));
     }
 
     if let Some(env_rec) = env_rec {
-        print_value("Project directory", env_rec.project_dir.display());
+        row!(table, "Project directory", env_rec.project_dir.display());
 
         for package_rec in &env_rec.packages {
-            print_value("Package", &package_rec.id);
+            row!(table, "Package", &package_rec.id);
             if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
                 for line in s.lines() {
-                    println!("    {line}");
+                    table.add_line(line.trim());
                 }
             }
         }
     } else {
-        print_value(
+        row!(
+            table,
             "Original project directory",
-            manifest.original_project_dir().display(),
+            manifest.original_project_dir().display()
         );
     }
 
-    print_value("Data directory", manifest.data_dir().display());
-    print_value("Manifest path", manifest.manifest_path().display());
-    print_value("Created at", manifest.created_at());
+    row!(table, "Data directory", manifest.data_dir().display());
+    row!(table, "Manifest path", manifest.manifest_path().display());
+    row!(table, "Created at", manifest.created_at());
 }
 
-pub fn print_dir_info(dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
+pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
     if let Some(env_rec) = env_rec {
-        print_value("Project directory", env_rec.project_dir.display());
+        row!(table, "Project directory", env_rec.project_dir.display());
 
         for package_rec in &env_rec.packages {
             if let Ok(Some(env_info)) =
                 Registry::global().make_env_info(dir_info.data_dir(), package_rec, None)
             {
-                print_value("Package", &package_rec.id);
+                row!(table, "Package", &package_rec.id);
                 if let Ok(s) = serde_yaml::to_string(&package_rec.props) {
                     for line in s.lines() {
-                        println!("    {line}");
+                        table.add_line(line.trim());
                     }
                 }
                 for p in env_info.path_dirs {
-                    println!("    {}", p.display());
+                    table.add_line(&p.display().to_string());
                 }
                 for (k, v) in env_info.vars {
-                    println!("    {k} = {v}");
+                    table.add_line(&format!("{k} = {v}"));
                 }
             };
         }
     }
 
-    print_value("Data directory", dir_info.data_dir().display());
-    print_value("Manifest path", dir_info.manifest_path().display());
-    print_value("Data directory created at", dir_info.created_at());
-    print_value(
+    row!(table, "Data directory", dir_info.data_dir().display());
+    row!(table, "Manifest path", dir_info.manifest_path().display());
+    row!(table, "Data directory created at", dir_info.created_at());
+    row!(
+        table,
         "Original project directory",
-        dir_info.original_project_dir().display(),
+        dir_info.original_project_dir().display()
     );
-    print_value("Meta ID", dir_info.meta_id());
-    print_value("Link path", dir_info.link_path().display());
-    print_value("Link created at", dir_info.link_created_at());
-    print_value("Link ID", dir_info.link_id());
-    print_value("Project directory", dir_info.project_dir().display());
+    row!(table, "Meta ID", dir_info.meta_id());
+    row!(table, "Link path", dir_info.link_path().display());
+    row!(table, "Link created at", dir_info.link_created_at());
+    row!(table, "Link ID", dir_info.link_id());
+    row!(table, "Project directory", dir_info.project_dir().display());
 }
 
-pub fn print_dir_info_and_env(dir_info: &DirInfo) -> Result<()> {
-    print_title("Environment info");
+pub fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {
+    table.add_title("Environment info");
     let env_rec = existing(dir_info.read_env_config())?;
-    print_dir_info(dir_info, &env_rec);
+    print_dir_info(table, dir_info, &env_rec);
     Ok(())
+}
+
+pub fn make_list_table() -> Table {
+    TableSettings {
+        divider_indent: 0,
+        columns_indent: 2,
+        column_colours: vec![Color::BrightYellow, Color::BrightWhite],
+        column_separator: String::from("    "),
+        ..Default::default()
+    }
+    .build()
+}
+
+pub fn make_prop_table() -> Table {
+    TableSettings {
+        title_indent: 0,
+        divider_indent: 2,
+        columns_indent: 2,
+        line_indent: 4,
+        divider_colour: Color::BrightWhite,
+        column_colours: vec![Color::Green, Color::Yellow],
+        column_separator: String::from(" : "),
+        ..Default::default()
+    }
+    .build()
 }

@@ -20,20 +20,25 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::print::{print_dir_info_and_env, print_repo, print_title, print_value};
+use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
 use crate::status::Status;
+use crate::table::row;
 use anyhow::Result;
 
 pub fn info(app: &App) -> Result<Status> {
-    print_title("Current directory");
-    print_value("Working directory", app.cwd.display());
+    let mut table = make_prop_table();
+
+    table.add_title("Current directory");
+
+    row!(table, "Working directory", app.cwd.display());
 
     if let Some(dir_info) = app.find_dir_info(None)? {
-        print_dir_info_and_env(&dir_info)?;
+        print_dir_info_and_env(&mut table, &dir_info)?;
     }
 
-    print_title("Repository information");
-    print_repo(&app.repo);
+    table.add_title("Repository information");
+    print_repo(&mut table, &app.repo);
 
+    table.print();
     Ok(Status::OK)
 }
