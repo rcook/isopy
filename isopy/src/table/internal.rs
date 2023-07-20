@@ -19,25 +19,35 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::cell::CellPtr;
 use super::row::Row;
 use colored::{Color, Colorize};
+use std::fmt::Display;
 
 macro_rules! row {
     ($table: expr, $c0: expr) => {{
-        $table.add_row(&[$c0.into()]);
+        $table.add_row(&[Box::new($c0)]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr) => {{
-        $table.add_row(&[$c0.into(), $c1.into()]);
+        $table.add_row(&[Box::new($c0), Box::new($c1)]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr, $c2: expr) => {{
-        $table.add_row(&[$c0.into(), $c1.into(), $c2.into()]);
+        $table.add_row(&[Box::new($c0), Box::new($c1), Box::new($c2)]);
     }};
 
     ($table: expr, $c0: expr, $c1: expr, $c2: expr, $c3: expr) => {{
-        $table.add_row(&[$c0.into(), $c1.into(), $c2.into(), $c3.into()]);
+        $table.add_row(&[Box::new($c0), Box::new($c1), Box::new($c2), Box::new($c3)]);
+    }};
+
+    ($table: expr, $c0: expr, $c1: expr, $c2: expr, $c3: expr, $c4: expr) => {{
+        $table.add_row(&[
+            Box::new($c0),
+            Box::new($c1),
+            Box::new($c2),
+            Box::new($c3),
+            Box::new($c4),
+        ]);
     }};
 }
 
@@ -79,14 +89,15 @@ impl Table {
         self.rows.push(Row::Divider(String::from(s)));
     }
 
-    pub fn add_row(&mut self, cells: &[CellPtr]) {
-        if self.widths.len() < cells.len() {
-            self.widths.resize(cells.len(), 0);
+    pub fn add_row(&mut self, values: &[Box<dyn Display>]) {
+        let values_len = values.len();
+        if self.widths.len() < values_len {
+            self.widths.resize(values_len, 0);
         }
 
-        let mut strs = Vec::with_capacity(cells.len());
-        for (idx, cell) in cells.iter().enumerate() {
-            let s = cell.render();
+        let mut strs = Vec::with_capacity(values.len());
+        for (idx, value) in values.iter().enumerate() {
+            let s = value.to_string();
             self.widths[idx] = self.widths[idx].max(s.len());
             strs.push(s);
         }
