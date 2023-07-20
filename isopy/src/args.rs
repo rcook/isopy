@@ -22,6 +22,7 @@
 use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Parser, Subcommand, ValueEnum};
+use clap_complete::Shell;
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
@@ -95,6 +96,12 @@ pub enum Command {
 
         #[arg(help = "Do not clean up cache directory", long = "no-clean")]
         _no_clean: bool,
+    },
+
+    #[command(name = "completions", about = "Generate shell completions")]
+    Completions {
+        #[arg(help = "Shell", long = "shell", value_enum)]
+        shell: Option<Shell>,
     },
 
     #[command(name = "env", about = "Environment commands")]

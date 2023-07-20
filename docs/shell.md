@@ -11,6 +11,9 @@ function __temp_isopy {
     }
     alias cd='cd_isopy'
     export PATH=$HOME/.isopy/bin:$PATH
+    if command -v isopy &> /dev/null; then
+      source <(isopy completions --shell bash)
+    fi
   fi
 }
 __temp_isopy

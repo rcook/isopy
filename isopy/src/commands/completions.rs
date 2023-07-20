@@ -1,3 +1,5 @@
+use std::io::stdout;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,23 +21,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod env;
-pub mod package;
-pub mod project;
-pub mod wrap;
+use crate::args::Args;
+use crate::status::Status;
+use clap::CommandFactory;
+use clap_complete::{generate, Shell};
 
-mod check;
-mod completions;
-mod info;
-mod prompt;
-mod run;
-mod scratch;
-mod shell;
-
-pub use self::check::check;
-pub use self::completions::completions;
-pub use self::info::info;
-pub use self::prompt::prompt;
-pub use self::run::run;
-pub use self::scratch::scratch;
-pub use self::shell::shell;
+pub fn completions(shell: Option<Shell>) -> Status {
+    let shell = shell.unwrap_or(Shell::Bash);
+    let mut command = Args::command();
+    let name = command.get_name().to_string();
+    generate(shell, &mut command, name, &mut stdout());
+    Status::OK
+}

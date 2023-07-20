@@ -26,7 +26,7 @@ use crate::commands::env::{install as env_install, link as env_link, list as env
 use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::{wrap, WrapTarget};
-use crate::commands::{check, info, prompt, run as run_command, scratch, shell};
+use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
 use crate::constants::CACHE_DIR;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
@@ -89,6 +89,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
 
     match command {
         Check { clean, .. } => check(&app, clean),
+        Completions { shell } => Ok(completions(shell)),
         Env { command } => match command {
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
             EnvCommand::List => env_list(&app),
