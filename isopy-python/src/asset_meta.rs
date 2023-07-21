@@ -1,4 +1,3 @@
-use crate::error::IsopyPythonError;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -20,6 +19,7 @@ use crate::error::IsopyPythonError;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::error::IsopyPythonError;
 use crate::python_standalone_builds::api::{
     Arch, ArchiveType, ArchiveTypeBaseName, Family, Flavour, Platform, Subflavour, Variant, OS,
 };
