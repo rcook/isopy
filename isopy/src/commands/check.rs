@@ -72,5 +72,5 @@ pub fn check(app: &App, clean: bool) -> Result<Status> {
         trash.empty()?;
     }
 
-    Ok(Status::Success)
+    return_success!();
 }

@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::ensure_file_executable_mode;
-use crate::status::{return_user_error, Status};
+use crate::status::{return_success, return_user_error, Status};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{anyhow, Result};
 use joatmon::safe_write_file;
@@ -113,7 +113,7 @@ pub fn wrap(
     safe_write_file(&wrapper_path, s, force)?;
     ensure_file_executable_mode(&wrapper_path)?;
     info!("wrapper created at {}", wrapper_path.display());
-    Ok(Status::Success)
+    return_success!();
 }
 
 fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {

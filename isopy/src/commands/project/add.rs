@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
 use crate::serialization::{PackageRec, ProjectRec};
-use crate::status::{return_user_error, Status};
+use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use log::info;
 
@@ -42,5 +42,5 @@ pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
 
     app.write_project_config(&ProjectRec { packages }, true)?;
     info!("added package \"{id}\" to project at {}", app.cwd.display());
-    Ok(Status::Success)
+    return_success!();
 }

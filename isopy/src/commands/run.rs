@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::Command;
-use crate::status::{return_user_error, Status};
+use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use std::ffi::OsString;
 
@@ -46,5 +46,5 @@ pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
     command.exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
-    Ok(Status::Success)
+    return_success!();
 }

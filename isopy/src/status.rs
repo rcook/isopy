@@ -25,6 +25,11 @@ pub enum Status {
 }
 
 macro_rules! return_success {
+    () => {{
+        log::info!("isopy completed successfully");
+        return Ok(Status::Success);
+    }};
+
     ($($arg: tt)*) => {{
         log::info!($($arg)*);
         return Ok(Status::Success);

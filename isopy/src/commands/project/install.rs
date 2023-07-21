@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::fs::existing;
 use crate::registry::Registry;
-use crate::status::{return_user_error, Status};
+use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use isopy_lib::PluginFactory;
 use std::collections::HashMap;
@@ -64,5 +64,5 @@ pub async fn install(app: &App) -> Result<Status> {
         app.add_package(plugin_host, descriptor.as_ref()).await?;
     }
 
-    Ok(Status::Success)
+    return_success!();
 }

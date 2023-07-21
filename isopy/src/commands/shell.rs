@@ -19,11 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::Command;
-use crate::status::Status;
-use crate::{app::App, status::return_user_error};
+use crate::status::{return_success, return_user_error, Status};
 use anyhow::{bail, Result};
 use colored::Colorize;
 use log::info;
@@ -70,5 +70,5 @@ pub fn shell(app: App, verbose: bool) -> Result<Status> {
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
     Command::new_shell().exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
-    Ok(Status::Success)
+    return_success!();
 }

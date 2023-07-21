@@ -21,11 +21,11 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::Status;
+use crate::status::{return_success, Status};
 use anyhow::Result;
 
 pub async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
     app.add_package(package_id.plugin_host(), package_id.descriptor())
         .await?;
-    Ok(Status::Success)
+    return_success!();
 }

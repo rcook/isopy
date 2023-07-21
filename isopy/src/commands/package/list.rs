@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::plugin_host::PluginHostRef;
 use crate::print::{make_list_table, prettify_descriptor, prettify_package};
 use crate::registry::Registry;
-use crate::status::Status;
+use crate::status::{return_success, Status};
 use crate::table::{table_divider, table_row, Table};
 use anyhow::Result;
 use colored::Colorize;
@@ -51,7 +51,7 @@ pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Statu
 
     table.print();
 
-    Ok(Status::Success)
+    return_success!();
 }
 
 fn add_plugin_rows(

@@ -20,12 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::status::Status;
+use crate::status::{return_success, Status};
 use anyhow::Result;
-use log::info;
 
 #[allow(clippy::unnecessary_wraps)]
 pub fn scratch(_app: &App) -> Result<Status> {
-    info!("this is a sample log message");
-    Ok(Status::Success)
+    return_success!("this is a sample log message");
 }
