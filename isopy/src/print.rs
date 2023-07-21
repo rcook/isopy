@@ -19,23 +19,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::descriptor_info::DescriptorInfo;
 use crate::dir_info_ext::DirInfoExt;
+use crate::fs::existing;
+use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use crate::table::{table_divider, table_line, table_row, table_title, Table, TableSettings};
-use crate::util::existing;
-use anyhow::Result;
-use colored::Color;
+use anyhow::{anyhow, Result};
+use colored::{Color, Colorize};
+use isopy_lib::Package;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use serde_json::Value;
-
-fn pretty_value(value: &Value) -> String {
-    if let Some(s) = value.as_str() {
-        String::from(s)
-    } else {
-        value.to_string()
-    }
-}
+use std::ffi::OsStr;
+use std::fs::metadata;
+use std::sync::Arc;
 
 pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
@@ -73,7 +71,7 @@ pub fn print_metadir(
 
             if let Some(obj) = package_rec.props.as_object() {
                 for (k, v) in obj {
-                    table_line!(table, "{k}: {}", pretty_value(v));
+                    table_line!(table, "{k}: {}", prettify_value(v));
                 }
             }
         }
@@ -102,7 +100,7 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
 
                 if let Some(obj) = package_rec.props.as_object() {
                     for (k, v) in obj {
-                        table_line!(table, "{k}: {}", pretty_value(v));
+                        table_line!(table, "{k}: {}", prettify_value(v));
                     }
                 }
 
@@ -162,4 +160,96 @@ pub fn make_prop_table() -> Table {
         ..Default::default()
     }
     .build()
+}
+
+pub fn prettify_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
+    let descriptor_info = DescriptorInfo {
+        plugin_host: Arc::clone(plugin_host),
+        descriptor: Arc::clone(&package.descriptor),
+    };
+    descriptor_info.to_string()
+}
+
+pub fn prettify_package(package: &Package, verbose: bool) -> Result<String> {
+    let is_file = package.asset_path.is_file();
+
+    let asset_path_display = (if verbose && is_file {
+        package.asset_path.to_str()
+    } else {
+        package.asset_path.file_name().and_then(OsStr::to_str)
+    })
+    .ok_or_else(|| anyhow!("cannot convert path {}", package.asset_path.display()))?;
+
+    let asset_path_pretty = if is_file {
+        asset_path_display.bright_white().bold()
+    } else {
+        asset_path_display.white()
+    };
+
+    let size = if is_file {
+        Some(metadata(&package.asset_path)?.len())
+    } else {
+        None
+    };
+
+    Ok(if let Some(size) = size {
+        let size_pretty = format!("{}", humanize_size_base_2(size).cyan());
+        format!("{asset_path_pretty} ({size_pretty})")
+    } else {
+        format!("{asset_path_pretty}")
+    })
+}
+
+pub fn prettify_value(value: &Value) -> String {
+    if let Some(s) = value.as_str() {
+        String::from(s)
+    } else {
+        value.to_string()
+    }
+}
+
+#[allow(clippy::cast_precision_loss)]
+pub fn humanize_size_base_2(bytes: u64) -> String {
+    const KB: u64 = 1024;
+    const MB: u64 = 1024 * 1024;
+    const GB: u64 = 1024 * 1024 * 1024;
+    const TB: u64 = 1024 * 1024 * 1024 * 1024;
+
+    if bytes < KB {
+        return format!("{bytes} B");
+    }
+
+    if bytes < MB {
+        return format!("{:.1} kB", (bytes as f64) / (KB as f64));
+    }
+
+    if bytes < GB {
+        return format!("{:.1} MB", (bytes as f64) / (MB as f64));
+    }
+
+    if bytes < TB {
+        return format!("{:.1} GB", (bytes as f64) / (GB as f64));
+    }
+
+    format!("{:.1} TB", (bytes as f64) / (TB as f64))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::humanize_size_base_2;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("100 B", 100u64)]
+    #[case("1023 B", 1023u64)]
+    #[case("1.0 kB", 1024u64)]
+    #[case("1.0 kB", 1025u64)]
+    #[case("2.0 kB", 2048u64)]
+    #[case("1.0 MB", 1_048_576_u64)]
+    #[case("1.0 GB", 1_073_741_824_u64)]
+    #[case("1.0 TB", 1_099_511_627_776_u64)]
+
+    fn test_humanize_size_base_2(#[case] expected_str: &str, #[case] input: u64) {
+        assert_eq!(expected_str, &humanize_size_base_2(input));
+    }
 }

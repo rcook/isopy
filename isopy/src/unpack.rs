@@ -19,16 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::util::set_file_mode;
+use crate::fs::set_file_mode;
 use anyhow::{anyhow, bail, Result};
 use flate2::read::GzDecoder;
 use isopy_lib::Descriptor;
 use joat_logger::{begin_operation, OpProgress};
-use joatmon::open_file;
-use joatmon::safe_create_file;
+use joatmon::{open_file, safe_create_file};
 use std::ffi::OsStr;
-use std::fs::create_dir_all;
-use std::fs::File;
+use std::fs::{create_dir_all, File};
 use std::io::{copy, Read};
 use std::path::Path;
 use tar::{Archive, Entry};

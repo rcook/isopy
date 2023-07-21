@@ -21,12 +21,10 @@
 //
 use crate::app::App;
 use crate::plugin_host::PluginHostRef;
-use crate::print::make_list_table;
+use crate::print::{make_list_table, prettify_descriptor, prettify_package};
 use crate::registry::Registry;
 use crate::status::Status;
-use crate::table::table_divider;
-use crate::table::{table_row, Table};
-use crate::util::{prettify_descriptor, prettify_package};
+use crate::table::{table_divider, table_row, Table};
 use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};

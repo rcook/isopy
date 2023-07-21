@@ -40,6 +40,7 @@ mod commands;
 mod constants;
 mod descriptor_info;
 mod dir_info_ext;
+mod fs;
 mod package_id;
 mod plugin_host;
 mod print;
@@ -51,7 +52,6 @@ mod status;
 mod table;
 mod terminal;
 mod unpack;
-mod util;
 mod wrapper_file_name;
 
 #[tokio::main]

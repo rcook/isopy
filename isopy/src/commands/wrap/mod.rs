@@ -21,11 +21,10 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
+use crate::fs::ensure_file_executable_mode;
 use crate::status::Status;
-use crate::util::ensure_file_executable_mode;
 use crate::wrapper_file_name::WrapperFileName;
-use anyhow::anyhow;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use joatmon::safe_write_file;
 use log::{error, info};
 use serde::Serialize;

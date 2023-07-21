@@ -20,10 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::fs::existing;
 use crate::package_id::PackageId;
 use crate::serialization::{PackageRec, ProjectRec};
 use crate::status::Status;
-use crate::util::existing;
 use anyhow::Result;
 use log::{error, info};
 

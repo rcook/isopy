@@ -20,9 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::fs::existing;
 use crate::registry::Registry;
 use crate::status::Status;
-use crate::util::existing;
 use anyhow::Result;
 use isopy_lib::PluginFactory;
 use log::error;
