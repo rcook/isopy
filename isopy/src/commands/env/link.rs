@@ -22,13 +22,17 @@
 use crate::app::App;
 use crate::print::make_prop_table;
 use crate::print::print_dir_info_and_env;
-use crate::status::Status;
-use anyhow::{bail, Result};
+use crate::status::{return_user_error, Status};
+use anyhow::Result;
 use joat_repo::MetaId;
 
 pub fn link(app: &App, dir_id: &MetaId) -> Result<Status> {
     let Some(dir_info) = app.repo.link(dir_id, &app.cwd)? else {
-        bail!("could not create link");
+        return_user_error!(
+            "directory {} is already linked to metadirectory with ID {}",
+            app.cwd.display(),
+            dir_id
+        );
     };
 
     let mut table = make_prop_table();

@@ -37,8 +37,10 @@ pub const JRE_DESCRIPTOR_PREFIX: &str = "jre";
 
 pub type ExitCode = i32;
 
-pub const OK: ExitCode = 0;
+pub const SUCCESS: ExitCode = 0;
 
-pub const ERROR: ExitCode = 1;
+pub const GENERAL_FAILURE: ExitCode = 1;
+
+pub const USER_ERROR: ExitCode = 2;
 
 pub const ISOPY_ENV_NAME: &str = "ISOPY_ENV";

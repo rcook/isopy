@@ -23,3 +23,11 @@ pub enum Status {
     OK,
     Fail,
 }
+
+macro_rules! return_user_error {
+    ($($arg: tt)*) => {{
+        log::error!($($arg)*);
+        return Ok(Status::Fail);
+    }};
+}
+pub(crate) use return_user_error;
