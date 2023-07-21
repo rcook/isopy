@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
-use crate::status::{return_success, Status};
+use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
 use colored::Colorize;
 use serde_json::Value;
@@ -73,5 +73,5 @@ pub fn prompt(app: &App) -> Result<Status> {
         print!("{} ", prompt.bright_magenta());
     }
 
-    return_success!();
+    return_success_quiet!();
 }

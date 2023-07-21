@@ -24,6 +24,13 @@ pub enum Status {
     UserError,
 }
 
+macro_rules! return_success_quiet {
+    () => {{
+        return Ok(Status::Success);
+    }};
+}
+pub(crate) use return_success_quiet;
+
 macro_rules! return_success {
     () => {{
         log::info!("isopy completed successfully");
