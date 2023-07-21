@@ -27,6 +27,15 @@ use crate::util::existing;
 use anyhow::Result;
 use colored::Color;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
+use serde_json::Value;
+
+fn pretty_value(value: &Value) -> String {
+    if let Some(s) = value.as_str() {
+        String::from(s)
+    } else {
+        value.to_string()
+    }
+}
 
 pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
@@ -64,7 +73,7 @@ pub fn print_metadir(
 
             if let Some(obj) = package_rec.props.as_object() {
                 for (k, v) in obj {
-                    table_line!(table, "{k}: {v}");
+                    table_line!(table, "{k}: {}", pretty_value(v));
                 }
             }
         }
@@ -93,7 +102,7 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
 
                 if let Some(obj) = package_rec.props.as_object() {
                     for (k, v) in obj {
-                        table_line!(table, "{k}: {v}");
+                        table_line!(table, "{k}: {}", pretty_value(v));
                     }
                 }
 
