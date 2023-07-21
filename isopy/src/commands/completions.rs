@@ -1,5 +1,3 @@
-use std::io::stdout;
-
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -25,6 +23,7 @@ use crate::args::Args;
 use crate::status::Status;
 use clap::CommandFactory;
 use clap_complete::{generate, Shell};
+use std::io::stdout;
 
 pub fn completions(shell: Option<Shell>) -> Status {
     let shell = shell.unwrap_or(Shell::Bash);
