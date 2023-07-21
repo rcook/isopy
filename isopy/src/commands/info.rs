@@ -40,5 +40,5 @@ pub fn info(app: &App) -> Result<Status> {
     print_repo(&mut table, &app.repo);
 
     table.print();
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

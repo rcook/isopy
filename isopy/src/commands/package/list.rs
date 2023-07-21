@@ -51,7 +51,7 @@ pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Statu
 
     table.print();
 
-    Ok(Status::OK)
+    Ok(Status::Success)
 }
 
 fn add_plugin_rows(

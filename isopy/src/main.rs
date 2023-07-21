@@ -63,8 +63,8 @@ async fn main() {
     use std::process::exit;
 
     exit(match run().await {
-        Ok(Status::OK) => SUCCESS,
-        Ok(Status::Fail) => USER_ERROR,
+        Ok(Status::Success) => SUCCESS,
+        Ok(Status::UserError) => USER_ERROR,
         Err(e) => {
             eprintln!("{}", format!("{e}").bright_red());
             GENERAL_FAILURE

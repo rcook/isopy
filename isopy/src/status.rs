@@ -20,14 +20,22 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 pub enum Status {
-    OK,
-    Fail,
+    Success,
+    UserError,
 }
+
+macro_rules! return_success {
+    ($($arg: tt)*) => {{
+        log::info!($($arg)*);
+        return Ok(Status::Success);
+    }};
+}
+pub(crate) use return_success;
 
 macro_rules! return_user_error {
     ($($arg: tt)*) => {{
         log::error!($($arg)*);
-        return Ok(Status::Fail);
+        return Ok(Status::UserError);
     }};
 }
 pub(crate) use return_user_error;

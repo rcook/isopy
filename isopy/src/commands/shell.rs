@@ -19,14 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
 use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::Command;
 use crate::status::Status;
+use crate::{app::App, status::return_user_error};
 use anyhow::{bail, Result};
 use colored::Colorize;
-use log::{error, info};
+use log::info;
 use std::env::{var, VarError};
 
 pub fn shell(app: App, verbose: bool) -> Result<Status> {
@@ -39,16 +39,14 @@ pub fn shell(app: App, verbose: bool) -> Result<Status> {
     }
 
     let Some(dir_info) = app.find_dir_info(None)? else {
-        error!(
+        return_user_error!(
             "could not find environment for directory {}",
             app.cwd.display()
         );
-        return Ok(Status::Fail);
     };
 
     let Some(env_info) = dir_info.make_env_info(None)? else {
-        error!("could not get environment info");
-        return Ok(Status::Fail);
+        return_user_error!("could not get environment info");
     };
 
     if verbose {
@@ -72,5 +70,5 @@ pub fn shell(app: App, verbose: bool) -> Result<Status> {
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
     Command::new_shell().exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

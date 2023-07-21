@@ -39,5 +39,5 @@ pub fn link(app: &App, dir_id: &MetaId) -> Result<Status> {
     print_dir_info_and_env(&mut table, &dir_info)?;
     table.print();
 
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

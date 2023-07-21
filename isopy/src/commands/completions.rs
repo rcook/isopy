@@ -31,5 +31,5 @@ pub fn completions(shell: Option<Shell>) -> Status {
     let mut command = Args::command();
     let name = command.get_name().to_string();
     generate(shell, &mut command, name, &mut stdout());
-    Status::OK
+    Status::Success
 }

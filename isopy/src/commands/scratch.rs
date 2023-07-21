@@ -27,5 +27,5 @@ use log::info;
 #[allow(clippy::unnecessary_wraps)]
 pub fn scratch(_app: &App) -> Result<Status> {
     info!("this is a sample log message");
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

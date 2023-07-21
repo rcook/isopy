@@ -23,17 +23,16 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
 use crate::serialization::{PackageRec, ProjectRec};
-use crate::status::Status;
+use crate::status::{return_user_error, Status};
 use anyhow::Result;
-use log::{error, info};
+use log::info;
 
 pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
     let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
 
     let id = package_id.plugin_host().prefix();
     if packages.iter().any(|p| p.id == id) {
-        error!("environment already has a package with ID \"{id}\" configured");
-        return Ok(Status::Fail);
+        return_user_error!("environment already has a package with ID \"{id}\" configured");
     }
 
     packages.push(PackageRec {
@@ -43,5 +42,5 @@ pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
 
     app.write_project_config(&ProjectRec { packages }, true)?;
     info!("added package \"{id}\" to project at {}", app.cwd.display());
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

@@ -22,11 +22,11 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::ensure_file_executable_mode;
-use crate::status::Status;
+use crate::status::{return_user_error, Status};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{anyhow, Result};
 use joatmon::safe_write_file;
-use log::{error, info};
+use log::info;
 use serde::Serialize;
 use std::env::join_paths;
 use std::ffi::OsString;
@@ -68,16 +68,14 @@ pub fn wrap(
     force: bool,
 ) -> Result<Status> {
     let Some(dir_info) = app.find_dir_info(None)? else {
-        error!(
+        return_user_error!(
             "could not find environment for directory {}",
             app.cwd.display()
         );
-        return Ok(Status::Fail);
     };
 
     let Some(env_info) = dir_info.make_env_info(Some(base_dir))? else {
-        error!("could not get environment info");
-        return Ok(Status::Fail);
+        return_user_error!("could not get environment info");
     };
 
     let mut template = TinyTemplate::new();
@@ -115,7 +113,7 @@ pub fn wrap(
     safe_write_file(&wrapper_path, s, force)?;
     ensure_file_executable_mode(&wrapper_path)?;
     info!("wrapper created at {}", wrapper_path.display());
-    Ok(Status::OK)
+    Ok(Status::Success)
 }
 
 fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {

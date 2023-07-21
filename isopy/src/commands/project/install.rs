@@ -22,24 +22,21 @@
 use crate::app::App;
 use crate::fs::existing;
 use crate::registry::Registry;
-use crate::status::Status;
+use crate::status::{return_user_error, Status};
 use anyhow::Result;
 use isopy_lib::PluginFactory;
-use log::error;
 use std::collections::HashMap;
 
 pub async fn install(app: &App) -> Result<Status> {
     if app.repo.get(&app.cwd)?.is_some() {
-        error!("directory {} already has an environment", app.cwd.display());
-        return Ok(Status::Fail);
+        return_user_error!("directory {} already has an environment", app.cwd.display());
     }
 
     let Some(project_rec) = existing(app.read_project_config())? else {
-        error!(
+        return_user_error!(
             "no project configuration file in directory {}",
             app.cwd.display()
         );
-        return Ok(Status::Fail);
     };
 
     let plugin_hosts = Registry::global()
@@ -51,11 +48,10 @@ pub async fn install(app: &App) -> Result<Status> {
     let mut descriptors = Vec::new();
     for package_rec in project_rec.packages {
         let Some(plugin_host) = plugin_hosts.get(&package_rec.id) else {
-            error!(
+            return_user_error!(
                 "no project configuration file in directory {}",
                 app.cwd.display()
             );
-            return Ok(Status::Fail);
         };
 
         descriptors.push((
@@ -68,5 +64,5 @@ pub async fn install(app: &App) -> Result<Status> {
         app.add_package(plugin_host, descriptor.as_ref()).await?;
     }
 
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

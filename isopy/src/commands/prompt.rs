@@ -73,5 +73,5 @@ pub fn prompt(app: &App) -> Result<Status> {
         print!("{} ", prompt.bright_magenta());
     }
 
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

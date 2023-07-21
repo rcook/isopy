@@ -59,5 +59,5 @@ pub fn list(app: &App) -> Result<Status> {
 
     table.print();
 
-    Ok(Status::OK)
+    Ok(Status::Success)
 }

@@ -27,5 +27,5 @@ use anyhow::Result;
 pub async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
     app.add_package(package_id.plugin_host(), package_id.descriptor())
         .await?;
-    Ok(Status::OK)
+    Ok(Status::Success)
 }
