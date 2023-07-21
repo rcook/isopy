@@ -35,7 +35,6 @@
 #![allow(clippy::option_if_let_else)]
 mod app;
 mod args;
-mod backtrace;
 mod commands;
 mod constants;
 mod descriptor_info;
@@ -56,18 +55,16 @@ mod wrapper_file_name;
 
 #[tokio::main]
 async fn main() {
-    use crate::constants::{GENERAL_FAILURE, SUCCESS, USER_ERROR};
     use crate::run::run;
-    use crate::status::Status;
-    use colored::Colorize;
+    use crate::status::{show_error, Status};
     use std::process::exit;
 
     exit(match run().await {
-        Ok(Status::Success) => SUCCESS,
-        Ok(Status::UserError) => USER_ERROR,
+        Ok(Status::Success) => 0,
+        Ok(Status::UserError) => 2,
         Err(e) => {
-            eprintln!("{}", format!("{e}").bright_red());
-            GENERAL_FAILURE
+            show_error(&e);
+            1
         }
     })
 }

@@ -17,7 +17,6 @@ bytes = "1.4.0"
 chrono = { version = "0.4.26", features = ["serde"] }
 clap = { version = "4.3.17", features = ["derive", "env"] }
 clap_complete = "4.3.2"
-color-backtrace = "0.5.1"
 colored = "2.0.4"
 flate2 = "1.0.26"
 futures-util = "0.3.28"
