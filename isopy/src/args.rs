@@ -194,30 +194,14 @@ pub enum EnvCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum PackageCommand {
-    #[command(name = "available", about = "List packages available for download")]
-    Available {
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
-    },
-
     #[command(name = "download", about = "Download package")]
     Download {
         #[arg(help = "Package ID")]
         package_id: PackageId,
     },
 
-    #[command(name = "downloaded", about = "List locally downloaded packages")]
-    Downloaded {
+    #[command(name = "list", about = "List local and (optionally) remote packages")]
+    List {
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
         // --verbose/--no-verbose with default of "false"
         #[arg(
@@ -230,6 +214,14 @@ pub enum PackageCommand {
 
         #[arg(help = "Show brief output", long = "no-verbose")]
         _no_verbose: bool,
+
+        #[arg(
+            help = "Show all packages including remote packages",
+            short = 'a',
+            long = "all",
+            default_value_t = false
+        )]
+        all: bool,
     },
 }
 

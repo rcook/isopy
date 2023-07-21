@@ -32,8 +32,8 @@ use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
 
 pub enum ListType {
-    Available,
-    Downloaded,
+    LocalOnly,
+    All,
 }
 
 pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Status> {
@@ -44,8 +44,8 @@ pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Statu
         let plugin = plugin_host.make_plugin(&plugin_dir);
 
         let packages = match list_type {
-            ListType::Available => plugin.get_available_packages().await?,
-            ListType::Downloaded => plugin.get_downloaded_packages().await?,
+            ListType::LocalOnly => plugin.get_downloaded_packages().await?,
+            ListType::All => plugin.get_available_packages().await?,
         };
 
         add_plugin_rows(&mut table, plugin_host, &packages, verbose)?;

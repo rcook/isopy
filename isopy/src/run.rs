@@ -97,12 +97,18 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         },
         Info => info(&app),
         Package { command } => match command {
-            PackageCommand::Available { verbose, .. } => {
-                package_list(&app, ListType::Available, verbose).await
-            }
             PackageCommand::Download { package_id } => package_download(&app, &package_id).await,
-            PackageCommand::Downloaded { verbose, .. } => {
-                package_list(&app, ListType::Downloaded, verbose).await
+            PackageCommand::List { verbose, all, .. } => {
+                package_list(
+                    &app,
+                    if all {
+                        ListType::All
+                    } else {
+                        ListType::LocalOnly
+                    },
+                    verbose,
+                )
+                .await
             }
         },
         Project { command } => match command {
