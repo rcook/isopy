@@ -19,24 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use std::result::Result as StdResult;
-use std::str::FromStr;
+use strum_macros::EnumString;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, EnumString, PartialEq)]
 pub enum Family {
+    #[strum(serialize = "cpython")]
     CPython,
-}
-
-impl FromStr for Family {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "cpython" => Ok(Self::CPython),
-            _ => Err(IsopyPythonError::UnsupportedFamily(String::from(s))),
-        }
-    }
 }
 
 #[cfg(test)]

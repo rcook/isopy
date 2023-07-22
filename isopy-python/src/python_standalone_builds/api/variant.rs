@@ -19,26 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use std::result::Result as StdResult;
-use std::str::FromStr;
+use strum_macros::EnumString;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, EnumString, PartialEq)]
 pub enum Variant {
+    #[strum(serialize = "install_only")]
     InstallOnly,
+
+    #[strum(serialize = "full")]
     Full,
-}
-
-impl FromStr for Variant {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "install_only" => Ok(Self::InstallOnly),
-            "full" => Ok(Self::Full),
-            _ => Err(IsopyPythonError::UnsupportedVariant(String::from(s))),
-        }
-    }
 }
 
 #[cfg(test)]

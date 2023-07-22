@@ -19,28 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use std::result::Result as StdResult;
-use std::str::FromStr;
+use strum_macros::EnumString;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, EnumString, PartialEq)]
 pub enum Platform {
+    #[strum(serialize = "pc")]
     Pc,
+
+    #[strum(serialize = "apple")]
     Apple,
+
+    #[strum(serialize = "unknown")]
     Unknown,
-}
-
-impl FromStr for Platform {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "pc" => Ok(Self::Pc),
-            "apple" => Ok(Self::Apple),
-            "unknown" => Ok(Self::Unknown),
-            _ => Err(IsopyPythonError::UnsupportedPlatform(String::from(s))),
-        }
-    }
 }
 
 #[cfg(test)]

@@ -19,36 +19,30 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use std::result::Result as StdResult;
-use std::str::FromStr;
+use strum_macros::EnumString;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, EnumString, PartialEq)]
 pub enum Subflavour {
+    #[strum(serialize = "debug")]
     Debug,
+
+    #[strum(serialize = "noopt")]
     NoOpt,
+
+    #[strum(serialize = "pgo+lto")]
     PgoLto,
+
+    #[strum(serialize = "pgo")]
     Pgo,
+
+    #[strum(serialize = "lto")]
     Lto,
+
+    #[strum(serialize = "shared")]
     Shared,
+
+    #[strum(serialize = "static")]
     Static,
-}
-
-impl FromStr for Subflavour {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "debug" => Ok(Self::Debug),
-            "noopt" => Ok(Self::NoOpt),
-            "pgo+lto" => Ok(Self::PgoLto),
-            "pgo" => Ok(Self::Pgo),
-            "lto" => Ok(Self::Lto),
-            "shared" => Ok(Self::Shared),
-            "static" => Ok(Self::Static),
-            _ => Err(IsopyPythonError::UnsupportedSubflavour(String::from(s))),
-        }
-    }
 }
 
 #[cfg(test)]

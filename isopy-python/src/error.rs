@@ -30,32 +30,20 @@ pub enum IsopyPythonError {
     #[error("invalid repository name \"{0}\"")]
     InvalidRepositoryName(String),
 
-    #[error("unsupported architecture \"{0}\"")]
-    UnsupportedArchitecture(String),
-
     #[error("unsupported archive type \"{0}\"")]
     UnsupportedArchiveType(String),
 
-    #[error("unsupported family \"{0}\"")]
-    UnsupportedFamily(String),
-
-    #[error("unsupported flavour \"{0}\"")]
-    UnsupportedFlavour(String),
-
-    #[error("unsupported OS \"{0}\"")]
-    UnsupportedOS(String),
-
-    #[error("unsupported platform \"{0}\"")]
-    UnsupportedPlatform(String),
-
-    #[error("unsupported subflavour \"{0}\"")]
-    UnsupportedSubflavour(String),
-
-    #[error("unsupported variant \"{0}\"")]
-    UnsupportedVariant(String),
+    #[error("parse error \"{0}\"")]
+    ParseError(String),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),
+}
+
+impl From<strum::ParseError> for IsopyPythonError {
+    fn from(value: strum::ParseError) -> Self {
+        Self::ParseError(value.to_string())
+    }
 }
 
 pub fn other_error<E>(error: E) -> IsopyPythonError

@@ -19,28 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::IsopyPythonError;
-use std::result::Result as StdResult;
-use std::str::FromStr;
+use strum_macros::EnumString;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, EnumString, PartialEq)]
 pub enum OS {
+    #[strum(serialize = "darwin")]
     Darwin,
+
+    #[strum(serialize = "linux")]
     Linux,
+
+    #[strum(serialize = "windows")]
     Windows,
-}
-
-impl FromStr for OS {
-    type Err = IsopyPythonError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match s {
-            "darwin" => Ok(Self::Darwin),
-            "linux" => Ok(Self::Linux),
-            "windows" => Ok(Self::Windows),
-            _ => Err(IsopyPythonError::UnsupportedOS(String::from(s))),
-        }
-    }
 }
 
 #[cfg(test)]
