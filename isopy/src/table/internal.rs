@@ -38,40 +38,13 @@ macro_rules! table_divider {
 pub(crate) use table_divider;
 
 macro_rules! table_row {
-    ($table: expr, $c0: expr) => {{
-        $table.add_row(&[&format!("{}", $c0)]);
-    }};
+    ($table: expr) => {
+        $table.add_row(&[""; 0])
+    };
 
-    ($table: expr, $c0: expr, $c1: expr) => {{
-        $table.add_row(&[&format!("{}", $c0), &format!("{}", $c1)]);
-    }};
-
-    ($table: expr, $c0: expr, $c1: expr, $c2: expr) => {{
-        $table.add_row(&[
-            &format!("{}", $c0),
-            &format!("{}", $c1),
-            &format!("{}", $c2),
-        ]);
-    }};
-
-    ($table: expr, $c0: expr, $c1: expr, $c2: expr, $c3: expr) => {{
-        $table.add_row(&[
-            &format!("{}", $c0),
-            &format!("{}", $c1),
-            &format!("{}", $c2),
-            &format!("{}", $c3),
-        ]);
-    }};
-
-    ($table: expr, $c0: expr, $c1: expr, $c2: expr, $c3: expr, $c4: expr) => {{
-        $table.add_row(&[
-            &format!("{}", $c0),
-            &format!("{}", $c1),
-            &format!("{}", $c2),
-            &format!("{}", $c3),
-            &format!("{}", $c4),
-        ]);
-    }};
+    ($table: expr, $head: expr $(, $tail: expr) *) => {
+        $table.add_row(&[&$head.to_string() $(, &$tail.to_string())*])
+    };
 }
 pub(crate) use table_row;
 
@@ -167,5 +140,35 @@ impl Table {
                 ),
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::settings::TableSettings;
+    use super::{table_row, Table};
+    use std::fmt::{Display, Formatter, Result as FmtResult};
+
+    #[test]
+    fn table_row_macro() {
+        struct MyStruct;
+
+        impl Display for MyStruct {
+            fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+                write!(f, "EMPTY")
+            }
+        }
+
+        let settings = TableSettings::default();
+        let mut table = Table::new(&settings);
+        assert_eq!(0, table.rows.len());
+        table_row!(table);
+        assert_eq!(1, table.rows.len());
+        table_row!(table, 1);
+        assert_eq!(2, table.rows.len());
+        table_row!(table, 1, "hello");
+        assert_eq!(3, table.rows.len());
+        table_row!(table, 1, "hello", MyStruct {});
+        assert_eq!(4, table.rows.len());
     }
 }
