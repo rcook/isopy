@@ -41,50 +41,25 @@ pub struct Query {
 
 impl Query {
     pub fn apply(&self, mut request_builder: RequestBuilder) -> RequestBuilder {
-        if let Some(value) = self.architecture.as_ref() {
-            request_builder = request_builder.query(&[("architecture", value)]);
+        macro_rules! query_field {
+            ($field: ident) => {
+                if let Some(value) = self.$field.as_ref() {
+                    request_builder = request_builder.query(&[(stringify!($field), value)]);
+                }
+            };
         }
 
-        if let Some(value) = self.heap_size.as_ref() {
-            request_builder = request_builder.query(&[("heap_size", value)]);
-        }
-
-        if let Some(value) = self.image_type.as_ref() {
-            request_builder = request_builder.query(&[("image_type", value)]);
-        }
-
-        if let Some(value) = self.jvm_impl.as_ref() {
-            request_builder = request_builder.query(&[("jvm_impl", value)]);
-        }
-
-        if let Some(value) = self.os.as_ref() {
-            request_builder = request_builder.query(&[("os", value)]);
-        }
-
-        if let Some(value) = self.project.as_ref() {
-            request_builder = request_builder.query(&[("project", value)]);
-        }
-
-        if let Some(value) = self.release_type.as_ref() {
-            request_builder = request_builder.query(&[("release_type", value)]);
-        }
-
-        if let Some(value) = self.sort_method.as_ref() {
-            request_builder = request_builder.query(&[("sort_method", value)]);
-        }
-
-        if let Some(value) = self.sort_order.as_ref() {
-            request_builder = request_builder.query(&[("sort_order", value)]);
-        }
-
-        if let Some(value) = self.vendor.as_ref() {
-            request_builder = request_builder.query(&[("vendor", value)]);
-        }
-
-        if let Some(value) = self.version.as_ref() {
-            request_builder = request_builder.query(&[("version", value)]);
-        }
-
+        query_field!(architecture);
+        query_field!(heap_size);
+        query_field!(image_type);
+        query_field!(jvm_impl);
+        query_field!(os);
+        query_field!(project);
+        query_field!(release_type);
+        query_field!(sort_method);
+        query_field!(sort_order);
+        query_field!(vendor);
+        query_field!(version);
         request_builder
     }
 }
