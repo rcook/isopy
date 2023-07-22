@@ -19,33 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::serializable_string_newtype;
 use anyhow::Error;
-use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-#[derive(Clone, Debug)]
-pub struct LastModified(String);
-
-impl LastModified {
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl Display for LastModified {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.0)
-    }
-}
+serializable_string_newtype!(LastModified);
 
 impl FromStr for LastModified {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(String::from(s)))
     }
 }
@@ -65,26 +50,6 @@ impl TryFrom<&LastModified> for SystemTime {
     fn try_from(value: &LastModified) -> StdResult<Self, Self::Error> {
         let nanos = str::parse::<u64>(value.as_str())?;
         Ok(UNIX_EPOCH + Duration::from_nanos(nanos))
-    }
-}
-
-impl<'de> Deserialize<'de> for LastModified {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        String::deserialize(deserializer)?
-            .parse::<Self>()
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-impl Serialize for LastModified {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
     }
 }
 

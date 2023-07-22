@@ -40,6 +40,7 @@ mod env_info;
 mod error;
 mod last_modified;
 mod link_header;
+mod macros;
 mod package;
 mod plugin;
 mod plugin_factory;

@@ -20,52 +20,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::error::IsopyPythonError;
-use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use isopy_lib::serializable_string_newtype;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
-#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct Tag(String);
-
-impl Tag {
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
+serializable_string_newtype!(Tag);
 
 impl FromStr for Tag {
     type Err = IsopyPythonError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(String::from(s)))
-    }
-}
-
-impl Display for Tag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl<'de> Deserialize<'de> for Tag {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        String::deserialize(deserializer)?
-            .parse::<Self>()
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-impl Serialize for Tag {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
     }
 }
 
