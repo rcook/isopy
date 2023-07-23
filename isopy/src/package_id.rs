@@ -23,8 +23,6 @@ use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::PluginHost;
 use crate::registry::Registry;
 use isopy_lib::Descriptor;
-use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
@@ -48,31 +46,5 @@ impl FromStr for PackageId {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let descriptor_info = Registry::global().parse_descriptor(s)?;
         Ok(Self { descriptor_info })
-    }
-}
-
-impl Display for PackageId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.descriptor_info)
-    }
-}
-
-impl<'de> Deserialize<'de> for PackageId {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        String::deserialize(deserializer)?
-            .parse::<Self>()
-            .map_err(serde::de::Error::custom)
-    }
-}
-
-impl Serialize for PackageId {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(&self.descriptor_info.to_string())
     }
 }
