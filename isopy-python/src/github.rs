@@ -57,7 +57,7 @@ impl Repository for GitHubRepository {
             .head(self.base_url.join("latest")?)
             .header(USER_AGENT, ISOPY_USER_AGENT);
         if let Some(x) = last_modified {
-            head_request = head_request.header(IF_MODIFIED_SINCE, x.as_str());
+            head_request = head_request.header(IF_MODIFIED_SINCE, x.to_string());
         }
 
         let raw_response = head_request.send().await?;

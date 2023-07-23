@@ -20,31 +20,39 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::{serializable_newtype, TryToString};
-use anyhow::Error;
+use anyhow::{bail, Error};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-serializable_newtype!(LastModified, String);
+type NanosType = u128;
 
-impl LastModified {
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+enum LastModifiedImpl {
+    Nanos(NanosType),
+    UnknownFormat(String),
 }
+
+serializable_newtype!(LastModified, LastModifiedImpl);
 
 impl FromStr for LastModified {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self(String::from(s)))
+        Ok(Self(if let Ok(nanos) = s.parse::<NanosType>() {
+            LastModifiedImpl::Nanos(nanos)
+        } else {
+            LastModifiedImpl::UnknownFormat(String::from(s))
+        }))
     }
 }
 
 impl TryToString for LastModified {
     fn to_string_lossy(&self) -> String {
-        self.0.clone()
+        match &self.0 {
+            LastModifiedImpl::Nanos(nanos) => nanos.to_string(),
+            LastModifiedImpl::UnknownFormat(s) => s.clone(),
+        }
     }
 
     fn try_to_string(&self) -> Option<String> {
@@ -56,8 +64,9 @@ impl TryFrom<&SystemTime> for LastModified {
     type Error = Error;
 
     fn try_from(value: &SystemTime) -> StdResult<Self, Self::Error> {
-        let nanos = value.duration_since(UNIX_EPOCH)?.as_nanos();
-        nanos.to_string().parse::<Self>()
+        Ok(Self(LastModifiedImpl::Nanos(
+            value.duration_since(UNIX_EPOCH)?.as_nanos(),
+        )))
     }
 }
 
@@ -65,8 +74,13 @@ impl TryFrom<&LastModified> for SystemTime {
     type Error = Error;
 
     fn try_from(value: &LastModified) -> StdResult<Self, Self::Error> {
-        let nanos = str::parse::<u64>(value.as_str())?;
-        Ok(UNIX_EPOCH + Duration::from_nanos(nanos))
+        match &value.0 {
+            LastModifiedImpl::Nanos(nanos) => {
+                let nanos_i64 = (*nanos).try_into()?;
+                Ok(UNIX_EPOCH + Duration::from_nanos(nanos_i64))
+            }
+            LastModifiedImpl::UnknownFormat(s) => bail!("cannot convert {s} to system time"),
+        }
     }
 }
 
