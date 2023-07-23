@@ -20,17 +20,34 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::error::IsopyPythonError;
-use isopy_lib::serializable_string_newtype;
+use isopy_lib::{serializable_newtype, TryToString};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
-serializable_string_newtype!(Tag);
+serializable_newtype!(Tag, String);
+
+impl Tag {
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
 
 impl FromStr for Tag {
     type Err = IsopyPythonError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(String::from(s)))
+    }
+}
+
+impl TryToString for Tag {
+    fn to_string_lossy(&self) -> String {
+        self.0.clone()
+    }
+
+    fn try_to_string(&self) -> Option<String> {
+        Some(self.to_string_lossy())
     }
 }
 

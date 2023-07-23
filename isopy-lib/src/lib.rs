@@ -56,6 +56,7 @@ pub use self::env_info::EnvInfo;
 pub use self::error::{other_error, IsopyLibError};
 pub use self::last_modified::LastModified;
 pub use self::link_header::LinkHeader;
+pub use self::macros::TryToString;
 pub use self::package::Package;
 pub use self::plugin::Plugin;
 pub use self::plugin_factory::PluginFactory;

@@ -19,14 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use serde::de::Error;
-use serde::{Deserialize, Serialize};
+use isopy_lib::{serializable_newtype, TryToString};
 use std::ffi::{OsStr, OsString};
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
-#[derive(Clone, Debug)]
-pub struct WrapperFileName(OsString);
+serializable_newtype!(WrapperFileName, OsString);
 
 impl WrapperFileName {
     pub fn as_os_str(&self) -> &OsStr {
@@ -38,12 +36,12 @@ impl FromStr for WrapperFileName {
     type Err = anyhow::Error;
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(OsString::from_str(s)?))
     }
 
     #[cfg(target_os = "windows")]
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         use anyhow::bail;
 
         let temp = s.to_lowercase();
@@ -57,32 +55,12 @@ impl FromStr for WrapperFileName {
     }
 }
 
-impl Display for WrapperFileName {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.0.to_str().ok_or_else(FmtError::default)?)
+impl TryToString for WrapperFileName {
+    fn to_string_lossy(&self) -> String {
+        self.0.to_string_lossy().to_string()
     }
-}
 
-impl<'de> Deserialize<'de> for WrapperFileName {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        String::deserialize(deserializer)?
-            .parse::<Self>()
-            .map_err(Error::custom)
-    }
-}
-
-impl Serialize for WrapperFileName {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(
-            self.0.to_str().ok_or_else(|| {
-                serde::ser::Error::custom("could not serialize wrapper file name")
-            })?,
-        )
+    fn try_to_string(&self) -> Option<String> {
+        self.0.to_str().map(String::from)
     }
 }

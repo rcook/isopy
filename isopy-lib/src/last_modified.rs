@@ -19,19 +19,36 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serializable_string_newtype;
+use crate::{serializable_newtype, TryToString};
 use anyhow::Error;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-serializable_string_newtype!(LastModified);
+serializable_newtype!(LastModified, String);
+
+impl LastModified {
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
 
 impl FromStr for LastModified {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(String::from(s)))
+    }
+}
+
+impl TryToString for LastModified {
+    fn to_string_lossy(&self) -> String {
+        self.0.clone()
+    }
+
+    fn try_to_string(&self) -> Option<String> {
+        Some(self.to_string_lossy())
     }
 }
 
