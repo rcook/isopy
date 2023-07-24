@@ -126,7 +126,21 @@ pub enum Command {
     },
 
     #[command(name = "prompt", about = "Show brief information in shell prompt")]
-    Prompt,
+    Prompt {
+        #[arg(
+            help = "String to output before non-empty prompt",
+            short = 'b',
+            long = "before"
+        )]
+        before: Option<String>,
+
+        #[arg(
+            help = "String to output after non-empty prompt",
+            short = 'a',
+            long = "after"
+        )]
+        after: Option<String>,
+    },
 
     #[command(name = "run", about = "Run command in environment")]
     Run {

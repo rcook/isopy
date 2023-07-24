@@ -114,7 +114,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             ProjectCommand::Add { package_id } => project_add(&app, &package_id),
             ProjectCommand::Install => project_install(&app).await,
         },
-        Prompt => prompt(&app),
+        Prompt { before, after } => prompt(&app, &before, &after),
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app),
         Shell { verbose, .. } => shell(app, verbose),

@@ -25,10 +25,9 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
-use colored::Colorize;
 use std::env::{var, VarError};
 
-pub fn prompt(app: &App) -> Result<Status> {
+pub fn prompt(app: &App, before: &Option<String>, after: &Option<String>) -> Result<Status> {
     let isopy_env = match var(ISOPY_ENV_NAME) {
         Ok(s) => Some(s),
         Err(VarError::NotPresent) => None,
@@ -42,14 +41,18 @@ pub fn prompt(app: &App) -> Result<Status> {
     };
 
     let prompt_message = match (isopy_env.is_some(), env_rec.is_some()) {
-        (true, true) => Some("env"),
+        (true, true) => Some("shell"),
         (true, false) => Some("error"),
         (false, true) => Some("env available"),
         (false, false) => None,
     };
 
     if let Some(m) = prompt_message {
-        print!("{} ", format!("(isopy {m})").bright_magenta());
+        print!(
+            "{before}(isopy {m}){after}",
+            before = before.as_deref().unwrap_or_default(),
+            after = after.as_deref().unwrap_or_default()
+        );
     }
 
     return_success_quiet!();

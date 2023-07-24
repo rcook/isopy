@@ -1,15 +1,12 @@
 # Basic shell integration
 
-Something like the following should do the trick:
+## Enable tab completion (bash)
+
+Add something like the following to your shell startup script:
 
 ```bash
 function __temp_isopy {
   if [ -d "$HOME/.isopy" ]; then
-    function cd_isopy {
-      builtin cd "$@"
-      isopy prompt
-    }
-    alias cd='cd_isopy'
     export PATH=$HOME/.isopy/bin:$PATH
     if command -v isopy &> /dev/null; then
       local isopy_completions_file=$(mktemp)
@@ -21,4 +18,12 @@ function __temp_isopy {
 }
 __temp_isopy
 unset -f __temp_isopy
+```
+
+Similar mechanisms exist to add tab completion to other shells.
+
+## Add info to prompt (bash)
+
+```bash
+export PS1="\$(isopy prompt --after ' ')\$ "
 ```
