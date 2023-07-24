@@ -41,12 +41,12 @@ pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Statu
         let plugin_dir = app.repo.shared_dir().join(plugin_host.prefix());
         let plugin = plugin_host.make_plugin(&plugin_dir);
 
-        let packages = match list_type {
+        let packages = match &list_type {
             ListType::LocalOnly => plugin.get_downloaded_packages().await?,
             ListType::All => plugin.get_available_packages().await?,
         };
 
-        add_plugin_rows(&mut table, plugin_host, &packages, verbose)?;
+        add_plugin_rows(&list_type, &mut table, plugin_host, &packages, verbose)?;
     }
 
     table.print();
@@ -55,18 +55,27 @@ pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Statu
 }
 
 fn add_plugin_rows(
+    list_type: &ListType,
     table: &mut Table,
     plugin_host: &PluginHostRef,
     packages: &Vec<Package>,
     verbose: bool,
 ) -> Result<()> {
     if packages.is_empty() {
-        table_divider!(
-            table,
-            "No packages found for {} ({})",
-            plugin_host.name().cyan(),
-            plugin_host.source_url().as_str().bright_magenta()
-        );
+        match list_type {
+            ListType::LocalOnly => table_divider!(
+                table,
+                "No local packages found for {} ({})",
+                plugin_host.name().cyan(),
+                plugin_host.source_url().as_str().bright_magenta()
+            ),
+            ListType::All => table_divider!(
+                table,
+                "No packages (local or remote) found for {} ({})",
+                plugin_host.name().cyan(),
+                plugin_host.source_url().as_str().bright_magenta()
+            ),
+        }
     } else {
         table_divider!(
             table,
