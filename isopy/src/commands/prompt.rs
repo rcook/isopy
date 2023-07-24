@@ -26,7 +26,6 @@ use crate::fs::existing;
 use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
 use colored::Colorize;
-use serde_json::Value;
 use std::env::{var, VarError};
 
 pub fn prompt(app: &App) -> Result<Status> {
@@ -42,35 +41,15 @@ pub fn prompt(app: &App) -> Result<Status> {
         None
     };
 
-    let mut prompt = String::new();
+    let prompt_message = match (isopy_env.is_some(), env_rec.is_some()) {
+        (true, true) => Some("env"),
+        (true, false) => Some("error"),
+        (false, true) => Some("env available"),
+        (false, false) => None,
+    };
 
-    if isopy_env.is_some() {
-        if let Some(env_rec) = env_rec {
-            prompt.push_str(
-                &env_rec
-                    .packages
-                    .iter()
-                    .map(|p| {
-                        p.props
-                            .as_object()
-                            .and_then(|x| x.get("version"))
-                            .and_then(Value::as_str)
-                            .map_or_else(|| p.id.clone(), |x| format!("{}-{}", p.id, x))
-                    })
-                    .collect::<Vec<_>>()
-                    .join(" "),
-            );
-        } else {
-            prompt.push_str("(isopy error)");
-        }
-    } else if let Some(env_rec) = env_rec {
-        if !env_rec.packages.is_empty() {
-            prompt.push_str("Run \"isopy shell\"");
-        }
-    }
-
-    if !prompt.is_empty() {
-        print!("{} ", prompt.bright_magenta());
+    if let Some(m) = prompt_message {
+        print!("{} ", format!("(isopy {m})").bright_magenta());
     }
 
     return_success_quiet!();
