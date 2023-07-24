@@ -70,7 +70,7 @@ pub fn wrap(
     let Some(dir_info) = app.find_dir_info(None)? else {
         return_user_error!(
             "could not find environment for directory {}",
-            app.cwd.display()
+            app.cwd().display()
         );
     };
 
@@ -90,7 +90,7 @@ pub fn wrap(
     let vars = make_vars(&env_info.vars);
 
     let wrapper_path = app
-        .cache_dir
+        .cache_dir()
         .join("bin")
         .join(wrapper_file_name.as_os_str());
 

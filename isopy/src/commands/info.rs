@@ -30,14 +30,14 @@ pub fn info(app: &App) -> Result<Status> {
 
     table_title!(table, "Current directory");
 
-    table_row!(table, "Working directory", app.cwd.display());
+    table_row!(table, "Working directory", app.cwd().display());
 
     if let Some(dir_info) = app.find_dir_info(None)? {
         print_dir_info_and_env(&mut table, &dir_info)?;
     }
 
     table_title!(table, "Repository information");
-    print_repo(&mut table, &app.repo);
+    print_repo(&mut table, app.repo());
 
     table.print();
     return_success!();

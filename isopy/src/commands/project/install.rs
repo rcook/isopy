@@ -28,14 +28,17 @@ use isopy_lib::PluginFactory;
 use std::collections::HashMap;
 
 pub async fn install(app: &App) -> Result<Status> {
-    if app.repo.get(&app.cwd)?.is_some() {
-        return_user_error!("directory {} already has an environment", app.cwd.display());
+    if app.repo().get(app.cwd())?.is_some() {
+        return_user_error!(
+            "directory {} already has an environment",
+            app.cwd().display()
+        );
     }
 
     let Some(project_rec) = existing(app.read_project_config())? else {
         return_user_error!(
             "no project configuration file in directory {}",
-            app.cwd.display()
+            app.cwd().display()
         );
     };
 
@@ -50,7 +53,7 @@ pub async fn install(app: &App) -> Result<Status> {
         let Some(plugin_host) = plugin_hosts.get(&package_rec.id) else {
             return_user_error!(
                 "no project configuration file in directory {}",
-                app.cwd.display()
+                app.cwd().display()
             );
         };
 

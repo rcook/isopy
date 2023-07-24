@@ -41,7 +41,7 @@ pub fn list(app: &App, verbose: bool) -> Result<Status> {
 fn list_verbose(app: &App) -> Result<()> {
     let mut table = make_prop_table();
 
-    let manifests = app.repo.list_manifests()?;
+    let manifests = app.repo().list_manifests()?;
     if !manifests.is_empty() {
         table_title!(table, "Metadirectories");
         for (idx, manifest) in manifests.iter().enumerate() {
@@ -51,7 +51,7 @@ fn list_verbose(app: &App) -> Result<()> {
         }
     }
 
-    let links = app.repo.list_links()?;
+    let links = app.repo().list_links()?;
     if !links.is_empty() {
         table_title!(table, "Links");
 
@@ -73,7 +73,7 @@ fn list_verbose(app: &App) -> Result<()> {
 }
 
 fn list_brief(app: &App) -> Result<()> {
-    for link in app.repo.list_links()? {
+    for link in app.repo().list_links()? {
         info!("{}", link.project_dir().display());
     }
     Ok(())

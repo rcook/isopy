@@ -27,7 +27,7 @@ use anyhow::Result;
 use joat_repo::Trash;
 
 pub fn check(app: &App, clean: bool) -> Result<Status> {
-    let mut trash = Trash::compute(&app.repo)?;
+    let mut trash = Trash::compute(app.repo())?;
 
     if trash.is_empty() {
         return_success!("no clean-up required");

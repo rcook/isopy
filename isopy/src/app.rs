@@ -32,10 +32,10 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct App {
-    pub cwd: PathBuf,
+    cwd: PathBuf,
     project_config_path: PathBuf,
-    pub cache_dir: PathBuf,
-    pub repo: Repo,
+    cache_dir: PathBuf,
+    repo: Repo,
 }
 
 impl App {
@@ -47,6 +47,18 @@ impl App {
             cache_dir: cache_dir.to_path_buf(),
             repo,
         }
+    }
+
+    pub fn cwd(&self) -> &Path {
+        &self.cwd
+    }
+
+    pub fn cache_dir(&self) -> &Path {
+        &self.cache_dir
+    }
+
+    pub const fn repo(&self) -> &Repo {
+        &self.repo
     }
 
     pub fn read_project_config(&self) -> Result<ProjectRec> {

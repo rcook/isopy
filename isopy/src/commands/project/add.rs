@@ -41,6 +41,9 @@ pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
     });
 
     app.write_project_config(&ProjectRec { packages }, true)?;
-    info!("added package \"{id}\" to project at {}", app.cwd.display());
+    info!(
+        "added package \"{id}\" to project at {}",
+        app.cwd().display()
+    );
     return_success!();
 }

@@ -27,10 +27,10 @@ use anyhow::Result;
 use joat_repo::MetaId;
 
 pub fn link(app: &App, dir_id: &MetaId) -> Result<Status> {
-    let Some(dir_info) = app.repo.link(dir_id, &app.cwd)? else {
+    let Some(dir_info) = app.repo().link(dir_id, app.cwd())? else {
         return_user_error!(
             "directory {} is already linked to metadirectory with ID {}",
-            app.cwd.display(),
+            app.cwd().display(),
             dir_id
         );
     };
