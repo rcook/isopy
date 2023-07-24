@@ -26,8 +26,19 @@ use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::{return_success, Status};
 use crate::table::{table_divider, table_title};
 use anyhow::Result;
+use log::info;
 
-pub fn list(app: &App) -> Result<Status> {
+pub fn list(app: &App, verbose: bool) -> Result<Status> {
+    if verbose {
+        list_verbose(app)?;
+    } else {
+        list_brief(app)?;
+    }
+
+    return_success!();
+}
+
+fn list_verbose(app: &App) -> Result<()> {
     let mut table = make_prop_table();
 
     let manifests = app.repo.list_manifests()?;
@@ -58,6 +69,12 @@ pub fn list(app: &App) -> Result<Status> {
     }
 
     table.print();
+    Ok(())
+}
 
-    return_success!();
+fn list_brief(app: &App) -> Result<()> {
+    for link in app.repo.list_links()? {
+        info!("{}", link.project_dir().display());
+    }
+    Ok(())
 }

@@ -91,7 +91,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Completions { shell } => Ok(completions(shell)),
         Env { command } => match command {
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
-            EnvCommand::List => env_list(&app),
+            EnvCommand::List { verbose, .. } => env_list(&app, verbose),
             EnvCommand::Link { dir_id } => env_link(&app, &dir_id),
         },
         Info => info(&app),
