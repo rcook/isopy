@@ -140,6 +140,21 @@ pub enum Command {
             long = "after"
         )]
         after: Option<String>,
+
+        #[arg(
+            help = "Message to display when running in isopy shell",
+            long = "shell"
+        )]
+        shell_message: Option<String>,
+
+        #[arg(
+            help = "Message to display when isopy environment available",
+            long = "available"
+        )]
+        available_message: Option<String>,
+
+        #[arg(help = "Message to display when isopy error occurs", long = "error")]
+        error_message: Option<String>,
     },
 
     #[command(name = "run", about = "Run command in environment")]

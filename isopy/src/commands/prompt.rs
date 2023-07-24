@@ -27,7 +27,14 @@ use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
 use std::env::{var, VarError};
 
-pub fn prompt(app: &App, before: &Option<String>, after: &Option<String>) -> Result<Status> {
+pub fn prompt(
+    app: &App,
+    before: &Option<String>,
+    after: &Option<String>,
+    shell_message: &Option<String>,
+    available_message: &Option<String>,
+    error_message: &Option<String>,
+) -> Result<Status> {
     let isopy_env = match var(ISOPY_ENV_NAME) {
         Ok(s) => Some(s),
         Err(VarError::NotPresent) => None,
@@ -41,15 +48,15 @@ pub fn prompt(app: &App, before: &Option<String>, after: &Option<String>) -> Res
     };
 
     let prompt_message = match (isopy_env.is_some(), env_rec.is_some()) {
-        (true, true) => Some("shell"),
-        (true, false) => Some("error"),
-        (false, true) => Some("env available"),
+        (true, true) => Some(shell_message.as_deref().unwrap_or("(isopy)")),
+        (true, false) => Some(error_message.as_deref().unwrap_or("(!)")),
+        (false, true) => Some(available_message.as_deref().unwrap_or("(*)")),
         (false, false) => None,
     };
 
     if let Some(m) = prompt_message {
         print!(
-            "{before}(isopy {m}){after}",
+            "{before}{m}{after}",
             before = before.as_deref().unwrap_or_default(),
             after = after.as_deref().unwrap_or_default()
         );
