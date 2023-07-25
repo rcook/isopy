@@ -73,8 +73,35 @@ fn list_verbose(app: &App) -> Result<()> {
 }
 
 fn list_brief(app: &App) -> Result<()> {
-    for link in app.repo().list_links()? {
-        info!("{}", link.project_dir().display());
+    let manifests = app.repo().list_manifests()?;
+    if manifests.is_empty() {
+        info!("You have no metadirectories");
+    } else {
+        info!("You have {} metadirectories:", manifests.len());
+        for (idx, manifest) in manifests.iter().enumerate() {
+            info!("({}) {}", idx + 1, manifest.data_dir().display());
+        }
     }
+
+    let links = app.repo().list_links()?;
+    if links.is_empty() {
+        info!("You have no project directories linked to metadirectories");
+    } else {
+        info!(
+            "You have {} project directories linked to metadirectories:",
+            links.len()
+        );
+        for (idx, link) in links.iter().enumerate() {
+            info!(
+                "({}) {} -> {}",
+                idx + 1,
+                link.project_dir().display(),
+                link.meta_id()
+            );
+        }
+    }
+
+    info!("Pass --verbose to get more information");
+
     Ok(())
 }
