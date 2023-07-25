@@ -33,9 +33,9 @@ use std::path::{Path, PathBuf};
 
 pub struct App {
     cwd: PathBuf,
-    project_config_path: PathBuf,
     cache_dir: PathBuf,
     repo: Repo,
+    project_config_path: PathBuf,
 }
 
 impl App {
@@ -43,9 +43,9 @@ impl App {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         Self {
             cwd,
-            project_config_path,
             cache_dir: cache_dir.to_path_buf(),
             repo,
+            project_config_path,
         }
     }
 
@@ -59,6 +59,10 @@ impl App {
 
     pub const fn repo(&self) -> &Repo {
         &self.repo
+    }
+
+    pub fn has_project_config_file(&self) -> bool {
+        self.project_config_path.is_file()
     }
 
     pub fn read_project_config(&self) -> Result<ProjectRec> {

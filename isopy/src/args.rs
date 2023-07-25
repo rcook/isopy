@@ -21,7 +21,7 @@
 //
 use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
-use clap::{ArgAction, Parser, Subcommand, ValueEnum};
+use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 use joat_repo::MetaId;
 use log::LevelFilter;
@@ -126,36 +126,7 @@ pub enum Command {
     },
 
     #[command(name = "prompt", about = "Show brief information in shell prompt")]
-    Prompt {
-        #[arg(
-            help = "String to output before non-empty prompt",
-            short = 'b',
-            long = "before"
-        )]
-        before: Option<String>,
-
-        #[arg(
-            help = "String to output after non-empty prompt",
-            short = 'a',
-            long = "after"
-        )]
-        after: Option<String>,
-
-        #[arg(
-            help = "Message to display when running in isopy shell",
-            long = "shell"
-        )]
-        shell_message: Option<String>,
-
-        #[arg(
-            help = "Message to display when isopy environment available",
-            long = "available"
-        )]
-        available_message: Option<String>,
-
-        #[arg(help = "Message to display when isopy error occurs", long = "error")]
-        error_message: Option<String>,
-    },
+    Prompt(PromptConfig),
 
     #[command(name = "run", about = "Run command in environment")]
     Run {
@@ -336,6 +307,44 @@ pub enum WrapCommand {
         #[arg(help = "Dot not force overwrite of output file", long = "no-force")]
         _no_force: bool,
     },
+}
+
+#[derive(ClapArgs, Debug)]
+pub struct PromptConfig {
+    #[arg(
+        help = "String to output before non-empty prompt",
+        short = 'b',
+        long = "before"
+    )]
+    pub before: Option<String>,
+
+    #[arg(
+        help = "String to output after non-empty prompt",
+        short = 'a',
+        long = "after"
+    )]
+    pub after: Option<String>,
+
+    #[arg(
+        help = "Message to display when running in isopy shell",
+        long = "shell"
+    )]
+    pub shell_message: Option<String>,
+
+    #[arg(
+        help = "Message to display when isopy environment available",
+        long = "available"
+    )]
+    pub available_message: Option<String>,
+
+    #[arg(
+        help = "Message to display if isopy configuration file is available",
+        long = "config"
+    )]
+    pub config_message: Option<String>,
+
+    #[arg(help = "Message to display when isopy error occurs", long = "error")]
+    pub error_message: Option<String>,
 }
 
 #[derive(Clone, Debug, ValueEnum)]

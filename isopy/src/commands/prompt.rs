@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::args::PromptConfig;
 use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
@@ -27,14 +28,7 @@ use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
 use std::env::{var, VarError};
 
-pub fn prompt(
-    app: &App,
-    before: &Option<String>,
-    after: &Option<String>,
-    shell_message: &Option<String>,
-    available_message: &Option<String>,
-    error_message: &Option<String>,
-) -> Result<Status> {
+pub fn prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
     let isopy_env = match var(ISOPY_ENV_NAME) {
         Ok(s) => Some(s),
         Err(VarError::NotPresent) => None,
@@ -47,18 +41,30 @@ pub fn prompt(
         None
     };
 
-    let prompt_message = match (isopy_env.is_some(), env_rec.is_some()) {
-        (true, true) => Some(shell_message.as_deref().unwrap_or("(isopy)")),
-        (true, false) => Some(error_message.as_deref().unwrap_or("(!)")),
-        (false, true) => Some(available_message.as_deref().unwrap_or("(*)")),
-        (false, false) => None,
+    let has_project_config_file = app.has_project_config_file();
+
+    let prompt_message = match (
+        isopy_env.is_some(),
+        env_rec.is_some(),
+        has_project_config_file,
+    ) {
+        (true, true, _) => Some(prompt_config.shell_message.as_deref().unwrap_or("(isopy)")),
+        (true, false, _) => Some(prompt_config.error_message.as_deref().unwrap_or("(!)")),
+        (false, true, _) => Some(prompt_config.available_message.as_deref().unwrap_or("(*)")),
+        (_, _, true) => Some(
+            prompt_config
+                .config_message
+                .as_deref()
+                .unwrap_or("(config)"),
+        ),
+        (false, false, false) => None,
     };
 
     if let Some(m) = prompt_message {
         print!(
             "{before}{m}{after}",
-            before = before.as_deref().unwrap_or_default(),
-            after = after.as_deref().unwrap_or_default()
+            before = prompt_config.before.as_deref().unwrap_or_default(),
+            after = prompt_config.after.as_deref().unwrap_or_default()
         );
     }
 
