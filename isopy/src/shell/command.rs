@@ -19,14 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ISOPY_ENV_NAME;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use isopy_lib::EnvInfo;
-use joat_repo::{LinkId, MetaId};
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitStatus;
+
+use super::IsopyEnv;
 
 pub struct Command {
     program: Option<OsString>,
@@ -53,15 +53,11 @@ impl Command {
         self
     }
 
-    pub fn exec(
-        &self,
-        link_id: &LinkId,
-        meta_id: &MetaId,
-        env_info: &EnvInfo,
-    ) -> Result<ExitStatus> {
+    pub fn exec(&self, isopy_env: &IsopyEnv, env_info: &EnvInfo) -> Result<ExitStatus> {
         prepend_paths(&env_info.path_dirs)?;
 
-        set_var(ISOPY_ENV_NAME, format!("{meta_id}-{link_id}"));
+        isopy_env.set_vars();
+
         for (key, value) in &env_info.vars {
             set_var(key, value);
         }
@@ -71,7 +67,7 @@ impl Command {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn exec_impl(&self) -> Result<ExitStatus> {
-        use anyhow::{anyhow, bail};
+        use anyhow::anyhow;
         use exec::execvp;
         use std::iter::once;
 

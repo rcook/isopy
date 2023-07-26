@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::shell::Command;
+use crate::shell::{Command, IsopyEnv};
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use std::ffi::OsString;
@@ -43,8 +43,10 @@ pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
         return_user_error!("could not get environment info");
     };
 
+    let isopy_env = IsopyEnv::from_dir_info(&dir_info);
+
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
-    command.exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
+    command.exec(&isopy_env, &env_info)?;
     return_success!();
 }

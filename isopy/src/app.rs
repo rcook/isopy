@@ -23,6 +23,7 @@ use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
+use crate::shell::IsopyEnv;
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, Package, PluginFactory};
@@ -148,8 +149,8 @@ impl App {
         Ok(())
     }
 
-    pub fn find_dir_info(&self, isopy_env: Option<String>) -> Result<Option<DirInfo>> {
-        if let Some(isopy_env_value) = isopy_env {
+    pub fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
+        if let Some(isopy_env) = isopy_env {
             // THIS IS A TEMPORARY HACK!
             // joat-repo-rs needs a method to get a DirInfo given a link ID or something
             fn find_link(repo: &Repo, link_id: &LinkId) -> RepoResult<Option<Link>> {
@@ -162,13 +163,7 @@ impl App {
                 Ok(None)
             }
 
-            let Some((_, link_id_str)) = isopy_env_value.split_once('-') else {
-                return Ok(None);
-            };
-
-            let link_id = link_id_str.parse::<LinkId>()?;
-
-            let Some(link) = find_link(&self.repo, &link_id)? else {
+            let Some(link) = find_link(&self.repo, isopy_env.link_id())? else {
                 return Ok(None);
             };
 

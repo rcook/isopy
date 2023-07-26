@@ -20,11 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod command;
+mod isopy_env;
 #[cfg(target_os = "windows")]
 mod proc;
 #[cfg(target_os = "windows")]
 mod windows;
 
 pub use self::command::Command;
+pub use self::isopy_env::IsopyEnv;
 #[cfg(target_os = "windows")]
 pub use self::windows::{get_windows_shell_info, WindowsShellKind};

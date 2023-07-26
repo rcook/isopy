@@ -20,23 +20,20 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
-use crate::shell::Command;
+use crate::shell::{Command, IsopyEnv};
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use colored::Colorize;
 use log::info;
-use std::env::{var, VarError};
 
 pub fn shell(app: App, verbose: bool) -> Result<Status> {
-    match var(ISOPY_ENV_NAME) {
-        Ok(_) => {
-            return_user_error!("you are already in an isopy shell");
-        }
-        Err(VarError::NotPresent) => {}
-        Err(e) => return Err(e)?,
-    }
+    if let Some(isopy_env) = IsopyEnv::get_vars()? {
+        return_user_error!(
+            "you are already in an isopy shell (metadirectory ID {})",
+            isopy_env.meta_id()
+        );
+    };
 
     let Some(dir_info) = app.find_dir_info(None)? else {
         return_user_error!(
@@ -67,8 +64,10 @@ pub fn shell(app: App, verbose: bool) -> Result<Status> {
         }
     }
 
+    let isopy_env = IsopyEnv::from_dir_info(&dir_info);
+
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
-    Command::new_shell().exec(dir_info.link_id(), dir_info.meta_id(), &env_info)?;
+    Command::new_shell().exec(&isopy_env, &env_info)?;
     return_success!();
 }

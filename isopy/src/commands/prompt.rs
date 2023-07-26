@@ -21,21 +21,15 @@
 //
 use crate::app::App;
 use crate::args::PromptConfig;
-use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
+use crate::shell::IsopyEnv;
 use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
-use std::env::{var, VarError};
 
 pub fn prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
-    let isopy_env = match var(ISOPY_ENV_NAME) {
-        Ok(s) => Some(s),
-        Err(VarError::NotPresent) => None,
-        Err(e) => return Err(e)?,
-    };
-
-    let env_rec = if let Some(d) = app.find_dir_info(isopy_env.clone())? {
+    let isopy_env = IsopyEnv::get_vars()?;
+    let env_rec = if let Some(d) = app.find_dir_info(isopy_env.as_ref())? {
         existing(d.read_env_config())?
     } else {
         None
