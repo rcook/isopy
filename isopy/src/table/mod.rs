@@ -27,5 +27,5 @@ pub use self::internal::Table;
 pub use self::settings::TableSettings;
 
 pub(crate) use self::internal::{
-    table_divider, table_headings, table_line, table_row, table_title,
+    table_columns, table_divider, table_headings, table_line, table_title,
 };

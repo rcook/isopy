@@ -25,7 +25,7 @@ use crate::fs::existing;
 use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
-use crate::table::{table_divider, table_line, table_row, table_title, Table, TableSettings};
+use crate::table::{table_columns, table_divider, table_line, table_title, Table, TableSettings};
 use anyhow::{anyhow, Result};
 use colored::{Color, Colorize};
 use isopy_lib::Package;
@@ -40,17 +40,17 @@ pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
         table_divider!(table, "({i})");
     }
 
-    table_row!(table, "Project directory", link.project_dir().display());
-    table_row!(table, "Link path", link.link_path().display());
-    table_row!(table, "Created at", link.created_at());
+    table_columns!(table, "Project directory", link.project_dir().display());
+    table_columns!(table, "Link path", link.link_path().display());
+    table_columns!(table, "Created at", link.created_at());
 }
 
 pub fn print_repo(table: &mut Table, repo: &Repo) {
-    table_row!(table, "Lock file", repo.lock_path().display());
-    table_row!(table, "Configuration file", repo.config_path().display());
-    table_row!(table, "Links directory", repo.links_dir().display());
-    table_row!(table, "Container directory", repo.container_dir().display());
-    table_row!(table, "Shared directory", repo.shared_dir().display());
+    table_columns!(table, "Lock file", repo.lock_path().display());
+    table_columns!(table, "Configuration file", repo.config_path().display());
+    table_columns!(table, "Links directory", repo.links_dir().display());
+    table_columns!(table, "Container directory", repo.container_dir().display());
+    table_columns!(table, "Shared directory", repo.shared_dir().display());
 }
 
 pub fn print_metadir(
@@ -64,10 +64,10 @@ pub fn print_metadir(
     }
 
     if let Some(env_rec) = env_rec {
-        table_row!(table, "Project directory", env_rec.project_dir.display());
+        table_columns!(table, "Project directory", env_rec.project_dir.display());
 
         for package_rec in &env_rec.packages {
-            table_row!(table, "Package", &package_rec.id);
+            table_columns!(table, "Package", &package_rec.id);
 
             if let Some(obj) = package_rec.props.as_object() {
                 for (k, v) in obj {
@@ -76,27 +76,27 @@ pub fn print_metadir(
             }
         }
     } else {
-        table_row!(
+        table_columns!(
             table,
             "Original project directory",
             manifest.original_project_dir().display()
         );
     }
 
-    table_row!(table, "Data directory", manifest.data_dir().display());
-    table_row!(table, "Manifest path", manifest.manifest_path().display());
-    table_row!(table, "Created at", manifest.created_at());
+    table_columns!(table, "Data directory", manifest.data_dir().display());
+    table_columns!(table, "Manifest path", manifest.manifest_path().display());
+    table_columns!(table, "Created at", manifest.created_at());
 }
 
 pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
     if let Some(env_rec) = env_rec {
-        table_row!(table, "Project directory", env_rec.project_dir.display());
+        table_columns!(table, "Project directory", env_rec.project_dir.display());
 
         for package_rec in &env_rec.packages {
             if let Ok(Some(env_info)) =
                 Registry::global().make_env_info(dir_info.data_dir(), package_rec, None)
             {
-                table_row!(table, "Package", &package_rec.id);
+                table_columns!(table, "Package", &package_rec.id);
 
                 if let Some(obj) = package_rec.props.as_object() {
                     for (k, v) in obj {
@@ -115,19 +115,19 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
         }
     }
 
-    table_row!(table, "Data directory", dir_info.data_dir().display());
-    table_row!(table, "Manifest path", dir_info.manifest_path().display());
-    table_row!(table, "Data directory created at", dir_info.created_at());
-    table_row!(
+    table_columns!(table, "Data directory", dir_info.data_dir().display());
+    table_columns!(table, "Manifest path", dir_info.manifest_path().display());
+    table_columns!(table, "Data directory created at", dir_info.created_at());
+    table_columns!(
         table,
         "Original project directory",
         dir_info.original_project_dir().display()
     );
-    table_row!(table, "Meta ID", dir_info.meta_id());
-    table_row!(table, "Link path", dir_info.link_path().display());
-    table_row!(table, "Link created at", dir_info.link_created_at());
-    table_row!(table, "Link ID", dir_info.link_id());
-    table_row!(table, "Project directory", dir_info.project_dir().display());
+    table_columns!(table, "Meta ID", dir_info.meta_id());
+    table_columns!(table, "Link path", dir_info.link_path().display());
+    table_columns!(table, "Link created at", dir_info.link_created_at());
+    table_columns!(table, "Link ID", dir_info.link_id());
+    table_columns!(table, "Project directory", dir_info.project_dir().display());
 }
 
 pub fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {

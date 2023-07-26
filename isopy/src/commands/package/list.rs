@@ -24,7 +24,7 @@ use crate::plugin_host::PluginHostRef;
 use crate::print::{make_list_table, prettify_descriptor, prettify_package};
 use crate::registry::Registry;
 use crate::status::{return_success, Status};
-use crate::table::{table_divider, table_headings, table_row, Table};
+use crate::table::{table_columns, table_divider, table_headings, Table};
 use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
@@ -88,7 +88,7 @@ fn add_plugin_rows(
         for package in packages {
             let descriptor_pretty = prettify_descriptor(plugin_host, package);
             let package_pretty = prettify_package(package, verbose)?;
-            table_row!(table, descriptor_pretty, package_pretty);
+            table_columns!(table, descriptor_pretty, package_pretty);
         }
     }
 

@@ -37,16 +37,16 @@ macro_rules! table_divider {
 }
 pub(crate) use table_divider;
 
-macro_rules! table_row {
+macro_rules! table_columns {
     ($table: expr) => {
-        $table.add_row(&[""; 0])
+        $table.add_columns(&[""; 0])
     };
 
     ($table: expr, $head: expr $(, $tail: expr) *) => {
-        $table.add_row(&[&$head.to_string() $(, &$tail.to_string())*])
+        $table.add_columns(&[&$head.to_string() $(, &$tail.to_string())*])
     };
 }
-pub(crate) use table_row;
+pub(crate) use table_columns;
 
 macro_rules! table_headings {
     ($table: expr) => {
@@ -89,7 +89,7 @@ impl Table {
         self.rows.push(Row::Divider(String::from(s)));
     }
 
-    pub fn add_row(&mut self, values: &[&str]) {
+    pub fn add_columns(&mut self, values: &[&str]) {
         let columns = self.make_column_vec(values);
         self.rows.push(Row::Columns(columns));
     }
@@ -174,11 +174,11 @@ impl Table {
 #[cfg(test)]
 mod tests {
     use super::super::settings::TableSettings;
-    use super::{table_row, Table};
+    use super::{table_columns, Table};
     use std::fmt::{Display, Formatter, Result as FmtResult};
 
     #[test]
-    fn table_row_macro() {
+    fn table_columns_macro() {
         struct MyStruct;
 
         impl Display for MyStruct {
@@ -190,13 +190,13 @@ mod tests {
         let settings = TableSettings::default();
         let mut table = Table::new(&settings);
         assert_eq!(0, table.rows.len());
-        table_row!(table);
+        table_columns!(table);
         assert_eq!(1, table.rows.len());
-        table_row!(table, 1);
+        table_columns!(table, 1);
         assert_eq!(2, table.rows.len());
-        table_row!(table, 1, "hello");
+        table_columns!(table, 1, "hello");
         assert_eq!(3, table.rows.len());
-        table_row!(table, 1, "hello", MyStruct {});
+        table_columns!(table, 1, "hello", MyStruct {});
         assert_eq!(4, table.rows.len());
     }
 }
