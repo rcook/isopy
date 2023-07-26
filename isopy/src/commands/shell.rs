@@ -29,8 +29,15 @@ use log::info;
 
 pub fn shell(app: App, verbose: bool) -> Result<Status> {
     if let Some(isopy_env) = IsopyEnv::get_vars()? {
+        if let Some(link) = app.find_link(isopy_env.link_id())? {
+            return_user_error!(
+                "you are already in the isopy shell for project {}",
+                link.project_dir().display()
+            );
+        }
+
         return_user_error!(
-            "you are already in an isopy shell (metadirectory ID {})",
+            "you are already in an isopy shell (metadirectory ID {}",
             isopy_env.meta_id()
         );
     };

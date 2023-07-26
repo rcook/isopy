@@ -149,21 +149,21 @@ impl App {
         Ok(())
     }
 
+    pub fn find_link(&self, link_id: &LinkId) -> RepoResult<Option<Link>> {
+        // THIS IS A TEMPORARY HACK!
+        // joat-repo-rs needs a method to get a DirInfo given a link ID or something
+        for link in self.repo.list_links()? {
+            if link.link_id() == link_id {
+                return Ok(Some(link));
+            }
+        }
+
+        Ok(None)
+    }
+
     pub fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
         if let Some(isopy_env) = isopy_env {
-            // THIS IS A TEMPORARY HACK!
-            // joat-repo-rs needs a method to get a DirInfo given a link ID or something
-            fn find_link(repo: &Repo, link_id: &LinkId) -> RepoResult<Option<Link>> {
-                for link in repo.list_links()? {
-                    if link.link_id() == link_id {
-                        return Ok(Some(link));
-                    }
-                }
-
-                Ok(None)
-            }
-
-            let Some(link) = find_link(&self.repo, isopy_env.link_id())? else {
+            let Some(link) = self.find_link(isopy_env.link_id())? else {
                 return Ok(None);
             };
 
@@ -174,7 +174,7 @@ impl App {
             return Ok(Some(dir_info));
         }
 
-        let Some(link) = self.find_link(&self.cwd)? else {
+        let Some(link) = self.find_link_for_dir(&self.cwd)? else {
             return Ok(None);
         };
 
@@ -185,7 +185,7 @@ impl App {
         Ok(Some(dir_info))
     }
 
-    fn find_link(&self, dir: &Path) -> Result<Option<Link>> {
+    fn find_link_for_dir(&self, dir: &Path) -> Result<Option<Link>> {
         let mut map = self
             .repo
             .list_links()?
