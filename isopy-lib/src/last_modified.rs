@@ -91,6 +91,13 @@ mod tests {
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
     #[test]
+    fn try_from_str() -> Result<()> {
+        let last_modified = "Sun, 14 May 2023 17:40:13 GMT".parse::<LastModified>()?;
+        assert_eq!("Sun, 14 May 2023 17:40:13 GMT", last_modified.to_string());
+        Ok(())
+    }
+
+    #[test]
     fn try_from_basics() -> Result<()> {
         let system_time = UNIX_EPOCH + Duration::from_secs(12_345_678);
         let last_modified = LastModified::try_from(&system_time)?;
