@@ -24,7 +24,7 @@ use crate::constants::ISOPY_ENV_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::Command;
 use crate::status::{return_success, return_user_error, Status};
-use anyhow::{bail, Result};
+use anyhow::Result;
 use colored::Colorize;
 use log::info;
 use std::env::{var, VarError};
@@ -32,7 +32,7 @@ use std::env::{var, VarError};
 pub fn shell(app: App, verbose: bool) -> Result<Status> {
     match var(ISOPY_ENV_NAME) {
         Ok(_) => {
-            bail!("you are already in an isopy shell");
+            return_user_error!("you are already in an isopy shell");
         }
         Err(VarError::NotPresent) => {}
         Err(e) => return Err(e)?,
