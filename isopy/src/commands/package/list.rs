@@ -84,6 +84,7 @@ fn add_plugin_rows(
             plugin_host.source_url().as_str().bright_magenta()
         );
 
+        table_row!(table, "(PACKAGE ID)", "(DETAILS)");
         for package in packages {
             let descriptor_pretty = prettify_descriptor(plugin_host, package);
             let package_pretty = prettify_package(package, verbose)?;
