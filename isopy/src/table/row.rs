@@ -23,5 +23,6 @@ pub enum Row {
     Title(String),
     Divider(String),
     Columns(Vec<String>),
+    Headings(Vec<String>),
     Line(String),
 }

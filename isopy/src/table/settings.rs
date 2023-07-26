@@ -32,6 +32,8 @@ pub struct TableSettings {
     pub divider_colour: Color,
     pub default_column_colour: Color,
     pub column_colours: Vec<Color>,
+    pub default_heading_colour: Color,
+    pub heading_colours: Vec<Color>,
     pub line_colour: Color,
     pub column_separator: String,
 }
@@ -53,6 +55,8 @@ impl Default for TableSettings {
             divider_colour: Color::BrightYellow,
             default_column_colour: Color::BrightWhite,
             column_colours: vec![],
+            default_heading_colour: Color::BrightGreen,
+            heading_colours: vec![],
             line_colour: Color::BrightWhite,
             column_separator: String::from("  "),
         }

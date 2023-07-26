@@ -21,7 +21,7 @@
 //
 use super::row::Row;
 use super::settings::TableSettings;
-use colored::Colorize;
+use colored::{Color, Colorize};
 
 macro_rules! table_title {
     ($table: expr, $($arg: tt)*) => {{
@@ -47,6 +47,17 @@ macro_rules! table_row {
     };
 }
 pub(crate) use table_row;
+
+macro_rules! table_headings {
+    ($table: expr) => {
+        $table.add_headings(&[""; 0])
+    };
+
+    ($table: expr, $head: expr $(, $tail: expr) *) => {
+        $table.add_headings(&[&$head.to_string() $(, &$tail.to_string())*])
+    };
+}
+pub(crate) use table_headings;
 
 macro_rules! table_line {
     ($table: expr, $($arg: tt)*) => {{
@@ -79,19 +90,13 @@ impl Table {
     }
 
     pub fn add_row(&mut self, values: &[&str]) {
-        let values_len = values.len();
-        if self.widths.len() < values_len {
-            self.widths.resize(values_len, 0);
-        }
+        let columns = self.make_column_vec(values);
+        self.rows.push(Row::Columns(columns));
+    }
 
-        let mut strs = Vec::with_capacity(values.len());
-        for (idx, value) in values.iter().enumerate() {
-            let s = (*value).to_string();
-            self.widths[idx] = self.widths[idx].max(s.len());
-            strs.push(s);
-        }
-
-        self.rows.push(Row::Columns(strs));
+    pub fn add_headings(&mut self, values: &[&str]) {
+        let columns = self.make_column_vec(values);
+        self.rows.push(Row::Headings(columns));
     }
 
     pub fn add_line(&mut self, s: &str) {
@@ -113,25 +118,16 @@ impl Table {
                     s.color(self.settings.divider_colour),
                     width = self.settings.divider_indent
                 ),
-                Row::Columns(strs) => {
-                    if !strs.is_empty() {
-                        print!("{:<width$}", "", width = self.settings.columns_indent);
-
-                        for (idx, s) in strs.iter().enumerate() {
-                            if idx > 0 {
-                                print!("{}", self.settings.column_separator);
-                            }
-
-                            let colour = self
-                                .settings
-                                .column_colours
-                                .get(idx)
-                                .unwrap_or(&self.settings.default_column_colour);
-                            print!("{:<width$}", s.color(*colour), width = self.widths[idx]);
-                        }
-                        println!();
-                    }
-                }
+                Row::Columns(strs) => self.print_columns(
+                    strs,
+                    &self.settings.column_colours,
+                    self.settings.default_column_colour,
+                ),
+                Row::Headings(strs) => self.print_columns(
+                    strs,
+                    &self.settings.heading_colours,
+                    self.settings.default_heading_colour,
+                ),
                 Row::Line(s) => println!(
                     "{:<width$}{}",
                     "",
@@ -139,6 +135,38 @@ impl Table {
                     width = self.settings.line_indent
                 ),
             }
+        }
+    }
+
+    fn make_column_vec(&mut self, values: &[&str]) -> Vec<String> {
+        let values_len = values.len();
+        if self.widths.len() < values_len {
+            self.widths.resize(values_len, 0);
+        }
+
+        let mut strs = Vec::with_capacity(values.len());
+        for (idx, value) in values.iter().enumerate() {
+            let s = (*value).to_string();
+            self.widths[idx] = self.widths[idx].max(s.len());
+            strs.push(s);
+        }
+
+        strs
+    }
+
+    fn print_columns(&self, strs: &[String], colours: &[Color], default_colour: Color) {
+        if !strs.is_empty() {
+            print!("{:<width$}", "", width = self.settings.columns_indent);
+
+            for (idx, s) in strs.iter().enumerate() {
+                if idx > 0 {
+                    print!("{}", self.settings.column_separator);
+                }
+
+                let colour = colours.get(idx).unwrap_or(&default_colour);
+                print!("{:<width$}", s.color(*colour), width = self.widths[idx]);
+            }
+            println!();
         }
     }
 }
