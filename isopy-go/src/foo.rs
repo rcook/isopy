@@ -19,13 +19,32 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::{return_success, Status};
-use anyhow::Result;
-use isopy_go::hello;
+use crate::download::download_index;
+use crate::error::other_error;
+use crate::filter::Filter;
+use crate::go_version::GoVersion;
+use crate::result::IsopyGoResult;
+use crate::serialization::IndexRec;
+use joatmon::read_yaml_file;
+use std::path::Path;
 
-#[allow(clippy::unnecessary_wraps)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    hello(app.cache_dir()).await?;
-    return_success!("this is a sample log message");
+pub async fn hello(cache_dir: &Path) -> IsopyGoResult<()> {
+    let index_path = cache_dir.join("go.yaml");
+
+    download_index(&Filter::default(), &index_path).await?;
+
+    let index_rec = read_yaml_file::<IndexRec>(&index_path).map_err(other_error)?;
+
+    let mut versions = Vec::new();
+    for version_rec in index_rec.versions {
+        versions.push(version_rec.version.parse::<GoVersion>()?);
+    }
+
+    versions.sort();
+
+    for version in versions {
+        println!("{}", version.raw);
+    }
+
+    Ok(())
 }

@@ -19,13 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::{return_success, Status};
-use anyhow::Result;
-use isopy_go::hello;
+use reqwest::Url;
+use serde::{Deserialize, Serialize};
 
-#[allow(clippy::unnecessary_wraps)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    hello(app.cache_dir()).await?;
-    return_success!("this is a sample log message");
+#[derive(Debug, Deserialize, Serialize)]
+pub struct VersionRec {
+    #[serde(rename = "version")]
+    pub version: String,
+
+    #[serde(rename = "stable")]
+    pub stable: bool,
+
+    #[serde(rename = "file_name")]
+    pub file_name: String,
+
+    #[serde(rename = "url")]
+    pub url: Url,
+
+    #[serde(rename = "size")]
+    pub size: u64,
+
+    #[serde(rename = "checksum")]
+    pub checksum: String,
 }

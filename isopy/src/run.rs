@@ -116,7 +116,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         },
         Prompt(prompt_config) => prompt(&app, &prompt_config),
         Run { program, args } => run_command(app, &program, &args),
-        Scratch => scratch(&app),
+        Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
         Wrap { command } => match command {
             WrapCommand::Command {

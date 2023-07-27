@@ -22,6 +22,8 @@
 use colored::Colorize;
 use std::env::var;
 
+const ISOPY_BYPASS_ENV_ENV_NAME: &str = "ISOPY_BYPASS_ENV";
+const ISOPY_BYPASS_ENV_ENV_ON_VALUE: &str = "1";
 const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 const RUST_BACKTRACE_ENV_ON_VALUE: &str = "1";
 
@@ -62,7 +64,9 @@ pub(crate) use return_user_error;
 pub fn init_backtrace() {
     use std::env::{set_var, VarError};
 
-    if var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent) {
+    if var(ISOPY_BYPASS_ENV_ENV_NAME) != Ok(String::from(ISOPY_BYPASS_ENV_ENV_ON_VALUE))
+        && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
+    {
         set_var(RUST_BACKTRACE_ENV_NAME, RUST_BACKTRACE_ENV_ON_VALUE);
     }
 }

@@ -19,13 +19,43 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::{return_success, Status};
-use anyhow::Result;
-use isopy_go::hello;
+use serde::Deserialize;
 
-#[allow(clippy::unnecessary_wraps)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    hello(app.cache_dir()).await?;
-    return_success!("this is a sample log message");
+#[derive(Debug, Deserialize, PartialEq)]
+pub enum Os {
+    #[serde(rename = "aix")]
+    Aix,
+
+    #[serde(rename = "darwin")]
+    Darwin,
+
+    #[serde(rename = "dragonfly")]
+    Dragonfly,
+
+    #[serde(rename = "4")]
+    Four,
+
+    #[serde(rename = "freebsd")]
+    FreeBsd,
+
+    #[serde(rename = "illumos")]
+    Illumos,
+
+    #[serde(rename = "linux")]
+    Linux,
+
+    #[serde(rename = "netbsd")]
+    NetBsd,
+
+    #[serde(rename = "openbsd")]
+    OpenBsd,
+
+    #[serde(rename = "plan9")]
+    Plan9,
+
+    #[serde(rename = "solaris")]
+    Solaris,
+
+    #[serde(rename = "windows")]
+    Windows,
 }

@@ -19,13 +19,52 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::{return_success, Status};
-use anyhow::Result;
-use isopy_go::hello;
+use serde::Deserialize;
 
-#[allow(clippy::unnecessary_wraps)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    hello(app.cache_dir()).await?;
-    return_success!("this is a sample log message");
+#[derive(Debug, Deserialize, PartialEq)]
+pub enum Arch {
+    #[serde(rename = "amd64")]
+    Amd64,
+
+    #[serde(rename = "arm6")]
+    Arm6,
+
+    #[serde(rename = "arm64")]
+    Arm64,
+
+    #[serde(rename = "armv6l")]
+    Armv6l,
+
+    #[serde(rename = "bootstrap")]
+    Bootstrap,
+
+    #[serde(rename = "386")]
+    I386,
+
+    #[serde(rename = "loong64")]
+    Loong64,
+
+    #[serde(rename = "mips")]
+    Mips,
+
+    #[serde(rename = "mipsle")]
+    Mipsle,
+
+    #[serde(rename = "mips64")]
+    Mips64,
+
+    #[serde(rename = "mips64le")]
+    Mips64le,
+
+    #[serde(rename = "ppc64")]
+    Ppc64,
+
+    #[serde(rename = "ppc64le")]
+    Ppc64le,
+
+    #[serde(rename = "riscv64")]
+    Riscv64,
+
+    #[serde(rename = "s390x")]
+    S390x,
 }

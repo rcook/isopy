@@ -993,6 +993,7 @@ dependencies = [
  "home",
  "include_dir",
  "indicatif",
+ "isopy-go",
  "isopy-java",
  "isopy-lib",
  "isopy-python",
@@ -1020,6 +1021,27 @@ dependencies = [
  "url",
  "uuid",
  "zip",
+]
+
+[[package]]
+name = "isopy-go"
+version = "0.3.3"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "isopy-lib",
+ "joatmon",
+ "lazy_static",
+ "log",
+ "percent-encoding",
+ "reqwest",
+ "rstest",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "thiserror",
+ "url",
 ]
 
 [[package]]

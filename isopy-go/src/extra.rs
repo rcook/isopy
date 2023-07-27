@@ -19,13 +19,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::{return_success, Status};
-use anyhow::Result;
-use isopy_go::hello;
+use std::cmp::Ordering;
 
-#[allow(clippy::unnecessary_wraps)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    hello(app.cache_dir()).await?;
-    return_success!("this is a sample log message");
+#[derive(Debug, Eq, PartialEq)]
+pub enum Extra {
+    Stable,
+    ReleaseCandidate(u32),
+    Beta(u32),
+}
+
+impl PartialOrd for Extra {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Extra {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self {
+            Self::Stable => match other {
+                Self::Stable => Ordering::Equal,
+                _ => Ordering::Greater,
+            },
+            Self::ReleaseCandidate(this) => match other {
+                Self::Stable => Ordering::Less,
+                Self::ReleaseCandidate(that) => this.cmp(that),
+                Self::Beta(_) => Ordering::Greater,
+            },
+            Self::Beta(this) => match other {
+                Self::Beta(that) => this.cmp(that),
+                _ => Ordering::Less,
+            },
+        }
+    }
 }
