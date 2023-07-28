@@ -92,61 +92,56 @@ impl FromStr for AssetMeta {
         let platform = wrap(s, "platform", iter.next())?.parse::<Platform>()?;
         let os = wrap(s, "OS", iter.next())?.parse::<OS>()?;
 
-        let mut need_flavour = true;
         let mut flavour_opt = None;
-        let mut need_subflavour0 = true;
         let mut subflavour0_opt = None;
-        let mut need_subflavour1 = true;
         let mut subflavour1_opt = None;
-        let mut need_variant = true;
         let mut variant_opt = None;
-        let mut need_tag = tag_opt.is_none();
-        while need_flavour || need_subflavour0 || need_subflavour1 || need_variant || need_tag {
-            let temp = wrap(s, "flavour/subflavour/variant/tag", iter.next())?;
 
-            if need_flavour {
-                need_flavour = false;
-                flavour_opt = temp.parse::<Flavour>().ok();
-                if flavour_opt.is_some() {
+        for token in iter {
+            if flavour_opt.is_none() {
+                if let Ok(value) = token.parse::<Flavour>() {
+                    flavour_opt = Some(value);
                     continue;
                 }
             }
 
-            if need_subflavour0 {
-                need_subflavour0 = false;
-                subflavour0_opt = temp.parse::<Subflavour>().ok();
-                if subflavour0_opt.is_some() {
+            if subflavour0_opt.is_none() {
+                if let Ok(value) = token.parse::<Subflavour>() {
+                    subflavour0_opt = Some(value);
                     continue;
                 }
             }
 
-            if need_subflavour1 {
-                need_subflavour1 = false;
-                subflavour1_opt = temp.parse::<Subflavour>().ok();
-                if subflavour1_opt.is_some() {
+            if subflavour1_opt.is_none() {
+                if let Ok(value) = token.parse::<Subflavour>() {
+                    subflavour1_opt = Some(value);
                     continue;
                 }
             }
 
-            if need_variant {
-                need_variant = false;
-                variant_opt = temp.parse::<Variant>().ok();
-                if variant_opt.is_some() {
+            if variant_opt.is_none() {
+                if let Ok(value) = token.parse::<Variant>() {
+                    variant_opt = Some(value);
                     continue;
                 }
             }
 
-            if need_tag {
-                need_tag = false;
-                tag_opt = temp.parse::<Tag>().ok();
-                continue;
+            if tag_opt.is_none() {
+                if let Ok(value) = token.parse::<Tag>() {
+                    tag_opt = Some(value);
+                    continue;
+                }
             }
 
-            unreachable!()
+            return Err(IsopyPythonError::InvalidAssetNameToken(
+                String::from(s),
+                String::from(token),
+            ));
         }
 
-        let tag = tag_opt.expect("tag must be present");
-        assert!(iter.next().is_none());
+        let Some(tag) = tag_opt else {
+            return Err(IsopyPythonError::InvalidAssetName(String::from(s)));
+        };
 
         Ok(Self {
             archive_type,
@@ -168,7 +163,7 @@ impl FromStr for AssetMeta {
 mod tests {
     use super::AssetMeta;
     use crate::python_standalone_builds::api::{
-        Arch, ArchiveType, Family, Platform, Subflavour, Variant, OS,
+        Arch, ArchiveType, Family, Flavour, Platform, Subflavour, Variant, OS,
     };
     use crate::python_version::PythonVersion;
     use crate::tag::Tag;
@@ -239,6 +234,70 @@ mod tests {
             parsed_tag: "20210724T1424".parse::<Tag>().expect("test: must be valid tag")
         },
         "cpython-3.9.6-x86_64-apple-darwin-install_only-20210724T1424.tar.gz"
+    )]
+    #[case(
+        AssetMeta {
+            archive_type: ArchiveType::TarZST,
+            family: Family::CPython,
+            version: PythonVersion::new(3, 10, 12, "3.10.12"),
+            arch: Arch::PPC64LE,
+            platform: Platform::Unknown,
+            os: OS::Linux,
+            flavour: Some(Flavour::Gnu),
+            subflavour0: Some(Subflavour::NoOpt),
+            subflavour1: None,
+            variant: Some(Variant::Full),
+            parsed_tag: "20230726".parse::<Tag>().expect("test: must be valid tag")
+        },
+        "cpython-3.10.12+20230726-ppc64le-unknown-linux-gnu-noopt-full.tar.zst"
+    )]
+    #[case(
+        AssetMeta {
+            archive_type: ArchiveType::TarZST,
+            family: Family::CPython,
+            version: PythonVersion::new(3, 10, 12, "3.10.12"),
+            arch: Arch::AArch64,
+            platform: Platform::Apple,
+            os: OS::Darwin,
+            flavour: None,
+            subflavour0: Some(Subflavour::Debug),
+            subflavour1: None,
+            variant: Some(Variant::Full),
+            parsed_tag: "20230726".parse::<Tag>().expect("test: must be valid tag")
+        },
+        "cpython-3.10.12+20230726-aarch64-apple-darwin-debug-full.tar.zst"
+    )]
+    #[case(
+        AssetMeta {
+            archive_type: ArchiveType::TarZST,
+            family: Family::CPython,
+            version: PythonVersion::new(3, 10, 12, "3.10.12"),
+            arch: Arch::PPC64LE,
+            platform: Platform::Unknown,
+            os: OS::Linux,
+            flavour: Some(Flavour::Gnu),
+            subflavour0: Some(Subflavour::NoOpt),
+            subflavour1: None,
+            variant: Some(Variant::Full),
+            parsed_tag: "20230726".parse::<Tag>().expect("test: must be valid tag")
+        },
+        "cpython-3.10.12+20230726-ppc64le-unknown-linux-gnu-noopt-full.tar.zst"
+    )]
+    #[case(
+        AssetMeta {
+            archive_type: ArchiveType::TarZST,
+            family: Family::CPython,
+            version: PythonVersion::new(3, 10, 12, "3.10.12"),
+            arch: Arch::S390X,
+            platform: Platform::Unknown,
+            os: OS::Linux,
+            flavour: Some(Flavour::Gnu),
+            subflavour0: Some(Subflavour::Debug),
+            subflavour1: None,
+            variant: Some(Variant::Full),
+            parsed_tag: "20230726".parse::<Tag>().expect("test: must be valid tag")
+        },
+        "cpython-3.10.12+20230726-s390x-unknown-linux-gnu-debug-full.tar.zst"
     )]
     fn test_parse(#[case] expected_result: AssetMeta, #[case] input: &str) -> Result<()> {
         assert_eq!(expected_result, input.parse::<AssetMeta>()?);

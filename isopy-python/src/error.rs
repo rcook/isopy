@@ -36,6 +36,12 @@ pub enum IsopyPythonError {
     #[error("parse error \"{0}\"")]
     ParseError(String),
 
+    #[error("invalid asset name \"{0}\"")]
+    InvalidAssetName(String),
+
+    #[error("invalid token \"{1}\" in asset name \"{0}\"")]
+    InvalidAssetNameToken(String, String),
+
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

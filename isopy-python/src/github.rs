@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::asset::Asset;
-use crate::constants::ISOPY_USER_AGENT;
+use crate::constants::{ISOPY_OFFLINE_ENV_NAME, ISOPY_OFFLINE_ON_ENV_VALUE, ISOPY_USER_AGENT};
 use crate::repository::Repository;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -28,20 +28,24 @@ use isopy_lib::{dir_url, file_url, LastModified, ReqwestResponse, Response};
 use log::info;
 use reqwest::header::{IF_MODIFIED_SINCE, LAST_MODIFIED, USER_AGENT};
 use reqwest::{Client, StatusCode, Url};
+use std::env::var;
 
 pub struct GitHubRepository {
     base_url: Url,
     index_url: Url,
     client: Client,
+    offline: bool,
 }
 
 impl GitHubRepository {
     #[must_use]
     pub fn new(url: &Url) -> Self {
+        let offline = var(ISOPY_OFFLINE_ENV_NAME) == Ok(String::from(ISOPY_OFFLINE_ON_ENV_VALUE));
         Self {
             base_url: dir_url(url),
             index_url: file_url(url),
             client: Client::new(),
+            offline,
         }
     }
 }
@@ -52,6 +56,10 @@ impl Repository for GitHubRepository {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>> {
+        if self.offline {
+            return Ok(None);
+        }
+
         let mut head_request = self
             .client
             .head(self.base_url.join("latest")?)

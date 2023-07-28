@@ -32,6 +32,9 @@ pub enum Arch {
     #[strum(serialize = "ppc64le")]
     PPC64LE,
 
+    #[strum(serialize = "s390x")]
+    S390X,
+
     #[strum(serialize = "x86_64")]
     X86_64,
 
