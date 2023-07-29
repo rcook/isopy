@@ -113,7 +113,7 @@ impl PluginFactory for JavaPluginFactory {
         })
     }
 
-    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
-        Box::new(JavaPlugin::new(self.image_type.clone(), dir))
+    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
+        Box::new(JavaPlugin::new(offline, self.image_type.clone(), dir))
     }
 }

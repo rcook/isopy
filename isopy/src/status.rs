@@ -23,9 +23,9 @@ use colored::Colorize;
 use std::env::var;
 
 const ISOPY_BYPASS_ENV_ENV_NAME: &str = "ISOPY_BYPASS_ENV";
-const ISOPY_BYPASS_ENV_ENV_ON_VALUE: &str = "1";
+const ISOPY_BYPASS_ENV_ENV_TRUE_VALUE: &str = "true";
 const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
-const RUST_BACKTRACE_ENV_ON_VALUE: &str = "1";
+const RUST_BACKTRACE_ENV_TRUE_VALUE: &str = "1";
 
 pub enum Status {
     Success,
@@ -64,10 +64,10 @@ pub(crate) use return_user_error;
 pub fn init_backtrace() {
     use std::env::{set_var, VarError};
 
-    if var(ISOPY_BYPASS_ENV_ENV_NAME) != Ok(String::from(ISOPY_BYPASS_ENV_ENV_ON_VALUE))
+    if var(ISOPY_BYPASS_ENV_ENV_NAME) != Ok(String::from(ISOPY_BYPASS_ENV_ENV_TRUE_VALUE))
         && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
     {
-        set_var(RUST_BACKTRACE_ENV_NAME, RUST_BACKTRACE_ENV_ON_VALUE);
+        set_var(RUST_BACKTRACE_ENV_NAME, RUST_BACKTRACE_ENV_TRUE_VALUE);
     }
 }
 
@@ -80,7 +80,7 @@ pub fn show_error(error: &anyhow::Error) {
         eprintln!("stack backtrace:\n{}", error.backtrace());
     } else {
         #[cfg(debug_assertions)]
-        eprintln!("{}", format!("Set environment variable {RUST_BACKTRACE_ENV_NAME}={RUST_BACKTRACE_ENV_ON_VALUE} to see backtrace").bright_white().bold());
+        eprintln!("{}", format!("Set environment variable {RUST_BACKTRACE_ENV_NAME}={RUST_BACKTRACE_ENV_TRUE_VALUE} to see backtrace").bright_white().bold());
     }
 }
 

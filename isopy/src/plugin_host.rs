@@ -71,7 +71,7 @@ impl PluginFactory for PluginHost {
         self.plugin_factory.make_env_info(data_dir, props, base_dir)
     }
 
-    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
-        self.plugin_factory.make_plugin(dir)
+    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
+        self.plugin_factory.make_plugin(offline, dir)
     }
 }

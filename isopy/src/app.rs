@@ -33,6 +33,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct App {
+    offline: bool,
     cwd: PathBuf,
     cache_dir: PathBuf,
     repo: Repo,
@@ -40,14 +41,19 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Self {
+    pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Self {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         Self {
+            offline,
             cwd,
             cache_dir: cache_dir.to_path_buf(),
             repo,
             project_config_path,
         }
+    }
+
+    pub const fn offline(&self) -> bool {
+        self.offline
     }
 
     pub fn cwd(&self) -> &Path {
@@ -118,7 +124,7 @@ impl App {
         }
 
         let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
-        let plugin = plugin_host.make_plugin(&plugin_dir);
+        let plugin = plugin_host.make_plugin(self.offline, &plugin_dir);
         let Package {
             asset_path,
             descriptor,

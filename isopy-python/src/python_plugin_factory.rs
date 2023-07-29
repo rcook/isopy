@@ -102,7 +102,7 @@ impl PluginFactory for PythonPluginFactory {
         Ok(EnvInfo { path_dirs, vars })
     }
 
-    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin> {
-        Box::new(PythonPlugin::new(dir))
+    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
+        Box::new(PythonPlugin::new(offline, dir))
     }
 }

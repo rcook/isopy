@@ -37,16 +37,18 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 pub struct JavaPlugin {
+    offline: bool,
     image_type: ImageType,
     dir: PathBuf,
     assets_dir: PathBuf,
 }
 
 impl JavaPlugin {
-    pub fn new(image_type: ImageType, dir: &Path) -> Self {
+    pub fn new(offline: bool, image_type: ImageType, dir: &Path) -> Self {
         let dir = dir.to_path_buf();
         let assets_dir = dir.join(&*ASSETS_DIR);
         Self {
+            offline,
             image_type,
             dir,
             assets_dir,
@@ -55,7 +57,7 @@ impl JavaPlugin {
 
     async fn get_available_packages_extended(&self) -> IsopyLibResult<Vec<(Package, JavaVersion)>> {
         Ok(
-            AdoptiumIndexManager::new_default(self.image_type.clone(), &self.dir)
+            AdoptiumIndexManager::new_default(self.offline, self.image_type.clone(), &self.dir)
                 .read_versions()
                 .await?
                 .into_iter()
@@ -127,7 +129,8 @@ impl Plugin for JavaPlugin {
             .downcast_ref::<JavaDescriptor>()
             .expect("must be JavaDescriptor");
 
-        let manager = AdoptiumIndexManager::new_default(self.image_type.clone(), &self.dir);
+        let manager =
+            AdoptiumIndexManager::new_default(self.offline, self.image_type.clone(), &self.dir);
 
         let versions = manager.read_versions().await?;
         let Some(version) = versions

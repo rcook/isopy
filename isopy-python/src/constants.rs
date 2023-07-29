@@ -47,10 +47,6 @@ pub const ISOPY_USER_AGENT: &str = "isopy";
 
 pub const PLUGIN_NAME: &str = "Python";
 
-pub const ISOPY_OFFLINE_ENV_NAME: &str = "ISOPY_OFFLINE";
-
-pub const ISOPY_OFFLINE_ON_ENV_VALUE: &str = "1";
-
 #[cfg(test)]
 mod tests {
     use super::{RELEASES_URL, REPOSITORY_NAME_REGEX};

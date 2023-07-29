@@ -23,13 +23,14 @@ use super::api::{ImageType, Release, Singleton};
 use super::client::{all_versions, AdoptiumClient, Query};
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
 use crate::serialization::{IndexRec, VersionRec};
-use anyhow::Result;
+use anyhow::{bail, Result};
 use chrono::{Duration, Utc};
 use joatmon::{read_yaml_file, safe_write_file};
 use reqwest::Url;
 use std::path::{Path, PathBuf};
 
 pub struct AdoptiumIndexManager {
+    offline: bool,
     image_type: ImageType,
     client: AdoptiumClient,
     index_path: PathBuf,
@@ -37,8 +38,9 @@ pub struct AdoptiumIndexManager {
 
 impl AdoptiumIndexManager {
     #[must_use]
-    pub fn new_default(image_type: ImageType, shared_dir: &Path) -> Self {
+    pub fn new_default(offline: bool, image_type: ImageType, shared_dir: &Path) -> Self {
         Self::new(
+            offline,
             image_type,
             &ADOPTIUM_SERVER_URL,
             &shared_dir.join(&*ADOPTIUM_INDEX_FILE_NAME),
@@ -51,9 +53,10 @@ impl AdoptiumIndexManager {
     ///
     /// Panics if `index_path` is not absolute.
     #[must_use]
-    pub fn new(image_type: ImageType, server_url: &Url, index_path: &Path) -> Self {
+    pub fn new(offline: bool, image_type: ImageType, server_url: &Url, index_path: &Path) -> Self {
         assert!(index_path.is_absolute());
         Self {
+            offline,
             image_type,
             client: AdoptiumClient::new(server_url),
             index_path: index_path.to_path_buf(),
@@ -68,6 +71,10 @@ impl AdoptiumIndexManager {
     }
 
     pub async fn download_asset(&self, url: &Url, output_path: &Path) -> Result<()> {
+        if self.offline {
+            bail!("cannot download assets in offline mode");
+        }
+
         self.client.download_asset(url, output_path).await?;
         Ok(())
     }
@@ -120,6 +127,10 @@ impl AdoptiumIndexManager {
                 size,
                 checksum: String::from(checksum),
             })
+        }
+
+        if self.offline {
+            bail!("cannot download index in offline mode");
         }
 
         let last_updated_at = Utc::now();

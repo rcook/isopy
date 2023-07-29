@@ -52,15 +52,20 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 pub struct PythonPlugin {
+    offline: bool,
     dir: PathBuf,
     assets_dir: PathBuf,
 }
 
 impl PythonPlugin {
-    pub fn new(dir: &Path) -> Self {
+    pub fn new(offline: bool, dir: &Path) -> Self {
         let dir = dir.to_path_buf();
         let assets_dir = dir.join(&*ASSETS_DIR);
-        Self { dir, assets_dir }
+        Self {
+            offline,
+            dir,
+            assets_dir,
+        }
     }
 
     fn read_assets(&self) -> Result<Vec<Asset>> {
@@ -86,11 +91,16 @@ impl PythonPlugin {
     }
 
     fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {
-        fn make_repository(rec: RepositoryRec) -> (RepositoryName, bool, Box<dyn Repository>) {
+        fn make_repository(
+            offline: bool,
+            rec: RepositoryRec,
+        ) -> (RepositoryName, bool, Box<dyn Repository>) {
             match rec {
-                RepositoryRec::GitHub { name, url, enabled } => {
-                    (name, enabled, Box::new(GitHubRepository::new(&url)))
-                }
+                RepositoryRec::GitHub { name, url, enabled } => (
+                    name,
+                    enabled,
+                    Box::new(GitHubRepository::new(offline, &url)),
+                ),
                 RepositoryRec::Local { name, dir, enabled } => {
                     (name, enabled, Box::new(LocalRepository::new(&dir)))
                 }
@@ -126,7 +136,7 @@ impl PythonPlugin {
         let all_repositories = repositories_rec
             .repositories
             .into_iter()
-            .map(make_repository);
+            .map(|rec| make_repository(self.offline, rec));
         let enabled_repositories = all_repositories
             .into_iter()
             .filter(|x| x.1)

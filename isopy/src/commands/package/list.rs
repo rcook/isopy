@@ -39,7 +39,7 @@ pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Statu
 
     for plugin_host in &Registry::global().plugin_hosts {
         let plugin_dir = app.repo().shared_dir().join(plugin_host.prefix());
-        let plugin = plugin_host.make_plugin(&plugin_dir);
+        let plugin = plugin_host.make_plugin(app.offline(), &plugin_dir);
 
         let packages = match &list_type {
             ListType::LocalOnly => plugin.get_downloaded_packages().await?,

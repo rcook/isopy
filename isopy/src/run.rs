@@ -75,7 +75,7 @@ pub async fn run() -> Result<Status> {
         None => current_dir()?,
     };
 
-    let app = App::new(cwd, &cache_dir, repo);
+    let app = App::new(args.offline, cwd, &cache_dir, repo);
     do_it(app, args.command).await
 }
 

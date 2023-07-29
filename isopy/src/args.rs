@@ -45,6 +45,15 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
 pub struct Args {
     #[arg(
         global = true,
+        help = "Perform operations without connecting to network",
+        long = "offline",
+        default_value_t = false,
+        env = "ISOPY_OFFLINE"
+    )]
+    pub offline: bool,
+
+    #[arg(
+        global = true,
         help = "Path to isopy cache directory",
         short = 'd',
         long = "cache-dir",

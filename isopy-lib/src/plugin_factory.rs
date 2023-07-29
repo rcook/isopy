@@ -36,5 +36,5 @@ pub trait PluginFactory: Send + Sync {
         props: &Value,
         base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo>;
-    fn make_plugin(&self, dir: &Path) -> Box<dyn Plugin>;
+    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin>;
 }
