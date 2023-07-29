@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME, ISOPY_OFFLINE_ENV_NAME};
 use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
@@ -48,7 +49,7 @@ pub struct Args {
         help = "Perform operations without connecting to network",
         long = "offline",
         default_value_t = false,
-        env = "ISOPY_OFFLINE"
+        env = ISOPY_OFFLINE_ENV_NAME
     )]
     pub offline: bool,
 
@@ -58,7 +59,7 @@ pub struct Args {
         short = 'd',
         long = "cache-dir",
         value_parser = parse_absolute_path,
-        env = "ISOPY_CACHE_DIR"
+        env = ISOPY_CACHE_DIR_ENV_NAME
     )]
     pub cache_dir: Option<PathBuf>,
 
@@ -78,7 +79,7 @@ pub struct Args {
         long = "level",
         default_value_t = LogLevel::Info,
         value_enum,
-        env = "ISOPY_LOG_LEVEL"
+        env = ISOPY_LOG_LEVEL_ENV_NAME
     )]
     pub log_level: LogLevel,
 

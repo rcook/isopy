@@ -19,54 +19,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-mod app;
-mod args;
-mod bool_util;
-mod commands;
-mod constants;
-mod descriptor_info;
-mod dir_info_ext;
-mod env;
-mod fs;
-mod package_id;
-mod plugin_host;
-mod print;
-mod registry;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod table;
-mod terminal;
-mod unpack;
-mod wrapper_file_name;
+const TRUE_LITERALS: [&str; 6] = ["y", "yes", "t", "true", "on", "1"];
+const FALSE_LITERALS: [&str; 6] = ["n", "no", "f", "false", "off", "0"];
 
-#[tokio::main]
-async fn main() {
-    use crate::run::run;
-    use crate::status::{show_error, Status};
-    use std::process::exit;
+pub fn str_to_bool(s: &str) -> Option<bool> {
+    let s = s.trim().to_lowercase();
+    let t = s.as_str();
+    if TRUE_LITERALS.contains(&t) {
+        Some(true)
+    } else if FALSE_LITERALS.contains(&t) {
+        Some(false)
+    } else {
+        None
+    }
+}
 
-    exit(match run().await {
-        Ok(Status::Success) => 0,
-        Ok(Status::UserError) => 2,
-        Err(e) => {
-            show_error(&e);
-            1
-        }
-    })
+#[cfg(test)]
+mod tests {
+    use super::str_to_bool;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(None, "junk")]
+    #[case(None, "")]
+    #[case(Some(true), "1")]
+    #[case(Some(true), " 1 ")]
+    #[case(Some(false), " 0 ")]
+    fn basics(#[case] expected_result: Option<bool>, #[case] input: &str) {
+        assert_eq!(expected_result, str_to_bool(input));
+    }
 }

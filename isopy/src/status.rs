@@ -19,12 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::env::RUST_BACKTRACE_ENV_NAME;
 use colored::Colorize;
 use std::env::var;
 
-const ISOPY_BYPASS_ENV_ENV_NAME: &str = "ISOPY_BYPASS_ENV";
-const ISOPY_BYPASS_ENV_ENV_TRUE_VALUE: &str = "true";
-const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 const RUST_BACKTRACE_ENV_TRUE_VALUE: &str = "1";
 
 pub enum Status {
@@ -62,9 +60,10 @@ pub(crate) use return_user_error;
 
 #[cfg(debug_assertions)]
 pub fn init_backtrace() {
+    use crate::env::{get_env_bool, ISOPY_BYPASS_ENV_ENV_NAME};
     use std::env::{set_var, VarError};
 
-    if var(ISOPY_BYPASS_ENV_ENV_NAME) != Ok(String::from(ISOPY_BYPASS_ENV_ENV_TRUE_VALUE))
+    if !get_env_bool(ISOPY_BYPASS_ENV_ENV_NAME)
         && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
     {
         set_var(RUST_BACKTRACE_ENV_NAME, RUST_BACKTRACE_ENV_TRUE_VALUE);

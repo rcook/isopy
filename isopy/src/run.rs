@@ -27,6 +27,7 @@ use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::{wrap, WrapTarget};
 use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
 use crate::constants::CACHE_DIR;
+use crate::env::normalize_all_envs;
 use crate::status::{init_backtrace, Status};
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
@@ -38,6 +39,7 @@ use std::env::current_dir;
 use std::path::PathBuf;
 
 fn set_up() -> Result<()> {
+    normalize_all_envs()?;
     init_backtrace();
     reset_terminal();
     init_ui(true)?;
