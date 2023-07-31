@@ -50,9 +50,54 @@ pub enum EnvVarType {
     Bool,
 }
 
+pub enum Op {
+    DoNothing,
+    SetVar(String),
+    RemoveVar,
+}
+
+pub struct Action {
+    key: String,
+    op: Op,
+}
+
+impl Action {
+    fn compute(env_var_type: &EnvVarType, key: &str, value: &str) -> Self {
+        let key = String::from(key);
+        match env_var_type {
+            EnvVarType::Ignore => Self {
+                key,
+                op: Op::DoNothing,
+            },
+            EnvVarType::Bool => match str_to_bool(value) {
+                Some(true) => Self {
+                    key,
+                    op: Op::SetVar(String::from(BOOL_TRUE_VALUE)),
+                },
+                Some(false) => Self {
+                    key,
+                    op: Op::SetVar(String::from(BOOL_FALSE_VALUE)),
+                },
+                None => Self {
+                    key,
+                    op: Op::RemoveVar,
+                },
+            },
+        }
+    }
+
+    fn run(&self) {
+        match &self.op {
+            Op::DoNothing => {}
+            Op::SetVar(value) => set_var(&self.key, value),
+            Op::RemoveVar => remove_var(&self.key),
+        }
+    }
+}
+
 impl EnvVarType {
     fn normalize_all(envs: &[(&str, Self)]) -> Result<()> {
-        for (key, t) in envs.iter() {
+        for (key, t) in envs {
             match var(key) {
                 Ok(value) => t.normalize(key, &value),
                 Err(VarError::NotPresent) => {}
@@ -63,14 +108,7 @@ impl EnvVarType {
     }
 
     fn normalize(&self, key: &str, value: &str) {
-        match self {
-            Self::Ignore => {}
-            Self::Bool => match str_to_bool(value) {
-                Some(true) => set_var(key, BOOL_TRUE_VALUE),
-                Some(false) => set_var(key, BOOL_FALSE_VALUE),
-                None => remove_var(key),
-            },
-        }
+        Action::compute(self, key, value).run();
     }
 }
 
