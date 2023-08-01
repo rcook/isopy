@@ -34,56 +34,74 @@ pub const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 const BOOL_TRUE_VALUE: &str = "true";
 const BOOL_FALSE_VALUE: &str = "false";
 
-lazy_static! {
-    pub static ref ENVS: Vec<(&'static str, EnvVarType)> = vec![
-        (ISOPY_CACHE_DIR_ENV_NAME, EnvVarType::Ignore),
-        (ISOPY_OFFLINE_ENV_NAME, EnvVarType::Bool),
-        (ISOPY_BACKTRACE_ENV_NAME, EnvVarType::Bool),
-        (ISOPY_LOG_LEVEL_ENV_NAME, EnvVarType::Ignore),
-        (ISOPY_BYPASS_ENV_ENV_NAME, EnvVarType::Bool),
-        (RUST_BACKTRACE_ENV_NAME, EnvVarType::Ignore)
-    ];
-}
-
-pub enum EnvVarType {
+enum EnvType {
     Ignore,
     Bool,
 }
 
-pub enum Op {
+lazy_static! {
+    static ref ENVS: Vec<(&'static str, EnvType)> = vec![
+        (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),
+        (ISOPY_OFFLINE_ENV_NAME, EnvType::Bool),
+        (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
+        (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
+        (ISOPY_BYPASS_ENV_ENV_NAME, EnvType::Bool),
+        (RUST_BACKTRACE_ENV_NAME, EnvType::Ignore)
+    ];
+}
+
+#[derive(Debug)]
+enum Op {
     DoNothing,
     SetVar(String),
     RemoveVar,
 }
 
-pub struct Action {
+#[derive(Debug)]
+struct Action {
     key: String,
     op: Op,
 }
 
 impl Action {
-    fn compute(env_var_type: &EnvVarType, key: &str, value: &str) -> Self {
-        let key = String::from(key);
-        match env_var_type {
-            EnvVarType::Ignore => Self {
-                key,
-                op: Op::DoNothing,
-            },
-            EnvVarType::Bool => match str_to_bool(value) {
-                Some(true) => Self {
+    fn make_all(envs: &[(&str, EnvType)]) -> Result<Vec<Self>> {
+        fn make(env_type: &EnvType, key: &str, value: &str) -> Action {
+            let key = String::from(key);
+            match env_type {
+                EnvType::Ignore => Action {
                     key,
-                    op: Op::SetVar(String::from(BOOL_TRUE_VALUE)),
+                    op: Op::DoNothing,
                 },
-                Some(false) => Self {
-                    key,
-                    op: Op::SetVar(String::from(BOOL_FALSE_VALUE)),
+                EnvType::Bool => match str_to_bool(value) {
+                    Some(true) => Action {
+                        key,
+                        op: Op::SetVar(String::from(BOOL_TRUE_VALUE)),
+                    },
+                    Some(false) => Action {
+                        key,
+                        op: Op::SetVar(String::from(BOOL_FALSE_VALUE)),
+                    },
+                    None => Action {
+                        key,
+                        op: Op::RemoveVar,
+                    },
                 },
-                None => Self {
-                    key,
-                    op: Op::RemoveVar,
-                },
-            },
+            }
         }
+
+        let mut actions = Vec::new();
+        for (key, t) in envs {
+            let action = match read_env_var(key)? {
+                Some(value) => make(t, key, &value),
+                None => Self {
+                    key: String::from(*key),
+                    op: Op::DoNothing,
+                },
+            };
+            actions.push(action);
+        }
+
+        Ok(actions)
     }
 
     fn run(&self) {
@@ -95,27 +113,25 @@ impl Action {
     }
 }
 
-impl EnvVarType {
-    fn normalize_all(envs: &[(&str, Self)]) -> Result<()> {
-        for (key, t) in envs {
-            match var(key) {
-                Ok(value) => t.normalize(key, &value),
-                Err(VarError::NotPresent) => {}
-                Err(e) => bail!(e),
-            };
-        }
-        Ok(())
+pub fn transform_env_vars() -> Result<()> {
+    for action in Action::make_all(&ENVS)? {
+        action.run();
     }
+    Ok(())
+}
 
-    fn normalize(&self, key: &str, value: &str) {
-        Action::compute(self, key, value).run();
+pub fn get_env_keys() -> Vec<String> {
+    ENVS.iter().map(|e| String::from(e.0)).collect::<Vec<_>>()
+}
+
+pub fn read_env_var(key: &str) -> Result<Option<String>> {
+    match var(key) {
+        Ok(s) => Ok(Some(s)),
+        Err(VarError::NotPresent) => Ok(None),
+        Err(e) => bail!(e),
     }
 }
 
-pub fn get_env_bool(key: &str) -> bool {
+pub fn read_env_var_bool(key: &str) -> bool {
     var(key) == Ok(String::from(BOOL_TRUE_VALUE))
-}
-
-pub fn normalize_all_envs() -> Result<()> {
-    EnvVarType::normalize_all(&ENVS)
 }

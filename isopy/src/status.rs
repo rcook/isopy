@@ -60,10 +60,10 @@ pub(crate) use return_user_error;
 
 #[cfg(debug_assertions)]
 pub fn init_backtrace() {
-    use crate::env::{get_env_bool, ISOPY_BYPASS_ENV_ENV_NAME};
+    use crate::env::{read_env_var_bool, ISOPY_BYPASS_ENV_ENV_NAME};
     use std::env::{set_var, VarError};
 
-    if !get_env_bool(ISOPY_BYPASS_ENV_ENV_NAME)
+    if !read_env_var_bool(ISOPY_BYPASS_ENV_ENV_NAME)
         && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
     {
         set_var(RUST_BACKTRACE_ENV_NAME, RUST_BACKTRACE_ENV_TRUE_VALUE);

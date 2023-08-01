@@ -20,10 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::env::{get_env_keys, read_env_var};
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
 use crate::status::{return_success, Status};
 use crate::table::{table_columns, table_title};
 use anyhow::Result;
+
+const NO_VALUE: &str = "(not set)";
 
 pub fn info(app: &App) -> Result<Status> {
     let mut table = make_prop_table();
@@ -39,6 +42,16 @@ pub fn info(app: &App) -> Result<Status> {
     table_title!(table, "Repository information");
     print_repo(&mut table, app.repo());
 
+    table_title!(table, "Environment variables");
+    let mut keys = get_env_keys();
+    keys.sort();
+    for key in keys {
+        let value = read_env_var(&key)?;
+        let value_str = value.as_deref().unwrap_or(NO_VALUE);
+        table_columns!(table, key, value_str);
+    }
+
     table.print();
+
     return_success!();
 }
