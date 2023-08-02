@@ -28,7 +28,8 @@ use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::{read_yaml_file, safe_write_file};
+use joatmon::HasOtherError;
+use joatmon::{read_yaml_file, safe_write_file, FileReadError, YamlError};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -184,11 +185,28 @@ impl App {
             return Ok(None);
         };
 
-        let Some(dir_info) = self.repo.get(link.project_dir())? else {
-            return Ok(None);
+        // Well, this is painful...
+        let dir_info = match self.repo.get(link.project_dir()) {
+            Ok(dir_info) => dir_info,
+            Err(e) if e.is_other() => {
+                let Some(e0) = e.downcast_other_ref::<YamlError>() else {
+                    bail!(e);
+                };
+
+                let Some(e1) = e0.downcast_other_ref::<FileReadError>() else {
+                    bail!(e);
+                };
+
+                if !e1.is_not_found() {
+                    bail!(e);
+                }
+
+                None
+            }
+            Err(e) => bail!(e),
         };
 
-        Ok(Some(dir_info))
+        Ok(dir_info)
     }
 
     fn find_link_for_dir(&self, dir: &Path) -> Result<Option<Link>> {
