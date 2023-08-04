@@ -429,6 +429,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "deranged"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7684a49fb1af197853ef7b2ee694bc1f5b4179556f1e5710e1760c5db6f5e929"
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -919,9 +925,9 @@ dependencies = [
 
 [[package]]
 name = "indicatif"
-version = "0.17.5"
+version = "0.17.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ff8cc23a7393a397ed1d7f56e6365cba772aba9f9912ab968b03043c395d057"
+checksum = "0b297dc40733f23a0e52728a58fa9489a5b7638a324932de16b41adc3ef80730"
 dependencies = [
  "console",
  "instant",
@@ -999,7 +1005,7 @@ dependencies = [
  "isopy-python",
  "joat-logger",
  "joat-repo",
- "joatmon",
+ "joatmon 0.0.31",
  "lazy_static",
  "log",
  "md5",
@@ -1015,7 +1021,7 @@ dependencies = [
  "sysinfo",
  "tar",
  "thiserror",
- "time 0.3.23",
+ "time 0.3.25",
  "tinytemplate",
  "tokio",
  "url",
@@ -1031,7 +1037,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "isopy-lib",
- "joatmon",
+ "joatmon 0.0.31",
  "lazy_static",
  "log",
  "percent-encoding",
@@ -1052,7 +1058,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "isopy-lib",
- "joatmon",
+ "joatmon 0.0.31",
  "lazy_static",
  "log",
  "percent-encoding",
@@ -1075,7 +1081,7 @@ dependencies = [
  "futures-util",
  "hex",
  "joat-logger",
- "joatmon",
+ "joatmon 0.0.31",
  "log",
  "reqwest",
  "rstest",
@@ -1094,7 +1100,7 @@ dependencies = [
  "bytes",
  "include_dir",
  "isopy-lib",
- "joatmon",
+ "joatmon 0.0.31",
  "lazy_static",
  "log",
  "regex",
@@ -1117,9 +1123,9 @@ checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
 
 [[package]]
 name = "joat-logger"
-version = "0.0.1"
+version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b643dbd5de656d7c664c4322905fac53aff8583f2a9f87f116ab6da4dd2479c"
+checksum = "18b759e8a167cc2db4943e86892b0601600bf6bc67630564d551e4957aca650a"
 dependencies = [
  "indicatif",
  "lazy_static",
@@ -1136,7 +1142,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "fslock",
- "joatmon",
+ "joatmon 0.0.30",
  "md5",
  "path-absolutize",
  "serde",
@@ -1150,6 +1156,22 @@ name = "joatmon"
 version = "0.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25dd58cc34cc6d7d46e72bd0863062ce8e22c08397fbbb3acf0fb8e0574d644c"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "thiserror",
+ "toml",
+ "toml_edit",
+]
+
+[[package]]
+name = "joatmon"
+version = "0.0.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16d70e53fe29fed95b99c6362172b8260bcc455ea33222a8281c3a646c2b7c42"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1733,18 +1755,18 @@ checksum = "bebd363326d05ec3e2f532ab7660680f3b02130d780c299bca73469d521bc0ed"
 
 [[package]]
 name = "serde"
-version = "1.0.175"
+version = "1.0.181"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d25439cd7397d044e2748a6fe2432b5e85db703d6d097bd014b3c0ad1ebff0b"
+checksum = "6d3e73c93c3240c0bda063c239298e633114c69a888c3e37ca8bb33f343e9890"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.175"
+version = "1.0.181"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b23f7ade6f110613c0d63858ddb8b94c1041f550eab58a16b371bdf2c9c80ab4"
+checksum = "be02f6cb0cd3a5ec20bbcfbcbd749f57daddb1a0882dc2e46a6c236c90b977ed"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1753,9 +1775,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.103"
+version = "1.0.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d03b412469450d4404fe8499a268edd7f8b79fecb074b0d812ad64ca21f4031b"
+checksum = "076066c5f1078eac5b722a31827a8832fe108bed65dfa75e233c89f8206e976c"
 dependencies = [
  "itoa",
  "ryu",
@@ -1870,9 +1892,9 @@ checksum = "81cdd64d312baedb58e21336b31bc043b77e01cc99033ce76ef539f78e965ebc"
 
 [[package]]
 name = "syn"
-version = "2.0.27"
+version = "2.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b60f673f44a8255b9c8c657daf66a596d435f2da81a555b06dc644d080ba45e0"
+checksum = "04361975b3f5e348b2189d8dc55bc942f278b2d482a6a0365de5bdd62d351567"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1881,9 +1903,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.29.6"
+version = "0.29.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7cb97a5a85a136d84e75d5c3cf89655090602efb1be0d8d5337b7e386af2908"
+checksum = "165d6d8539689e3d3bc8b98ac59541e1f21c7de7c85d60dc80e43ae0ed2113db"
 dependencies = [
  "cfg-if",
  "core-foundation-sys",
@@ -1951,10 +1973,11 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.23"
+version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59e399c068f43a5d116fedaf73b203fa4f9c519f17e2b34f63221d3792f81446"
+checksum = "b0fdd63d58b18d663fbdf70e049f00a22c8e42be082203be7f26589213cd75ea"
 dependencies = [
+ "deranged",
  "serde",
  "time-core",
 ]
@@ -2529,7 +2552,7 @@ dependencies = [
  "hmac",
  "pbkdf2",
  "sha1",
- "time 0.3.23",
+ "time 0.3.25",
  "zstd",
 ]
 
