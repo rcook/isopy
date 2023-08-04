@@ -28,8 +28,7 @@ use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::HasOtherError;
-use joatmon::{read_yaml_file, safe_write_file, FileReadError, YamlError};
+use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
