@@ -27,8 +27,8 @@ use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::{wrap, WrapTarget};
 use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
 use crate::constants::CACHE_DIR;
-use crate::env::transform_env_vars;
-use crate::status::{init_backtrace, Status};
+use crate::env::set_up_env;
+use crate::status::Status;
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
 use clap::Parser;
@@ -39,11 +39,10 @@ use std::env::current_dir;
 use std::path::PathBuf;
 
 fn set_up() -> Result<()> {
-    transform_env_vars()?;
-    init_backtrace();
     reset_terminal();
     init_ui(true)?;
     set_max_level(LevelFilter::Trace);
+    set_up_env()?;
     Ok(())
 }
 

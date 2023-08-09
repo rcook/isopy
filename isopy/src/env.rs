@@ -24,15 +24,14 @@ use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use std::env::{remove_var, set_var, var, VarError};
 
-pub const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
-pub const ISOPY_OFFLINE_ENV_NAME: &str = "ISOPY_OFFLINE";
 pub const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
+pub const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
 pub const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
-pub const ISOPY_BYPASS_ENV_ENV_NAME: &str = "ISOPY_BYPASS_ENV";
+pub const ISOPY_OFFLINE_ENV_NAME: &str = "ISOPY_OFFLINE";
 pub const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
-const BOOL_TRUE_VALUE: &str = "true";
-const BOOL_FALSE_VALUE: &str = "false";
+pub const BOOL_TRUE_VALUE: &str = "true";
+pub const BOOL_FALSE_VALUE: &str = "false";
 
 enum EnvType {
     Ignore,
@@ -41,12 +40,10 @@ enum EnvType {
 
 lazy_static! {
     static ref ENVS: Vec<(&'static str, EnvType)> = vec![
-        (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),
-        (ISOPY_OFFLINE_ENV_NAME, EnvType::Bool),
         (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
+        (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),
         (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
-        (ISOPY_BYPASS_ENV_ENV_NAME, EnvType::Bool),
-        (RUST_BACKTRACE_ENV_NAME, EnvType::Ignore)
+        (ISOPY_OFFLINE_ENV_NAME, EnvType::Bool),
     ];
 }
 
@@ -91,7 +88,7 @@ impl Action {
 
         let mut actions = Vec::new();
         for (key, t) in envs {
-            let action = match read_env_var(key)? {
+            let action = match read_env(key)? {
                 Some(value) => make(t, key, &value),
                 None => Self {
                     key: String::from(*key),
@@ -113,25 +110,32 @@ impl Action {
     }
 }
 
-pub fn transform_env_vars() -> Result<()> {
+pub fn set_up_env() -> Result<()> {
     for action in Action::make_all(&ENVS)? {
         action.run();
     }
+
+    if read_env_bool(ISOPY_BACKTRACE_ENV_NAME)
+        && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
+    {
+        set_var(RUST_BACKTRACE_ENV_NAME, "1");
+    }
+
     Ok(())
+}
+
+pub fn read_env_bool(key: &str) -> bool {
+    var(key) == Ok(String::from(BOOL_TRUE_VALUE))
 }
 
 pub fn get_env_keys() -> Vec<String> {
     ENVS.iter().map(|e| String::from(e.0)).collect::<Vec<_>>()
 }
 
-pub fn read_env_var(key: &str) -> Result<Option<String>> {
+pub fn read_env(key: &str) -> Result<Option<String>> {
     match var(key) {
         Ok(s) => Ok(Some(s)),
         Err(VarError::NotPresent) => Ok(None),
         Err(e) => bail!(e),
     }
-}
-
-pub fn read_env_var_bool(key: &str) -> bool {
-    var(key) == Ok(String::from(BOOL_TRUE_VALUE))
 }

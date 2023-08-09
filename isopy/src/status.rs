@@ -19,11 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::RUST_BACKTRACE_ENV_NAME;
+use crate::env::{read_env_bool, BOOL_TRUE_VALUE, ISOPY_BACKTRACE_ENV_NAME};
 use colored::Colorize;
-use std::env::var;
-
-const RUST_BACKTRACE_ENV_TRUE_VALUE: &str = "1";
 
 pub enum Status {
     Success,
@@ -58,31 +55,12 @@ macro_rules! return_user_error {
 }
 pub(crate) use return_user_error;
 
-#[cfg(debug_assertions)]
-pub fn init_backtrace() {
-    use crate::env::{read_env_var_bool, ISOPY_BYPASS_ENV_ENV_NAME};
-    use std::env::{set_var, VarError};
-
-    if !read_env_var_bool(ISOPY_BYPASS_ENV_ENV_NAME)
-        && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
-    {
-        set_var(RUST_BACKTRACE_ENV_NAME, RUST_BACKTRACE_ENV_TRUE_VALUE);
-    }
-}
-
-#[cfg(not(debug_assertions))]
-pub fn init_backtrace() {}
-
 pub fn show_error(error: &anyhow::Error) {
     eprintln!("{}", format!("{error}").bright_red());
-    if is_backtrace_enabled() {
+    if read_env_bool(ISOPY_BACKTRACE_ENV_NAME) {
         eprintln!("stack backtrace:\n{}", error.backtrace());
     } else {
         #[cfg(debug_assertions)]
-        eprintln!("{}", format!("Set environment variable {RUST_BACKTRACE_ENV_NAME}={RUST_BACKTRACE_ENV_TRUE_VALUE} to see backtrace").bright_white().bold());
+        eprintln!("{}", format!("note: run with `{ISOPY_BACKTRACE_ENV_NAME}={BOOL_TRUE_VALUE}` environment variable to display a backtrace").bright_white().bold());
     }
-}
-
-fn is_backtrace_enabled() -> bool {
-    var(RUST_BACKTRACE_ENV_NAME) == Ok(String::from("1"))
 }
