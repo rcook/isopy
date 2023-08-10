@@ -23,6 +23,7 @@ use crate::plugin::Plugin;
 use crate::{Descriptor, EnvInfo, IsopyLibResult};
 use reqwest::Url;
 use serde_json::Value;
+use std::ffi::OsString;
 use std::path::Path;
 
 pub trait PluginFactory: Send + Sync {
@@ -36,5 +37,6 @@ pub trait PluginFactory: Send + Sync {
         props: &Value,
         base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo>;
+    fn make_script_command(&self, script_path: &Path) -> IsopyLibResult<Option<OsString>>;
     fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin>;
 }

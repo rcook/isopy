@@ -21,6 +21,7 @@
 //
 use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Plugin, PluginFactory};
 use serde_json::Value;
+use std::ffi::OsString;
 use std::path::Path;
 use std::sync::Arc;
 use url::Url;
@@ -69,6 +70,10 @@ impl PluginFactory for PluginHost {
         base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo> {
         self.plugin_factory.make_env_info(data_dir, props, base_dir)
+    }
+
+    fn make_script_command(&self, script_path: &Path) -> IsopyLibResult<Option<OsString>> {
+        self.plugin_factory.make_script_command(script_path)
     }
 
     fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PLUGIN_NAME, RELEASES_URL};
+use crate::constants::{PLUGIN_NAME, PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT, RELEASES_URL};
 use crate::python_descriptor::PythonDescriptor;
 use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
@@ -28,6 +28,7 @@ use isopy_lib::{
     PluginFactory,
 };
 use serde_json::Value;
+use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -100,6 +101,28 @@ impl PluginFactory for PythonPluginFactory {
         let vars = vec![];
 
         Ok(EnvInfo { path_dirs, vars })
+    }
+
+    fn make_script_command(&self, script_path: &Path) -> IsopyLibResult<Option<OsString>> {
+        fn make_command(script_path: &Path) -> OsString {
+            let mut s = OsString::new();
+            s.push(PYTHON_BIN_FILE_NAME.as_os_str());
+            s.push(" '");
+            s.push(script_path);
+            s.push("'");
+            s
+        }
+
+        if script_path
+            .extension()
+            .map(OsStr::to_ascii_lowercase)
+            .as_ref()
+            == Some(&*PYTHON_SCRIPT_EXT)
+        {
+            Ok(Some(make_command(script_path)))
+        } else {
+            Ok(None)
+        }
     }
 
     fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {

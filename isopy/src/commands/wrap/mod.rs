@@ -29,9 +29,9 @@ use joatmon::safe_write_file;
 use log::info;
 use serde::Serialize;
 use std::env::join_paths;
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
-use tinytemplate::TinyTemplate;
+use tinytemplate::{format_unescaped, TinyTemplate};
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
@@ -79,6 +79,7 @@ pub fn wrap(
     };
 
     let mut template = TinyTemplate::new();
+    template.set_default_formatter(&format_unescaped);
     template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;
 
     let path_env = String::from(
@@ -97,7 +98,14 @@ pub fn wrap(
     let command = match target {
         WrapTarget::Command(s) => s.clone(),
         WrapTarget::Script(p) => {
-            String::from(p.to_str().ok_or_else(|| anyhow!("cannot convert path"))?)
+            let result = dir_info.make_script_command(p)?;
+            String::from(
+                result
+                    .as_ref()
+                    .map_or_else(|| p.as_os_str(), |s| s as &OsStr)
+                    .to_str()
+                    .ok_or_else(|| anyhow!("cannot convert OS string"))?,
+            )
         }
     };
 

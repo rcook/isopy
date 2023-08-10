@@ -22,6 +22,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
 use reqwest::Url;
+use std::ffi::OsString;
 use std::path::PathBuf;
 
 lazy_static! {
@@ -31,6 +32,8 @@ lazy_static! {
     pub static ref REPOSITORY_NAME_REGEX: Regex =
         Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
     pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
+    pub static ref PYTHON_BIN_FILE_NAME: OsString = python_bin_file_name();
+    pub static ref PYTHON_SCRIPT_EXT: OsString = OsString::from("py");
 }
 
 pub const DEFAULT_REPOSITORY_NAME: &str = "default";
@@ -46,6 +49,16 @@ pub const INDEX_FILE_NAME: &str = "index.yaml";
 pub const ISOPY_USER_AGENT: &str = "isopy";
 
 pub const PLUGIN_NAME: &str = "Python";
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn python_bin_file_name() -> OsString {
+    OsString::from("python3")
+}
+
+#[cfg(target_os = "windows")]
+fn python_bin_file_name() -> OsString {
+    OsString::from("python.exe")
+}
 
 #[cfg(test)]
 mod tests {

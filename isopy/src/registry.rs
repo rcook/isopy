@@ -28,6 +28,7 @@ use isopy_java::JavaPluginFactory;
 use isopy_lib::{EnvInfo, PluginFactory};
 use isopy_python::PythonPluginFactory;
 use lazy_static::lazy_static;
+use std::ffi::OsString;
 use std::path::Path;
 use std::sync::Arc;
 
@@ -95,6 +96,22 @@ impl Registry {
             &package_rec.props,
             base_dir,
         )?))
+    }
+
+    pub fn make_script_command(
+        &self,
+        package_rec: &PackageRec,
+        script_path: &Path,
+    ) -> Result<Option<OsString>> {
+        let Some(plugin_host) = self
+            .plugin_hosts
+            .iter()
+            .find(|p| p.prefix() == package_rec.id)
+        else {
+            return Ok(None);
+        };
+
+        Ok(plugin_host.make_script_command(script_path)?)
     }
 
     fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&PluginHostRef, &'a str)> {

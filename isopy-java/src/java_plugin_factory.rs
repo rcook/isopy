@@ -30,6 +30,7 @@ use isopy_lib::{
     PluginFactory,
 };
 use serde_json::Value;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -111,6 +112,10 @@ impl PluginFactory for JavaPluginFactory {
             path_dirs: make_path_dirs(data_dir, &env_config_rec),
             vars: vec![(String::from("JAVA_HOME"), openjdk_dir_str)],
         })
+    }
+
+    fn make_script_command(&self, _script_path: &Path) -> IsopyLibResult<Option<OsString>> {
+        Ok(None)
     }
 
     fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
