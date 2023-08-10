@@ -56,15 +56,10 @@ struct TemplateContext {
     command: String,
 }
 
-pub enum WrapTarget {
-    Command(String),
-    Script(PathBuf),
-}
-
 pub fn wrap(
     app: &App,
     wrapper_file_name: &WrapperFileName,
-    target: &WrapTarget,
+    script_path: &Path,
     base_dir: &Path,
     force: bool,
 ) -> Result<Status> {
@@ -96,10 +91,7 @@ pub fn wrap(
         .join("bin")
         .join(wrapper_file_name.as_os_str());
 
-    let command = match target {
-        WrapTarget::Command(s) => s.clone(),
-        WrapTarget::Script(p) => make_script_command(&dir_info, p)?,
-    };
+    let command = make_script_command(&dir_info, script_path)?;
 
     let s = template.render(
         "WRAPPER",

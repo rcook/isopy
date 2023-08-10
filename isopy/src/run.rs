@@ -24,7 +24,7 @@ use crate::args::{Args, Command};
 use crate::commands::env::{install as env_install, link as env_link, list as env_list};
 use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
-use crate::commands::wrap::{wrap, WrapTarget};
+use crate::commands::wrap::wrap;
 use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
@@ -85,7 +85,6 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     use crate::args::EnvCommand;
     use crate::args::PackageCommand;
     use crate::args::ProjectCommand;
-    use crate::args::WrapCommand;
 
     match command {
         Check { clean, .. } => check(&app, clean),
@@ -119,33 +118,12 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
-        Wrap { command } => match command {
-            WrapCommand::Command {
-                wrapper_file_name,
-                command,
-                base_dir,
-                force,
-                ..
-            } => wrap(
-                &app,
-                &wrapper_file_name,
-                &WrapTarget::Command(command),
-                &base_dir,
-                force,
-            ),
-            WrapCommand::Script {
-                wrapper_file_name,
-                script_path,
-                base_dir,
-                force,
-                ..
-            } => wrap(
-                &app,
-                &wrapper_file_name,
-                &WrapTarget::Script(script_path),
-                &base_dir,
-                force,
-            ),
-        },
+        Wrap {
+            wrapper_file_name,
+            script_path,
+            base_dir,
+            force,
+            ..
+        } => wrap(&app, &wrapper_file_name, &script_path, &base_dir, force),
     }
 }

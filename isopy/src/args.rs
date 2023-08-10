@@ -174,10 +174,31 @@ pub enum Command {
         _no_verbose: bool,
     },
 
-    #[command(name = "wrap", about = "Wrap commands")]
+    #[command(
+        name = "wrap",
+        about = "Generate environment wrapper script in bin directory for script"
+    )]
     Wrap {
-        #[command(subcommand)]
-        command: WrapCommand,
+        #[arg(help = "Wrapper file name")]
+        wrapper_file_name: WrapperFileName,
+
+        #[arg(help = "Script path", value_parser = parse_absolute_path)]
+        script_path: PathBuf,
+
+        #[arg(help = "Base directory", value_parser = parse_absolute_path)]
+        base_dir: PathBuf,
+
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        #[arg(
+            help = "Force overwrite of output file",
+            short = 'f',
+            long = "force",
+            overrides_with = "_no_force"
+        )]
+        force: bool,
+
+        #[arg(help = "Dot not force overwrite of output file", long = "no-force")]
+        _no_force: bool,
     },
 }
 
@@ -258,65 +279,6 @@ pub enum ProjectCommand {
 
     #[command(name = "install", about = "Install project packages into environment")]
     Install,
-}
-
-#[derive(Debug, Subcommand)]
-pub enum WrapCommand {
-    #[command(
-        name = "command",
-        about = "Generate environment wrapper script in bin directory for command"
-    )]
-    Command {
-        #[arg(help = "Wrapper file name")]
-        wrapper_file_name: WrapperFileName,
-
-        #[arg(help = "Command")]
-        command: String,
-
-        #[arg(help = "Base directory", value_parser = parse_absolute_path)]
-        base_dir: PathBuf,
-
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --force/--no-force with default of "false"
-        #[arg(
-            help = "Force overwrite of output file",
-            short = 'f',
-            long = "force",
-            overrides_with = "_no_force",
-            default_value_t = false
-        )]
-        force: bool,
-
-        #[arg(help = "Do not force overwrite of output file", long = "no-force")]
-        _no_force: bool,
-    },
-
-    #[command(
-        name = "script",
-        about = "Generate environment wrapper script in bin directory for script"
-    )]
-    Script {
-        #[arg(help = "Wrapper file name")]
-        wrapper_file_name: WrapperFileName,
-
-        #[arg(help = "Script path", value_parser = parse_absolute_path)]
-        script_path: PathBuf,
-
-        #[arg(help = "Base directory", value_parser = parse_absolute_path)]
-        base_dir: PathBuf,
-
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        #[arg(
-            help = "Force overwrite of output file",
-            short = 'f',
-            long = "force",
-            overrides_with = "_no_force"
-        )]
-        force: bool,
-
-        #[arg(help = "Dot not force overwrite of output file", long = "no-force")]
-        _no_force: bool,
-    },
 }
 
 #[derive(ClapArgs, Debug)]
