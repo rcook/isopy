@@ -21,15 +21,16 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::ensure_file_executable_mode;
+use crate::fs::{ensure_file_executable_mode, is_executable_file};
 use crate::status::{return_success, return_user_error, Status};
 use crate::wrapper_file_name::WrapperFileName;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
+use joat_repo::DirInfo;
 use joatmon::safe_write_file;
 use log::info;
 use serde::Serialize;
 use std::env::join_paths;
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use tinytemplate::{format_unescaped, TinyTemplate};
 
@@ -97,16 +98,7 @@ pub fn wrap(
 
     let command = match target {
         WrapTarget::Command(s) => s.clone(),
-        WrapTarget::Script(p) => {
-            let result = dir_info.make_script_command(p)?;
-            String::from(
-                result
-                    .as_ref()
-                    .map_or_else(|| p.as_os_str(), |s| s as &OsStr)
-                    .to_str()
-                    .ok_or_else(|| anyhow!("cannot convert OS string"))?,
-            )
-        }
+        WrapTarget::Script(p) => make_script_command(&dir_info, p)?,
     };
 
     let s = template.render(
@@ -161,4 +153,26 @@ fn make_vars(vars: &[(String, String)]) -> String {
     }
 
     inner(vars)
+}
+
+fn make_script_command(dir_info: &DirInfo, script_path: &Path) -> Result<String> {
+    if let Some(s) = dir_info.make_script_command(script_path)? {
+        return Ok(String::from(
+            s.to_str()
+                .ok_or_else(|| anyhow!("cannot convert OS string"))?,
+        ));
+    }
+
+    if !is_executable_file(script_path)? {
+        bail!(
+            "cannot wrap script {} since it is not executable",
+            script_path.display()
+        );
+    }
+
+    Ok(String::from(
+        script_path
+            .to_str()
+            .ok_or_else(|| anyhow!("cannot convert path"))?,
+    ))
 }

@@ -34,3 +34,5 @@ pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 pub const JDK_DESCRIPTOR_PREFIX: &str = "jdk";
 
 pub const JRE_DESCRIPTOR_PREFIX: &str = "jre";
+
+pub const EXECUTABLE_MASK: u32 = 0o100;

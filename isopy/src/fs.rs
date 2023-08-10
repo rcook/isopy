@@ -40,11 +40,32 @@ pub fn existing<T>(result: Result<T>) -> Result<Option<T>> {
     }
 }
 
+pub fn is_executable_file(path: &Path) -> Result<bool> {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn inner(path: &Path) -> Result<bool> {
+        use crate::constants::EXECUTABLE_MASK;
+        use std::os::unix::fs::PermissionsExt;
+
+        let permissions = metadata(path)?.permissions();
+        Ok((permissions.mode() & EXECUTABLE_MASK) != 0)
+    }
+
+    #[cfg(target_os = "windows")]
+    #[allow(clippy::missing_const_for_fn)]
+    #[allow(clippy::unnecessary_wraps)]
+    fn inner(_path: &Path, _mode: u32) -> Result<bool> {
+        Ok(true)
+    }
+
+    Ok(path.is_file() && inner(path)?)
+}
+
 pub fn set_file_mode(path: &Path, mode: u32) -> Result<()> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path, mode: u32) -> Result<()> {
         use std::fs::{set_permissions, Permissions};
         use std::os::unix::fs::PermissionsExt;
+
         set_permissions(path, Permissions::from_mode(mode))?;
         Ok(())
     }
@@ -62,10 +83,12 @@ pub fn set_file_mode(path: &Path, mode: u32) -> Result<()> {
 pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<()> {
+        use crate::constants::EXECUTABLE_MASK;
         use std::fs::set_permissions;
         use std::os::unix::fs::PermissionsExt;
+
         let mut permissions = metadata(path)?.permissions();
-        permissions.set_mode(permissions.mode() | 0o100);
+        permissions.set_mode(permissions.mode() | EXECUTABLE_MASK);
         set_permissions(path, permissions)?;
         Ok(())
     }
