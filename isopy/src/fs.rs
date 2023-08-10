@@ -53,7 +53,7 @@ pub fn is_executable_file(path: &Path) -> Result<bool> {
     #[cfg(target_os = "windows")]
     #[allow(clippy::missing_const_for_fn)]
     #[allow(clippy::unnecessary_wraps)]
-    fn inner(_path: &Path, _mode: u32) -> Result<bool> {
+    fn inner(_path: &Path) -> Result<bool> {
         Ok(true)
     }
 
