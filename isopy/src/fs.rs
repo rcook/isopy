@@ -21,7 +21,6 @@
 //
 use anyhow::Result;
 use joatmon::{FileReadError, HasOtherError, YamlError};
-use std::fs::metadata;
 use std::path::Path;
 
 pub fn existing<T>(result: Result<T>) -> Result<Option<T>> {
@@ -44,6 +43,7 @@ pub fn is_executable_file(path: &Path) -> Result<bool> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<bool> {
         use crate::constants::EXECUTABLE_MASK;
+        use std::fs::metadata;
         use std::os::unix::fs::PermissionsExt;
 
         let permissions = metadata(path)?.permissions();
@@ -84,7 +84,7 @@ pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<()> {
         use crate::constants::EXECUTABLE_MASK;
-        use std::fs::set_permissions;
+        use std::fs::{metadata, set_permissions};
         use std::os::unix::fs::PermissionsExt;
 
         let mut permissions = metadata(path)?.permissions();

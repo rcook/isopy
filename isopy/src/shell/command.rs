@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::Result;
 use isopy_lib::EnvInfo;
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
@@ -67,7 +67,7 @@ impl Command {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn exec_impl(&self) -> Result<ExitStatus> {
-        use anyhow::anyhow;
+        use anyhow::{anyhow, bail};
         use exec::execvp;
         use std::iter::once;
 
