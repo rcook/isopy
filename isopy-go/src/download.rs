@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::api::{File, Version};
+use crate::constants::DOWNLOADS_URL;
 use crate::error::other_error;
 use crate::filter::Filter;
 use crate::result::IsopyGoResult;
@@ -78,7 +79,7 @@ pub async fn download_index(filter: &Filter, index_path: &Path) -> IsopyGoResult
     }
 
     // URL must have trailing slash
-    let server_url = dir_url(&"https://go.dev/dl/".parse::<Url>().map_err(other_error)?);
+    let server_url = dir_url(&DOWNLOADS_URL);
 
     let client = Client::new();
     let versions = client

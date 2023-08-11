@@ -19,33 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
-mod api;
-mod constants;
-mod download;
-mod error;
-mod extra;
-mod filter;
-mod foo;
-mod go_plugin;
-mod go_plugin_factory;
-mod go_version;
-mod helper;
-mod result;
-mod serialization;
+use lazy_static::lazy_static;
+use reqwest::Url;
 
-pub use self::foo::hello;
-pub use self::go_plugin_factory::GoPluginFactory;
+lazy_static! {
+    pub static ref DOWNLOADS_URL: Url = "https://go.dev/dl/"
+        .parse::<Url>()
+        .expect("lazy_static: URL must be valid");
+}
+
+pub const PLUGIN_NAME: &str = "Go";

@@ -19,11 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{JDK_DESCRIPTOR_PREFIX, JRE_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX};
+use crate::constants::{
+    GO_DESCRIPTOR_PREFIX, JDK_DESCRIPTOR_PREFIX, JRE_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX,
+};
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::PackageRec;
 use anyhow::{bail, Result};
+use isopy_go::GoPluginFactory;
 use isopy_java::JavaPluginFactory;
 use isopy_lib::{EnvInfo, PluginFactory};
 use isopy_python::PythonPluginFactory;
@@ -45,7 +48,8 @@ lazy_static! {
         PluginHost::new(
             JRE_DESCRIPTOR_PREFIX,
             Box::new(JavaPluginFactory::new_jre())
-        )
+        ),
+        PluginHost::new(GO_DESCRIPTOR_PREFIX, Box::<GoPluginFactory>::default()),
     ]);
 }
 

@@ -19,23 +19,53 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use lazy_static::lazy_static;
+use crate::constants::{DOWNLOADS_URL, PLUGIN_NAME};
+use crate::go_plugin::GoPlugin;
+use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Plugin, PluginFactory};
+use reqwest::Url;
+use serde_json::Value;
 use std::ffi::OsString;
-use std::path::PathBuf;
+use std::path::Path;
 
-lazy_static! {
-    pub static ref CACHE_DIR: PathBuf = PathBuf::from(".isopy");
-    pub static ref ENV_CONFIG_FILE_NAME: OsString = OsString::from("env.yaml");
-    pub static ref PROJECT_CONFIG_FILE_NAME: OsString = OsString::from(".isopy.yaml");
+pub struct GoPluginFactory;
+
+impl Default for GoPluginFactory {
+    fn default() -> Self {
+        Self
+    }
 }
 
-pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
+impl PluginFactory for GoPluginFactory {
+    fn name(&self) -> &str {
+        PLUGIN_NAME
+    }
 
-pub const JDK_DESCRIPTOR_PREFIX: &str = "jdk";
+    fn source_url(&self) -> &Url {
+        &DOWNLOADS_URL
+    }
 
-pub const JRE_DESCRIPTOR_PREFIX: &str = "jre";
+    fn read_project_config(&self, _props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
+        todo!();
+    }
 
-pub const GO_DESCRIPTOR_PREFIX: &str = "go";
+    fn parse_descriptor(&self, _s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
+        todo!();
+    }
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-pub const EXECUTABLE_MASK: u32 = 0o100;
+    fn make_env_info(
+        &self,
+        _data_dir: &Path,
+        _props: &Value,
+        _base_dir: Option<&Path>,
+    ) -> IsopyLibResult<EnvInfo> {
+        todo!();
+    }
+
+    fn make_script_command(&self, _script_path: &Path) -> IsopyLibResult<Option<OsString>> {
+        todo!();
+    }
+
+    fn make_plugin(&self, _offline: bool, _dir: &Path) -> Box<dyn Plugin> {
+        Box::new(GoPlugin::new())
+    }
+}
