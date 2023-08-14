@@ -17,7 +17,7 @@ chrono = { version = "0.4.26", features = ["serde"] }
 isopy-lib = { path = "../isopy-lib" }
 joatmon = "0.0.32"
 lazy_static = "1.4.0"
-log = "0.4.19"
+log = "0.4.20"
 percent-encoding = "2.3.0"
 reqwest = { version = "0.11.18", features = ["json"] }
 serde = "1.0.183"
