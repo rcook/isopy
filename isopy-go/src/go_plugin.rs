@@ -32,7 +32,9 @@ use isopy_lib::{
 use joatmon::read_yaml_file;
 use log::info;
 use reqwest::Client;
-use std::fs::remove_file;
+use std::collections::HashMap;
+use std::ffi::OsString;
+use std::fs::{read_dir, remove_file};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -103,18 +105,43 @@ impl Plugin for GoPlugin {
     }
 
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let mut items: Vec<(Package, GoVersion)> = Vec::new();
-
         if self.assets_dir.exists() {
             let infos = self.get_available_package_infos().await?;
-            for info in infos {
-                println!("{}", info.version.raw);
-            }
-            todo!();
-        }
+            let map = infos
+                .iter()
+                .filter_map(|x| {
+                    x.package
+                        .asset_path
+                        .file_name()
+                        .map(OsString::from)
+                        .map(|f| (f, x))
+                })
+                .collect::<HashMap<_, _>>();
 
-        items.sort_by(|a, b| b.1.cmp(&a.1));
-        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
+            let mut items = Vec::new();
+            for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
+                let entry = result.map_err(isopy_lib_other_error)?;
+                let asset_path = entry.path();
+                let asset_file_name = entry.file_name();
+                if let Some(x) = map
+                    .get(&asset_file_name)
+                    .map(|x| (Arc::clone(&x.package.descriptor), &x.version))
+                {
+                    items.push((
+                        Package {
+                            asset_path,
+                            descriptor: x.0,
+                        },
+                        x.1,
+                    ));
+                }
+            }
+
+            items.sort_by(|a, b| b.1.cmp(a.1));
+            Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
+        } else {
+            Ok(vec![])
+        }
     }
 
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
