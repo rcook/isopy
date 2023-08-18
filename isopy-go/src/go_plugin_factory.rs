@@ -65,7 +65,7 @@ impl PluginFactory for GoPluginFactory {
         todo!();
     }
 
-    fn make_plugin(&self, _offline: bool, _dir: &Path) -> Box<dyn Plugin> {
-        Box::new(GoPlugin::new())
+    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
+        Box::new(GoPlugin::new(offline, dir))
     }
 }

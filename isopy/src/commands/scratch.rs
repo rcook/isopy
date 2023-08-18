@@ -22,10 +22,9 @@
 use crate::app::App;
 use crate::status::{return_success, Status};
 use anyhow::Result;
-use isopy_go::hello;
 
 #[allow(clippy::unnecessary_wraps)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    hello(app.cache_dir()).await?;
+#[allow(clippy::unused_async)]
+pub async fn scratch(_app: &App) -> Result<Status> {
     return_success!("this is a sample log message");
 }

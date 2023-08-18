@@ -21,11 +21,13 @@
 //
 use lazy_static::lazy_static;
 use reqwest::Url;
+use std::ffi::OsString;
 
 lazy_static! {
     pub static ref DOWNLOADS_URL: Url = "https://go.dev/dl/"
         .parse::<Url>()
         .expect("lazy_static: URL must be valid");
+    pub static ref INDEX_FILE_NAME: OsString = OsString::from("index.yaml");
 }
 
 pub const PLUGIN_NAME: &str = "Go";

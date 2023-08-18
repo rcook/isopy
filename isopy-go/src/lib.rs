@@ -39,7 +39,6 @@ mod download;
 mod error;
 mod extra;
 mod filter;
-mod foo;
 mod go_plugin;
 mod go_plugin_factory;
 mod go_version;
@@ -47,5 +46,4 @@ mod helper;
 mod result;
 mod serialization;
 
-pub use self::foo::hello;
 pub use self::go_plugin_factory::GoPluginFactory;
