@@ -22,6 +22,7 @@
 use crate::descriptor::DescriptorRef;
 use std::path::PathBuf;
 
+#[derive(Debug)]
 pub struct Package {
     pub asset_path: PathBuf,
     pub descriptor: DescriptorRef,
