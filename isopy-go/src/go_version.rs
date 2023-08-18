@@ -114,7 +114,7 @@ impl Display for GoVersion {
 
 impl Descriptor for GoVersion {
     fn as_any(&self) -> &dyn Any {
-        todo!();
+        self
     }
 
     fn transform_archive_path(&self, _path: &Path, _bin_subdir: &Path) -> PathBuf {

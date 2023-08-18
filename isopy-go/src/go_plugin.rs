@@ -101,7 +101,12 @@ impl Plugin for GoPlugin {
         Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 
-    async fn download_package(&self, _descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
-        todo!();
+    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
+        let version = descriptor
+            .as_any()
+            .downcast_ref::<GoVersion>()
+            .expect("must be GoVersion");
+
+        todo!("version={:?}", version);
     }
 }

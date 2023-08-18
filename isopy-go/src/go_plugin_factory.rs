@@ -21,7 +21,11 @@
 //
 use crate::constants::{DOWNLOADS_URL, PLUGIN_NAME};
 use crate::go_plugin::GoPlugin;
-use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Plugin, PluginFactory};
+use crate::go_version::GoVersion;
+use isopy_lib::{
+    other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
+    PluginFactory,
+};
 use reqwest::Url;
 use serde_json::Value;
 use std::ffi::OsString;
@@ -48,8 +52,10 @@ impl PluginFactory for GoPluginFactory {
         todo!();
     }
 
-    fn parse_descriptor(&self, _s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
-        todo!();
+    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
+        Ok(Box::new(
+            s.parse::<GoVersion>().map_err(isopy_lib_other_error)?,
+        ))
     }
 
     fn make_env_info(
