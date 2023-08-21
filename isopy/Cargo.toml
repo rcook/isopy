@@ -43,7 +43,7 @@ tar = "0.4.40"
 thiserror = "1.0.44"
 time = "0.3.25"
 tinytemplate = "1.2.1"
-tokio = { version = "1.30.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.32.0", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.4.0", features = ["serde"] }
 uuid = { version = "1.4.1", features = ["v4"] }
 zip = "0.6.6"
