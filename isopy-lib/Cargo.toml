@@ -7,24 +7,25 @@ homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
 name = "isopy-lib"
-repository = "https://rcook.github.io/isopy"
+readme = "../README.md"
+repository = "https://github.com/rcook/isopy.git"
 version = "0.3.5"
 
 [dependencies]
-anyhow = "1.0.72"
-async-trait = "0.1.72"
-bytes = "1.4.0"
+anyhow = "1.0.75"
+async-trait = "0.1.73"
+bytes = "1.5.0"
 futures-util = "0.3.28"
 hex = "0.4.3"
-joat-logger = "0.0.3"
-joatmon = "0.0.32"
-log = "0.4.19"
-reqwest = { version = "0.11.18", features = ["stream"] }
-rstest = "0.18.1"
-serde = "1.0.183"
-serde_json = "1.0.104"
+joat-logger = "0.0.4"
+joatmon = "0.0.33"
+log = "0.4.20"
+reqwest = { version = "0.11.20", features = ["stream"] }
+rstest = "0.18.2"
+serde = "1.0.188"
+serde_json = "1.0.107"
 sha2 = "0.10.7"
-thiserror = "1.0.44"
+thiserror = "1.0.48"
 
 [dev-dependencies]
-rstest = "0.18.1"
+rstest = "0.18.2"
