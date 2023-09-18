@@ -9,7 +9,7 @@ license = "MIT"
 name = "isopy"
 readme = "README.md"
 repository = "https://github.com/rcook/isopy.git"
-version = "0.3.5"
+version = "0.3.6"
 
 [dependencies]
 anyhow = { version = "1.0.75", features = ["backtrace"] }
