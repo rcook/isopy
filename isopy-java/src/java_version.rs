@@ -108,7 +108,12 @@ impl FromStr for JavaVersion {
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         if let Some((prefix, suffix)) = s.split_once('+') {
             let (major, minor, patch, build) = Self::parse_dotted(s, prefix)?;
-            let qualifier1 = Self::to_u32(suffix)?;
+            let (qualifier1, qualifier2) = if let Some((q1, q2)) = suffix.split_once('-') {
+                (Self::to_u32(q1)?, Some(String::from(q2)))
+            } else {
+                (Self::to_u32(suffix)?, None)
+            };
+
             return Ok(Self::new(
                 JavaVersionKind::V2,
                 major,
@@ -116,7 +121,7 @@ impl FromStr for JavaVersion {
                 patch,
                 build,
                 qualifier1,
-                None,
+                qualifier2,
                 s,
             ));
         }
@@ -128,6 +133,7 @@ impl FromStr for JavaVersion {
             };
             let qualifier1 = Self::to_u32(q1)?;
             let qualifier2 = Some(String::from(q2));
+
             return Ok(Self::new(
                 JavaVersionKind::V1,
                 major,
@@ -179,6 +185,7 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
+    #[case(V2, 21, Some(0), Some(1), None, 12, Some("LTS"), "21.0.1+12-LTS")]
     #[case(V2, 20, Some(0), Some(1), None, 9, None, "20.0.1+9")]
     #[case(V2, 20, None, None, None, 36, None, "20+36")]
     #[case(V2, 19, Some(0), Some(2), None, 7, None, "19.0.2+7")]
