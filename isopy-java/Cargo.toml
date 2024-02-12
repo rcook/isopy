@@ -9,7 +9,7 @@ license = "MIT"
 name = "isopy-java"
 readme = "../README.md"
 repository = "https://github.com/rcook/isopy.git"
-version = "0.3.8"
+version = "0.3.9"
 
 [dependencies]
 anyhow = "1.0.75"
