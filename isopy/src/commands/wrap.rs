@@ -48,12 +48,6 @@ setlocal
 {command} %*
 "#;
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-const DEFAULT_SHELL: Shell = Shell::Bash;
-
-#[cfg(target_os = "windows")]
-const DEFAULT_SHELL: Shell = Shell::Cmd;
-
 #[derive(Serialize)]
 struct TemplateContext {
     path_env: String,
@@ -66,7 +60,8 @@ pub fn wrap(
     wrapper_file_name: &WrapperFileName,
     script_path: &Path,
     base_dir: &Path,
-    shell: Option<Shell>,
+    platform: Platform,
+    shell: Shell,
     force: bool,
 ) -> Result<Status> {
     let Some(dir_info) = app.find_dir_info(None)? else {
@@ -79,8 +74,6 @@ pub fn wrap(
     let Some(env_info) = dir_info.make_env_info(Some(base_dir))? else {
         return_user_error!("could not get environment info");
     };
-
-    let shell = shell.unwrap_or(DEFAULT_SHELL);
 
     let wrapper_template = match shell {
         Shell::Bash => BASH_WRAPPER_TEMPLATE,
@@ -104,7 +97,7 @@ pub fn wrap(
         .join("bin")
         .join(wrapper_file_name.as_os_str());
 
-    let command = make_script_command(&dir_info, script_path, Platform::Unix, shell)?;
+    let command = make_script_command(&dir_info, script_path, platform, shell)?;
 
     let s = template.render(
         "WRAPPER",

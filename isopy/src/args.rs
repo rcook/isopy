@@ -24,7 +24,7 @@ use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell as ClapCompleteShell;
-use isopy_lib::Shell as IsopyLibShell;
+use isopy_lib::{Platform as IsopyLibPlatform, Shell as IsopyLibShell};
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
@@ -189,8 +189,23 @@ pub enum Command {
         #[arg(help = "Base directory", value_parser = parse_absolute_path)]
         base_dir: PathBuf,
 
-        #[arg(help = "Shell script type", short = 's', long = "shell")]
-        shell: Option<Shell>,
+        #[arg(
+            help = "Platform",
+            short = 'p',
+            long = "platform",
+            default_value_t = Platform::default(),
+            value_enum
+        )]
+        platform: Platform,
+
+        #[arg(
+            help = "Shell script type",
+            short = 's',
+            long = "shell",
+            default_value_t = Shell::default(),
+            value_enum
+        )]
+        shell: Shell,
 
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
         #[arg(
@@ -358,12 +373,63 @@ impl From<LogLevel> for LevelFilter {
 }
 
 #[derive(Clone, Debug, ValueEnum)]
+pub enum Platform {
+    #[clap(name = "linux")]
+    Linux,
+
+    #[clap(name = "macos")]
+    MacOS,
+
+    #[clap(name = "windows")]
+    Windows,
+}
+
+impl Default for Platform {
+    #[cfg(target_os = "linux")]
+    fn default() -> Self {
+        Self::Linux
+    }
+
+    #[cfg(target_os = "macos")]
+    fn default() -> Self {
+        Self::MacOS
+    }
+
+    #[cfg(target_os = "windows")]
+    fn default() -> Self {
+        Self::Windows
+    }
+}
+
+impl From<Platform> for IsopyLibPlatform {
+    fn from(value: Platform) -> Self {
+        match value {
+            Platform::Linux => Self::Linux,
+            Platform::MacOS => Self::MacOS,
+            Platform::Windows => Self::Windows,
+        }
+    }
+}
+
+#[derive(Clone, Debug, ValueEnum)]
 pub enum Shell {
     #[clap(name = "bash")]
     Bash,
 
     #[clap(name = "cmd")]
     Cmd,
+}
+
+impl Default for Shell {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn default() -> Self {
+        Self::Bash
+    }
+
+    #[cfg(target_os = "windows")]
+    fn default() -> Self {
+        Self::Cmd
+    }
 }
 
 impl From<Shell> for IsopyLibShell {

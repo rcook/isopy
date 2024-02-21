@@ -28,7 +28,8 @@ use std::path::Path;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Platform {
-    Unix,
+    Linux,
+    MacOS,
     Windows,
 }
 
