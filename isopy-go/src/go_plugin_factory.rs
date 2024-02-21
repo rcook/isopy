@@ -23,8 +23,8 @@ use crate::constants::{DOWNLOADS_URL, PLUGIN_NAME};
 use crate::go_plugin::GoPlugin;
 use crate::go_version::GoVersion;
 use isopy_lib::{
-    other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
-    PluginFactory,
+    other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Platform, Plugin,
+    PluginFactory, Shell,
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -67,7 +67,12 @@ impl PluginFactory for GoPluginFactory {
         todo!();
     }
 
-    fn make_script_command(&self, _script_path: &Path) -> IsopyLibResult<Option<OsString>> {
+    fn make_script_command(
+        &self,
+        _script_path: &Path,
+        _platform: Platform,
+        _shell: Shell,
+    ) -> IsopyLibResult<Option<OsString>> {
         todo!();
     }
 

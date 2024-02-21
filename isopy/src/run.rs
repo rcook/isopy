@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::{Args, Command};
+use crate::args::{Args, Command, Shell as ArgsShell};
 use crate::commands::env::{install as env_install, link as env_link, list as env_list};
 use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
@@ -122,8 +122,16 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             wrapper_file_name,
             script_path,
             base_dir,
+            shell,
             force,
             ..
-        } => wrap(&app, &wrapper_file_name, &script_path, &base_dir, force),
+        } => wrap(
+            &app,
+            &wrapper_file_name,
+            &script_path,
+            &base_dir,
+            shell.map(ArgsShell::into),
+            force,
+        ),
     }
 }

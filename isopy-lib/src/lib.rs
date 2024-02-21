@@ -59,7 +59,7 @@ pub use self::link_header::LinkHeader;
 pub use self::macros::TryToString;
 pub use self::package::Package;
 pub use self::plugin::Plugin;
-pub use self::plugin_factory::PluginFactory;
+pub use self::plugin_factory::{Platform, PluginFactory, Shell};
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
 pub use self::result::IsopyLibResult;

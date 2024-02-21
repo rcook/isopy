@@ -23,7 +23,7 @@ use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::registry::Registry;
 use crate::serialization::EnvRec;
 use anyhow::Result;
-use isopy_lib::EnvInfo;
+use isopy_lib::{EnvInfo, Platform, Shell};
 use joat_repo::{DirInfo, Manifest};
 use joatmon::{read_yaml_file, safe_write_file};
 use std::ffi::OsString;
@@ -33,7 +33,12 @@ pub trait DirInfoExt {
     fn read_env_config(&self) -> Result<EnvRec>;
     fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()>;
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
-    fn make_script_command(&self, script_path: &Path) -> Result<Option<OsString>>;
+    fn make_script_command(
+        &self,
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>>;
 }
 
 impl DirInfoExt for DirInfo {
@@ -49,8 +54,13 @@ impl DirInfoExt for DirInfo {
         make_env_info(self.data_dir(), base_dir)
     }
 
-    fn make_script_command(&self, script_path: &Path) -> Result<Option<OsString>> {
-        make_script_command(self.data_dir(), script_path)
+    fn make_script_command(
+        &self,
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>> {
+        make_script_command(self.data_dir(), script_path, platform, shell)
     }
 }
 
@@ -67,8 +77,13 @@ impl DirInfoExt for Manifest {
         make_env_info(self.data_dir(), base_dir)
     }
 
-    fn make_script_command(&self, script_path: &Path) -> Result<Option<OsString>> {
-        make_script_command(self.data_dir(), script_path)
+    fn make_script_command(
+        &self,
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>> {
+        make_script_command(self.data_dir(), script_path, platform, shell)
     }
 }
 
@@ -110,11 +125,17 @@ fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvI
     Ok(Some(all_env_info))
 }
 
-fn make_script_command(data_dir: &Path, script_path: &Path) -> Result<Option<OsString>> {
+fn make_script_command(
+    data_dir: &Path,
+    script_path: &Path,
+    platform: Platform,
+    shell: Shell,
+) -> Result<Option<OsString>> {
     let env_rec = read_env_config(data_dir)?;
 
     for package_rec in &env_rec.packages {
-        let result = Registry::global().make_script_command(package_rec, script_path)?;
+        let result =
+            Registry::global().make_script_command(package_rec, script_path, platform, shell)?;
         if result.is_some() {
             return Ok(result);
         }

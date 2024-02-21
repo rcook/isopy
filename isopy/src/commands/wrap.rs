@@ -25,6 +25,7 @@ use crate::fs::{ensure_file_executable_mode, is_executable_file};
 use crate::status::{return_success, return_user_error, Status};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{anyhow, bail, Result};
+use isopy_lib::{Platform, Shell};
 use joat_repo::DirInfo;
 use joatmon::safe_write_file;
 use log::info;
@@ -34,20 +35,24 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use tinytemplate::{format_unescaped, TinyTemplate};
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-const WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
+const BASH_WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
 set -euo pipefail
 {path_env} \
 {vars}exec {command} "$@"
 "#;
 
-#[cfg(target_os = "windows")]
-const WRAPPER_TEMPLATE: &str = r#"@echo off
+const CMD_WRAPPER_TEMPLATE: &str = r#"@echo off
 setlocal
 {path_env}
 {vars}
-"{command}" %*
+{command} %*
 "#;
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+const DEFAULT_SHELL: Shell = Shell::Bash;
+
+#[cfg(target_os = "windows")]
+const DEFAULT_SHELL: Shell = Shell::Cmd;
 
 #[derive(Serialize)]
 struct TemplateContext {
@@ -61,6 +66,7 @@ pub fn wrap(
     wrapper_file_name: &WrapperFileName,
     script_path: &Path,
     base_dir: &Path,
+    shell: Option<Shell>,
     force: bool,
 ) -> Result<Status> {
     let Some(dir_info) = app.find_dir_info(None)? else {
@@ -74,9 +80,16 @@ pub fn wrap(
         return_user_error!("could not get environment info");
     };
 
+    let shell = shell.unwrap_or(DEFAULT_SHELL);
+
+    let wrapper_template = match shell {
+        Shell::Bash => BASH_WRAPPER_TEMPLATE,
+        Shell::Cmd => CMD_WRAPPER_TEMPLATE,
+    };
+
     let mut template = TinyTemplate::new();
     template.set_default_formatter(&format_unescaped);
-    template.add_template("WRAPPER", WRAPPER_TEMPLATE)?;
+    template.add_template("WRAPPER", wrapper_template)?;
 
     let path_env = String::from(
         make_path_env(&env_info.path_dirs)?
@@ -91,7 +104,7 @@ pub fn wrap(
         .join("bin")
         .join(wrapper_file_name.as_os_str());
 
-    let command = make_script_command(&dir_info, script_path)?;
+    let command = make_script_command(&dir_info, script_path, Platform::Unix, shell)?;
 
     let s = template.render(
         "WRAPPER",
@@ -147,8 +160,13 @@ fn make_vars(vars: &[(String, String)]) -> String {
     inner(vars)
 }
 
-fn make_script_command(dir_info: &DirInfo, script_path: &Path) -> Result<String> {
-    if let Some(s) = dir_info.make_script_command(script_path)? {
+fn make_script_command(
+    dir_info: &DirInfo,
+    script_path: &Path,
+    platform: Platform,
+    shell: Shell,
+) -> Result<String> {
+    if let Some(s) = dir_info.make_script_command(script_path, platform, shell)? {
         return Ok(String::from(
             s.to_str()
                 .ok_or_else(|| anyhow!("cannot convert OS string"))?,

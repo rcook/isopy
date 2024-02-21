@@ -28,7 +28,7 @@ use crate::serialization::PackageRec;
 use anyhow::{bail, Result};
 use isopy_go::GoPluginFactory;
 use isopy_java::JavaPluginFactory;
-use isopy_lib::{EnvInfo, PluginFactory};
+use isopy_lib::{EnvInfo, Platform, PluginFactory, Shell};
 use isopy_python::PythonPluginFactory;
 use lazy_static::lazy_static;
 use std::ffi::OsString;
@@ -106,6 +106,8 @@ impl Registry {
         &self,
         package_rec: &PackageRec,
         script_path: &Path,
+        platform: Platform,
+        shell: Shell,
     ) -> Result<Option<OsString>> {
         let Some(plugin_host) = self
             .plugin_hosts
@@ -115,7 +117,7 @@ impl Registry {
             return Ok(None);
         };
 
-        Ok(plugin_host.make_script_command(script_path)?)
+        Ok(plugin_host.make_script_command(script_path, platform, shell)?)
     }
 
     fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&PluginHostRef, &'a str)> {

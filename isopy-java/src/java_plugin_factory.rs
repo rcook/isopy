@@ -26,8 +26,8 @@ use crate::java_plugin::JavaPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use anyhow::anyhow;
 use isopy_lib::{
-    other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Plugin,
-    PluginFactory,
+    other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Platform, Plugin,
+    PluginFactory, Shell,
 };
 use serde_json::Value;
 use std::ffi::OsString;
@@ -114,7 +114,12 @@ impl PluginFactory for JavaPluginFactory {
         })
     }
 
-    fn make_script_command(&self, _script_path: &Path) -> IsopyLibResult<Option<OsString>> {
+    fn make_script_command(
+        &self,
+        _script_path: &Path,
+        _platform: Platform,
+        _shell: Shell,
+    ) -> IsopyLibResult<Option<OsString>> {
         Ok(None)
     }
 
