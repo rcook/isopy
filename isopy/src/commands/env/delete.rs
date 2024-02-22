@@ -19,12 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod delete;
-mod install;
-mod link;
-mod list;
+use crate::app::App;
+use crate::status::{return_success, Status};
+use anyhow::Result;
+use std::path::Path;
 
-pub use self::delete::delete;
-pub use self::install::install;
-pub use self::link::link;
-pub use self::list::list;
+#[allow(clippy::no_effect_underscore_binding)]
+pub async fn delete(_app: &App, project_dir: &Path) -> Result<Status> {
+    println!("DELETE: {project_dir:?}");
+    return_success!();
+}
