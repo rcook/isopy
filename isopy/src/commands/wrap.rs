@@ -25,7 +25,7 @@ use crate::fs::{ensure_file_executable_mode, is_executable_file};
 use crate::status::{return_success, return_user_error, Status};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{anyhow, bail, Result};
-use isopy_lib::{env_var_substitution, join_paths, render_path, Platform, Shell};
+use isopy_lib::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
 use joat_repo::DirInfo;
 use joatmon::safe_write_file;
 use log::info;
@@ -85,7 +85,7 @@ pub fn wrap(
     template.add_template("WRAPPER", wrapper_template)?;
 
     let path_env = String::from(
-        make_path_env(shell, &env_info.path_dirs)
+        make_path_env(shell, &env_info.path_dirs)?
             .to_str()
             .ok_or_else(|| anyhow!("failed to generate PATH environment variable"))?,
     );
@@ -114,10 +114,10 @@ pub fn wrap(
     return_success!();
 }
 
-fn make_path_env(shell: Shell, paths: &[PathBuf]) -> OsString {
+fn make_path_env(shell: Shell, paths: &[PathBuf]) -> Result<OsString> {
     let mut all_paths = Vec::new();
     for path in paths {
-        all_paths.push(render_path(shell, path));
+        all_paths.push(render_absolute_path(shell, path)?);
     }
     all_paths.push(env_var_substitution(shell, "PATH"));
 
@@ -129,7 +129,7 @@ fn make_path_env(shell: Shell, paths: &[PathBuf]) -> OsString {
     }
 
     s.push(join_paths(shell, all_paths.iter()));
-    s
+    Ok(s)
 }
 
 fn make_vars(vars: &[(String, String)]) -> String {

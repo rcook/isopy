@@ -23,6 +23,13 @@ use std::error::Error as StdError;
 use std::path::PathBuf;
 use thiserror::Error;
 
+#[derive(Debug)]
+pub enum RenderPathFailedReason {
+    IsNotAbsolute,
+    PrefixMissing,
+    DriveMissing,
+}
+
 #[derive(Debug, Error)]
 pub enum IsopyLibError {
     #[error("invalid URL {0}: {1}")]
@@ -33,6 +40,9 @@ pub enum IsopyLibError {
 
     #[error("version {0} not found")]
     VersionNotFound(String),
+
+    #[error("could not render path {0}")]
+    RenderPathFailed(PathBuf, RenderPathFailedReason),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),

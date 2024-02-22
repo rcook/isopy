@@ -19,12 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::result::IsopyLibResult;
 use lazy_static::lazy_static;
 use std::ffi::{OsStr, OsString};
-#[cfg(any(target_os = "linux", target_os = "macos"))]
 use std::path::Path;
-#[cfg(target_os = "windows")]
-use std::path::{Component, Path, Prefix};
 
 lazy_static! {
     static ref COLON_PATH_SEPARATOR: OsString = OsString::from(":");
@@ -85,46 +83,64 @@ where
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-#[must_use]
-pub fn render_path(shell: Shell, path: &Path) -> OsString {
+pub fn render_absolute_path(_shell: Shell, path: &Path) -> IsopyLibResult<OsString> {
+    Ok(OsString::from(path))
+}
+
+#[cfg(target_os = "windows")]
+pub fn render_absolute_path(shell: Shell, path: &Path) -> IsopyLibResult<OsString> {
+    use crate::error::{IsopyLibError, RenderPathFailedReason};
+
+    if !path.is_absolute() {
+        return Err(IsopyLibError::RenderPathFailed(
+            path.to_path_buf(),
+            RenderPathFailedReason::IsNotAbsolute,
+        ));
+    }
+
     match shell {
-        Shell::Bash => OsString::from(path),
-        Shell::Cmd => todo!("Will this ever be needed?"),
+        Shell::Bash => render_absolute_path_windows_bash(path),
+        Shell::Cmd => Ok(OsString::from(path)),
     }
 }
 
-// What an hideous and hideously inefficient mess
-// It panics too!
-// TBD: Fix this!
-#[allow(clippy::missing_panics_doc)]
 #[cfg(target_os = "windows")]
-#[must_use]
-pub fn render_path(shell: Shell, path: &Path) -> OsString {
-    match shell {
-        Shell::Bash => {
-            let mut s = OsString::new();
-            let mut iter = path.components();
-            match iter.next() {
-                Some(Component::Prefix(prefix)) => match prefix.kind() {
-                    Prefix::Disk(raw) => {
-                        s.push("/");
-                        let temp = String::from_utf8(vec![raw]).expect("unimplemented");
-                        s.push(temp);
-                    }
-                    _ => unimplemented!(),
-                },
-                _ => unimplemented!(),
-            }
-            match iter.next() {
-                Some(Component::RootDir) => {}
-                _ => unimplemented!(),
-            }
-            for component in iter {
-                s.push("/");
-                s.push(component);
-            }
-            s
-        }
-        Shell::Cmd => OsString::from(path),
+fn render_absolute_path_windows_bash(path: &Path) -> IsopyLibResult<OsString> {
+    use crate::error::{IsopyLibError, RenderPathFailedReason};
+    use std::path::{Component, Prefix};
+
+    let mut iter = path.components();
+
+    let Some(Component::Prefix(prefix)) = iter.next() else {
+        return Err(IsopyLibError::RenderPathFailed(
+            path.to_path_buf(),
+            RenderPathFailedReason::PrefixMissing,
+        ));
+    };
+
+    let Prefix::Disk(raw) = prefix.kind() else {
+        return Err(IsopyLibError::RenderPathFailed(
+            path.to_path_buf(),
+            RenderPathFailedReason::DriveMissing,
+        ));
+    };
+
+    let mut s = OsString::new();
+    s.push("/");
+    let temp = String::from_utf8(vec![raw]).expect("unimplemented");
+    s.push(temp);
+
+    let Some(Component::RootDir) = iter.next() else {
+        return Err(IsopyLibError::RenderPathFailed(
+            path.to_path_buf(),
+            RenderPathFailedReason::IsNotAbsolute,
+        ));
+    };
+
+    for component in iter {
+        s.push("/");
+        s.push(component);
     }
+
+    Ok(s)
 }

@@ -24,8 +24,8 @@ use crate::python_descriptor::PythonDescriptor;
 use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use isopy_lib::{
-    other_error as isopy_lib_other_error, render_path, Descriptor, EnvInfo, IsopyLibResult,
-    Platform, Plugin, PluginFactory, Shell,
+    other_error as isopy_lib_other_error, render_absolute_path, Descriptor, EnvInfo,
+    IsopyLibResult, Platform, Plugin, PluginFactory, Shell,
 };
 use serde_json::Value;
 use std::ffi::{OsStr, OsString};
@@ -109,7 +109,7 @@ impl PluginFactory for PythonPluginFactory {
         _platform: Platform,
         shell: Shell,
     ) -> IsopyLibResult<Option<OsString>> {
-        fn make_command(script_path: &Path, shell: Shell) -> OsString {
+        fn make_command(script_path: &Path, shell: Shell) -> IsopyLibResult<OsString> {
             let delimiter: &str = match shell {
                 Shell::Bash => "'",
                 Shell::Cmd => "\"",
@@ -119,9 +119,9 @@ impl PluginFactory for PythonPluginFactory {
             s.push(PYTHON_BIN_FILE_NAME.as_os_str());
             s.push(" ");
             s.push(delimiter);
-            s.push(render_path(shell, script_path));
+            s.push(render_absolute_path(shell, script_path)?);
             s.push(delimiter);
-            s
+            Ok(s)
         }
 
         if script_path
@@ -130,7 +130,7 @@ impl PluginFactory for PythonPluginFactory {
             .as_ref()
             == Some(&*PYTHON_SCRIPT_EXT)
         {
-            Ok(Some(make_command(script_path, shell)))
+            Ok(Some(make_command(script_path, shell)?))
         } else {
             Ok(None)
         }

@@ -64,5 +64,5 @@ pub use self::plugin_factory::PluginFactory;
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
 pub use self::result::IsopyLibResult;
-pub use self::shell::{env_var_substitution, join_paths, render_path, Platform, Shell};
+pub use self::shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
 pub use self::url::{dir_url, file_url};
