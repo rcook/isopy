@@ -32,9 +32,11 @@ pub struct Release {
     pub id: String,
 
     #[serde(rename = "release_link")]
+    #[allow(clippy::struct_field_names)]
     pub release_link: String,
 
     #[serde(rename = "release_name")]
+    #[allow(clippy::struct_field_names)]
     pub release_name: String,
 
     #[serde(rename = "timestamp")]
@@ -47,6 +49,7 @@ pub struct Release {
     pub binaries: Vec<Binary>,
 
     #[serde(rename = "release_type")]
+    #[allow(clippy::struct_field_names)]
     pub release_type: ReleaseType,
 
     #[serde(rename = "vendor")]

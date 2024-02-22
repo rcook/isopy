@@ -25,6 +25,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct Version {
     #[serde(rename = "version")]
+    #[allow(clippy::struct_field_names)]
     pub version: String,
 
     #[serde(rename = "stable")]

@@ -32,6 +32,7 @@ use log::info;
 use serde::Serialize;
 use std::env::join_paths;
 use std::ffi::OsString;
+use std::fmt::Write;
 use std::path::{Path, PathBuf};
 use tinytemplate::{format_unescaped, TinyTemplate};
 
@@ -41,12 +42,12 @@ set -euo pipefail
 {vars}exec {command} "$@"
 "#;
 
-const CMD_WRAPPER_TEMPLATE: &str = r#"@echo off
+const CMD_WRAPPER_TEMPLATE: &str = r"@echo off
 setlocal
 {path_env}
 {vars}
 {command} %*
-"#;
+";
 
 #[derive(Serialize)]
 struct TemplateContext {
@@ -138,16 +139,18 @@ fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {
 fn make_vars(vars: &[(String, String)]) -> String {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(vars: &[(String, String)]) -> String {
-        vars.iter()
-            .map(|(k, v)| format!("{k}={v} \\\n"))
-            .collect::<String>()
+        vars.iter().fold(String::new(), |mut s, (k, v)| {
+            _ = writeln!(s, "{k}={v} \\");
+            s
+        })
     }
 
     #[cfg(target_os = "windows")]
     fn inner(vars: &[(String, String)]) -> String {
-        vars.iter()
-            .map(|(k, v)| format!("set {k}={v}\n"))
-            .collect::<String>()
+        vars.iter().fold(String::new(), |mut s, (k, v)| {
+            _ = writeln!(s, "set {k}={v}");
+            s
+        })
     }
 
     inner(vars)

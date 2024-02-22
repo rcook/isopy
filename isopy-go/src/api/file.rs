@@ -28,6 +28,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct File {
     #[serde(rename = "filename")]
+    #[allow(clippy::struct_field_names)]
     pub file_name: String,
 
     #[serde(rename = "os", deserialize_with = "empty_string_is_none")]
