@@ -21,6 +21,9 @@
 //
 use lazy_static::lazy_static;
 use std::ffi::{OsStr, OsString};
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+use std::path::Path;
+#[cfg(target_os = "windows")]
 use std::path::{Component, Path, Prefix};
 
 lazy_static! {
@@ -41,7 +44,8 @@ pub enum Shell {
     Cmd,
 }
 
-#[must_use] pub fn env_var_substitution(shell: Shell, env_var: &str) -> OsString {
+#[must_use]
+pub fn env_var_substitution(shell: Shell, env_var: &str) -> OsString {
     let mut s = OsString::new();
     match shell {
         Shell::Bash => {
@@ -81,6 +85,7 @@ where
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
+#[must_use]
 pub fn render_path(shell: Shell, path: &Path) -> OsString {
     match shell {
         Shell::Bash => OsString::from(path),
@@ -93,7 +98,8 @@ pub fn render_path(shell: Shell, path: &Path) -> OsString {
 // TBD: Fix this!
 #[allow(clippy::missing_panics_doc)]
 #[cfg(target_os = "windows")]
-#[must_use] pub fn render_path(shell: Shell, path: &Path) -> OsString {
+#[must_use]
+pub fn render_path(shell: Shell, path: &Path) -> OsString {
     match shell {
         Shell::Bash => {
             let mut s = OsString::new();
