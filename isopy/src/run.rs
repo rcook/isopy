@@ -21,7 +21,9 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command};
-use crate::commands::env::{install as env_install, link as env_link, list as env_list};
+use crate::commands::env::{
+    delete as env_delete, install as env_install, link as env_link, list as env_list,
+};
 use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
@@ -90,6 +92,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Check { clean, .. } => check(&app, clean),
         Completions { shell } => Ok(completions(shell)),
         Env { command } => match command {
+            EnvCommand::Delete { project_dir } => env_delete(&app, &project_dir).await,
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
             EnvCommand::List { verbose, .. } => env_list(&app, verbose),
             EnvCommand::Link { dir_id } => env_link(&app, &dir_id),

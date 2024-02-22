@@ -167,6 +167,14 @@ impl App {
         Ok(None)
     }
 
+    pub fn get_dir_info(&self, project_dir: &Path) -> Result<Option<DirInfo>> {
+        Ok(self.repo.get(project_dir)?)
+    }
+
+    pub fn remove_project_env(&self, project_dir: &Path) -> Result<bool> {
+        Ok(self.repo.remove(project_dir)?)
+    }
+
     pub fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
         if let Some(isopy_env) = isopy_env {
             let Some(link) = self.find_link(isopy_env.link_id())? else {

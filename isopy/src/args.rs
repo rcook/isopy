@@ -223,6 +223,15 @@ pub enum Command {
 
 #[derive(Debug, Subcommand)]
 pub enum EnvCommand {
+    #[command(
+        name = "delete",
+        about = "Delete environment corresponding to project directory"
+    )]
+    Delete {
+        #[arg(help = "Project directory", value_parser = parse_absolute_path)]
+        project_dir: PathBuf,
+    },
+
     #[command(name = "install", about = "Install package into environment")]
     Install {
         #[arg(help = "Package ID")]

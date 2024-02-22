@@ -19,12 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod delete;
-mod install;
-mod link;
-mod list;
+use crate::app::App;
+use crate::status::{return_success, return_user_error, Status};
+use anyhow::Result;
+use std::path::Path;
 
-pub use self::delete::delete;
-pub use self::install::install;
-pub use self::link::link;
-pub use self::list::list;
+#[allow(clippy::no_effect_underscore_binding)]
+pub async fn delete(app: &App, project_dir: &Path) -> Result<Status> {
+    let Some(_) = app.get_dir_info(project_dir)? else {
+        return_user_error!(
+            "no environment exists for project directory {}",
+            project_dir.display()
+        )
+    };
+
+    app.remove_project_env(project_dir)?;
+
+    return_success!(
+        "environment for project directory {} successfully removed",
+        project_dir.display()
+    );
+}
