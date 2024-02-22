@@ -24,8 +24,8 @@ use crate::python_descriptor::PythonDescriptor;
 use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfigRec, ProjectConfigRec};
 use isopy_lib::{
-    other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Platform, Plugin,
-    PluginFactory, Shell,
+    other_error as isopy_lib_other_error, render_path, Descriptor, EnvInfo, IsopyLibResult,
+    Platform, Plugin, PluginFactory, Shell,
 };
 use serde_json::Value;
 use std::ffi::{OsStr, OsString};
@@ -119,7 +119,7 @@ impl PluginFactory for PythonPluginFactory {
             s.push(PYTHON_BIN_FILE_NAME.as_os_str());
             s.push(" ");
             s.push(delimiter);
-            s.push(script_path);
+            s.push(render_path(shell, script_path));
             s.push(delimiter);
             s
         }

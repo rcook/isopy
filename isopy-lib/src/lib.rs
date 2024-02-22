@@ -47,6 +47,7 @@ mod plugin_factory;
 mod reqwest_response;
 mod response;
 mod result;
+mod shell;
 mod url;
 
 pub use self::checksum::verify_sha256_file_checksum;
@@ -59,8 +60,9 @@ pub use self::link_header::LinkHeader;
 pub use self::macros::TryToString;
 pub use self::package::Package;
 pub use self::plugin::Plugin;
-pub use self::plugin_factory::{Platform, PluginFactory, Shell};
+pub use self::plugin_factory::PluginFactory;
 pub use self::reqwest_response::ReqwestResponse;
 pub use self::response::{ContentLength, Response, Stream};
 pub use self::result::IsopyLibResult;
+pub use self::shell::{env_var_substitution, join_paths, render_path, Platform, Shell};
 pub use self::url::{dir_url, file_url};

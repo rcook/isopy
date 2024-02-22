@@ -35,11 +35,13 @@ impl WrapperFileName {
 impl FromStr for WrapperFileName {
     type Err = anyhow::Error;
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    //#[cfg(any(target_os = "linux", target_os = "macos"))]
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         Ok(Self(OsString::from_str(s)?))
     }
 
+    // TBD: Defer this check until time of creation of the file
+    /*
     #[cfg(target_os = "windows")]
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         use anyhow::bail;
@@ -53,6 +55,7 @@ impl FromStr for WrapperFileName {
 
         Ok(Self(OsString::from_str(s)?))
     }
+    */
 }
 
 impl TryToString for WrapperFileName {

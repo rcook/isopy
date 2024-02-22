@@ -20,24 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::plugin::Plugin;
-use crate::{Descriptor, EnvInfo, IsopyLibResult};
+use crate::{Descriptor, EnvInfo, IsopyLibResult, Platform, Shell};
 use reqwest::Url;
 use serde_json::Value;
 use std::ffi::OsString;
 use std::path::Path;
-
-#[derive(Clone, Copy, Debug)]
-pub enum Platform {
-    Linux,
-    MacOS,
-    Windows,
-}
-
-#[derive(Clone, Copy, Debug)]
-pub enum Shell {
-    Bash,
-    Cmd,
-}
 
 pub trait PluginFactory: Send + Sync {
     fn name(&self) -> &str;

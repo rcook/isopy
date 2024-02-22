@@ -25,12 +25,11 @@ use crate::fs::{ensure_file_executable_mode, is_executable_file};
 use crate::status::{return_success, return_user_error, Status};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{anyhow, bail, Result};
-use isopy_lib::{Platform, Shell};
+use isopy_lib::{env_var_substitution, join_paths, render_path, Platform, Shell};
 use joat_repo::DirInfo;
 use joatmon::safe_write_file;
 use log::info;
 use serde::Serialize;
-use std::env::join_paths;
 use std::ffi::OsString;
 use std::fmt::Write;
 use std::path::{Path, PathBuf};
@@ -86,7 +85,7 @@ pub fn wrap(
     template.add_template("WRAPPER", wrapper_template)?;
 
     let path_env = String::from(
-        make_path_env(&env_info.path_dirs)?
+        make_path_env(shell, &env_info.path_dirs)
             .to_str()
             .ok_or_else(|| anyhow!("failed to generate PATH environment variable"))?,
     );
@@ -115,25 +114,22 @@ pub fn wrap(
     return_success!();
 }
 
-fn make_path_env(paths: &[PathBuf]) -> Result<OsString> {
-    let mut new_paths = paths.to_owned();
-
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    new_paths.push(PathBuf::from("$PATH"));
-
-    #[cfg(target_os = "windows")]
-    new_paths.push(PathBuf::from("%PATH%"));
+fn make_path_env(shell: Shell, paths: &[PathBuf]) -> OsString {
+    let mut all_paths = Vec::new();
+    for path in paths {
+        all_paths.push(render_path(shell, path));
+    }
+    all_paths.push(env_var_substitution(shell, "PATH"));
 
     let mut s = OsString::new();
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    s.push("PATH=");
+    match shell {
+        Shell::Bash => s.push("PATH="),
+        Shell::Cmd => s.push("set PATH="),
+    }
 
-    #[cfg(target_os = "windows")]
-    s.push("set PATH=");
-
-    s.push(join_paths(new_paths)?);
-    Ok(s)
+    s.push(join_paths(shell, all_paths.iter()));
+    s
 }
 
 fn make_vars(vars: &[(String, String)]) -> String {
