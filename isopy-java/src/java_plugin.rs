@@ -43,6 +43,11 @@ pub struct JavaPlugin {
     assets_dir: PathBuf,
 }
 
+struct PackageInfo {
+    package: Package,
+    version: JavaVersion,
+}
+
 impl JavaPlugin {
     pub fn new(offline: bool, image_type: ImageType, dir: &Path) -> Self {
         let dir = dir.to_path_buf();
@@ -55,22 +60,20 @@ impl JavaPlugin {
         }
     }
 
-    async fn get_available_packages_extended(&self) -> IsopyLibResult<Vec<(Package, JavaVersion)>> {
+    async fn get_available_package_infos(&self) -> IsopyLibResult<Vec<PackageInfo>> {
         Ok(
             AdoptiumIndexManager::new_default(self.offline, self.image_type.clone(), &self.dir)
                 .read_versions()
                 .await?
                 .into_iter()
-                .map(|x| {
-                    (
-                        Package {
-                            asset_path: self.assets_dir.join(x.file_name),
-                            descriptor: Arc::new(Box::new(JavaDescriptor {
-                                version: x.openjdk_version.clone(),
-                            })),
-                        },
-                        x.openjdk_version,
-                    )
+                .map(|x| PackageInfo {
+                    package: Package {
+                        asset_path: self.assets_dir.join(x.file_name),
+                        descriptor: Arc::new(Box::new(JavaDescriptor {
+                            version: x.openjdk_version.clone(),
+                        })),
+                    },
+                    version: x.openjdk_version,
                 })
                 .collect::<Vec<_>>(),
         )
@@ -80,47 +83,48 @@ impl JavaPlugin {
 #[async_trait]
 impl Plugin for JavaPlugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let items = self.get_available_packages_extended().await?;
-        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
+        let infos = self.get_available_package_infos().await?;
+        Ok(infos.into_iter().map(|x| x.package).collect::<Vec<_>>())
     }
 
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let packages_with_version = self.get_available_packages_extended().await?;
-        let map = packages_with_version
-            .iter()
-            .filter_map(|p| {
-                p.0.asset_path
-                    .file_name()
-                    .map(OsString::from)
-                    .map(|f| (f, p))
-            })
-            .collect::<HashMap<_, _>>();
-
-        let mut items = Vec::new();
-
         if self.assets_dir.exists() {
+            let infos = self.get_available_package_infos().await?;
+            let map = infos
+                .iter()
+                .filter_map(|x| {
+                    x.package
+                        .asset_path
+                        .file_name()
+                        .map(OsString::from)
+                        .map(|f| (f, x))
+                })
+                .collect::<HashMap<_, _>>();
+
+            let mut items = Vec::new();
             for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
                 let entry = result.map_err(isopy_lib_other_error)?;
                 let asset_path = entry.path();
                 let asset_file_name = entry.file_name();
-                if let Some(p) = map
+                if let Some(x) = map
                     .get(&asset_file_name)
-                    .map(|p| (Arc::clone(&p.0.descriptor), &p.1))
+                    .map(|x| (Arc::clone(&x.package.descriptor), &x.version))
                 {
                     items.push((
                         Package {
                             asset_path,
-                            descriptor: p.0,
+                            descriptor: x.0,
                         },
-                        p.1,
+                        x.1,
                     ));
                 }
             }
+
+            items.sort_by(|a, b| b.1.cmp(a.1));
+            Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
+        } else {
+            Ok(vec![])
         }
-
-        items.sort_by(|a, b| b.1.cmp(a.1));
-
-        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {

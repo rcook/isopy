@@ -26,6 +26,19 @@ use serde_json::Value;
 use std::ffi::OsString;
 use std::path::Path;
 
+#[derive(Clone, Copy, Debug)]
+pub enum Platform {
+    Linux,
+    MacOS,
+    Windows,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum Shell {
+    Bash,
+    Cmd,
+}
+
 pub trait PluginFactory: Send + Sync {
     fn name(&self) -> &str;
     fn source_url(&self) -> &Url;
@@ -37,6 +50,11 @@ pub trait PluginFactory: Send + Sync {
         props: &Value,
         base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo>;
-    fn make_script_command(&self, script_path: &Path) -> IsopyLibResult<Option<OsString>>;
+    fn make_script_command(
+        &self,
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> IsopyLibResult<Option<OsString>>;
     fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin>;
 }

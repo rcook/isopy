@@ -22,10 +22,14 @@
 use crate::error::{other_error, IsopyGoError};
 use crate::extra::Extra;
 use crate::result::IsopyGoResult;
+use isopy_lib::{Descriptor, IsopyLibResult};
+use serde_json::Value;
+use std::any::Any;
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct GoVersion {
     pub major: u32,
     pub minor: u32,
@@ -105,5 +109,23 @@ impl FromStr for GoVersion {
 impl Display for GoVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.raw)
+    }
+}
+
+impl Descriptor for GoVersion {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn transform_archive_path(&self, _path: &Path, _bin_subdir: &Path) -> PathBuf {
+        todo!();
+    }
+
+    fn get_env_props(&self, _bin_subdir: &Path) -> IsopyLibResult<Value> {
+        todo!();
+    }
+
+    fn get_project_props(&self) -> IsopyLibResult<Value> {
+        todo!();
     }
 }

@@ -122,8 +122,18 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             wrapper_file_name,
             script_path,
             base_dir,
+            platform,
+            shell,
             force,
             ..
-        } => wrap(&app, &wrapper_file_name, &script_path, &base_dir, force),
+        } => wrap(
+            &app,
+            &wrapper_file_name,
+            &script_path,
+            &base_dir,
+            platform.into(),
+            shell.into(),
+            force,
+        ),
     }
 }
