@@ -21,7 +21,7 @@ clap_complete = "4.4.6"
 colored = "2.0.4"
 flate2 = "1.0.27"
 futures-util = "0.3.30"
-home = "0.5.5"
+home = "0.5.9"
 include_dir = "0.7.3"
 indicatif = "0.17.6"
 isopy-go = { path = "../isopy-go" }
