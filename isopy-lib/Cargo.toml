@@ -24,7 +24,7 @@ log = "0.4.20"
 reqwest = { version = "0.11.24", features = ["stream"] }
 rstest = "0.18.2"
 serde = "1.0.188"
-serde_json = "1.0.107"
+serde_json = "1.0.109"
 sha2 = "0.10.7"
 thiserror = "1.0.48"
 
