@@ -337,4 +337,26 @@ impl Plugin for PythonPlugin {
             })),
         })
     }
+
+    async fn on_before_install(
+        &self,
+        _output_dir: &Path,
+        _bin_subdir: &Path,
+    ) -> IsopyLibResult<()> {
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    async fn on_after_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> IsopyLibResult<()> {
+        Ok(())
+    }
+
+    #[cfg(target_os = "windows")]
+    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> IsopyLibResult<()> {
+        use std::fs::write;
+        const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
+        let cmd_path = output_dir.join(bin_subdir).join("python3.cmd");
+        write(cmd_path, WRAPPER).map_err(isopy_lib_other_error)?;
+        Ok(())
+    }
 }

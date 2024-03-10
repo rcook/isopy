@@ -132,12 +132,20 @@ impl App {
 
         let bin_subdir = Path::new(plugin_host.prefix());
 
+        plugin
+            .on_before_install(dir_info.data_dir(), bin_subdir)
+            .await?;
+
         unpack_file(
             descriptor.as_ref().as_ref(),
             &asset_path,
             dir_info.data_dir(),
             bin_subdir,
         )?;
+
+        plugin
+            .on_after_install(dir_info.data_dir(), bin_subdir)
+            .await?;
 
         packages.push(PackageRec {
             id: String::from(plugin_host.prefix()),
