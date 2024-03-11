@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use chrono::{Duration, TimeDelta};
 use lazy_static::lazy_static;
 use reqwest::Url;
 use std::ffi::OsString;
@@ -29,6 +30,8 @@ lazy_static! {
         Url::parse("https://api.adoptium.net/").expect("lazy_static: URL must be valid");
     pub static ref ADOPTIUM_INDEX_FILE_NAME: OsString = OsString::from("adoptium-index.yaml");
     pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
+    pub static ref TWELVE_HOURS: TimeDelta =
+        Duration::try_hours(12).expect("lazy_static: 12 must be valid number of hours");
 }
 
 pub const PLUGIN_NAME: &str = "OpenJDK";

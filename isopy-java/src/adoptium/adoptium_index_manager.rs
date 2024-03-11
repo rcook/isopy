@@ -21,10 +21,10 @@
 //
 use super::api::{ImageType, Release, Singleton};
 use super::client::{all_versions, AdoptiumClient, Query};
-use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL};
+use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, TWELVE_HOURS};
 use crate::serialization::{IndexRec, VersionRec};
 use anyhow::{bail, Result};
-use chrono::{Duration, Utc};
+use chrono::Utc;
 use joatmon::{read_yaml_file, safe_write_file};
 use reqwest::Url;
 use std::path::{Path, PathBuf};
@@ -85,7 +85,7 @@ impl AdoptiumIndexManager {
         }
 
         let index = read_yaml_file::<IndexRec>(&self.index_path)?;
-        if Utc::now() - index.last_updated_at < Duration::hours(12) {
+        if Utc::now() - index.last_updated_at < *TWELVE_HOURS {
             return Ok(index);
         }
 
