@@ -346,8 +346,11 @@ impl Plugin for PythonPlugin {
         Ok(())
     }
 
-    #[cfg(not(target_os = "windows"))]
-    async fn on_after_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> IsopyLibResult<()> {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> IsopyLibResult<()> {
+        use std::os::unix::fs::symlink;
+        let bin_dir = output_dir.join(bin_subdir).join("bin");
+        symlink(bin_dir.join("python3"), bin_dir.join("python")).map_err(isopy_lib_other_error)?;
         Ok(())
     }
 
