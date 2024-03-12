@@ -25,7 +25,7 @@ use lazy_static::lazy_static;
 use same_file::is_same_file;
 use std::env::var;
 use std::path::{Path, PathBuf};
-use sysinfo::{ProcessExt, System, SystemExt};
+use sysinfo::System;
 
 #[derive(Debug)]
 pub struct WindowsShellInfo {
@@ -67,12 +67,14 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
             bail!("Failed to determine parent shell");
         }
 
-        if is_same_file(POWERSHELL.path, process.exe())? {
-            return Ok(&POWERSHELL);
-        }
+        if let Some(process_exe) = process.exe() {
+            if is_same_file(POWERSHELL.path, process_exe)? {
+                return Ok(&POWERSHELL);
+            }
 
-        if is_same_file(CMD.path, process.exe())? {
-            return Ok(&CMD);
+            if is_same_file(CMD.path, process_exe)? {
+                return Ok(&CMD);
+            }
         }
 
         let parent_pid = get_parent_pid(process)?;

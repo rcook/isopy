@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{anyhow, bail, Result};
-use sysinfo::{get_current_pid, Pid, Process, ProcessExt, System, SystemExt};
+use sysinfo::{get_current_pid, Pid, Process, System};
 
 pub fn get_pid() -> Result<Pid> {
     get_current_pid().or(Err(anyhow!("Failed to get process ID")))
