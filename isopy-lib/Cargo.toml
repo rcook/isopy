@@ -12,8 +12,8 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.3.16"
 
 [dependencies]
-anyhow = "1.0.80"
-async-trait = "0.1.77"
+anyhow = "1.0.81"
+async-trait = "0.1.78"
 bytes = "1.5.0"
 futures-util = "0.3.30"
 hex = "0.4.3"
@@ -21,12 +21,12 @@ joat-logger = "0.0.4"
 joatmon = "0.0.33"
 lazy_static = "1.4.0"
 log = "0.4.21"
-reqwest = { version = "0.11.25", features = ["stream"] }
+reqwest = { version = "0.11.27", features = ["stream"] }
 rstest = "0.18.2"
 serde = "1.0.197"
 serde_json = "1.0.114"
 sha2 = "0.10.8"
-thiserror = "1.0.57"
+thiserror = "1.0.58"
 
 [dev-dependencies]
 rstest = "0.18.2"
