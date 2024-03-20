@@ -17,7 +17,7 @@ async-trait = "0.1.78"
 bytes = "1.5.0"
 include_dir = "0.7.3"
 isopy-lib = { path = "../isopy-lib" }
-joatmon = "0.0.33"
+joatmon = "0.0.34"
 lazy_static = "1.4.0"
 log = "0.4.21"
 regex = "1.10.3"
