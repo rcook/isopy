@@ -21,7 +21,7 @@ joat-logger = "0.0.5"
 joatmon = "0.0.34"
 lazy_static = "1.4.0"
 log = "0.4.21"
-reqwest = { version = "0.12.0", features = ["stream"] }
+reqwest = { version = "0.12.1", features = ["stream"] }
 rstest = "0.18.2"
 serde = "1.0.197"
 serde_json = "1.0.114"
