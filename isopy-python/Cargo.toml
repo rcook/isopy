@@ -20,7 +20,7 @@ isopy-lib = { path = "../isopy-lib" }
 joatmon = "0.0.34"
 lazy_static = "1.4.0"
 log = "0.4.21"
-regex = "1.10.3"
+regex = "1.10.4"
 reqwest = "0.12.1"
 serde = "1.0.197"
 serde_json = "1.0.114"
