@@ -53,7 +53,7 @@ zip = "0.6.6"
 exec = "0.3.1"
 
 [target."cfg(target_os = \"linux\")".dependencies]
-openssl-sys = { version = "0.9.101", features = ["vendored"] }
+openssl-sys = { version = "0.9.102", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
