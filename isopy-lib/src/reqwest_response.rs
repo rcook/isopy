@@ -37,6 +37,7 @@ pub struct ReqwestResponse {
 }
 
 impl ReqwestResponse {
+    #[must_use]
     pub fn new(last_modified: Option<LastModified>, response: reqwest::Response) -> Self {
         let content_length = response.content_length();
         Self {

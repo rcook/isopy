@@ -100,25 +100,17 @@ impl AdoptiumIndexManager {
 
     async fn download_index(&self) -> Result<IndexRec> {
         fn make_version(release: &Release) -> Option<VersionRec> {
-            let Some(binary) = release.binaries.single() else {
-                return None;
-            };
+            let binary = release.binaries.single()?;
 
-            let Some(package) = binary.package.as_ref() else {
-                return None;
-            };
+            let package = binary.package.as_ref()?;
 
             let Ok(url) = package.link.parse::<Url>() else {
                 return None;
             };
 
-            let Some(size) = package.size else {
-                return None;
-            };
+            let size = package.size?;
 
-            let Some(checksum) = package.checksum.as_ref() else {
-                return None;
-            };
+            let checksum = package.checksum.as_ref()?;
 
             Some(VersionRec {
                 openjdk_version: release.version_data.openjdk_version.clone(),
