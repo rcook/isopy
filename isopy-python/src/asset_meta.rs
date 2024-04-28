@@ -26,6 +26,7 @@ use crate::python_standalone_builds::api::{
 use crate::python_version::PythonVersion;
 use crate::tag::Tag;
 use anyhow::{bail, Result};
+use log::trace;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
@@ -59,6 +60,7 @@ impl FromStr for AssetMeta {
     type Err = IsopyPythonError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        trace!("Parsing asset name {s}");
         fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
             match result {
                 Some(value) => Ok(value),
