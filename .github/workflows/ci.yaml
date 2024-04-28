@@ -28,6 +28,6 @@ jobs:
     runs-on: ${{ matrix.host_os }}
     steps:
       - name: Build and test Rust package
-        uses: rcook/rust-package-action@v0.0.2
+        uses: rcook/rust-package-action@v0.0.5
         with:
           target: ${{ matrix.target }}

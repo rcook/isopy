@@ -41,7 +41,7 @@ jobs:
     runs-on: ${{ matrix.build_os }}
     steps:
       - name: Build, test and release Rust tool
-        uses: rcook/rust-tool-action@v0.0.26
+        uses: rcook/rust-tool-action@v0.0.32
         with:
           tool_name: ${{ env.tool_name }}
           target: ${{ matrix.target }}
