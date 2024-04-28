@@ -46,6 +46,9 @@ pub enum Arch {
 
     #[strum(serialize = "x86_64_v4")]
     X86_64V4,
+
+    #[strum(serialize = "armv7")]
+    ArmV7,
 }
 
 #[cfg(test)]

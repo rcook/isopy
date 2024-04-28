@@ -31,6 +31,12 @@ pub enum Flavour {
 
     #[strum(serialize = "musl")]
     Musl,
+
+    #[strum(serialize = "gnueabi")]
+    Gnueabi,
+
+    #[strum(serialize = "gnueabihf")]
+    Gnueabihf,
 }
 
 #[cfg(test)]

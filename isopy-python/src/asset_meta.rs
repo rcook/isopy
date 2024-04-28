@@ -48,7 +48,7 @@ pub struct AssetMeta {
 impl AssetMeta {
     #[must_use]
     pub fn definitely_not_an_asset_name(s: &str) -> bool {
-        if "libuuid-1.0.3.tar.gz" == s || "SHA256SUMS" == s {
+        if "libuuid-1.0.3.tar.gz" == s || "SHA256SUMS" == s || "xz-5.2.12.tar.gz" == s {
             true
         } else {
             s.ends_with(".sha256")
@@ -56,11 +56,34 @@ impl AssetMeta {
     }
 }
 
+macro_rules! asset_token {
+    ($iter:expr, $type:ty, $asset:expr, $field:expr) => {
+        match $iter.next() {
+            Some(value) => match value.parse::<$type>() {
+                Ok(result) => result,
+                Err(_e) => {
+                    return Err(IsopyPythonError::InvalidAssetNameToken(
+                        String::from($asset),
+                        String::from(value),
+                    ))
+                }
+            },
+            None => {
+                return Err(IsopyPythonError::MissingAssetNameToken(
+                    String::from($asset),
+                    String::from($field),
+                ))
+            }
+        }
+    };
+}
+
 impl FromStr for AssetMeta {
     type Err = IsopyPythonError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         trace!("Parsing asset name {s}");
+
         fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
             match result {
                 Some(value) => Ok(value),
@@ -87,12 +110,13 @@ impl FromStr for AssetMeta {
 
         let mut iter = base_name.split('-');
 
-        let family = wrap(s, "family", iter.next())?.parse::<Family>()?;
+        let family = asset_token!(iter, Family, s, "family");
         let (version, mut tag_opt) =
             parse_version_and_tag_opt(wrap(s, "version/tag", iter.next())?)?;
-        let arch = wrap(s, "architecture", iter.next())?.parse::<Arch>()?;
-        let platform = wrap(s, "platform", iter.next())?.parse::<Platform>()?;
-        let os = wrap(s, "OS", iter.next())?.parse::<OS>()?;
+
+        let arch = asset_token!(iter, Arch, s, "architecture");
+        let platform = asset_token!(iter, Platform, s, "platform");
+        let os = asset_token!(iter, OS, s, "OS");
 
         let mut flavour_opt = None;
         let mut subflavour0_opt = None;

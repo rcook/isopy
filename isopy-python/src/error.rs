@@ -24,23 +24,26 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum IsopyPythonError {
-    #[error("invalid version \"{0}\"")]
+    #[error("Invalid version \"{0}\"")]
     InvalidVersion(String),
 
-    #[error("invalid repository name \"{0}\"")]
+    #[error("Invalid repository name \"{0}\"")]
     InvalidRepositoryName(String),
 
-    #[error("unsupported archive type \"{0}\"")]
+    #[error("Unsupported archive type \"{0}\"")]
     UnsupportedArchiveType(String),
 
-    #[error("parse error \"{0}\"")]
+    #[error("Parse error \"{0}\"")]
     ParseError(String),
 
-    #[error("invalid asset name \"{0}\"")]
+    #[error("Invalid asset name \"{0}\"")]
     InvalidAssetName(String),
 
-    #[error("invalid token \"{1}\" in asset name \"{0}\"")]
+    #[error("Invalid token \"{1}\" in asset name \"{0}\"")]
     InvalidAssetNameToken(String, String),
+
+    #[error("Token \"{1}\" missing from asset name \"{0}\"")]
+    MissingAssetNameToken(String, String),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),
