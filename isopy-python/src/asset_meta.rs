@@ -82,8 +82,6 @@ impl FromStr for AssetMeta {
     type Err = IsopyPythonError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        trace!("Parsing asset name {s}");
-
         fn wrap<'a>(s: &str, label: &str, result: Option<&'a str>) -> Result<&'a str> {
             match result {
                 Some(value) => Ok(value),
@@ -102,6 +100,8 @@ impl FromStr for AssetMeta {
             let version = version_str.parse::<PythonVersion>()?;
             Ok((version, tag))
         }
+
+        trace!("Parsing asset name {s}");
 
         let ArchiveTypeBaseName {
             archive_type,
