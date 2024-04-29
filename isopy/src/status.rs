@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::{read_env_bool, BOOL_TRUE_VALUE, ISOPY_BACKTRACE_ENV_NAME};
+use crate::env::{read_env_bool, ISOPY_BACKTRACE_ENV_NAME};
 use colored::Colorize;
 
 pub enum Status {
@@ -61,6 +61,6 @@ pub fn show_error(error: &anyhow::Error) {
         eprintln!("stack backtrace:\n{}", error.backtrace());
     } else {
         #[cfg(debug_assertions)]
-        eprintln!("{}", format!("note: run with `{ISOPY_BACKTRACE_ENV_NAME}={BOOL_TRUE_VALUE}` environment variable to display a backtrace").bright_white().bold());
+        eprintln!("{}", format!("note: run with `{ISOPY_BACKTRACE_ENV_NAME}={}` environment variable to display a backtrace", crate::env::BOOL_TRUE_VALUE).bright_white().bold());
     }
 }
