@@ -45,7 +45,7 @@ jobs:
         with:
           tool_name: ${{ env.tool_name }}
           target: ${{ matrix.target }}
-          executable_ext: ${{ matrix.executable_ext }}
+          target_ext: ${{ matrix.target_ext }}
           archive_type: ${{ matrix.archive_type }}
           build_type: ${{ env.build_type }}
           code_sign: true
