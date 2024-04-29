@@ -23,19 +23,19 @@ jobs:
           - x86_64-unknown-linux-musl
         include:
           - target: aarch64-apple-darwin
-            executable_ext:
+            target_ext:
             archive_type: .tar.gz
             build_os: macos-latest
           #- target: x86_64-apple-darwin
-          #  executable_ext:
+          #  target_ext:
           #  archive_type: .tar.gz
           #  build_os: macos-latest
           - target: x86_64-pc-windows-msvc
-            executable_ext: .exe
+            target_ext: .exe
             archive_type: .zip
             build_os: windows-latest
           - target: x86_64-unknown-linux-musl
-            executable_ext:
+            target_ext:
             archive_type: .tar.gz
             build_os: ubuntu-latest
     runs-on: ${{ matrix.build_os }}
