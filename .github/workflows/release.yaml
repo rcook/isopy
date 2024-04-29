@@ -18,7 +18,7 @@ jobs:
       matrix:
         target:
           - aarch64-apple-darwin
-          - x86_64-apple-darwin
+          #- x86_64-apple-darwin
           - x86_64-pc-windows-msvc
           - x86_64-unknown-linux-musl
         include:
@@ -26,10 +26,10 @@ jobs:
             executable_ext:
             archive_type: .tar.gz
             build_os: macos-latest
-          - target: x86_64-apple-darwin
-            executable_ext:
-            archive_type: .tar.gz
-            build_os: macos-latest
+          #- target: x86_64-apple-darwin
+          #  executable_ext:
+          #  archive_type: .tar.gz
+          #  build_os: macos-latest
           - target: x86_64-pc-windows-msvc
             executable_ext: .exe
             archive_type: .zip
