@@ -44,6 +44,7 @@ use isopy_lib::{
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
 use joatmon::{read_json_file, safe_write_file};
+use log::trace;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::ffi::OsString;
@@ -349,17 +350,29 @@ impl Plugin for PythonPlugin {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> IsopyLibResult<()> {
         use std::os::unix::fs::symlink;
+
         let bin_dir = output_dir.join(bin_subdir).join("bin");
-        symlink(bin_dir.join("python3"), bin_dir.join("python")).map_err(isopy_lib_other_error)?;
+        let link = bin_dir.join("python");
+        if !link.exists() {
+            let original = bin_dir.join("python3");
+            trace!("Creating link {} to {}", link.display(), original.display());
+            symlink(&original, &link).map_err(isopy_lib_other_error)?;
+            trace!("Created link {} to {}", link.display(), original.display());
+        }
         Ok(())
     }
 
     #[cfg(target_os = "windows")]
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> IsopyLibResult<()> {
         use std::fs::write;
-        const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
+
         let cmd_path = output_dir.join(bin_subdir).join("python3.cmd");
-        write(cmd_path, WRAPPER).map_err(isopy_lib_other_error)?;
+        if !cmd_path.exists() {
+            const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
+            trace!("Creating wrapper script {cmd_path}", cmd_path.display());
+            write(cmd_path, WRAPPER).map_err(isopy_lib_other_error)?;
+            trace!("Created wrapper script {cmd_path}", cmd_path.display());
+        }
         Ok(())
     }
 }
