@@ -369,9 +369,9 @@ impl Plugin for PythonPlugin {
         let cmd_path = output_dir.join(bin_subdir).join("python3.cmd");
         if !cmd_path.exists() {
             const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
-            trace!("Creating wrapper script {cmd_path}", cmd_path.display());
-            write(cmd_path, WRAPPER).map_err(isopy_lib_other_error)?;
-            trace!("Created wrapper script {cmd_path}", cmd_path.display());
+            trace!("Creating wrapper script {}", cmd_path.display());
+            write(&cmd_path, WRAPPER).map_err(isopy_lib_other_error)?;
+            trace!("Created wrapper script {}", cmd_path.display());
         }
         Ok(())
     }
