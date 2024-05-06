@@ -15,7 +15,7 @@ version = "0.3.23"
 anyhow = { version = "1.0.82", features = ["backtrace"] }
 async-trait = "0.1.79"
 bytes = "1.6.0"
-chrono = { version = "0.4.37", features = ["serde"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 clap = { version = "4.5.4", features = ["derive", "env"] }
 clap_complete = "4.5.2"
 colored = "2.1.0"
