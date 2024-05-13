@@ -27,7 +27,7 @@ serde_json = "1.0.116"
 serde_yaml = "0.9.34"
 strum = "0.26.2"
 strum_macros = "0.26.2"
-thiserror = "1.0.59"
+thiserror = "1.0.60"
 url = { version = "2.5.0", features = ["serde"] }
 
 [dev-dependencies]
