@@ -12,7 +12,7 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.3.24"
 
 [dependencies]
-anyhow = { version = "1.0.82", features = ["backtrace"] }
+anyhow = { version = "1.0.85", features = ["backtrace"] }
 async-trait = "0.1.80"
 bytes = "1.6.0"
 chrono = { version = "0.4.38", features = ["serde"] }
