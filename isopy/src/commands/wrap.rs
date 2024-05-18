@@ -92,10 +92,7 @@ pub fn wrap(
 
     let vars = make_vars(&env_info.vars);
 
-    let wrapper_path = app
-        .cache_dir()
-        .join("bin")
-        .join(wrapper_file_name.as_os_str());
+    let wrapper_path = make_wrapper_path(app.cache_dir(), wrapper_file_name);
 
     let command = make_script_command(&dir_info, script_path, platform, shell)?;
 
@@ -177,4 +174,18 @@ fn make_script_command(
             .to_str()
             .ok_or_else(|| anyhow!("cannot convert path"))?,
     ))
+}
+
+fn make_wrapper_path(cache_dir: &Path, wrapper_file_name: &WrapperFileName) -> PathBuf {
+    let mut path = cache_dir.join("bin");
+    path.push(wrapper_file_name.as_os_str());
+
+    #[cfg(target_os = "windows")]
+    if path.extension().map_or(true, |ext| {
+        !ext.eq_ignore_ascii_case("bat") && !ext.eq_ignore_ascii_case("cmd")
+    }) {
+        _ = path.set_extension("cmd");
+    }
+
+    path
 }
