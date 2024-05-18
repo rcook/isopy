@@ -25,6 +25,7 @@ use crate::shell::{Command, IsopyEnv};
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use colored::Colorize;
+use ctrlc::set_handler;
 use log::info;
 
 pub fn shell(app: App, verbose: bool) -> Result<Status> {
@@ -75,6 +76,10 @@ pub fn shell(app: App, verbose: bool) -> Result<Status> {
 
     // Explicitly drop app so that repository is unlocked in shell
     drop(app);
+
+    // Handler to prevent isopy.exe from being killed by Ctrl+C from child process
+    set_handler(move || {})?;
+
     Command::new_shell().exec(&isopy_env, &env_info)?;
     return_success!();
 }
