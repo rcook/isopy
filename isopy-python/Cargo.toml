@@ -15,7 +15,7 @@ version = "0.3.25"
 anyhow = "1.0.86"
 async-trait = "0.1.80"
 bytes = "1.6.0"
-include_dir = "0.7.3"
+include_dir = "0.7.4"
 isopy-lib = { path = "../isopy-lib" }
 joatmon = "0.0.34"
 lazy_static = "1.4.0"
