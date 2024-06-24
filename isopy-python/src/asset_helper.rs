@@ -34,7 +34,7 @@ use std::path::{Path, PathBuf};
 pub fn get_asset<'a>(assets: &'a [Asset], descriptor: &PythonDescriptor) -> Result<&'a Asset> {
     let mut asset_filter = AssetFilter::default_for_platform();
     asset_filter.version = Some(descriptor.version.clone());
-    asset_filter.tag = descriptor.tag.clone();
+    asset_filter.tag.clone_from(&descriptor.tag);
     let matching_assets = asset_filter.filter(assets.iter());
 
     if matching_assets.len() > 1 {
