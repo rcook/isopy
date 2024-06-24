@@ -22,6 +22,7 @@
 use crate::java_version::JavaVersion;
 use serde::Deserialize;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug, Deserialize)]
 pub struct VersionData {
     #[serde(rename = "openjdk_version")]

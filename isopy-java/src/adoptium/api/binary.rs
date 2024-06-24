@@ -29,6 +29,7 @@ use super::project::Project;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug, Deserialize)]
 pub struct Binary {
     #[serde(rename = "os")]

@@ -25,6 +25,7 @@ use super::os::Os;
 use crate::helper::empty_string_is_none;
 use serde::Deserialize;
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct File {
     #[serde(rename = "filename")]

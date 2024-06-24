@@ -26,6 +26,7 @@ use super::version_data::VersionData;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug, Deserialize)]
 pub struct Release {
     #[serde(rename = "id")]
