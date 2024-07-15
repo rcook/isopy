@@ -13,7 +13,7 @@ version = "0.3.25"
 
 [dependencies]
 anyhow = "1.0.86"
-async-trait = "0.1.80"
+async-trait = "0.1.81"
 chrono = { version = "0.4.38", features = ["serde"] }
 isopy-lib = { path = "../isopy-lib" }
 joatmon = "0.0.34"
