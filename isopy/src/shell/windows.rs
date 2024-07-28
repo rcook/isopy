@@ -24,12 +24,12 @@ use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use same_file::is_same_file;
 use std::env::var;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use sysinfo::System;
 
 #[derive(Debug)]
 pub struct WindowsShellInfo {
-    pub path: &'static Path,
+    pub path: PathBuf,
     pub kind: WindowsShellKind,
 }
 
@@ -46,19 +46,11 @@ lazy_static! {
             .join("WindowsPowerShell")
             .join("v1.0")
             .join("powershell.exe");
-    static ref POWERSHELL: WindowsShellInfo = WindowsShellInfo {
-        path: &POWERSHELL_PATH,
-        kind: WindowsShellKind::PowerShell
-    };
     static ref CMD_PATH: PathBuf =
         PathBuf::from(var("ComSpec").expect("lazy_static: ComSpec must be defined"));
-    static ref CMD: WindowsShellInfo = WindowsShellInfo {
-        path: &CMD_PATH,
-        kind: WindowsShellKind::Cmd
-    };
 }
 
-pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
+pub fn get_windows_shell_info() -> Result<WindowsShellInfo> {
     let mut system = System::new();
     let pid = get_pid()?;
     let mut process = get_process_from_pid(&mut system, pid)?;
@@ -68,12 +60,25 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
         }
 
         if let Some(process_exe) = process.exe() {
-            if is_same_file(POWERSHELL.path, process_exe)? {
-                return Ok(&POWERSHELL);
+            if is_same_file(&*POWERSHELL_PATH, process_exe)? {
+                return Ok(WindowsShellInfo {
+                    path: POWERSHELL_PATH.clone(),
+                    kind: WindowsShellKind::PowerShell,
+                });
             }
 
-            if is_same_file(CMD.path, process_exe)? {
-                return Ok(&CMD);
+            if is_same_file(&*CMD_PATH, process_exe)? {
+                return Ok(WindowsShellInfo {
+                    path: CMD_PATH.clone(),
+                    kind: WindowsShellKind::Cmd,
+                });
+            }
+
+            if process.name() == "pwsh.exe" {
+                return Ok(WindowsShellInfo {
+                    path: process_exe.to_path_buf(),
+                    kind: WindowsShellKind::PowerShell,
+                });
             }
         }
 
@@ -84,11 +89,11 @@ pub fn get_windows_shell_info() -> Result<&'static WindowsShellInfo> {
 
 #[cfg(test)]
 mod tests {
-    use crate::shell::windows::{CMD, CMD_PATH, POWERSHELL, POWERSHELL_PATH};
+    use crate::shell::windows::{CMD_PATH, POWERSHELL_PATH};
 
     #[test]
     fn cmd() {
-        _ = format!("{}", CMD.path.display());
+        _ = format!("{}", CMD_PATH.display());
     }
 
     #[test]
@@ -98,7 +103,7 @@ mod tests {
 
     #[test]
     fn powershell() {
-        _ = format!("{}", POWERSHELL.path.display());
+        _ = format!("{}", POWERSHELL_PATH.display());
     }
 
     #[test]
