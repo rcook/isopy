@@ -30,7 +30,7 @@ pub fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
     if system.refresh_process(pid) {
         system
             .process(pid)
-            .ok_or_else(|| anyhow!("failed to get process info"))
+            .ok_or_else(|| anyhow!("Failed to get process info"))
     } else {
         bail!("Failed to refresh process")
     }
