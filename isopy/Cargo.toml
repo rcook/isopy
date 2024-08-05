@@ -20,7 +20,7 @@ clap = { version = "4.5.13", features = ["derive", "env"] }
 clap_complete = "4.5.8"
 colored = "2.1.0"
 ctrlc = "3.4.4"
-flate2 = "1.0.30"
+flate2 = "1.0.31"
 futures-util = "0.3.30"
 home = "0.5.9"
 include_dir = "0.7.4"
