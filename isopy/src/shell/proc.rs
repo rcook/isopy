@@ -20,14 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{anyhow, bail, Result};
-use sysinfo::{get_current_pid, Pid, Process, System};
+use sysinfo::{get_current_pid, Pid, Process, ProcessesToUpdate, System};
 
 pub fn get_pid() -> Result<Pid> {
     get_current_pid().or(Err(anyhow!("Failed to get process ID")))
 }
 
 pub fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
-    if system.refresh_process(pid) {
+    if system.refresh_processes(ProcessesToUpdate::Some(&[pid])) == 1 {
         system
             .process(pid)
             .ok_or_else(|| anyhow!("Failed to get process info"))
