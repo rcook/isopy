@@ -1,16 +1,5 @@
-pub struct PackageManagerFactory {
-    name: String,
-}
+mod package_manager;
+mod package_manager_factory;
 
-impl PackageManagerFactory {
-    pub fn new<S>(name: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self { name: name.into() }
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-}
+pub use package_manager::PackageManager;
+pub use package_manager_factory::PackageManagerFactory;
