@@ -1,4 +1,4 @@
-use isopy_api::PackageManager;
+use isopy_api::{Host, PackageManager};
 
 pub struct PythonPackageManager {
     #[allow(unused)]
@@ -15,7 +15,8 @@ impl PythonPackageManager {
 }
 
 impl PackageManager for PythonPackageManager {
-    fn test(&self) {
+    fn test(&self, host: &Box<dyn Host>) {
         println!("PYTHON!");
+        host.get_file("python");
     }
 }

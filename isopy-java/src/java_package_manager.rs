@@ -1,4 +1,4 @@
-use isopy_api::PackageManager;
+use isopy_api::{Host, PackageManager};
 
 pub struct JavaPackageManager {
     #[allow(unused)]
@@ -15,7 +15,8 @@ impl JavaPackageManager {
 }
 
 impl PackageManager for JavaPackageManager {
-    fn test(&self) {
+    fn test(&self, host: &Box<dyn Host>) {
         println!("JAVA!");
+        host.get_file("java");
     }
 }
