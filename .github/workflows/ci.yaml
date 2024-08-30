@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: 0 5 * * *
+
+jobs:
+  ci:
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
+          - x86_64-pc-windows-msvc
+          - x86_64-unknown-linux-gnu
+        include:
+          - target: x86_64-apple-darwin
+            host_os: macos-13
+          - target: x86_64-pc-windows-msvc
+            host_os: windows-latest
+          - target: x86_64-unknown-linux-gnu
+            host_os: ubuntu-latest
+    runs-on: ${{ matrix.host_os }}
+    steps:
+      - name: Build and test Rust package
+        uses: rcook/rust-package-action@v0.0.5
+        with:
+          target: ${{ matrix.target }}

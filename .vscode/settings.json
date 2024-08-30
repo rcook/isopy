@@ -1,0 +1,9 @@
+{
+  "files.eol": "\n",
+  "files.exclude": {
+    "**/.vscode/": true,
+    "**/target/": true,
+    "py/": true,
+  },
+  "rust-analyzer.showUnlinkedFileNotification": false,
+}
