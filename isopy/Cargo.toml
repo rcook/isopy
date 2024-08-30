@@ -12,6 +12,10 @@ repository = "https://github.com/rcook/isopy-tng.git"
 version = "0.0.0"
 
 [dependencies]
+isopy-api = { path = "../isopy-api" }
+isopy-java = { path = "../isopy-java" }
+isopy-lib = { path = "../isopy-lib" }
+isopy-python = { path = "../isopy-python" }
 
 [dev-dependencies]
 rstest = "0.22.0"

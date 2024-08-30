@@ -150,6 +150,10 @@ dependencies = [
 name = "isopy"
 version = "0.0.0"
 dependencies = [
+ "isopy-api",
+ "isopy-java",
+ "isopy-lib",
+ "isopy-python",
  "rstest",
 ]
 
@@ -157,6 +161,14 @@ dependencies = [
 name = "isopy-api"
 version = "0.0.0"
 dependencies = [
+ "rstest",
+]
+
+[[package]]
+name = "isopy-java"
+version = "0.0.0"
+dependencies = [
+ "isopy-api",
  "rstest",
 ]
 
@@ -171,6 +183,7 @@ dependencies = [
 name = "isopy-python"
 version = "0.0.0"
 dependencies = [
+ "isopy-api",
  "rstest",
 ]
 
