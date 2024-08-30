@@ -7,5 +7,8 @@ strip = true
 [workspace]
 members = [
   "isopy",
+  "isopy-api",
+  "isopy-lib",
+  "isopy-python",
 ]
 resolver = "2"
