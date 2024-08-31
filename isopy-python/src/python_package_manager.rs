@@ -169,11 +169,27 @@ fn get_archive(index: &Value, version: &ArchiveVersion) -> Result<()> {
 
     let groups = get_groups(index)?;
     let latest_group = groups.first().ok_or_else(|| anyhow!("No groups found"))?;
-    println!("{latest_group:?}");
-
     let full_version = ArchiveFullVersion {
         version: version.clone(),
         group: latest_group.clone(),
     };
+
+    let search_keywords = get_platform_keywords();
+    let mut archives = Vec::new();
+    for item in g!(index.as_array()) {
+        for archive in get_archives(item)? {
+            if archive.metadata().keywords().is_superset(&search_keywords) {
+                archives.push(archive);
+            }
+        }
+    }
+
+    for archive in archives
+        .iter()
+        .filter(|x| *x.metadata().full_version() == full_version)
+    {
+        println!("{}", archive.url())
+    }
+
     Ok(())
 }
