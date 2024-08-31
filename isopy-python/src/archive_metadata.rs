@@ -18,7 +18,7 @@ impl ArchiveMetadata {
         &self.name
     }
 
-    pub fn tags(&self) -> &HashSet<String> {
+    pub fn keywords(&self) -> &HashSet<String> {
         &self.keywords
     }
 }

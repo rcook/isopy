@@ -76,16 +76,16 @@ impl PackageManager for PythonPackageManager {
 
         let index = download_json(ctx, &INDEX_URL)?;
         let items = g!(index.as_array());
-        let mut all_tags = HashSet::new();
+        let mut all_keywords = HashSet::new();
         for item in items {
-            //let name = g!(g!(item.get("tag_name")).as_str());
+            //let group = g!(g!(item.get("tag_name")).as_str());
             for archive in get_archives(item)? {
                 println!("{}", archive.metadata().name());
-                all_tags.extend(archive.metadata().tags().to_owned());
+                all_keywords.extend(archive.metadata().keywords().to_owned());
             }
         }
 
-        println!("all_tags={:?}", all_tags);
+        println!("all_keywords={:?}", all_keywords);
         Ok(())
     }
 }
