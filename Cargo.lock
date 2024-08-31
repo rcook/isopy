@@ -535,6 +535,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "isopy-api",
+ "regex",
  "rstest",
  "serde_json",
  "strum",

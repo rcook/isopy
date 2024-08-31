@@ -1,3 +1,4 @@
+use crate::archive_full_version::ArchiveFullVersion;
 use crate::archive_type::ArchiveType;
 use anyhow::{bail, Error, Result};
 use std::collections::HashSet;
@@ -7,17 +8,18 @@ use strum::IntoEnumIterator;
 #[derive(Debug)]
 pub struct ArchiveMetadata {
     name: String,
-    #[allow(unused)]
     archive_type: ArchiveType,
-    #[allow(unused)]
-    version: String,
-    #[allow(unused)]
-    tags: HashSet<String>,
+    full_version: ArchiveFullVersion,
+    keywords: HashSet<String>,
 }
 
 impl ArchiveMetadata {
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    pub fn tags(&self) -> &HashSet<String> {
+        &self.keywords
     }
 }
 
@@ -34,36 +36,22 @@ impl FromStr for ArchiveMetadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        fn get_version(s: &str, tags: &mut HashSet<String>) -> Result<String> {
-            let mut version = None;
-            for tag in tags.iter() {
-                if tag.starts_with("3") {
-                    version = Some(tag.clone());
-                    break;
-                }
-            }
-            let Some(version) = version else {
-                bail!("Archive {s} is not a valid Python archive")
-            };
-
-            tags.remove(&version);
-            Ok(version.clone())
-        }
+        let name = String::from(s);
 
         let (prefix, archive_type) = parse_archive_type(s)?;
 
-        let mut tags = prefix.split('-').map(str::to_owned).collect::<HashSet<_>>();
-        if !tags.remove("cpython") {
+        let mut keywords = prefix.split('-').map(str::to_owned).collect::<HashSet<_>>();
+        if !keywords.remove("cpython") {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let version = get_version(s, &mut tags)?;
+        let full_version = ArchiveFullVersion::from_keywords(&mut keywords)?;
 
         Ok(Self {
-            name: String::from(s),
+            name,
             archive_type,
-            version,
-            tags,
+            full_version,
+            keywords,
         })
     }
 }

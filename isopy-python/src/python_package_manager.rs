@@ -3,6 +3,7 @@ use crate::archive_metadata::ArchiveMetadata;
 use anyhow::{bail, Result};
 use isopy_api::{Accept, Context, PackageManager, Url};
 use serde_json::Value;
+use std::collections::HashSet;
 use std::fs::read_to_string;
 use std::sync::LazyLock;
 
@@ -48,7 +49,10 @@ impl PackageManager for PythonPackageManager {
         }
 
         fn get_archives(item: &Value) -> Result<Vec<ArchiveInfo>> {
-            //let name = g!(g!(item.get("tag_name")).as_str());
+            fn filter_fn(name: &str) -> bool {
+                name.starts_with("cpython-") && !name.ends_with(".sha256") && name != "SHA256SUMS"
+            }
+
             let assets = g!(g!(item.get("assets")).as_array());
             let assets = assets
                 .into_iter()
@@ -60,7 +64,7 @@ impl PackageManager for PythonPackageManager {
                 .collect::<Result<Vec<_>>>()?;
             let archives = assets
                 .into_iter()
-                .filter(|(_, name)| !name.ends_with(".sha256") && *name != "SHA256SUMS")
+                .filter(|(_, name)| filter_fn(*name))
                 .map(|(url, name)| {
                     let metadata = name.parse::<ArchiveMetadata>()?;
                     let archive_info = ArchiveInfo::new(url, metadata);
@@ -72,11 +76,16 @@ impl PackageManager for PythonPackageManager {
 
         let index = download_json(ctx, &INDEX_URL)?;
         let items = g!(index.as_array());
+        let mut all_tags = HashSet::new();
         for item in items {
+            //let name = g!(g!(item.get("tag_name")).as_str());
             for archive in get_archives(item)? {
-                println!("{}: {}", archive.url(), archive.metadata().name());
+                println!("{}", archive.metadata().name());
+                all_tags.extend(archive.metadata().tags().to_owned());
             }
         }
+
+        println!("all_tags={:?}", all_tags);
         Ok(())
     }
 }
