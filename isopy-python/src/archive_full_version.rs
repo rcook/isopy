@@ -13,7 +13,7 @@ static VERSION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 static OLD_STYLE_GROUP_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}T\\d{4}$").expect("Invalid regex"));
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ArchiveFullVersion {
     version: ArchiveVersion,
     group: ArchiveGroup,

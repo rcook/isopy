@@ -1,5 +1,5 @@
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum ArchiveGroup {
-    NewStyle(String),
     OldStyle(String),
+    NewStyle(String),
 }

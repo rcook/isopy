@@ -18,6 +18,14 @@ impl ArchiveMetadata {
         &self.name
     }
 
+    pub fn archive_type(&self) -> &ArchiveType {
+        &self.archive_type
+    }
+
+    pub fn full_version(&self) -> &ArchiveFullVersion {
+        &self.full_version
+    }
+
     pub fn keywords(&self) -> &HashSet<String> {
         &self.keywords
     }

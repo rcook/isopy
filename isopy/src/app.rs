@@ -40,7 +40,6 @@ impl App {
         }
     }
 
-    #[allow(unused)]
     pub fn config_dir(&self) -> &Path {
         &self.config_dir
     }
