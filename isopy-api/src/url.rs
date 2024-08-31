@@ -21,6 +21,10 @@ impl Url {
 
         Ok(d.join(&self.sanitized))
     }
+
+    pub fn as_str(&self) -> &str {
+        &self.value
+    }
 }
 
 impl FromStr for Url {
