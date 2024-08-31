@@ -62,7 +62,9 @@ impl PackageManager for PythonPackageManager {
                 revision: 5,
             },
         )?;
-        println!("{archive:?}");
+
+        let archive_path = ctx.download(archive.url(), None)?;
+        println!("{archive_path:?}");
         Ok(())
     }
 }
