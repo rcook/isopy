@@ -10,9 +10,6 @@ static VERSION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
         .expect("Invalid regex")
 });
 
-static OLD_STYLE_GROUP_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new("^\\d{8}T\\d{4}$").expect("Invalid regex"));
-
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ArchiveFullVersion {
     pub version: ArchiveVersion,
@@ -22,7 +19,6 @@ pub struct ArchiveFullVersion {
 impl ArchiveFullVersion {
     pub fn from_keywords(keywords: &mut HashSet<String>) -> Result<Self> {
         let version_regex = &*VERSION_REGEX;
-        let old_style_group_regex = &*OLD_STYLE_GROUP_REGEX;
 
         let mut full_version = None;
         let mut version = None;
@@ -72,10 +68,10 @@ impl ArchiveFullVersion {
                         break;
                     }
                 }
-            } else if old_style_group_regex.is_match(keyword) {
+            } else if let Ok(temp_group) = keyword.parse::<ArchiveGroup>() {
                 assert!(full_version.is_none() && group.is_none());
                 keywords_to_remove.push(keyword.clone());
-                group = Some(keyword.parse()?);
+                group = Some(temp_group);
                 if version.is_some() {
                     break;
                 }
