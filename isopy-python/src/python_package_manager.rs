@@ -54,7 +54,7 @@ impl PackageManager for PythonPackageManager {
         let index = download_json(ctx, &INDEX_URL)?;
         show_summary(&index)?;
         filter_archives(&index)?;
-        get_archive(
+        let archive = get_archive(
             &index,
             &ArchiveVersion {
                 major: 3,
@@ -62,6 +62,7 @@ impl PackageManager for PythonPackageManager {
                 revision: 5,
             },
         )?;
+        println!("{archive:?}");
         Ok(())
     }
 }
@@ -154,7 +155,7 @@ fn filter_archives(index: &Value) -> Result<()> {
     Ok(())
 }
 
-fn get_archive(index: &Value, version: &ArchiveVersion) -> Result<()> {
+fn get_archive(index: &Value, version: &ArchiveVersion) -> Result<ArchiveInfo> {
     fn get_groups(index: &Value) -> Result<Vec<ArchiveGroup>> {
         let mut groups = g!(index.as_array())
             .iter()
@@ -184,12 +185,16 @@ fn get_archive(index: &Value, version: &ArchiveVersion) -> Result<()> {
         }
     }
 
-    for archive in archives
+    let archives = archives
         .iter()
         .filter(|x| *x.metadata().full_version() == full_version)
-    {
-        println!("{}", archive.url())
+        .collect::<Vec<_>>();
+    match archives.len() {
+        0 => bail!("No matching archive found"),
+        1 => Ok((*archives
+            .first()
+            .expect("Vector contains exactly one element"))
+        .clone()),
+        _ => bail!("More than one matching archive found"),
     }
-
-    Ok(())
 }

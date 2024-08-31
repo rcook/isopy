@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ArchiveMetadata {
     name: String,
     archive_type: ArchiveType,
