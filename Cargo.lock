@@ -530,6 +530,7 @@ dependencies = [
  "anyhow",
  "isopy-api",
  "rstest",
+ "serde_json",
 ]
 
 [[package]]
