@@ -1,9 +1,12 @@
+use crate::archive_full_version::ArchiveFullVersion;
+use crate::archive_group::ArchiveGroup;
 use crate::archive_info::ArchiveInfo;
 use crate::archive_metadata::ArchiveMetadata;
-use anyhow::{bail, Result};
+use crate::archive_version::ArchiveVersion;
+use anyhow::{anyhow, bail, Result};
 use isopy_api::{Accept, Context, PackageManager, Url};
 use serde_json::Value;
-use std::collections::{hash_set, HashSet};
+use std::collections::HashSet;
 use std::fs::read_to_string;
 use std::sync::LazyLock;
 
@@ -51,6 +54,14 @@ impl PackageManager for PythonPackageManager {
         let index = download_json(ctx, &INDEX_URL)?;
         show_summary(&index)?;
         filter_archives(&index)?;
+        get_archive(
+            &index,
+            &ArchiveVersion {
+                major: 3,
+                minor: 12,
+                revision: 5,
+            },
+        )?;
         Ok(())
     }
 }
@@ -140,5 +151,29 @@ fn filter_archives(index: &Value) -> Result<()> {
     for archive in archives {
         println!("{}", archive.metadata().name());
     }
+    Ok(())
+}
+
+fn get_archive(index: &Value, version: &ArchiveVersion) -> Result<()> {
+    fn get_groups(index: &Value) -> Result<Vec<ArchiveGroup>> {
+        let mut groups = g!(index.as_array())
+            .iter()
+            .map(|item| g!(g!(item.get("tag_name")).as_str()).parse::<ArchiveGroup>())
+            .collect::<Result<HashSet<_>>>()?
+            .into_iter()
+            .collect::<Vec<_>>();
+        groups.sort();
+        groups.reverse();
+        Ok(groups)
+    }
+
+    let groups = get_groups(index)?;
+    let latest_group = groups.first().ok_or_else(|| anyhow!("No groups found"))?;
+    println!("{latest_group:?}");
+
+    let full_version = ArchiveFullVersion {
+        version: version.clone(),
+        group: latest_group.clone(),
+    };
     Ok(())
 }

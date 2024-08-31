@@ -15,8 +15,8 @@ static OLD_STYLE_GROUP_REGEX: LazyLock<Regex> =
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ArchiveFullVersion {
-    version: ArchiveVersion,
-    group: ArchiveGroup,
+    pub version: ArchiveVersion,
+    pub group: ArchiveGroup,
 }
 
 impl ArchiveFullVersion {
@@ -58,7 +58,7 @@ impl ArchiveFullVersion {
                 };
 
                 if let Some(m) = c.get(5) {
-                    let temp_group = ArchiveGroup::NewStyle(String::from(m.as_str()));
+                    let temp_group = m.as_str().parse()?;
                     assert!(full_version.is_none() && version.is_none() && group.is_none());
                     full_version = Some(Self {
                         version: temp_version,
@@ -75,7 +75,7 @@ impl ArchiveFullVersion {
             } else if old_style_group_regex.is_match(keyword) {
                 assert!(full_version.is_none() && group.is_none());
                 keywords_to_remove.push(keyword.clone());
-                group = Some(ArchiveGroup::OldStyle(keyword.clone()));
+                group = Some(keyword.parse()?);
                 if version.is_some() {
                     break;
                 }
