@@ -12,6 +12,8 @@ repository = "https://github.com/rcook/isopy-tng.git"
 version = "0.0.0"
 
 [dependencies]
+anyhow = "1.0.86"
+sanitise-file-name = "1.0.0"
 
 [dev-dependencies]
 rstest = "0.22.0"

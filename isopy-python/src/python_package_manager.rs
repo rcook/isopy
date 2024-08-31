@@ -1,7 +1,7 @@
-use isopy_api::{Host, PackageManager};
+use anyhow::Result;
+use isopy_api::{Context, PackageManager};
 
 pub struct PythonPackageManager {
-    #[allow(unused)]
     name: String,
 }
 
@@ -15,8 +15,14 @@ impl PythonPackageManager {
 }
 
 impl PackageManager for PythonPackageManager {
-    fn test(&self, host: &Box<dyn Host>) {
-        println!("PYTHON!");
-        host.get_file("python");
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn test(&self, ctx: &dyn Context) -> Result<()> {
+        let url = "https://raw.githubusercontent.com/indygreg/python-build-standalone/latest-release/latest-release.json".parse()?;
+        let manifest_path = ctx.download(&url)?;
+        println!("PYTHON! {}", manifest_path.display());
+        Ok(())
     }
 }

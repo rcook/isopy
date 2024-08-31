@@ -1,25 +1,27 @@
-use isopy_api::Host;
-use isopy_java::get_package_manager_factory as get_package_manager_factory_java;
-use isopy_python::get_package_manager_factory as get_package_manager_factory_python;
+mod app;
+mod app_context;
 
-struct IsopyHost {}
+use crate::app::App;
+use anyhow::{anyhow, Result};
+use app_context::AppContext;
+use dirs::config_dir;
+use std::rc::Rc;
 
-impl Host for IsopyHost {
-    fn get_file(&self, url: &str) {
-        println!("get {url}");
+fn main() -> Result<()> {
+    let app = Rc::new(App::new(
+        config_dir()
+            .ok_or_else(|| anyhow!("Could not determine config directory"))?
+            .join(".isopy-tng"),
+    ));
+
+    for f in app.package_manager_factories() {
+        println!("Factory: {}", f.name());
     }
-}
 
-fn main() {
-    let package_manager_factories = vec![
-        get_package_manager_factory_java(),
-        get_package_manager_factory_python(),
-    ];
+    let package_manager_factory = app.get_package_manager_factory("python")?;
+    let package_manager = package_manager_factory.make(package_manager_factory.name())?;
+    let ctx = AppContext::new(app, package_manager.name());
+    package_manager.test(&ctx)?;
 
-    let host = Box::new(IsopyHost {}) as Box<dyn Host>;
-
-    for f in package_manager_factories {
-        let package_manager = f.make(f.name());
-        package_manager.test(&host);
-    }
+    Ok(())
 }

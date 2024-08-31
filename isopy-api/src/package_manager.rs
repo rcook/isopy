@@ -1,5 +1,7 @@
-use crate::host::Host;
+use crate::context::Context;
+use anyhow::Result;
 
 pub trait PackageManager {
-    fn test(&self, host: &Box<dyn Host>);
+    fn name(&self) -> &str;
+    fn test(&self, ctx: &dyn Context) -> Result<()>;
 }

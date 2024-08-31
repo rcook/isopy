@@ -12,6 +12,8 @@ repository = "https://github.com/rcook/isopy-tng.git"
 version = "0.0.0"
 
 [dependencies]
+anyhow = "1.0.86"
+dirs = "5.0.1"
 isopy-api = { path = "../isopy-api" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
