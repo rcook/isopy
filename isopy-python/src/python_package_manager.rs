@@ -1,10 +1,9 @@
 use crate::archive_info::ArchiveInfo;
 use crate::archive_metadata::ArchiveMetadata;
 use anyhow::{bail, Result};
-use isopy_api::{Accept, Context, PackageManager, PackageVersion, Url};
+use isopy_api::{Context, PackageManager, PackageVersion, Url};
 use serde_json::Value;
 use std::collections::HashSet;
-use std::fs::read_to_string;
 use std::sync::LazyLock;
 
 macro_rules! g {
@@ -23,35 +22,21 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
 });
 
 pub struct PythonPackageManager {
-    name: String,
+    index: Value,
 }
 
 impl PythonPackageManager {
-    pub fn new<S>(name: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self { name: name.into() }
+    pub fn new(ctx: &dyn Context) -> Result<Self> {
+        let index = ctx.download_json(&INDEX_URL)?;
+        Ok(Self { index })
     }
 }
 
 impl PackageManager for PythonPackageManager {
-    fn name(&self) -> &str {
-        &self.name
-    }
-
     fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
-        fn download_json(ctx: &dyn Context, url: &Url) -> Result<Value> {
-            let path = ctx.download(url, Some(Accept::ApplicationJson))?;
-            let s = read_to_string(path)?;
-            let value = serde_json::from_str(&s)?;
-            Ok(value)
-        }
-
-        let index = download_json(ctx, &INDEX_URL)?;
-        show_summary(&index)?;
-        filter_archives(&index)?;
-        let archive = get_archive(&index, version)?;
+        show_summary(&self.index)?;
+        filter_archives(&self.index)?;
+        let archive = get_archive(&self.index, version)?;
 
         let archive_path = ctx.download(archive.url(), None)?;
         println!("{archive_path:?}");

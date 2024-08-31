@@ -8,7 +8,7 @@ fn main() -> anyhow::Result<()> {
     use isopy_api::PackageVersion;
 
     App::new(
-        config_dir()
+        &config_dir()
             .ok_or_else(|| anyhow!("Could not determine config directory"))?
             .join(".isopy-tng"),
     )

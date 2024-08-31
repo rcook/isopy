@@ -4,7 +4,8 @@ use isopy_api::{Accept, Context, Url};
 use reqwest::blocking::Client;
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Url as ReqwestUrl;
-use std::fs::{create_dir_all, write};
+use serde_json::Value;
+use std::fs::{create_dir_all, read_to_string, write};
 use std::path::PathBuf;
 
 pub struct AppContext<'a> {
@@ -55,5 +56,12 @@ impl<'a> Context for AppContext<'a> {
         println!("Downloaded {url}");
 
         return Ok(p);
+    }
+
+    fn download_json(&self, url: &Url) -> Result<Value> {
+        let path = self.download(url, Some(Accept::ApplicationJson))?;
+        let s = read_to_string(path)?;
+        let value = serde_json::from_str(&s)?;
+        Ok(value)
     }
 }

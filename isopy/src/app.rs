@@ -7,38 +7,20 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct App {
-    #[allow(unused)]
-    config_dir: PathBuf,
     cache_dir: PathBuf,
-    #[allow(unused)]
-    package_manager_factories: Vec<&'static PackageManagerFactory>,
-    package_manager_factory_map: HashMap<&'static str, &'static PackageManagerFactory>,
+    package_manager_factories: HashMap<&'static str, &'static PackageManagerFactory>,
 }
 
 impl App {
-    pub fn new<P>(config_dir: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        let config_dir = config_dir.into();
-
+    pub fn new(config_dir: &Path) -> Self {
         let cache_dir = config_dir.join("cache");
-
-        let package_manager_factories = vec![
-            get_package_manager_factory_java(),
-            get_package_manager_factory_python(),
-        ];
-
-        let package_manager_factory_map = package_manager_factories
-            .iter()
-            .map(|f| (f.name(), *f))
-            .collect::<HashMap<_, _>>();
-
+        let package_manager_factories = HashMap::from([
+            ("java", get_package_manager_factory_java()),
+            ("python", get_package_manager_factory_python()),
+        ]);
         Self {
-            config_dir,
             cache_dir,
             package_manager_factories,
-            package_manager_factory_map,
         }
     }
 
@@ -47,27 +29,13 @@ impl App {
     }
 
     pub fn download_package(&self, name: &str, version: &PackageVersion) -> Result<()> {
-        let package_manager_factory = self.get_package_manager_factory(name)?;
-        let package_manager = package_manager_factory.make(package_manager_factory.name())?;
-        let ctx = AppContext::new(self, package_manager.name());
+        let package_manager_factory = *self
+            .package_manager_factories
+            .get(name)
+            .ok_or_else(|| anyhow!("No package manager factory with name {name}"))?;
+        let ctx = AppContext::new(self, name);
+        let package_manager = package_manager_factory.make(&ctx)?;
         package_manager.download_package(&ctx, version)?;
         Ok(())
-    }
-
-    /*
-    pub fn package_manager_factories(&self) -> Iter<'_, &'static PackageManagerFactory> {
-        self.package_manager_factories.iter()
-    }
-    */
-
-    fn get_package_manager_factory<S>(&self, name: S) -> Result<&PackageManagerFactory>
-    where
-        S: AsRef<str>,
-    {
-        let package_manager_factory = *self
-            .package_manager_factory_map
-            .get(name.as_ref())
-            .ok_or_else(|| anyhow!("No package manager factory with name {}", name.as_ref()))?;
-        Ok(package_manager_factory)
     }
 }

@@ -2,18 +2,15 @@ mod java_package_manager;
 
 use crate::java_package_manager::JavaPackageManager;
 use anyhow::Result;
-use isopy_api::{PackageManager, PackageManagerFactory};
+use isopy_api::{Context, PackageManager, PackageManagerFactory};
 use std::sync::LazyLock;
 
 static JAVA_PACKAGE_FACTORY: LazyLock<PackageManagerFactory> = LazyLock::new(|| {
-    fn make_package_factory<S>(name: S) -> Result<Box<dyn PackageManager>>
-    where
-        S: Into<String>,
-    {
-        Ok(Box::new(JavaPackageManager::new(name)))
+    fn make_package_factory(_ctx: &dyn Context) -> Result<Box<dyn PackageManager>> {
+        Ok(Box::new(JavaPackageManager::new()))
     }
 
-    PackageManagerFactory::new("java", make_package_factory)
+    PackageManagerFactory::new(make_package_factory)
 });
 
 pub fn get_package_manager_factory() -> &'static PackageManagerFactory {

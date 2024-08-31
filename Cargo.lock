@@ -502,6 +502,7 @@ dependencies = [
  "isopy-python",
  "reqwest",
  "rstest",
+ "serde_json",
 ]
 
 [[package]]
@@ -511,6 +512,7 @@ dependencies = [
  "anyhow",
  "rstest",
  "sanitise-file-name",
+ "serde_json",
 ]
 
 [[package]]
