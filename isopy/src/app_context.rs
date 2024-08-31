@@ -6,15 +6,14 @@ use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Url as ReqwestUrl;
 use std::fs::{create_dir_all, write};
 use std::path::PathBuf;
-use std::rc::Rc;
 
-pub struct AppContext {
-    app: Rc<App>,
+pub struct AppContext<'a> {
+    app: &'a App,
     name: String,
 }
 
-impl AppContext {
-    pub fn new<S>(app: Rc<App>, name: S) -> Self
+impl<'a> AppContext<'a> {
+    pub fn new<S>(app: &'a App, name: S) -> Self
     where
         S: Into<String>,
     {
@@ -25,7 +24,7 @@ impl AppContext {
     }
 }
 
-impl Context for AppContext {
+impl<'a> Context for AppContext<'a> {
     fn download(&self, url: &Url, accept: Option<Accept>) -> Result<PathBuf> {
         let p = url.make_path(self.app.cache_dir().join(&self.name))?;
         if p.is_file() {

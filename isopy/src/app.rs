@@ -1,14 +1,16 @@
+use crate::app_context::AppContext;
 use anyhow::{anyhow, Result};
-use isopy_api::PackageManagerFactory;
+use isopy_api::{PackageManagerFactory, PackageVersion};
 use isopy_java::get_package_manager_factory as get_package_manager_factory_java;
 use isopy_python::get_package_manager_factory as get_package_manager_factory_python;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::slice::Iter;
 
 pub struct App {
+    #[allow(unused)]
     config_dir: PathBuf,
     cache_dir: PathBuf,
+    #[allow(unused)]
     package_manager_factories: Vec<&'static PackageManagerFactory>,
     package_manager_factory_map: HashMap<&'static str, &'static PackageManagerFactory>,
 }
@@ -40,19 +42,25 @@ impl App {
         }
     }
 
-    pub fn config_dir(&self) -> &Path {
-        &self.config_dir
-    }
-
     pub fn cache_dir(&self) -> &Path {
         &self.cache_dir
     }
 
+    pub fn download_package(&self, name: &str, version: &PackageVersion) -> Result<()> {
+        let package_manager_factory = self.get_package_manager_factory(name)?;
+        let package_manager = package_manager_factory.make(package_manager_factory.name())?;
+        let ctx = AppContext::new(self, package_manager.name());
+        package_manager.download_package(&ctx, version)?;
+        Ok(())
+    }
+
+    /*
     pub fn package_manager_factories(&self) -> Iter<'_, &'static PackageManagerFactory> {
         self.package_manager_factories.iter()
     }
+    */
 
-    pub fn get_package_manager_factory<S>(&self, name: S) -> Result<&PackageManagerFactory>
+    fn get_package_manager_factory<S>(&self, name: S) -> Result<&PackageManagerFactory>
     where
         S: AsRef<str>,
     {

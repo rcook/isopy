@@ -1,8 +1,6 @@
-use crate::archive_full_version::ArchiveFullVersion;
-use crate::archive_group::ArchiveGroup;
 use crate::archive_info::ArchiveInfo;
 use crate::archive_metadata::ArchiveMetadata;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{bail, Result};
 use isopy_api::{Accept, Context, PackageManager, PackageVersion, Url};
 use serde_json::Value;
 use std::collections::HashSet;
@@ -42,7 +40,7 @@ impl PackageManager for PythonPackageManager {
         &self.name
     }
 
-    fn test(&self, ctx: &dyn Context) -> Result<()> {
+    fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
         fn download_json(ctx: &dyn Context, url: &Url) -> Result<Value> {
             let path = ctx.download(url, Some(Accept::ApplicationJson))?;
             let s = read_to_string(path)?;
@@ -53,14 +51,7 @@ impl PackageManager for PythonPackageManager {
         let index = download_json(ctx, &INDEX_URL)?;
         show_summary(&index)?;
         filter_archives(&index)?;
-        let archive = get_archive(
-            &index,
-            &PackageVersion {
-                major: 3,
-                minor: 12,
-                revision: 5,
-            },
-        )?;
+        let archive = get_archive(&index, version)?;
 
         let archive_path = ctx.download(archive.url(), None)?;
         println!("{archive_path:?}");
@@ -157,45 +148,23 @@ fn filter_archives(index: &Value) -> Result<()> {
 }
 
 fn get_archive(index: &Value, version: &PackageVersion) -> Result<ArchiveInfo> {
-    fn get_groups(index: &Value) -> Result<Vec<ArchiveGroup>> {
-        let mut groups = g!(index.as_array())
-            .iter()
-            .map(|item| g!(g!(item.get("tag_name")).as_str()).parse::<ArchiveGroup>())
-            .collect::<Result<HashSet<_>>>()?
-            .into_iter()
-            .collect::<Vec<_>>();
-        groups.sort();
-        groups.reverse();
-        Ok(groups)
-    }
-
-    let groups = get_groups(index)?;
-    let latest_group = groups.first().ok_or_else(|| anyhow!("No groups found"))?;
-    let full_version = ArchiveFullVersion {
-        version: version.clone(),
-        group: latest_group.clone(),
-    };
-
-    let search_keywords = get_platform_keywords();
+    let keywords = get_platform_keywords();
     let mut archives = Vec::new();
     for item in g!(index.as_array()) {
-        for archive in get_archives(item)? {
-            if archive.metadata().keywords().is_superset(&search_keywords) {
-                archives.push(archive);
-            }
-        }
+        archives.extend(get_archives(item)?.into_iter().filter(|archive| {
+            let m = archive.metadata();
+            m.keywords().is_superset(&keywords) && m.full_version().version == *version
+        }));
     }
 
-    let archives = archives
-        .iter()
-        .filter(|x| *x.metadata().full_version() == full_version)
-        .collect::<Vec<_>>();
-    match archives.len() {
-        0 => bail!("No matching archive found"),
-        1 => Ok((*archives
-            .first()
-            .expect("Vector contains exactly one element"))
-        .clone()),
-        _ => bail!("More than one matching archive found"),
+    if archives.is_empty() {
+        bail!("No matching archives found")
     }
+
+    archives.sort_by_cached_key(|archive| archive.metadata().full_version().clone());
+    archives.reverse();
+    Ok(archives
+        .into_iter()
+        .next()
+        .expect("Vector must contain at least one element"))
 }

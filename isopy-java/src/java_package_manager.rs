@@ -1,5 +1,5 @@
 use anyhow::Result;
-use isopy_api::{Context, PackageManager};
+use isopy_api::{Context, PackageManager, PackageVersion};
 
 pub struct JavaPackageManager {
     name: String,
@@ -19,7 +19,7 @@ impl PackageManager for JavaPackageManager {
         &self.name
     }
 
-    fn test(&self, _ctx: &dyn Context) -> Result<()> {
-        Ok(())
+    fn download_package(&self, _ctx: &dyn Context, _version: &PackageVersion) -> Result<()> {
+        todo!()
     }
 }
