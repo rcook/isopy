@@ -1,6 +1,6 @@
 use crate::archive_group::ArchiveGroup;
-use crate::archive_version::ArchiveVersion;
 use anyhow::Result;
+use isopy_api::PackageVersion;
 use regex::Regex;
 use std::collections::HashSet;
 use std::sync::LazyLock;
@@ -12,7 +12,7 @@ static VERSION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ArchiveFullVersion {
-    pub version: ArchiveVersion,
+    pub version: PackageVersion,
     pub group: ArchiveGroup,
 }
 
@@ -47,7 +47,7 @@ impl ArchiveFullVersion {
                     .parse()
                     .expect("Must be integer");
 
-                let temp_version = ArchiveVersion {
+                let temp_version = PackageVersion {
                     major,
                     minor,
                     revision,

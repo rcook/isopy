@@ -3,7 +3,6 @@ mod archive_group;
 mod archive_info;
 mod archive_metadata;
 mod archive_type;
-mod archive_version;
 mod python_package_manager;
 
 use crate::python_package_manager::PythonPackageManager;

@@ -2,9 +2,8 @@ use crate::archive_full_version::ArchiveFullVersion;
 use crate::archive_group::ArchiveGroup;
 use crate::archive_info::ArchiveInfo;
 use crate::archive_metadata::ArchiveMetadata;
-use crate::archive_version::ArchiveVersion;
 use anyhow::{anyhow, bail, Result};
-use isopy_api::{Accept, Context, PackageManager, Url};
+use isopy_api::{Accept, Context, PackageManager, PackageVersion, Url};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::fs::read_to_string;
@@ -56,7 +55,7 @@ impl PackageManager for PythonPackageManager {
         filter_archives(&index)?;
         let archive = get_archive(
             &index,
-            &ArchiveVersion {
+            &PackageVersion {
                 major: 3,
                 minor: 12,
                 revision: 5,
@@ -157,7 +156,7 @@ fn filter_archives(index: &Value) -> Result<()> {
     Ok(())
 }
 
-fn get_archive(index: &Value, version: &ArchiveVersion) -> Result<ArchiveInfo> {
+fn get_archive(index: &Value, version: &PackageVersion) -> Result<ArchiveInfo> {
     fn get_groups(index: &Value) -> Result<Vec<ArchiveGroup>> {
         let mut groups = g!(index.as_array())
             .iter()
