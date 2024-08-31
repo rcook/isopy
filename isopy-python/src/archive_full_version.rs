@@ -1,14 +1,7 @@
 use crate::archive_group::ArchiveGroup;
 use anyhow::Result;
 use isopy_api::PackageVersion;
-use regex::Regex;
 use std::collections::HashSet;
-use std::sync::LazyLock;
-
-static VERSION_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new("^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<revision>\\d+)(\\+(?<group>.+))?$")
-        .expect("Invalid regex")
-});
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ArchiveFullVersion {
@@ -18,57 +11,36 @@ pub struct ArchiveFullVersion {
 
 impl ArchiveFullVersion {
     pub fn from_keywords(keywords: &mut HashSet<String>) -> Result<Self> {
-        let version_regex = &*VERSION_REGEX;
-
         let mut full_version = None;
         let mut version = None;
         let mut group = None;
         let mut keywords_to_remove = Vec::new();
 
         for keyword in keywords.iter() {
-            if let Some(c) = version_regex.captures(keyword) {
-                keywords_to_remove.push(keyword.clone());
-                let major = c
-                    .get(1)
-                    .expect("Must capture major")
-                    .as_str()
-                    .parse()
-                    .expect("Must be integer");
-                let minor = c
-                    .get(2)
-                    .expect("Must capture minor")
-                    .as_str()
-                    .parse()
-                    .expect("Must be integer");
-                let revision = c
-                    .get(3)
-                    .expect("Must capture revision")
-                    .as_str()
-                    .parse()
-                    .expect("Must be integer");
-
-                let temp_version = PackageVersion {
-                    major,
-                    minor,
-                    revision,
-                };
-
-                if let Some(m) = c.get(5) {
-                    let temp_group = m.as_str().parse()?;
-                    assert!(full_version.is_none() && version.is_none() && group.is_none());
-                    full_version = Some(Self {
-                        version: temp_version,
-                        group: temp_group,
-                    });
-                    break;
-                } else {
-                    assert!(full_version.is_none() && version.is_none());
-                    version = Some(temp_version);
-                    if group.is_some() {
+            if let Some((prefix, suffix)) = keyword.split_once('+') {
+                if let Ok(temp_version) = prefix.parse() {
+                    if let Ok(temp_group) = suffix.parse() {
+                        assert!(full_version.is_none() && version.is_none() && group.is_none());
+                        keywords_to_remove.push(keyword.clone());
+                        full_version = Some(Self {
+                            version: temp_version,
+                            group: temp_group,
+                        });
                         break;
                     }
                 }
-            } else if let Ok(temp_group) = keyword.parse::<ArchiveGroup>() {
+            }
+
+            if let Ok(temp_version) = keyword.parse() {
+                assert!(full_version.is_none() && version.is_none());
+                keywords_to_remove.push(keyword.clone());
+                version = Some(temp_version);
+                if group.is_some() {
+                    break;
+                }
+            }
+
+            if let Ok(temp_group) = keyword.parse() {
                 assert!(full_version.is_none() && group.is_none());
                 keywords_to_remove.push(keyword.clone());
                 group = Some(temp_group);
