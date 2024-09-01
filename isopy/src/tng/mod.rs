@@ -23,8 +23,8 @@ pub(crate) async fn run() -> anyhow::Result<()> {
         "python",
         &PackageVersion {
             major: 3,
-            minor: 8,
-            revision: 18,
+            minor: 9,
+            revision: 7,
         },
     )
     .await?;
