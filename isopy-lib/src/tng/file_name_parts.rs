@@ -1,6 +1,5 @@
 use crate::tng::sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 use anyhow::{bail, Result};
-use std::path::PathBuf;
 use url::Url;
 
 #[derive(Debug, PartialEq)]
@@ -78,12 +77,6 @@ impl FileNameParts {
             && url.port().is_none()
             && url.query().is_none()
             && url.fragment().is_none()
-    }
-}
-
-impl Into<PathBuf> for FileNameParts {
-    fn into(self) -> PathBuf {
-        PathBuf::from(format!("{}{}", self.prefix, self.suffix))
     }
 }
 
