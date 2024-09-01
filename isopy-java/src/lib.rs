@@ -1,6 +1,6 @@
-mod java_package_manager;
-mod java_package_manager_factory;
+mod tng;
 
-pub async fn get_package_manager_factory() -> anyhow::Result<isopy_lib::PackageManagerFactory> {
-    Ok(java_package_manager_factory::JavaPackageManagerFactory::new().await?)
+pub async fn get_package_manager_factory() -> anyhow::Result<isopy_lib::tng::PackageManagerFactory>
+{
+    Ok(crate::tng::JavaPackageManagerFactory::new().await?)
 }

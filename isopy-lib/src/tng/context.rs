@@ -1,5 +1,5 @@
-use crate::accept::Accept;
-use crate::url::Url;
+use crate::tng::accept::Accept;
+use crate::tng::url::Url;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde_json::Value;

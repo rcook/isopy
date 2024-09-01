@@ -1,8 +1,8 @@
-use crate::archive_info::ArchiveInfo;
-use crate::archive_metadata::ArchiveMetadata;
+use crate::tng::archive_info::ArchiveInfo;
+use crate::tng::archive_metadata::ArchiveMetadata;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
-use isopy_lib::{Context, PackageManagerOps, PackageVersion, Url};
+use isopy_lib::tng::{Context, PackageManagerOps, PackageVersion, Url};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::LazyLock;

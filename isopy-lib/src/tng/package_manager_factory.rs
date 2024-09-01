@@ -1,5 +1,5 @@
-use crate::context::Context;
-use crate::package_manager::PackageManager;
+use crate::tng::context::Context;
+use crate::tng::package_manager::PackageManager;
 use anyhow::Result;
 use async_trait::async_trait;
 

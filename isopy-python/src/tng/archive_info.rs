@@ -1,5 +1,5 @@
-use crate::archive_metadata::ArchiveMetadata;
-use isopy_lib::Url;
+use crate::tng::archive_metadata::ArchiveMetadata;
+use isopy_lib::tng::Url;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ArchiveInfo {

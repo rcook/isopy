@@ -1,7 +1,7 @@
-use crate::python_package_manager::PythonPackageManager;
+use crate::tng::python_package_manager::PythonPackageManager;
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_lib::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use isopy_lib::tng::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
 
 pub(crate) struct PythonPackageManagerFactory;
 

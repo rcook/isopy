@@ -1,7 +1,7 @@
-use crate::app::App;
+use crate::tng::app::App;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use isopy_lib::{Accept, Context, Url};
+use isopy_lib::tng::{Accept, Context, Url};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
@@ -10,13 +10,13 @@ use std::fs::{create_dir_all, write};
 use std::path::PathBuf;
 use tokio::fs::read_to_string;
 
-pub struct AppContext<'a> {
+pub(crate) struct AppContext<'a> {
     app: &'a App,
     name: String,
 }
 
 impl<'a> AppContext<'a> {
-    pub fn new<S>(app: &'a App, name: S) -> Self
+    pub(crate) fn new<S>(app: &'a App, name: S) -> Self
     where
         S: Into<String>,
     {

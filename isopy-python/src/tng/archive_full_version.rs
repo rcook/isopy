@@ -1,6 +1,6 @@
-use crate::archive_group::ArchiveGroup;
+use crate::tng::archive_group::ArchiveGroup;
 use anyhow::Result;
-use isopy_lib::PackageVersion;
+use isopy_lib::tng::PackageVersion;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
