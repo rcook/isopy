@@ -136,8 +136,10 @@ impl<'a> AppContext<'a> {
 #[async_trait]
 impl<'a> Context for AppContext<'a> {
     async fn download(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
-        if let Some(path) = self.check_cache(url)? {
-            return Ok(path);
+        if !options.update {
+            if let Some(path) = self.check_cache(url)? {
+                return Ok(path);
+            }
         }
 
         let path = self.make_unique_path(url)?;
