@@ -6,7 +6,7 @@ async fn main() -> anyhow::Result<()> {
     use crate::app::App;
     use anyhow::anyhow;
     use dirs::config_dir;
-    use isopy_api::PackageVersion;
+    use isopy_lib::PackageVersion;
 
     App::new(
         &config_dir()

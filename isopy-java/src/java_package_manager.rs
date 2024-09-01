@@ -1,6 +1,6 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_api::{Context, PackageManagerOps, PackageVersion};
+use isopy_lib::{Context, PackageManagerOps, PackageVersion};
 
 pub(crate) struct JavaPackageManager {}
 

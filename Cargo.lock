@@ -508,7 +508,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "dirs",
- "isopy-api",
  "isopy-java",
  "isopy-lib",
  "isopy-python",
@@ -519,7 +518,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "isopy-api"
+name = "isopy-java"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "isopy-lib",
+ "rstest",
+]
+
+[[package]]
+name = "isopy-lib"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -530,29 +539,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "isopy-java"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "isopy-api",
- "rstest",
-]
-
-[[package]]
-name = "isopy-lib"
-version = "0.0.0"
-dependencies = [
- "rstest",
-]
-
-[[package]]
 name = "isopy-python"
 version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "isopy-api",
+ "isopy-lib",
  "regex",
  "rstest",
  "serde_json",

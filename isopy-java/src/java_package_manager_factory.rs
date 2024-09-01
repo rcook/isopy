@@ -1,7 +1,7 @@
 use crate::java_package_manager::JavaPackageManager;
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_api::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use isopy_lib::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
 
 pub(crate) struct JavaPackageManagerFactory;
 

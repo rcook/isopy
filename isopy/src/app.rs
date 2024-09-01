@@ -1,7 +1,7 @@
 use crate::app_context::AppContext;
 use anyhow::{anyhow, Result};
-use isopy_api::{PackageManagerFactory, PackageVersion};
 use isopy_java::get_package_manager_factory as get_package_manager_factory_java2;
+use isopy_lib::{PackageManagerFactory, PackageVersion};
 use isopy_python::get_package_manager_factory as get_package_manager_factory_python2;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};

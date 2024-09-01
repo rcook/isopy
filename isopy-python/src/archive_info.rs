@@ -1,5 +1,5 @@
 use crate::archive_metadata::ArchiveMetadata;
-use isopy_api::Url;
+use isopy_lib::Url;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ArchiveInfo {

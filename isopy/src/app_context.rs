@@ -1,7 +1,7 @@
 use crate::app::App;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use isopy_api::{Accept, Context, Url};
+use isopy_lib::{Accept, Context, Url};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
