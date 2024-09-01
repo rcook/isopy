@@ -2,12 +2,13 @@ use crate::app::App;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_api::{Accept, Context, Url};
-use reqwest::blocking::Client;
 use reqwest::header::{ACCEPT, USER_AGENT};
+use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
 use serde_json::Value;
-use std::fs::{create_dir_all, read_to_string, write};
+use std::fs::{create_dir_all, write};
 use std::path::PathBuf;
+use tokio::fs::read_to_string;
 
 pub struct AppContext<'a> {
     app: &'a App,
@@ -50,10 +51,10 @@ impl<'a> Context for AppContext<'a> {
             request = request.header(ACCEPT, accept.as_str())
         };
 
-        let response = request.send()?;
+        let response = request.send().await?;
         response.error_for_status_ref()?;
 
-        let data = response.bytes()?;
+        let data = response.bytes().await?;
         write(&p, data)?;
         println!("Downloaded {url}");
 
@@ -62,7 +63,7 @@ impl<'a> Context for AppContext<'a> {
 
     async fn download_json(&self, url: &Url) -> Result<Value> {
         let path = self.download(url, Some(Accept::ApplicationJson)).await?;
-        let s = read_to_string(path)?;
+        let s = read_to_string(path).await?;
         let value = serde_json::from_str(&s)?;
         Ok(value)
     }
