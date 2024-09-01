@@ -31,7 +31,7 @@ impl FromStr for PackageVersion {
 
 #[cfg(test)]
 mod tests {
-    use super::PackageVersion;
+    use crate::tng::package_version::PackageVersion;
     use anyhow::Result;
     use rstest::rstest;
 
