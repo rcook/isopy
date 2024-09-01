@@ -1,7 +1,7 @@
 use crate::tng::app::App;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{Accept, Context, Url};
+use isopy_lib::tng::{Accept, Context, FileNameParts};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
@@ -9,6 +9,7 @@ use serde_json::Value;
 use std::fs::{create_dir_all, write};
 use std::path::PathBuf;
 use tokio::fs::read_to_string;
+use url::Url;
 
 pub(crate) struct AppContext<'a> {
     app: &'a App,
@@ -30,7 +31,12 @@ impl<'a> AppContext<'a> {
 #[async_trait]
 impl<'a> Context for AppContext<'a> {
     async fn download(&self, url: &Url, accept: Option<Accept>) -> Result<PathBuf> {
-        let p = url.make_path(self.app.cache_dir().join(&self.name))?;
+        let file_name_parts = FileNameParts::from_url_safe(url)?;
+        let p = self
+            .app
+            .cache_dir()
+            .join(&self.name)
+            .join(Into::<PathBuf>::into(file_name_parts));
         if p.is_file() {
             println!("Returning {url} from cache");
             return Ok(p);

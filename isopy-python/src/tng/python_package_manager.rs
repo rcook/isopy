@@ -2,10 +2,11 @@ use crate::tng::archive_info::ArchiveInfo;
 use crate::tng::archive_metadata::ArchiveMetadata;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{Context, PackageManagerOps, PackageVersion, Url};
+use isopy_lib::tng::{Context, PackageManagerOps, PackageVersion};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::LazyLock;
+use url::Url;
 
 macro_rules! g {
     ($e : expr) => {
@@ -65,7 +66,7 @@ fn get_archives(item: &Value) -> Result<Vec<ArchiveInfo>> {
         .filter(|(_, name)| filter_fn(*name))
         .map(|(url, name)| {
             let metadata = name.parse::<ArchiveMetadata>()?;
-            let archive_info = ArchiveInfo::new(url, metadata);
+            let archive_info = ArchiveInfo::new(&url, metadata);
             Ok(archive_info)
         })
         .collect::<Result<Vec<_>>>()?;

@@ -515,6 +515,7 @@ dependencies = [
  "rstest",
  "serde_json",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -534,8 +535,8 @@ dependencies = [
  "anyhow",
  "async-trait",
  "rstest",
- "sanitise-file-name",
  "serde_json",
+ "url",
 ]
 
 [[package]]
@@ -550,6 +551,7 @@ dependencies = [
  "serde_json",
  "strum",
  "strum_macros",
+ "url",
 ]
 
 [[package]]
@@ -1036,12 +1038,6 @@ name = "ryu"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
-
-[[package]]
-name = "sanitise-file-name"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19d36299972b96b8ae7e8f04ecbf75fb41a27bf3781af00abcf57609774cb911"
 
 [[package]]
 name = "schannel"

@@ -1,5 +1,5 @@
 use crate::tng::archive_metadata::ArchiveMetadata;
-use isopy_lib::tng::Url;
+use url::Url;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ArchiveInfo {
@@ -8,8 +8,11 @@ pub(crate) struct ArchiveInfo {
 }
 
 impl ArchiveInfo {
-    pub(crate) fn new(url: Url, metadata: ArchiveMetadata) -> Self {
-        Self { url, metadata }
+    pub(crate) fn new(url: &Url, metadata: ArchiveMetadata) -> Self {
+        Self {
+            url: url.clone(),
+            metadata,
+        }
     }
 
     pub(crate) fn url(&self) -> &Url {
