@@ -23,8 +23,8 @@ async fn run() -> anyhow::Result<()> {
         "python",
         &PackageVersion {
             major: 3,
-            minor: 8,
-            revision: 12,
+            minor: 9,
+            revision: 13,
         },
     )
     .await?;
