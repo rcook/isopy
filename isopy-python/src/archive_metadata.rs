@@ -6,7 +6,7 @@ use std::str::FromStr;
 use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug)]
-pub struct ArchiveMetadata {
+pub(crate) struct ArchiveMetadata {
     name: String,
     archive_type: ArchiveType,
     full_version: ArchiveFullVersion,
@@ -14,19 +14,20 @@ pub struct ArchiveMetadata {
 }
 
 impl ArchiveMetadata {
-    pub fn name(&self) -> &str {
+    pub(crate) fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn archive_type(&self) -> &ArchiveType {
+    #[allow(unused)]
+    pub(crate) fn archive_type(&self) -> &ArchiveType {
         &self.archive_type
     }
 
-    pub fn full_version(&self) -> &ArchiveFullVersion {
+    pub(crate) fn full_version(&self) -> &ArchiveFullVersion {
         &self.full_version
     }
 
-    pub fn keywords(&self) -> &HashSet<String> {
+    pub(crate) fn keywords(&self) -> &HashSet<String> {
         &self.keywords
     }
 }

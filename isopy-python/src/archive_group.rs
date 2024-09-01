@@ -32,7 +32,7 @@ impl PartialOrd for ArchiveGroupInner {
 }
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct ArchiveGroup {
+pub(crate) struct ArchiveGroup {
     inner: ArchiveGroupInner,
 }
 

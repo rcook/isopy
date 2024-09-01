@@ -1,7 +1,11 @@
 use crate::context::Context;
 use crate::package_version::PackageVersion;
 use anyhow::Result;
+use async_trait::async_trait;
 
-pub trait PackageManager {
-    fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()>;
+#[async_trait]
+pub trait PackageManagerOps: Send + Sync {
+    async fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()>;
 }
+
+pub type PackageManager = Box<dyn PackageManagerOps>;

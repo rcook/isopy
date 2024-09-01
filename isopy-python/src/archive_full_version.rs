@@ -4,13 +4,13 @@ use isopy_api::PackageVersion;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct ArchiveFullVersion {
-    pub version: PackageVersion,
-    pub group: ArchiveGroup,
+pub(crate) struct ArchiveFullVersion {
+    pub(crate) version: PackageVersion,
+    pub(crate) group: ArchiveGroup,
 }
 
 impl ArchiveFullVersion {
-    pub fn from_keywords(keywords: &mut HashSet<String>) -> Result<Self> {
+    pub(crate) fn from_keywords(keywords: &mut HashSet<String>) -> Result<Self> {
         let mut full_version = None;
         let mut version = None;
         let mut group = None;

@@ -1,5 +1,6 @@
 use crate::app::App;
 use anyhow::{anyhow, Result};
+use async_trait::async_trait;
 use isopy_api::{Accept, Context, Url};
 use reqwest::blocking::Client;
 use reqwest::header::{ACCEPT, USER_AGENT};
@@ -25,8 +26,9 @@ impl<'a> AppContext<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Context for AppContext<'a> {
-    fn download(&self, url: &Url, accept: Option<Accept>) -> Result<PathBuf> {
+    async fn download(&self, url: &Url, accept: Option<Accept>) -> Result<PathBuf> {
         let p = url.make_path(self.app.cache_dir().join(&self.name))?;
         if p.is_file() {
             println!("Returning {url} from cache");
@@ -58,8 +60,8 @@ impl<'a> Context for AppContext<'a> {
         return Ok(p);
     }
 
-    fn download_json(&self, url: &Url) -> Result<Value> {
-        let path = self.download(url, Some(Accept::ApplicationJson))?;
+    async fn download_json(&self, url: &Url) -> Result<Value> {
+        let path = self.download(url, Some(Accept::ApplicationJson)).await?;
         let s = read_to_string(path)?;
         let value = serde_json::from_str(&s)?;
         Ok(value)

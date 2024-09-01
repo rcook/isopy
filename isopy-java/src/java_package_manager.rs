@@ -1,16 +1,18 @@
 use anyhow::Result;
-use isopy_api::{Context, PackageManager, PackageVersion};
+use async_trait::async_trait;
+use isopy_api::{Context, PackageManagerOps, PackageVersion};
 
-pub struct JavaPackageManager {}
+pub(crate) struct JavaPackageManager {}
 
 impl JavaPackageManager {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {}
     }
 }
 
-impl PackageManager for JavaPackageManager {
-    fn download_package(&self, _ctx: &dyn Context, _version: &PackageVersion) -> Result<()> {
+#[async_trait]
+impl PackageManagerOps for JavaPackageManager {
+    async fn download_package(&self, _ctx: &dyn Context, _version: &PackageVersion) -> Result<()> {
         todo!()
     }
 }

@@ -1,7 +1,8 @@
 use crate::archive_info::ArchiveInfo;
 use crate::archive_metadata::ArchiveMetadata;
 use anyhow::{bail, Result};
-use isopy_api::{Context, PackageManager, PackageVersion, Url};
+use async_trait::async_trait;
+use isopy_api::{Context, PackageManagerOps, PackageVersion, Url};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::LazyLock;
@@ -21,24 +22,25 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
         .expect("Invalid index URL")
 });
 
-pub struct PythonPackageManager {
+pub(crate) struct PythonPackageManager {
     index: Value,
 }
 
 impl PythonPackageManager {
-    pub fn new(ctx: &dyn Context) -> Result<Self> {
-        let index = ctx.download_json(&INDEX_URL)?;
+    pub(crate) async fn new(ctx: &dyn Context) -> Result<Self> {
+        let index = ctx.download_json(&INDEX_URL).await?;
         Ok(Self { index })
     }
 }
 
-impl PackageManager for PythonPackageManager {
-    fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
+#[async_trait]
+impl PackageManagerOps for PythonPackageManager {
+    async fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
         show_summary(&self.index)?;
         filter_archives(&self.index)?;
         let archive = get_archive(&self.index, version)?;
 
-        let archive_path = ctx.download(archive.url(), None)?;
+        let archive_path = ctx.download(archive.url(), None).await?;
         println!("{archive_path:?}");
         Ok(())
     }

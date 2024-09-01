@@ -7,7 +7,7 @@ mod url;
 
 pub use accept::Accept;
 pub use context::Context;
-pub use package_manager::PackageManager;
-pub use package_manager_factory::PackageManagerFactory;
+pub use package_manager::{PackageManager, PackageManagerOps};
+pub use package_manager_factory::{PackageManagerFactory, PackageManagerFactoryOps};
 pub use package_version::PackageVersion;
 pub use url::Url;

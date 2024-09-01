@@ -1,7 +1,13 @@
 mod app;
 mod app_context;
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    run().await?;
+    Ok(())
+}
+
+async fn run() -> anyhow::Result<()> {
     use crate::app::App;
     use anyhow::anyhow;
     use dirs::config_dir;
@@ -12,6 +18,7 @@ fn main() -> anyhow::Result<()> {
             .ok_or_else(|| anyhow!("Could not determine config directory"))?
             .join(".isopy-tng"),
     )
+    .await?
     .download_package(
         "python",
         &PackageVersion {
@@ -19,7 +26,8 @@ fn main() -> anyhow::Result<()> {
             minor: 8,
             revision: 12,
         },
-    )?;
+    )
+    .await?;
 
     Ok(())
 }
