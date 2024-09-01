@@ -3,11 +3,6 @@ mod app_context;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    run().await?;
-    Ok(())
-}
-
-async fn run() -> anyhow::Result<()> {
     use crate::app::App;
     use anyhow::anyhow;
     use dirs::config_dir;
