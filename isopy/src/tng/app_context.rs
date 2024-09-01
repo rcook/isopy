@@ -5,15 +5,13 @@ use crate::tng::file::File;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::Utc;
-use isopy_lib::tng::{Accept, Context, FileNameParts};
+use isopy_lib::tng::{Context, DownloadOptions, FileNameParts};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
-use serde_json::Value;
 use std::collections::HashMap;
 use std::fs::{create_dir_all, write};
 use std::path::PathBuf;
-use tokio::fs::read_to_string;
 use url::Url;
 
 const CACHE_FILE_NAME: &str = "cache.json";
@@ -54,7 +52,7 @@ impl<'a> AppContext<'a> {
 
 #[async_trait]
 impl<'a> Context for AppContext<'a> {
-    async fn download(&self, url: &Url, accept: Option<Accept>) -> Result<PathBuf> {
+    async fn download(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         let cache_info = CacheInfo::load(self.cache_dir.join(CACHE_FILE_NAME))?;
         let downloads = cache_info
             .manifest
@@ -95,7 +93,7 @@ impl<'a> Context for AppContext<'a> {
             .get(ReqwestUrl::parse(url.as_str())?)
             .header(USER_AGENT, "isopy-tng");
 
-        if let Some(accept) = accept {
+        if let Some(accept) = &options.accept {
             request = request.header(ACCEPT, accept.as_str())
         };
 
@@ -127,12 +125,5 @@ impl<'a> Context for AppContext<'a> {
         println!("Downloaded {url}");
 
         return Ok(path);
-    }
-
-    async fn download_json(&self, url: &Url) -> Result<Value> {
-        let path = self.download(url, Some(Accept::ApplicationJson)).await?;
-        let s = read_to_string(path).await?;
-        let value = serde_json::from_str(&s)?;
-        Ok(value)
     }
 }

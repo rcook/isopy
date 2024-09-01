@@ -2,10 +2,11 @@ use crate::tng::archive_info::ArchiveInfo;
 use crate::tng::archive_metadata::ArchiveMetadata;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{Context, PackageManagerOps, PackageVersion};
+use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, PackageVersion};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::LazyLock;
+use tokio::fs::read_to_string;
 use url::Url;
 
 macro_rules! g {
@@ -29,7 +30,9 @@ pub(crate) struct PythonPackageManager {
 
 impl PythonPackageManager {
     pub(crate) async fn new(ctx: &dyn Context) -> Result<Self> {
-        let index = ctx.download_json(&INDEX_URL).await?;
+        let path = ctx.download(&INDEX_URL, &DownloadOptions::json()).await?;
+        let s = read_to_string(path).await?;
+        let index = serde_json::from_str(&s)?;
         Ok(Self { index })
     }
 }
@@ -41,7 +44,9 @@ impl PackageManagerOps for PythonPackageManager {
         filter_archives(&self.index)?;
         let archive = get_archive(&self.index, version)?;
 
-        let archive_path = ctx.download(archive.url(), None).await?;
+        let archive_path = ctx
+            .download(archive.url(), &DownloadOptions::default())
+            .await?;
         println!("{archive_path:?}");
         Ok(())
     }

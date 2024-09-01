@@ -1,5 +1,6 @@
 mod accept;
 mod context;
+mod download_options;
 mod file_name_parts;
 mod package_manager;
 mod package_manager_factory;
@@ -8,6 +9,7 @@ mod sanitize;
 
 pub use accept::Accept;
 pub use context::Context;
+pub use download_options::DownloadOptions;
 pub use file_name_parts::FileNameParts;
 pub use package_manager::{PackageManager, PackageManagerOps};
 pub use package_manager_factory::{PackageManagerFactory, PackageManagerFactoryOps};
