@@ -3,6 +3,7 @@ mod archive_group;
 mod archive_info;
 mod archive_metadata;
 mod archive_type;
+mod checksum;
 mod python_package_manager;
 mod python_package_manager_factory;
 

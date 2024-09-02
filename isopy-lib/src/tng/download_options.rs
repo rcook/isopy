@@ -1,8 +1,10 @@
 use crate::tng::accept::Accept;
+use crate::tng::checksum::Checksum;
 
 pub struct DownloadOptions {
     pub accept: Option<Accept>,
     pub update: bool,
+    pub checksum: Option<Checksum>,
 }
 
 impl DownloadOptions {
@@ -19,6 +21,11 @@ impl DownloadOptions {
         self.update = value;
         self
     }
+
+    pub fn checksum(mut self, value: Option<Checksum>) -> Self {
+        self.checksum = value;
+        self
+    }
 }
 
 impl Default for DownloadOptions {
@@ -26,6 +33,7 @@ impl Default for DownloadOptions {
         Self {
             accept: None,
             update: false,
+            checksum: None,
         }
     }
 }

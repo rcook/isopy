@@ -144,8 +144,16 @@ impl<'a> Context for AppContext<'a> {
 
         let path = self.make_unique_path(url)?;
         let downloaded_at = Utc::now();
+
         Self::download_to_path(url, &path, &options).await?;
+        if let Some(checksum) = &options.checksum {
+            if !checksum.validate_file(&path).await? {
+                bail!("Checksum validation of {} failed", path.display());
+            }
+        }
+
         self.update_cache(url, &path, &downloaded_at)?;
-        return Ok(path);
+
+        Ok(path)
     }
 }

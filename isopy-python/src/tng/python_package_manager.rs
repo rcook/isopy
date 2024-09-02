@@ -1,5 +1,6 @@
 use crate::tng::archive_info::ArchiveInfo;
 use crate::tng::archive_metadata::ArchiveMetadata;
+use crate::tng::checksum::get_checksum;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, PackageVersion};
@@ -40,14 +41,10 @@ impl PythonPackageManager {
 #[async_trait]
 impl PackageManagerOps for PythonPackageManager {
     async fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
-        show_summary(&self.index)?;
-        filter_archives(&self.index)?;
         let archive = get_archive(&self.index, version)?;
-
-        let archive_path = ctx
-            .download(archive.url(), &DownloadOptions::default())
-            .await?;
-        println!("{archive_path:?}");
+        let checksum = get_checksum(&archive)?;
+        let options = DownloadOptions::default().checksum(Some(checksum));
+        _ = ctx.download(archive.url(), &options).await?;
         Ok(())
     }
 }
@@ -78,6 +75,7 @@ fn get_archives(item: &Value) -> Result<Vec<ArchiveInfo>> {
     Ok(archives)
 }
 
+#[allow(unused)]
 fn show_summary(index: &Value) -> Result<()> {
     let mut groups = HashSet::new();
     let mut keywords = HashSet::new();
@@ -121,6 +119,7 @@ fn get_platform_keywords() -> HashSet<String> {
     ])
 }
 
+#[allow(unused)]
 fn filter_archives(index: &Value) -> Result<()> {
     let search_keywords = get_platform_keywords();
     let mut archives = Vec::new();

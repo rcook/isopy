@@ -1,4 +1,5 @@
 mod accept;
+mod checksum;
 mod context;
 mod download_options;
 mod file_name_parts;
@@ -8,6 +9,7 @@ mod package_version;
 mod sanitize;
 
 pub use accept::Accept;
+pub use checksum::Checksum;
 pub use context::Context;
 pub use download_options::DownloadOptions;
 pub use file_name_parts::FileNameParts;
