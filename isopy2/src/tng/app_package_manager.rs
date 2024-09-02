@@ -19,23 +19,42 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::python_package_manager::PythonPackageManager;
+use crate::tng::app_context::AppContext;
 use anyhow::Result;
-use async_trait::async_trait;
-use isopy_lib::tng::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use isopy_lib2::tng::{PackageManager, PackageVersion};
+use std::path::Path;
 
-pub(crate) struct PythonPackageManagerFactory;
-
-impl PythonPackageManagerFactory {
-    pub(crate) async fn new() -> Result<PackageManagerFactory> {
-        Ok(Box::new(Self))
-    }
+pub(crate) struct AppPackageManager {
+    ctx: AppContext,
+    inner: PackageManager,
 }
 
-#[async_trait]
-impl PackageManagerFactoryOps for PythonPackageManagerFactory {
-    async fn make_package_manager(&self, ctx: &dyn Context) -> Result<PackageManager> {
-        let package_manager = PythonPackageManager::new(ctx).await?;
-        Ok(Box::new(package_manager))
+impl AppPackageManager {
+    pub(crate) fn new(ctx: AppContext, inner: PackageManager) -> Self {
+        Self { ctx, inner }
+    }
+
+    #[allow(unused)]
+    pub(crate) async fn list_categories(&self) -> Result<()> {
+        self.inner.list_categories(&self.ctx).await?;
+        Ok(())
+    }
+
+    #[allow(unused)]
+    pub(crate) async fn list_packages(&self) -> Result<()> {
+        self.inner.list_packages(&self.ctx).await?;
+        Ok(())
+    }
+
+    #[allow(unused)]
+    pub(crate) async fn download_package(&self, version: &PackageVersion) -> Result<()> {
+        self.inner.download_package(&self.ctx, version).await?;
+        Ok(())
+    }
+
+    #[allow(unused)]
+    pub(crate) async fn install_package(&self, version: &PackageVersion, dir: &Path) -> Result<()> {
+        self.inner.install_package(&self.ctx, version, dir).await?;
+        Ok(())
     }
 }

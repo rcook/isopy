@@ -6,21 +6,22 @@ edition = "2021"
 homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
-name = "isopy-python"
+name = "isopy2"
 readme = "README.md"
-repository = "https://github.com/rcook/isopy-tng.git"
+repository = "https://github.com/rcook/isopy.git"
 version = "0.0.0"
 
 [dependencies]
 anyhow = "1.0.86"
 async-trait = "0.1.81"
-decompress = "0.6.0"
-include_dir = "0.7.4"
-isopy-lib = { path = "../isopy-lib" }
-regex = "1.10.6"
+chrono = "0.4.38"
+dirs = "5.0.1"
+isopy-java2 = { path = "../isopy-java2" }
+isopy-lib2 = { path = "../isopy-lib2" }
+isopy-python2 = { path = "../isopy-python2" }
+reqwest = { version = "0.12.7" }
+serde = { version = "1.0.209", features = ["derive"] }
 serde_json = "1.0.127"
-strum = { version = "0.26.3", features = ["strum_macros"] }
-strum_macros = "0.26.4"
 tokio = { version = "1.40.0", features = ["full"] }
 url = "2.5.2"
 

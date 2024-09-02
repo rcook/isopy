@@ -26,7 +26,7 @@ use crate::tng::file::File;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use isopy_lib::tng::{Context, DownloadOptions, FileNameParts};
+use isopy_lib2::tng::{Context, DownloadOptions, FileNameParts};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;

@@ -19,9 +19,39 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod tng;
+use anyhow::Result;
+use async_trait::async_trait;
+use isopy_lib2::tng::{Context, PackageManagerOps, PackageVersion};
+use std::path::Path;
 
-pub async fn get_package_manager_factory() -> anyhow::Result<isopy_lib::tng::PackageManagerFactory>
-{
-    Ok(crate::tng::JavaPackageManagerFactory::new().await?)
+pub(crate) struct JavaPackageManager {}
+
+impl JavaPackageManager {
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
+}
+
+#[async_trait]
+impl PackageManagerOps for JavaPackageManager {
+    async fn list_categories(&self, _ctx: &dyn Context) -> Result<()> {
+        todo!()
+    }
+
+    async fn list_packages(&self, _ctx: &dyn Context) -> Result<()> {
+        todo!()
+    }
+
+    async fn download_package(&self, _ctx: &dyn Context, _version: &PackageVersion) -> Result<()> {
+        todo!()
+    }
+
+    async fn install_package(
+        &self,
+        _ctx: &dyn Context,
+        _version: &PackageVersion,
+        _dir: &Path,
+    ) -> Result<()> {
+        todo!()
+    }
 }

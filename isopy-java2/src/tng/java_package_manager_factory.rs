@@ -19,55 +19,23 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app;
-mod app_context;
-mod app_package_manager;
-mod cache_info;
-mod consts;
-mod date_time_format;
-mod download;
-mod file;
-mod manifest;
-mod url_format;
+use crate::tng::java_package_manager::JavaPackageManager;
+use anyhow::Result;
+use async_trait::async_trait;
+use isopy_lib2::tng::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
 
-pub(crate) async fn run() -> anyhow::Result<()> {
-    use crate::tng::app::App;
-    use anyhow::anyhow;
-    use dirs::config_dir;
-    use isopy_lib::tng::PackageVersion;
-    use std::env::current_dir;
+pub(crate) struct JavaPackageManagerFactory;
 
-    let app = App::new(
-        &config_dir()
-            .ok_or_else(|| anyhow!("Could not determine config directory"))?
-            .join(".isopy-tng"),
-    )
-    .await?;
+impl JavaPackageManagerFactory {
+    pub(crate) async fn new() -> Result<PackageManagerFactory> {
+        Ok(Box::new(Self))
+    }
+}
 
-    let package_manager = app.get_package_manager("python").await?;
-
-    package_manager.list_categories().await?;
-
-    package_manager.list_packages().await?;
-
-    package_manager
-        .download_package(&PackageVersion {
-            major: 3,
-            minor: 12,
-            revision: 5,
-        })
-        .await?;
-
-    package_manager
-        .install_package(
-            &PackageVersion {
-                major: 3,
-                minor: 12,
-                revision: 5,
-            },
-            &current_dir()?.join("TEST"),
-        )
-        .await?;
-
-    Ok(())
+#[async_trait]
+impl PackageManagerFactoryOps for JavaPackageManagerFactory {
+    async fn make_package_manager(&self, _ctx: &dyn Context) -> Result<PackageManager> {
+        let package_manager = JavaPackageManager::new();
+        Ok(Box::new(package_manager))
+    }
 }

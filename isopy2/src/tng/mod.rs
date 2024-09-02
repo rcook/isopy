@@ -19,42 +19,55 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::app_context::AppContext;
-use anyhow::Result;
-use isopy_lib::tng::{PackageManager, PackageVersion};
-use std::path::Path;
+mod app;
+mod app_context;
+mod app_package_manager;
+mod cache_info;
+mod consts;
+mod date_time_format;
+mod download;
+mod file;
+mod manifest;
+mod url_format;
 
-pub(crate) struct AppPackageManager {
-    ctx: AppContext,
-    inner: PackageManager,
-}
+pub(crate) async fn run() -> anyhow::Result<()> {
+    use crate::tng::app::App;
+    use anyhow::anyhow;
+    use dirs::config_dir;
+    use isopy_lib2::tng::PackageVersion;
+    use std::env::current_dir;
 
-impl AppPackageManager {
-    pub(crate) fn new(ctx: AppContext, inner: PackageManager) -> Self {
-        Self { ctx, inner }
-    }
+    let app = App::new(
+        &config_dir()
+            .ok_or_else(|| anyhow!("Could not determine config directory"))?
+            .join(".isopy-tng"),
+    )
+    .await?;
 
-    #[allow(unused)]
-    pub(crate) async fn list_categories(&self) -> Result<()> {
-        self.inner.list_categories(&self.ctx).await?;
-        Ok(())
-    }
+    let package_manager = app.get_package_manager("python").await?;
 
-    #[allow(unused)]
-    pub(crate) async fn list_packages(&self) -> Result<()> {
-        self.inner.list_packages(&self.ctx).await?;
-        Ok(())
-    }
+    package_manager.list_categories().await?;
 
-    #[allow(unused)]
-    pub(crate) async fn download_package(&self, version: &PackageVersion) -> Result<()> {
-        self.inner.download_package(&self.ctx, version).await?;
-        Ok(())
-    }
+    package_manager.list_packages().await?;
 
-    #[allow(unused)]
-    pub(crate) async fn install_package(&self, version: &PackageVersion, dir: &Path) -> Result<()> {
-        self.inner.install_package(&self.ctx, version, dir).await?;
-        Ok(())
-    }
+    package_manager
+        .download_package(&PackageVersion {
+            major: 3,
+            minor: 12,
+            revision: 5,
+        })
+        .await?;
+
+    package_manager
+        .install_package(
+            &PackageVersion {
+                major: 3,
+                minor: 12,
+                revision: 5,
+            },
+            &current_dir()?.join("TEST"),
+        )
+        .await?;
+
+    Ok(())
 }

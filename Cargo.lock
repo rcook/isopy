@@ -900,36 +900,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f518f335dce6725a761382244631d86cf0ccb2863413590b31338feb467f9c3"
 
 [[package]]
-name = "isopy"
+name = "isopy-java2"
 version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "chrono",
- "dirs",
- "isopy-java",
- "isopy-lib",
- "isopy-python",
- "reqwest",
- "rstest",
- "serde",
- "serde_json",
- "tokio",
- "url",
-]
-
-[[package]]
-name = "isopy-java"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "isopy-lib",
+ "isopy-lib2",
  "rstest",
 ]
 
 [[package]]
-name = "isopy-lib"
+name = "isopy-lib2"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -943,19 +924,38 @@ dependencies = [
 ]
 
 [[package]]
-name = "isopy-python"
+name = "isopy-python2"
 version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-trait",
  "decompress",
  "include_dir",
- "isopy-lib",
+ "isopy-lib2",
  "regex",
  "rstest",
  "serde_json",
  "strum",
  "strum_macros",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "isopy2"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "dirs",
+ "isopy-java2",
+ "isopy-lib2",
+ "isopy-python2",
+ "reqwest",
+ "rstest",
+ "serde",
+ "serde_json",
  "tokio",
  "url",
 ]
