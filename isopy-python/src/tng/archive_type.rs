@@ -20,7 +20,8 @@ impl ArchiveType {
     }
 
     pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
-        decompress(archive_path, dir, &ExtractOptsBuilder::default().build()?)?;
+        let options = ExtractOptsBuilder::default().strip(1).build()?;
+        decompress(archive_path, dir, &options)?;
         Ok(())
     }
 }
