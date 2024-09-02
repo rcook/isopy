@@ -2,6 +2,7 @@ mod app;
 mod app_context;
 mod app_package_manager;
 mod cache_info;
+mod consts;
 mod date_time_format;
 mod download;
 mod file;

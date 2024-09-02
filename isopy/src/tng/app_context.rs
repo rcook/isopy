@@ -1,4 +1,5 @@
 use crate::tng::cache_info::CacheInfo;
+use crate::tng::consts::CACHE_FILE_NAME;
 use crate::tng::download::Download;
 use crate::tng::file::File;
 use anyhow::{anyhow, bail, Result};
@@ -12,8 +13,6 @@ use std::collections::HashMap;
 use std::fs::{create_dir_all, write};
 use std::path::{Path, PathBuf};
 use url::Url;
-
-const CACHE_FILE_NAME: &str = "cache.json";
 
 pub(crate) struct AppContext {
     cache_dir: PathBuf,

@@ -1,5 +1,6 @@
 use crate::tng::app_context::AppContext;
 use crate::tng::app_package_manager::AppPackageManager;
+use crate::tng::consts::{CACHE_DIR_NAME, JAVA_PACKAGE_MANAGER_NAME, PYTHON_PACKAGE_MANAGER_NAME};
 use anyhow::{anyhow, Result};
 use isopy_java::get_package_manager_factory as get_package_manager_factory_java;
 use isopy_lib::tng::PackageManagerFactory;
@@ -14,10 +15,16 @@ pub(crate) struct App {
 
 impl App {
     pub(crate) async fn new(config_dir: &Path) -> Result<Self> {
-        let cache_dir = config_dir.join("cache");
+        let cache_dir = config_dir.join(CACHE_DIR_NAME);
         let package_manager_factories = HashMap::from([
-            ("java", get_package_manager_factory_java().await?),
-            ("python", get_package_manager_factory_python().await?),
+            (
+                JAVA_PACKAGE_MANAGER_NAME,
+                get_package_manager_factory_java().await?,
+            ),
+            (
+                PYTHON_PACKAGE_MANAGER_NAME,
+                get_package_manager_factory_python().await?,
+            ),
         ]);
         Ok(Self {
             cache_dir,
