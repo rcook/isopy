@@ -2,9 +2,7 @@ use crate::tng::app_context::AppContext;
 use crate::tng::app_package_manager::AppPackageManager;
 use crate::tng::consts::{CACHE_DIR_NAME, JAVA_PACKAGE_MANAGER_NAME, PYTHON_PACKAGE_MANAGER_NAME};
 use anyhow::{anyhow, Result};
-use isopy_java::get_package_manager_factory as get_package_manager_factory_java;
 use isopy_lib::tng::PackageManagerFactory;
-use isopy_python::get_package_manager_factory as get_package_manager_factory_python;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -19,11 +17,11 @@ impl App {
         let package_manager_factories = HashMap::from([
             (
                 JAVA_PACKAGE_MANAGER_NAME,
-                get_package_manager_factory_java().await?,
+                isopy_java::get_package_manager_factory().await?,
             ),
             (
                 PYTHON_PACKAGE_MANAGER_NAME,
-                get_package_manager_factory_python().await?,
+                isopy_python::get_package_manager_factory().await?,
             ),
         ]);
         Ok(Self {
