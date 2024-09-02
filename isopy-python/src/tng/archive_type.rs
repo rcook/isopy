@@ -6,6 +6,7 @@ use strum_macros::EnumIter;
 pub(crate) enum ArchiveType {
     TarGz,
     TarZst,
+    Zip,
 }
 
 impl ArchiveType {
@@ -13,29 +14,16 @@ impl ArchiveType {
         match self {
             Self::TarGz => ".tar.gz",
             Self::TarZst => ".tar.zst",
+            Self::Zip => ".zip",
         }
     }
 
     pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
         match self {
-            Self::TarGz => Self::unpack_tar_gz(archive_path, dir),
-            Self::TarZst => Self::unpack_tar_zst(archive_path, dir),
+            Self::TarGz => crate::tng::tar_gz_archive::unpack(archive_path, dir).await?,
+            Self::TarZst => crate::tng::tar_zst_archive::unpack(archive_path, dir).await?,
+            Self::Zip => crate::tng::zip_archive::unpack(archive_path, dir).await?,
         }
-    }
-
-    fn unpack_tar_gz(archive_path: &Path, dir: &Path) -> Result<()> {
-        todo!(
-            "Unpack .tar.gz archive {} to {}",
-            archive_path.display(),
-            dir.display()
-        )
-    }
-
-    fn unpack_tar_zst(archive_path: &Path, dir: &Path) -> Result<()> {
-        todo!(
-            "Unpack .tar.zst archive {} to {}",
-            archive_path.display(),
-            dir.display()
-        )
+        Ok(())
     }
 }
