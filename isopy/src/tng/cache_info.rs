@@ -24,7 +24,6 @@ impl CacheInfo {
         Ok(Self { path, manifest })
     }
 
-    #[allow(unused)]
     pub(crate) fn save(&self) -> Result<()> {
         let f = File::create(&self.path)?;
         serde_json::to_writer_pretty(&f, &self.manifest)?;

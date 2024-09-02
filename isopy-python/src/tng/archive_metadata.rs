@@ -18,7 +18,6 @@ impl ArchiveMetadata {
         &self.name
     }
 
-    #[allow(unused)]
     pub(crate) fn archive_type(&self) -> &ArchiveType {
         &self.archive_type
     }

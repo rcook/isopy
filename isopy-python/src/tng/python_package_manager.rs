@@ -32,7 +32,9 @@ pub(crate) struct PythonPackageManager {
 
 impl PythonPackageManager {
     pub(crate) async fn new(ctx: &dyn Context) -> Result<Self> {
-        let path = ctx.download(&INDEX_URL, &DownloadOptions::json()).await?;
+        let path = ctx
+            .download_file(&INDEX_URL, &DownloadOptions::json())
+            .await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(Self { index })
@@ -168,16 +170,24 @@ impl PackageManagerOps for PythonPackageManager {
         let archive = Self::get_archive(&self.index, version)?;
         let checksum = get_checksum(&archive)?;
         let options = DownloadOptions::default().checksum(Some(checksum));
-        _ = ctx.download(archive.url(), &options).await?;
+        _ = ctx.download_file(archive.url(), &options).await?;
         Ok(())
     }
 
     async fn install_package(
         &self,
-        _ctx: &dyn Context,
-        _version: &PackageVersion,
-        _dir: &Path,
+        ctx: &dyn Context,
+        version: &PackageVersion,
+        dir: &Path,
     ) -> Result<()> {
-        todo!()
+        let archive = Self::get_archive(&self.index, version)?;
+        let archive_path = ctx.get_file(archive.url()).await?;
+        archive
+            .metadata()
+            .archive_type()
+            .unpack(&archive_path, dir)
+            .await?;
+        println!("{}", archive_path.display());
+        Ok(())
     }
 }

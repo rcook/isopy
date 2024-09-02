@@ -133,7 +133,7 @@ impl AppContext {
 
 #[async_trait]
 impl Context for AppContext {
-    async fn download(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
+    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {
                 return Ok(path);
@@ -153,5 +153,12 @@ impl Context for AppContext {
         self.update_cache(url, &path, &downloaded_at)?;
 
         Ok(path)
+    }
+
+    async fn get_file(&self, url: &Url) -> Result<PathBuf> {
+        match self.check_cache(url)? {
+            Some(path) => Ok(path),
+            _ => bail!("File at URL {url} not found in cache"),
+        }
     }
 }
