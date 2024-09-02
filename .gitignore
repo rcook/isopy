@@ -1,4 +1,1 @@
-/.isopy.yaml
-/target
-__pycache__/
-*.pyc
+/target/

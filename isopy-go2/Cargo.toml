@@ -1,0 +1,20 @@
+[package]
+authors = ["Richard Cook"]
+categories = ["development-tools"]
+description = "Isolated Python Tool"
+edition = "2021"
+homepage = "https://rcook.github.io/isopy"
+keywords = ["general"]
+license = "MIT"
+name = "isopy-go2"
+readme = "README.md"
+repository = "https://github.com/rcook/isopy.git"
+version = "0.0.0"
+
+[dependencies]
+anyhow = "1.0.86"
+async-trait = "0.1.81"
+isopy-lib2 = { path = "../isopy-lib2" }
+
+[dev-dependencies]
+rstest = "0.22.0"
