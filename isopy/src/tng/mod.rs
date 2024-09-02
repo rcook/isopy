@@ -19,9 +19,45 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod tng;
+#[allow(unused)]
+pub(crate) async fn run() -> anyhow::Result<()> {
+    use anyhow::anyhow;
+    use dirs::config_dir;
+    use isopy_internal::App;
+    use isopy_lib2::tng::PackageVersion;
+    use std::env::current_dir;
 
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    Ok(crate::tng::run().await?)
+    let app = App::new(
+        &config_dir()
+            .ok_or_else(|| anyhow!("Could not determine config directory"))?
+            .join(".isopy-tng"),
+    )
+    .await?;
+
+    let package_manager = app.get_package_manager("python").await?;
+
+    package_manager.list_categories().await?;
+
+    package_manager.list_packages().await?;
+
+    package_manager
+        .download_package(&PackageVersion {
+            major: 3,
+            minor: 12,
+            revision: 5,
+        })
+        .await?;
+
+    package_manager
+        .install_package(
+            &PackageVersion {
+                major: 3,
+                minor: 12,
+                revision: 5,
+            },
+            &current_dir()?.join("TEST"),
+        )
+        .await?;
+
+    Ok(())
 }

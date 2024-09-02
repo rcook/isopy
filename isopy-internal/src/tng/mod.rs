@@ -19,55 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::option_if_let_else)]
 mod app;
-mod args;
-mod bool_util;
-mod commands;
-mod constants;
-mod descriptor_info;
-mod dir_info_ext;
-mod env;
-mod fs;
-mod package_id;
-mod plugin_host;
-mod print;
-mod registry;
-mod run;
-mod serialization;
-mod shell;
-mod status;
-mod table;
-mod terminal;
-mod tng;
-mod unpack;
-mod wrapper_file_name;
+mod app_context;
+mod app_package_manager;
+mod cache_info;
+mod consts;
+mod date_time_format;
+mod download;
+mod file;
+mod manifest;
+mod url_format;
 
-#[tokio::main]
-async fn main() {
-    use crate::run::run;
-    use crate::status::{show_error, Status};
-    use std::process::exit;
-
-    exit(match run().await {
-        Ok(Status::Success) => 0,
-        Ok(Status::UserError) => 2,
-        Err(e) => {
-            show_error(&e);
-            1
-        }
-    })
-}
+pub use app::App;

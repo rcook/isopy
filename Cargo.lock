@@ -1225,6 +1225,7 @@ dependencies = [
  "clap_complete",
  "colored",
  "ctrlc",
+ "dirs",
  "exec",
  "flate2",
  "futures-util",
@@ -1232,8 +1233,10 @@ dependencies = [
  "include_dir",
  "indicatif",
  "isopy-go",
+ "isopy-internal",
  "isopy-java",
  "isopy-lib",
+ "isopy-lib2",
  "isopy-python",
  "joat-logger",
  "joat-repo",
@@ -1290,6 +1293,24 @@ dependencies = [
  "async-trait",
  "isopy-lib2",
  "rstest",
+]
+
+[[package]]
+name = "isopy-internal"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "isopy-java2",
+ "isopy-lib2",
+ "isopy-python2",
+ "reqwest",
+ "rstest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "url",
 ]
 
 [[package]]
@@ -1396,25 +1417,6 @@ dependencies = [
  "serde_json",
  "strum",
  "strum_macros",
- "tokio",
- "url",
-]
-
-[[package]]
-name = "isopy2"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "dirs",
- "isopy-java2",
- "isopy-lib2",
- "isopy-python2",
- "reqwest",
- "rstest",
- "serde",
- "serde_json",
  "tokio",
  "url",
 ]

@@ -6,7 +6,7 @@ edition = "2021"
 homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
-name = "isopy2"
+name = "isopy-internal"
 readme = "README.md"
 repository = "https://github.com/rcook/isopy.git"
 version = "0.0.0"
@@ -15,7 +15,6 @@ version = "0.0.0"
 anyhow = "1.0.86"
 async-trait = "0.1.81"
 chrono = "0.4.38"
-dirs = "5.0.1"
 isopy-java2 = { path = "../isopy-java2" }
 isopy-lib2 = { path = "../isopy-lib2" }
 isopy-python2 = { path = "../isopy-python2" }
