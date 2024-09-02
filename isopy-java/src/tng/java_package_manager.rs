@@ -12,6 +12,13 @@ impl JavaPackageManager {
 
 #[async_trait]
 impl PackageManagerOps for JavaPackageManager {
+    async fn list_categories(&self, _ctx: &dyn Context) -> Result<()> {
+        todo!()
+    }
+    async fn list_packages(&self, _ctx: &dyn Context) -> Result<()> {
+        todo!()
+    }
+
     async fn download_package(&self, _ctx: &dyn Context, _version: &PackageVersion) -> Result<()> {
         todo!()
     }

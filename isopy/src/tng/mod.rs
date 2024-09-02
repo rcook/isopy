@@ -5,29 +5,37 @@ mod date_time_format;
 mod download;
 mod file;
 mod manifest;
+mod package_manager_wrapper;
 mod url_format;
 
 pub(crate) async fn run() -> anyhow::Result<()> {
     use crate::tng::app::App;
     use anyhow::anyhow;
     use dirs::config_dir;
-    use isopy_lib::tng::PackageVersion;
 
-    App::new(
+    let app = App::new(
         &config_dir()
             .ok_or_else(|| anyhow!("Could not determine config directory"))?
             .join(".isopy-tng"),
     )
-    .await?
-    .download_package(
-        "python",
-        &PackageVersion {
-            major: 3,
-            minor: 12,
-            revision: 5,
-        },
-    )
     .await?;
+
+    let package_manager = app.get_package_manager("python").await?;
+
+    package_manager.list_categories().await?;
+
+    package_manager.list_packages().await?;
+
+    {
+        use isopy_lib::tng::PackageVersion;
+        package_manager
+            .download_package(&PackageVersion {
+                major: 3,
+                minor: 12,
+                revision: 5,
+            })
+            .await?;
+    }
 
     Ok(())
 }

@@ -1,4 +1,3 @@
-use crate::tng::app::App;
 use crate::tng::cache_info::CacheInfo;
 use crate::tng::download::Download;
 use crate::tng::file::File;
@@ -16,17 +15,17 @@ use url::Url;
 
 const CACHE_FILE_NAME: &str = "cache.json";
 
-pub(crate) struct AppContext<'a> {
-    #[allow(unused)]
-    app: &'a App,
+pub(crate) struct AppContext {
     cache_dir: PathBuf,
 }
 
-impl<'a> AppContext<'a> {
-    pub(crate) fn new(app: &'a App, name: &str) -> Self {
+impl AppContext {
+    pub(crate) fn new<P>(cache_dir: P) -> Self
+    where
+        P: Into<PathBuf>,
+    {
         Self {
-            app,
-            cache_dir: app.cache_dir().join(name),
+            cache_dir: cache_dir.into(),
         }
     }
 
@@ -134,7 +133,7 @@ impl<'a> AppContext<'a> {
 }
 
 #[async_trait]
-impl<'a> Context for AppContext<'a> {
+impl Context for AppContext {
     async fn download(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {
