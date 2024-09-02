@@ -6,6 +6,7 @@ use async_trait::async_trait;
 use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, PackageVersion};
 use serde_json::Value;
 use std::collections::HashSet;
+use std::path::Path;
 use std::sync::LazyLock;
 use tokio::fs::read_to_string;
 use url::Url;
@@ -169,5 +170,14 @@ impl PackageManagerOps for PythonPackageManager {
         let options = DownloadOptions::default().checksum(Some(checksum));
         _ = ctx.download(archive.url(), &options).await?;
         Ok(())
+    }
+
+    async fn install_package(
+        &self,
+        _ctx: &dyn Context,
+        _version: &PackageVersion,
+        _dir: &Path,
+    ) -> Result<()> {
+        todo!()
     }
 }

@@ -13,6 +13,8 @@ pub(crate) async fn run() -> anyhow::Result<()> {
     use crate::tng::app::App;
     use anyhow::anyhow;
     use dirs::config_dir;
+    use isopy_lib::tng::PackageVersion;
+    use std::env::current_dir;
 
     let app = App::new(
         &config_dir()
@@ -27,16 +29,24 @@ pub(crate) async fn run() -> anyhow::Result<()> {
 
     package_manager.list_packages().await?;
 
-    {
-        use isopy_lib::tng::PackageVersion;
-        package_manager
-            .download_package(&PackageVersion {
+    package_manager
+        .download_package(&PackageVersion {
+            major: 3,
+            minor: 12,
+            revision: 5,
+        })
+        .await?;
+
+    package_manager
+        .install_package(
+            &PackageVersion {
                 major: 3,
                 minor: 12,
                 revision: 5,
-            })
-            .await?;
-    }
+            },
+            &current_dir()?,
+        )
+        .await?;
 
     Ok(())
 }
