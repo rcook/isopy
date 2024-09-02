@@ -2,12 +2,12 @@ use crate::tng::app_context::AppContext;
 use anyhow::Result;
 use isopy_lib::tng::{PackageManager, PackageVersion};
 
-pub(crate) struct PackageManagerWrapper {
+pub(crate) struct AppPackageManager {
     ctx: AppContext,
     inner: PackageManager,
 }
 
-impl PackageManagerWrapper {
+impl AppPackageManager {
     pub(crate) fn new(ctx: AppContext, inner: PackageManager) -> Self {
         Self { ctx, inner }
     }

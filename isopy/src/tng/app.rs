@@ -1,5 +1,5 @@
 use crate::tng::app_context::AppContext;
-use crate::tng::package_manager_wrapper::PackageManagerWrapper;
+use crate::tng::app_package_manager::AppPackageManager;
 use anyhow::{anyhow, Result};
 use isopy_java::get_package_manager_factory as get_package_manager_factory_java;
 use isopy_lib::tng::PackageManagerFactory;
@@ -25,7 +25,7 @@ impl App {
         })
     }
 
-    pub(crate) async fn get_package_manager(&self, name: &str) -> Result<PackageManagerWrapper> {
+    pub(crate) async fn get_package_manager(&self, name: &str) -> Result<AppPackageManager> {
         let package_manager_factory = self
             .package_manager_factories
             .get(name)
@@ -33,6 +33,6 @@ impl App {
         let cache_dir = self.cache_dir.join(name);
         let ctx = AppContext::new(cache_dir);
         let package_manager = package_manager_factory.make_package_manager(&ctx).await?;
-        Ok(PackageManagerWrapper::new(ctx, package_manager))
+        Ok(AppPackageManager::new(ctx, package_manager))
     }
 }
