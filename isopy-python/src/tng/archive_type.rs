@@ -1,4 +1,5 @@
 use anyhow::Result;
+use decompress::{decompress, ExtractOptsBuilder};
 use std::path::Path;
 use strum_macros::EnumIter;
 
@@ -19,11 +20,7 @@ impl ArchiveType {
     }
 
     pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
-        match self {
-            Self::TarGz => crate::tng::tar_gz_archive::unpack(archive_path, dir).await?,
-            Self::TarZst => crate::tng::tar_zst_archive::unpack(archive_path, dir).await?,
-            Self::Zip => crate::tng::zip_archive::unpack(archive_path, dir).await?,
-        }
+        decompress(archive_path, dir, &ExtractOptsBuilder::default().build()?)?;
         Ok(())
     }
 }

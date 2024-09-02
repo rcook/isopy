@@ -44,7 +44,7 @@ pub(crate) async fn run() -> anyhow::Result<()> {
                 minor: 12,
                 revision: 5,
             },
-            &current_dir()?,
+            &current_dir()?.join("TEST"),
         )
         .await?;
 
