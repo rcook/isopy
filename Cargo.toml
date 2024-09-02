@@ -7,6 +7,7 @@ strip = true
 [workspace]
 members = [
   "isopy2",
+  "isopy-go2",
   "isopy-java2",
   "isopy-lib2",
   "isopy-python2",
