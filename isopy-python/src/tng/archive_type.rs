@@ -18,16 +18,24 @@ impl ArchiveType {
 
     pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
         match self {
-            Self::TarGz => todo!(
-                "Unpack .tar.gz archive {} to {}",
-                archive_path.display(),
-                dir.display()
-            ),
-            Self::TarZst => todo!(
-                "Unpack .tar.zst archive {} to {}",
-                archive_path.display(),
-                dir.display()
-            ),
+            Self::TarGz => Self::unpack_tar_gz(archive_path, dir),
+            Self::TarZst => Self::unpack_tar_zst(archive_path, dir),
         }
+    }
+
+    fn unpack_tar_gz(archive_path: &Path, dir: &Path) -> Result<()> {
+        todo!(
+            "Unpack .tar.gz archive {} to {}",
+            archive_path.display(),
+            dir.display()
+        )
+    }
+
+    fn unpack_tar_zst(archive_path: &Path, dir: &Path) -> Result<()> {
+        todo!(
+            "Unpack .tar.zst archive {} to {}",
+            archive_path.display(),
+            dir.display()
+        )
     }
 }
