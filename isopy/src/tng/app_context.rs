@@ -10,7 +10,7 @@ use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
 use std::collections::HashMap;
-use std::fs::{create_dir_all, write};
+use std::fs::{create_dir_all, remove_file, write};
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -146,6 +146,7 @@ impl Context for AppContext {
         Self::download_to_path(url, &path, &options).await?;
         if let Some(checksum) = &options.checksum {
             if !checksum.validate_file(&path).await? {
+                remove_file(&path)?;
                 bail!("Checksum validation of {} failed", path.display());
             }
         }
