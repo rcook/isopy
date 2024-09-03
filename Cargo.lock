@@ -1202,6 +1202,8 @@ name = "isopy"
 version = "0.3.25"
 dependencies = [
  "anyhow",
+ "async-trait",
+ "chrono",
  "clap",
  "clap_complete",
  "colored",
@@ -1211,11 +1213,12 @@ dependencies = [
  "flate2",
  "home",
  "isopy-go",
- "isopy-internal",
  "isopy-java",
+ "isopy-java2",
  "isopy-lib",
  "isopy-lib2",
  "isopy-python",
+ "isopy-python2",
  "joat-logger",
  "joat-repo",
  "joatmon",
@@ -1223,6 +1226,7 @@ dependencies = [
  "log",
  "openssl-sys",
  "path-absolutize",
+ "reqwest",
  "rstest",
  "same-file",
  "serde",
@@ -1262,23 +1266,6 @@ dependencies = [
  "async-trait",
  "isopy-lib2",
  "rstest",
-]
-
-[[package]]
-name = "isopy-internal"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "isopy-java2",
- "isopy-lib2",
- "isopy-python2",
- "reqwest",
- "rstest",
- "serde",
- "serde_json",
- "url",
 ]
 
 [[package]]

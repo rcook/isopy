@@ -19,27 +19,41 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#[allow(unused)]
+mod app;
+mod app_context;
+mod app_package_manager;
+mod cache_info;
+mod consts;
+mod date_time_format;
+mod download;
+mod file;
+mod manifest;
+
 pub(crate) async fn run() -> anyhow::Result<()> {
+    use crate::tng::app::App;
     use anyhow::anyhow;
     use dirs::config_dir;
-    use isopy_internal::App;
-    use isopy_lib2::tng::PackageVersion;
-    use std::env::current_dir;
 
-    let app = App::new(
+    let _app = App::new(
         &config_dir()
             .ok_or_else(|| anyhow!("Could not determine config directory"))?
             .join(".isopy-tng"),
     )
     .await?;
 
+    //demo(&app).await?;
+
+    Ok(())
+}
+
+#[allow(unused)]
+async fn demo(app: &crate::tng::app::App) -> anyhow::Result<()> {
+    use isopy_lib2::tng::PackageVersion;
+    use std::env::current_dir;
+
     let package_manager = app.get_package_manager("python").await?;
-
     package_manager.list_categories().await?;
-
     package_manager.list_packages().await?;
-
     package_manager
         .download_package(&PackageVersion {
             major: 3,
@@ -47,7 +61,6 @@ pub(crate) async fn run() -> anyhow::Result<()> {
             revision: 5,
         })
         .await?;
-
     package_manager
         .install_package(
             &PackageVersion {
