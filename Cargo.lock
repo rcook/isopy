@@ -1202,9 +1202,6 @@ name = "isopy"
 version = "0.3.25"
 dependencies = [
  "anyhow",
- "async-trait",
- "bytes",
- "chrono",
  "clap",
  "clap_complete",
  "colored",
@@ -1212,10 +1209,7 @@ dependencies = [
  "dirs",
  "exec",
  "flate2",
- "futures-util",
  "home",
- "include_dir",
- "indicatif",
  "isopy-go",
  "isopy-internal",
  "isopy-java",
@@ -1227,11 +1221,8 @@ dependencies = [
  "joatmon",
  "lazy_static",
  "log",
- "md5",
  "openssl-sys",
  "path-absolutize",
- "regex",
- "reqwest",
  "rstest",
  "same-file",
  "serde",
@@ -1239,12 +1230,9 @@ dependencies = [
  "serde_yaml",
  "sysinfo",
  "tar",
- "thiserror",
- "time",
  "tinytemplate",
  "tokio",
  "url",
- "uuid",
  "zip 2.2.0",
 ]
 
@@ -1259,14 +1247,11 @@ dependencies = [
  "joatmon",
  "lazy_static",
  "log",
- "percent-encoding",
  "reqwest",
- "rstest",
  "serde",
  "serde_json",
  "serde_yaml",
  "thiserror",
- "url",
 ]
 
 [[package]]
@@ -1293,7 +1278,6 @@ dependencies = [
  "rstest",
  "serde",
  "serde_json",
- "tokio",
  "url",
 ]
 
@@ -1357,7 +1341,6 @@ dependencies = [
  "async-trait",
  "hex",
  "rstest",
- "serde_json",
  "sha2",
  "tokio",
  "url",
