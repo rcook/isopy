@@ -87,6 +87,27 @@ impl PythonPackageManager {
         Ok(archives)
     }
 
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    fn get_platform_keywords() -> HashSet<String> {
+        HashSet::from([
+            String::from("aarch64"),
+            String::from("apple"),
+            String::from("darwin"),
+            String::from("install_only"),
+        ])
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+    fn get_platform_keywords() -> HashSet<String> {
+        HashSet::from([
+            String::from("x86_64"),
+            String::from("apple"),
+            String::from("darwin"),
+            String::from("install_only"),
+        ])
+    }
+
+    #[cfg(target_os = "windows")]
     fn get_platform_keywords() -> HashSet<String> {
         HashSet::from([
             String::from("x86_64"),

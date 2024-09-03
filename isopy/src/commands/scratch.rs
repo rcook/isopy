@@ -21,11 +21,12 @@
 //
 use crate::app::App;
 use crate::status::{return_success, Status};
+use crate::tng::run;
 use anyhow::Result;
 
 #[allow(clippy::unnecessary_wraps)]
 #[allow(clippy::unused_async)]
-pub async fn scratch(app: &App) -> Result<Status> {
-    println!("app={}", app.cwd().display());
+pub async fn scratch(_app: &App) -> Result<Status> {
+    run().await?;
     return_success!("this is a sample log message");
 }
