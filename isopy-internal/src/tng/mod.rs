@@ -28,6 +28,5 @@ mod date_time_format;
 mod download;
 mod file;
 mod manifest;
-mod url_format;
 
 pub use app::App;
