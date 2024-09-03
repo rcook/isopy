@@ -55,8 +55,6 @@ fn default_cache_dir() -> Option<PathBuf> {
 }
 
 pub async fn run() -> Result<Status> {
-    crate::tng::run().await?;
-
     set_up()?;
 
     let args = Args::parse();
@@ -80,7 +78,7 @@ pub async fn run() -> Result<Status> {
         None => current_dir()?,
     };
 
-    let app = App::new(args.offline, cwd, &cache_dir, repo);
+    let app = App::new(args.offline, cwd, &cache_dir, repo)?;
     do_it(app, args.command).await
 }
 

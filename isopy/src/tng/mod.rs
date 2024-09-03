@@ -29,21 +29,7 @@ mod download;
 mod file;
 mod manifest;
 
-pub(crate) async fn run() -> anyhow::Result<()> {
-    use crate::tng::app::App;
-    use anyhow::anyhow;
-    use dirs::config_dir;
-
-    let _app = App::new(
-        &config_dir()
-            .ok_or_else(|| anyhow!("Could not determine config directory"))?
-            .join(".isopy-tng"),
-    )?;
-
-    //demo(&app).await?;
-
-    Ok(())
-}
+pub use app::App;
 
 #[allow(unused)]
 async fn demo(app: &crate::tng::app::App) -> anyhow::Result<()> {

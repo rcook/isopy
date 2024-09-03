@@ -24,8 +24,10 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
+use crate::tng::App as AppTNG;
 use crate::unpack::unpack_file;
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
+use dirs::config_dir;
 use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
@@ -38,18 +40,25 @@ pub struct App {
     cache_dir: PathBuf,
     repo: Repo,
     project_config_path: PathBuf,
+    app_tng: AppTNG,
 }
 
 impl App {
-    pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Self {
+    pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-        Self {
+        let app_tng = AppTNG::new(
+            &config_dir()
+                .ok_or_else(|| anyhow!("Could not determine config directory"))?
+                .join(".isopy-tng"),
+        )?;
+        Ok(Self {
             offline,
             cwd,
             cache_dir: cache_dir.to_path_buf(),
             repo,
             project_config_path,
-        }
+            app_tng,
+        })
     }
 
     pub const fn offline(&self) -> bool {
@@ -222,6 +231,11 @@ impl App {
         };
 
         Ok(dir_info)
+    }
+
+    #[allow(unused)]
+    pub(crate) fn app_tng(&self) -> &AppTNG {
+        &self.app_tng
     }
 
     fn find_link_for_dir(&self, dir: &Path) -> Result<Option<Link>> {
