@@ -1213,6 +1213,7 @@ dependencies = [
  "flate2",
  "home",
  "isopy-go",
+ "isopy-go2",
  "isopy-java",
  "isopy-java2",
  "isopy-lib",

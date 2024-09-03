@@ -24,13 +24,7 @@ use async_trait::async_trait;
 use isopy_lib2::tng::{Context, PackageManagerOps, PackageVersion};
 use std::path::Path;
 
-pub(crate) struct JavaPackageManager {}
-
-impl JavaPackageManager {
-    pub(crate) fn new() -> Self {
-        Self {}
-    }
-}
+pub(crate) struct JavaPackageManager;
 
 #[async_trait]
 impl PackageManagerOps for JavaPackageManager {
@@ -53,5 +47,11 @@ impl PackageManagerOps for JavaPackageManager {
         _dir: &Path,
     ) -> Result<()> {
         todo!()
+    }
+}
+
+impl Default for JavaPackageManager {
+    fn default() -> Self {
+        Self
     }
 }

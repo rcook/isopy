@@ -24,13 +24,7 @@ use async_trait::async_trait;
 use isopy_lib2::tng::{Context, PackageManagerOps, PackageVersion};
 use std::path::Path;
 
-pub(crate) struct GoPackageManager {}
-
-impl GoPackageManager {
-    pub(crate) fn new() -> Self {
-        Self {}
-    }
-}
+pub(crate) struct GoPackageManager;
 
 #[async_trait]
 impl PackageManagerOps for GoPackageManager {
@@ -53,5 +47,11 @@ impl PackageManagerOps for GoPackageManager {
         _dir: &Path,
     ) -> Result<()> {
         todo!()
+    }
+}
+
+impl Default for GoPackageManager {
+    fn default() -> Self {
+        Self
     }
 }

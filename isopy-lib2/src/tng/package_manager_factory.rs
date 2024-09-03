@@ -19,14 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::context::Context;
 use crate::tng::package_manager::PackageManager;
-use anyhow::Result;
-use async_trait::async_trait;
 
-#[async_trait]
 pub trait PackageManagerFactoryOps: Sync {
-    async fn make_package_manager(&self, ctx: &dyn Context) -> Result<PackageManager>;
+    fn make_package_manager(&self) -> PackageManager;
 }
 
 pub type PackageManagerFactory = Box<dyn PackageManagerFactoryOps>;

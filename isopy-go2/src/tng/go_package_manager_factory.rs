@@ -20,22 +20,18 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::tng::go_package_manager::GoPackageManager;
-use anyhow::Result;
-use async_trait::async_trait;
-use isopy_lib2::tng::{Context, PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use isopy_lib2::tng::{PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
 
 pub(crate) struct GoPackageManagerFactory;
 
 impl GoPackageManagerFactory {
-    pub(crate) async fn new() -> Result<PackageManagerFactory> {
-        Ok(Box::new(Self))
+    pub(crate) fn new() -> PackageManagerFactory {
+        Box::new(Self)
     }
 }
 
-#[async_trait]
 impl PackageManagerFactoryOps for GoPackageManagerFactory {
-    async fn make_package_manager(&self, _ctx: &dyn Context) -> Result<PackageManager> {
-        let package_manager = GoPackageManager::new();
-        Ok(Box::new(package_manager))
+    fn make_package_manager(&self) -> PackageManager {
+        Box::new(GoPackageManager::default())
     }
 }

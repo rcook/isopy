@@ -21,7 +21,9 @@
 //
 use crate::tng::app_context::AppContext;
 use crate::tng::app_package_manager::AppPackageManager;
-use crate::tng::consts::{CACHE_DIR_NAME, JAVA_PACKAGE_MANAGER_NAME, PYTHON_PACKAGE_MANAGER_NAME};
+use crate::tng::consts::{
+    CACHE_DIR_NAME, GO_PACKAGE_MANAGER_NAME, JAVA_PACKAGE_MANAGER_NAME, PYTHON_PACKAGE_MANAGER_NAME,
+};
 use anyhow::{anyhow, Result};
 use isopy_lib2::tng::PackageManagerFactory;
 use std::collections::HashMap;
@@ -33,16 +35,20 @@ pub struct App {
 }
 
 impl App {
-    pub async fn new(config_dir: &Path) -> Result<Self> {
+    pub fn new(config_dir: &Path) -> Result<Self> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME);
         let package_manager_factories = HashMap::from([
             (
+                GO_PACKAGE_MANAGER_NAME,
+                isopy_go2::make_package_manager_factory(),
+            ),
+            (
                 JAVA_PACKAGE_MANAGER_NAME,
-                isopy_java2::get_package_manager_factory().await?,
+                isopy_java2::make_package_manager_factory(),
             ),
             (
                 PYTHON_PACKAGE_MANAGER_NAME,
-                isopy_python2::get_package_manager_factory().await?,
+                isopy_python2::make_package_manager_factory(),
             ),
         ]);
         Ok(Self {
@@ -58,7 +64,7 @@ impl App {
             .ok_or_else(|| anyhow!("No package manager factory with name {name}"))?;
         let cache_dir = self.cache_dir.join(name);
         let ctx = AppContext::new(cache_dir);
-        let package_manager = package_manager_factory.make_package_manager(&ctx).await?;
+        let package_manager = package_manager_factory.make_package_manager();
         Ok(AppPackageManager::new(ctx, package_manager))
     }
 }

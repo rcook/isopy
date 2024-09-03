@@ -38,8 +38,7 @@ pub(crate) async fn run() -> anyhow::Result<()> {
         &config_dir()
             .ok_or_else(|| anyhow!("Could not determine config directory"))?
             .join(".isopy-tng"),
-    )
-    .await?;
+    )?;
 
     //demo(&app).await?;
 
