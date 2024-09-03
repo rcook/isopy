@@ -14,7 +14,7 @@ version = "0.0.0"
 [dependencies]
 anyhow = "1.0.86"
 async-trait = "0.1.81"
-decompress = "0.6.0"
+decompress = { git = "https://github.com/rcook/decompress.git", rev = "bc4c5ec947ad10aa3330765ee5de23267d4d152d" }
 include_dir = "0.7.4"
 isopy-lib2 = { path = "../isopy-lib2" }
 regex = "1.10.6"
