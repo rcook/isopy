@@ -46,4 +46,6 @@ mod helper;
 mod result;
 mod serialization;
 
-pub use self::go_plugin_factory::GoPluginFactory;
+pub mod tng;
+
+pub use go_plugin_factory::GoPluginFactory;

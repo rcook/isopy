@@ -19,13 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod archive_full_version;
-mod archive_group;
-mod archive_info;
-mod archive_metadata;
-mod archive_type;
-mod checksum;
-mod python_package_manager;
-mod python_package_manager_factory;
+mod java_package_manager;
+mod java_package_manager_factory;
 
-pub(crate) use python_package_manager_factory::PythonPackageManagerFactory;
+pub(crate) use java_package_manager_factory::JavaPackageManagerFactory;
+
+pub fn make_package_manager_factory() -> isopy_lib::tng::PackageManagerFactory {
+    crate::tng::JavaPackageManagerFactory::new()
+}

@@ -40,15 +40,15 @@ impl App {
         let package_manager_factories = HashMap::from([
             (
                 GO_PACKAGE_MANAGER_NAME,
-                isopy_go2::make_package_manager_factory(),
+                isopy_go::tng::make_package_manager_factory(),
             ),
             (
                 JAVA_PACKAGE_MANAGER_NAME,
-                isopy_java2::make_package_manager_factory(),
+                isopy_java::tng::make_package_manager_factory(),
             ),
             (
                 PYTHON_PACKAGE_MANAGER_NAME,
-                isopy_python2::make_package_manager_factory(),
+                isopy_python::tng::make_package_manager_factory(),
             ),
         ]);
         Ok(Self {

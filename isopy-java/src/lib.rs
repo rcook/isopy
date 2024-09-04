@@ -44,4 +44,6 @@ mod maven_version_range;
 mod result;
 mod serialization;
 
-pub use self::java_plugin_factory::JavaPluginFactory;
+pub mod tng;
+
+pub use java_plugin_factory::JavaPluginFactory;

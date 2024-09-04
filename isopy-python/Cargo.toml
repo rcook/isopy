@@ -15,6 +15,7 @@ version = "0.3.25"
 anyhow = "1.0.86"
 async-trait = "0.1.81"
 bytes = "1.7.1"
+decompress = { git = "https://github.com/rcook/decompress.git", rev = "138bd44d10f0ced498a0e3f378c1caf54327b9bb" }
 include_dir = "0.7.4"
 isopy-lib = { path = "../isopy-lib" }
 joatmon = "0.0.34"
@@ -28,6 +29,7 @@ serde_yaml = "0.9.34"
 strum = "0.26.3"
 strum_macros = "0.26.4"
 thiserror = "1.0.63"
+tokio = { version = "1.40.0", features = ["full"] }
 url = { version = "2.5.2", features = ["serde"] }
 
 [dev-dependencies]

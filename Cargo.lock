@@ -1213,12 +1213,9 @@ dependencies = [
  "flate2",
  "home",
  "isopy-go",
- "isopy-go2",
  "isopy-java",
- "isopy-java2",
  "isopy-lib",
  "isopy-python",
- "isopy-python2",
  "joat-logger",
  "joat-repo",
  "joatmon",
@@ -1259,16 +1256,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "isopy-go2"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "isopy-lib",
- "rstest",
-]
-
-[[package]]
 name = "isopy-java"
 version = "0.3.25"
 dependencies = [
@@ -1287,16 +1274,6 @@ dependencies = [
  "serde_yaml",
  "thiserror",
  "url",
-]
-
-[[package]]
-name = "isopy-java2"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "isopy-lib",
- "rstest",
 ]
 
 [[package]]
@@ -1329,6 +1306,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bytes",
+ "decompress",
  "include_dir",
  "isopy-lib",
  "joatmon",
@@ -1343,23 +1321,6 @@ dependencies = [
  "strum",
  "strum_macros",
  "thiserror",
- "url",
-]
-
-[[package]]
-name = "isopy-python2"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "decompress",
- "include_dir",
- "isopy-lib",
- "regex",
- "rstest",
- "serde_json",
- "strum",
- "strum_macros",
  "tokio",
  "url",
 ]
@@ -2339,9 +2300,6 @@ name = "strum"
 version = "0.26.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8fec0f0aef304996cf250b31b5a10dee7980c85da9d759361292b8bca5a18f06"
-dependencies = [
- "strum_macros",
-]
 
 [[package]]
 name = "strum_macros"
