@@ -21,7 +21,7 @@
 //
 use crate::tng::app_context::AppContext;
 use anyhow::Result;
-use isopy_lib::tng::{PackageManager, PackageVersion};
+use isopy_lib::tng::{PackageManager, VersionTriple};
 use std::path::Path;
 
 pub(crate) struct AppPackageManager {
@@ -52,13 +52,13 @@ impl AppPackageManager {
     }
 
     #[allow(unused)]
-    pub(crate) async fn download_package(&self, version: &PackageVersion) -> Result<()> {
+    pub(crate) async fn download_package(&self, version: &VersionTriple) -> Result<()> {
         self.inner.download_package(&self.ctx, version).await?;
         Ok(())
     }
 
     #[allow(unused)]
-    pub(crate) async fn install_package(&self, version: &PackageVersion, dir: &Path) -> Result<()> {
+    pub(crate) async fn install_package(&self, version: &VersionTriple, dir: &Path) -> Result<()> {
         self.inner.install_package(&self.ctx, version, dir).await?;
         Ok(())
     }

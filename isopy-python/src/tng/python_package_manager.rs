@@ -24,7 +24,7 @@ use crate::tng::archive_metadata::ArchiveMetadata;
 use crate::tng::checksum::get_checksum;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, PackageVersion};
+use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, VersionTriple};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;
@@ -138,7 +138,7 @@ impl PythonPackageManager {
         ])
     }
 
-    fn get_archive(index: &Value, version: &PackageVersion) -> Result<ArchiveInfo> {
+    fn get_archive(index: &Value, version: &VersionTriple) -> Result<ArchiveInfo> {
         let keywords = Self::get_platform_keywords();
         let mut archives = Vec::new();
         for item in g!(index.as_array()) {
@@ -234,7 +234,7 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(())
     }
 
-    async fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
+    async fn download_package(&self, ctx: &dyn Context, version: &VersionTriple) -> Result<()> {
         let index = Self::get_index(ctx, false).await?;
         let archive = Self::get_archive(&index, version)?;
         let checksum = get_checksum(&archive)?;
@@ -246,7 +246,7 @@ impl PackageManagerOps for PythonPackageManager {
     async fn install_package(
         &self,
         ctx: &dyn Context,
-        version: &PackageVersion,
+        version: &VersionTriple,
         dir: &Path,
     ) -> Result<()> {
         let index = Self::get_index(ctx, false).await?;

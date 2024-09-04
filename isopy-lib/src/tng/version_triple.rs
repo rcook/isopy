@@ -24,19 +24,19 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct PackageVersion {
+pub struct VersionTriple {
     pub major: i32,
     pub minor: i32,
     pub revision: i32,
 }
 
-impl Display for PackageVersion {
+impl Display for VersionTriple {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}.{}.{}", self.major, self.minor, self.revision)
     }
 }
 
-impl FromStr for PackageVersion {
+impl FromStr for VersionTriple {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
@@ -59,13 +59,13 @@ impl FromStr for PackageVersion {
 
 #[cfg(test)]
 mod tests {
-    use crate::tng::package_version::PackageVersion;
+    use crate::tng::version_triple::VersionTriple;
     use anyhow::Result;
     use rstest::rstest;
 
     #[rstest]
-    #[case("1.2.3", PackageVersion { major: 1, minor: 2, revision: 3 })]
-    fn from_str(#[case] input: &str, #[case] expected: PackageVersion) -> Result<()> {
+    #[case("1.2.3", VersionTriple { major: 1, minor: 2, revision: 3 })]
+    fn from_str(#[case] input: &str, #[case] expected: VersionTriple) -> Result<()> {
         assert_eq!(expected, input.parse()?);
         Ok(())
     }
@@ -77,6 +77,6 @@ mod tests {
     #[case("1.2.3.4")]
     #[case("1.2.three")]
     fn from_str_fail(#[case] input: &str) {
-        assert!(input.parse::<PackageVersion>().is_err());
+        assert!(input.parse::<VersionTriple>().is_err());
     }
 }

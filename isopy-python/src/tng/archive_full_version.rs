@@ -21,12 +21,12 @@
 //
 use crate::tng::archive_group::ArchiveGroup;
 use anyhow::Result;
-use isopy_lib::tng::PackageVersion;
+use isopy_lib::tng::VersionTriple;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct ArchiveFullVersion {
-    pub(crate) version: PackageVersion,
+    pub(crate) version: VersionTriple,
     pub(crate) group: ArchiveGroup,
 }
 
