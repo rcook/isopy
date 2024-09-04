@@ -28,7 +28,7 @@ use crate::commands::package::{download as package_download, list as package_lis
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
 use crate::commands::{
-    check, completions, info, prompt, run as run_command, scratch, shell, update,
+    check, completions, download, info, prompt, run as run_command, scratch, shell, update,
 };
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
@@ -93,6 +93,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Check { clean, .. } => check(&app, clean),
         Completions { shell } => Ok(completions(shell)),
+        Download { package_id } => download(&app, &package_id).await,
         Env { command } => match command {
             EnvCommand::Delete { project_dir } => env_delete(&app, &project_dir).await,
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,

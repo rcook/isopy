@@ -115,6 +115,12 @@ pub enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
+    #[command(name = "download", about = "(Incubating feature) Download package")]
+    Download {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
     #[command(name = "env", about = "Environment commands")]
     Env {
         #[command(subcommand)]
@@ -175,7 +181,7 @@ pub enum Command {
         _no_verbose: bool,
     },
 
-    #[command(name = "update", about = "Update package indices")]
+    #[command(name = "update", about = "(Incubating feature) Update package indices")]
     Update {
         #[arg(help = "Package manager name to update")]
         name: Option<String>,

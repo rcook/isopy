@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{bail, Error, Result};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -27,6 +28,12 @@ pub struct PackageVersion {
     pub major: i32,
     pub minor: i32,
     pub revision: i32,
+}
+
+impl Display for PackageVersion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.revision)
+    }
 }
 
 impl FromStr for PackageVersion {

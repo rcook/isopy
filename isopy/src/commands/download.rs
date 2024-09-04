@@ -19,28 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod env;
-pub mod package;
-pub mod project;
-pub mod wrap;
+use crate::app::App;
+use crate::package_id::PackageId;
+use crate::status::{return_success, Status};
+use anyhow::Result;
+use log::info;
 
-mod check;
-mod completions;
-mod download;
-mod info;
-mod prompt;
-mod run;
-mod scratch;
-mod shell;
-mod update;
-
-pub use check::check;
-pub use completions::completions;
-pub use info::info;
-pub use prompt::prompt;
-pub use run::run;
-pub use scratch::scratch;
-pub use shell::shell;
-
-pub(crate) use download::download;
-pub(crate) use update::update;
+pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
+    let package_manager_name = package_id.plugin_host().prefix();
+    let package_manager = app.app_tng().get_package_manager(package_manager_name)?;
+    let version = package_id.descriptor().to_string().parse()?;
+    package_manager.download_package(&version).await?;
+    info!("Package {package_manager_name}:{version} is now available locally",);
+    return_success!();
+}
