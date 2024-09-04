@@ -28,8 +28,8 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use isopy_lib::tng::{Context, DownloadOptions, FileNameParts};
 use reqwest::header::{ACCEPT, USER_AGENT};
-use reqwest::Client;
-use reqwest::Url as ReqwestUrl;
+use reqwest::{Client, StatusCode};
+use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
 use std::fs::{create_dir_all, remove_file, write};
 use std::path::{Path, PathBuf};
@@ -67,6 +67,7 @@ impl AppContext {
         };
 
         let response = request.send().await?;
+        Self::error_for_github_rate_limit(&response)?;
         response.error_for_status_ref()?;
 
         let data = response.bytes().await?;
@@ -75,6 +76,50 @@ impl AppContext {
         println!("Downloaded {url}");
 
         Ok(())
+    }
+
+    fn error_for_github_rate_limit(response: &Response) -> Result<()> {
+        if response.status() != StatusCode::FORBIDDEN {
+            return Ok(());
+        }
+
+        let headers = response.headers();
+
+        if headers.get("x-github-request-id").is_none() {
+            return Ok(());
+        };
+
+        let Some(h) = headers.get("x-ratelimit-reset") else {
+            return Ok(());
+        };
+
+        let Ok(s) = h.to_str() else { return Ok(()) };
+
+        let Ok(reset_timestamp) = s.parse::<i64>() else {
+            return Ok(());
+        };
+
+        let Some(reset_date_time) = DateTime::<Utc>::from_timestamp(reset_timestamp, 0) else {
+            return Ok(());
+        };
+
+        let Some(h) = headers.get("x-ratelimit-remaining") else {
+            return Ok(());
+        };
+
+        let Ok(s) = h.to_str() else { return Ok(()) };
+
+        let Ok(value) = s.parse::<i32>() else {
+            return Ok(());
+        };
+
+        if value != 0 {
+            return Ok(());
+        }
+
+        bail!(
+            "GitHub rate limit was exceeded (limit resets at {reset_date_time}): please try again later!"
+        )
     }
 
     fn load_cache(&self) -> Result<CacheInfo> {
