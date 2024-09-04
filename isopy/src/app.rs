@@ -21,13 +21,13 @@
 //
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
+use crate::fs::default_config_dir;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
-use crate::tng::{App as AppTNG, CONFIG_DIR_NAME};
+use crate::tng::App as AppTNG;
 use crate::unpack::unpack_file;
-use anyhow::{anyhow, bail, Result};
-use dirs::config_dir;
+use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, Package, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
@@ -46,11 +46,7 @@ pub struct App {
 impl App {
     pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-        let app_tng = AppTNG::new(
-            &config_dir()
-                .ok_or_else(|| anyhow!("Could not determine config directory"))?
-                .join(CONFIG_DIR_NAME),
-        )?;
+        let app_tng = AppTNG::new(&default_config_dir()?)?;
         Ok(Self {
             offline,
             cwd,
