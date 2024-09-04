@@ -26,18 +26,19 @@ use crate::tng::consts::{
 };
 use anyhow::{anyhow, Result};
 use isopy_lib::tng::PackageManagerFactory;
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+
+pub(crate) type PackageManagerFactoryInfos = Vec<(&'static str, PackageManagerFactory)>;
 
 pub(crate) struct App {
     cache_dir: PathBuf,
-    package_manager_factories: HashMap<&'static str, PackageManagerFactory>,
+    package_manager_factories: PackageManagerFactoryInfos,
 }
 
 impl App {
     pub(crate) fn new(config_dir: &Path) -> Result<Self> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME);
-        let package_manager_factories = HashMap::from([
+        let package_manager_factories = Vec::from([
             (
                 GO_PACKAGE_MANAGER_NAME,
                 isopy_go::tng::make_package_manager_factory(),
@@ -57,10 +58,18 @@ impl App {
         })
     }
 
-    pub(crate) async fn get_package_manager(&self, name: &str) -> Result<AppPackageManager> {
-        let package_manager_factory = self
+    pub(crate) fn get_package_manager_factory_names(&self) -> Vec<String> {
+        self.package_manager_factories
+            .iter()
+            .map(|(n, _)| String::from(*n))
+            .collect()
+    }
+
+    pub(crate) fn get_package_manager(&self, name: &str) -> Result<AppPackageManager> {
+        let (_, package_manager_factory) = self
             .package_manager_factories
-            .get(name)
+            .iter()
+            .find(|(n, _)| *n == name)
             .ok_or_else(|| anyhow!("No package manager factory with name {name}"))?;
         let cache_dir = self.cache_dir.join(name);
         let ctx = AppContext::new(cache_dir);

@@ -19,43 +19,30 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
+use crate::status::{return_success, Status};
+use crate::tng::AppPackageManager;
 use anyhow::Result;
-use async_trait::async_trait;
-use isopy_lib::tng::{Context, PackageManagerOps, PackageVersion};
-use std::path::Path;
+use log::info;
 
-pub(crate) struct GoPackageManager;
-
-#[async_trait]
-impl PackageManagerOps for GoPackageManager {
-    async fn update_index(&self, _ctx: &dyn Context) -> Result<()> {
+pub(crate) async fn update(app: &App, name: &Option<String>) -> Result<Status> {
+    async fn update_index(name: &str, package_manager: &AppPackageManager) -> Result<()> {
+        package_manager.update_index().await?;
+        info!("Updated index for package manager {name}");
         Ok(())
     }
 
-    async fn list_categories(&self, _ctx: &dyn Context) -> Result<()> {
-        todo!()
+    match name {
+        Some(n) => {
+            let package_manager = app.app_tng().get_package_manager(n)?;
+            update_index(n, &package_manager).await?;
+        }
+        None => {
+            for n in app.app_tng().get_package_manager_factory_names() {
+                let package_manager = app.app_tng().get_package_manager(&n)?;
+                update_index(&n, &package_manager).await?;
+            }
+        }
     }
-
-    async fn list_packages(&self, _ctx: &dyn Context) -> Result<()> {
-        todo!()
-    }
-
-    async fn download_package(&self, _ctx: &dyn Context, _version: &PackageVersion) -> Result<()> {
-        todo!()
-    }
-
-    async fn install_package(
-        &self,
-        _ctx: &dyn Context,
-        _version: &PackageVersion,
-        _dir: &Path,
-    ) -> Result<()> {
-        todo!()
-    }
-}
-
-impl Default for GoPackageManager {
-    fn default() -> Self {
-        Self
-    }
+    return_success!();
 }

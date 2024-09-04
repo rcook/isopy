@@ -27,7 +27,9 @@ use crate::commands::env::{
 use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
-use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
+use crate::commands::{
+    check, completions, info, prompt, run as run_command, scratch, shell, update,
+};
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
 use crate::status::Status;
@@ -121,6 +123,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
+        Update { name } => update(&app, &name).await,
         Wrap {
             wrapper_file_name,
             script_path,

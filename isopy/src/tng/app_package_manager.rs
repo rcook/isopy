@@ -24,7 +24,7 @@ use anyhow::Result;
 use isopy_lib::tng::{PackageManager, PackageVersion};
 use std::path::Path;
 
-pub struct AppPackageManager {
+pub(crate) struct AppPackageManager {
     ctx: AppContext,
     inner: PackageManager,
 }
@@ -34,26 +34,31 @@ impl AppPackageManager {
         Self { ctx, inner }
     }
 
+    pub(crate) async fn update_index(&self) -> Result<()> {
+        self.inner.update_index(&self.ctx).await?;
+        Ok(())
+    }
+
     #[allow(unused)]
-    pub async fn list_categories(&self) -> Result<()> {
+    pub(crate) async fn list_categories(&self) -> Result<()> {
         self.inner.list_categories(&self.ctx).await?;
         Ok(())
     }
 
     #[allow(unused)]
-    pub async fn list_packages(&self) -> Result<()> {
+    pub(crate) async fn list_packages(&self) -> Result<()> {
         self.inner.list_packages(&self.ctx).await?;
         Ok(())
     }
 
     #[allow(unused)]
-    pub async fn download_package(&self, version: &PackageVersion) -> Result<()> {
+    pub(crate) async fn download_package(&self, version: &PackageVersion) -> Result<()> {
         self.inner.download_package(&self.ctx, version).await?;
         Ok(())
     }
 
     #[allow(unused)]
-    pub async fn install_package(&self, version: &PackageVersion, dir: &Path) -> Result<()> {
+    pub(crate) async fn install_package(&self, version: &PackageVersion, dir: &Path) -> Result<()> {
         self.inner.install_package(&self.ctx, version, dir).await?;
         Ok(())
     }

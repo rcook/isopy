@@ -175,6 +175,12 @@ pub enum Command {
         _no_verbose: bool,
     },
 
+    #[command(name = "update", about = "Update package indices")]
+    Update {
+        #[arg(help = "Package manager name to update")]
+        name: Option<String>,
+    },
+
     #[command(
         name = "wrap",
         about = "Generate environment wrapper script in bin directory for script"

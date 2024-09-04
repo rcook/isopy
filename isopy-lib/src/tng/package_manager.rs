@@ -27,6 +27,7 @@ use std::path::Path;
 
 #[async_trait]
 pub trait PackageManagerOps: Send + Sync {
+    async fn update_index(&self, ctx: &dyn Context) -> Result<()>;
     async fn list_categories(&self, ctx: &dyn Context) -> Result<()>;
     async fn list_packages(&self, ctx: &dyn Context) -> Result<()>;
     async fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()>;

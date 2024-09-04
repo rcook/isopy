@@ -31,11 +31,14 @@ mod prompt;
 mod run;
 mod scratch;
 mod shell;
+mod update;
 
-pub use self::check::check;
-pub use self::completions::completions;
-pub use self::info::info;
-pub use self::prompt::prompt;
-pub use self::run::run;
-pub use self::scratch::scratch;
-pub use self::shell::shell;
+pub use check::check;
+pub use completions::completions;
+pub use info::info;
+pub use prompt::prompt;
+pub use run::run;
+pub use scratch::scratch;
+pub use shell::shell;
+
+pub(crate) use update::update;

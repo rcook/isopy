@@ -30,6 +30,7 @@ mod file;
 mod manifest;
 
 pub(crate) use app::App;
+pub(crate) use app_package_manager::AppPackageManager;
 pub(crate) use consts::CONFIG_DIR_NAME;
 
 #[allow(unused)]
@@ -37,7 +38,7 @@ async fn demo(app: &crate::tng::app::App) -> anyhow::Result<()> {
     use isopy_lib::tng::PackageVersion;
     use std::env::current_dir;
 
-    let package_manager = app.get_package_manager("python").await?;
+    let package_manager = app.get_package_manager("python")?;
     package_manager.list_categories().await?;
     package_manager.list_packages().await?;
     package_manager

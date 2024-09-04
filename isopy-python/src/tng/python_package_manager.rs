@@ -50,10 +50,9 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
 pub(crate) struct PythonPackageManager;
 
 impl PythonPackageManager {
-    async fn get_index(ctx: &dyn Context) -> Result<Value> {
-        let path = ctx
-            .download_file(&INDEX_URL, &DownloadOptions::json())
-            .await?;
+    async fn get_index(ctx: &dyn Context, update: bool) -> Result<Value> {
+        let options = DownloadOptions::json().update(update);
+        let path = ctx.download_file(&INDEX_URL, &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)
@@ -164,10 +163,15 @@ impl PythonPackageManager {
 
 #[async_trait]
 impl PackageManagerOps for PythonPackageManager {
+    async fn update_index(&self, ctx: &dyn Context) -> Result<()> {
+        Self::get_index(ctx, true).await?;
+        Ok(())
+    }
+
     async fn list_categories(&self, ctx: &dyn Context) -> Result<()> {
         let mut groups = HashSet::new();
         let mut keywords = HashSet::new();
-        let index = Self::get_index(ctx).await?;
+        let index = Self::get_index(ctx, false).await?;
         for item in g!(index.as_array()) {
             groups.insert(g!(g!(item.get("tag_name")).as_str()));
             for archive in Self::get_archives(item)? {
@@ -209,7 +213,7 @@ impl PackageManagerOps for PythonPackageManager {
     async fn list_packages(&self, ctx: &dyn Context) -> Result<()> {
         let platform_keywords = Self::get_platform_keywords();
         let mut archives = Vec::new();
-        let index = Self::get_index(ctx).await?;
+        let index = Self::get_index(ctx, false).await?;
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
                 if archive
@@ -231,7 +235,7 @@ impl PackageManagerOps for PythonPackageManager {
     }
 
     async fn download_package(&self, ctx: &dyn Context, version: &PackageVersion) -> Result<()> {
-        let index = Self::get_index(ctx).await?;
+        let index = Self::get_index(ctx, false).await?;
         let archive = Self::get_archive(&index, version)?;
         let checksum = get_checksum(&archive)?;
         let options = DownloadOptions::default().checksum(Some(checksum));
@@ -245,7 +249,7 @@ impl PackageManagerOps for PythonPackageManager {
         version: &PackageVersion,
         dir: &Path,
     ) -> Result<()> {
-        let index = Self::get_index(ctx).await?;
+        let index = Self::get_index(ctx, false).await?;
         let archive = Self::get_archive(&index, version)?;
         let archive_path = ctx.get_file(archive.url()).await?;
         archive

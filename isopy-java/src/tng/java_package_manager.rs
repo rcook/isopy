@@ -28,6 +28,10 @@ pub(crate) struct JavaPackageManager;
 
 #[async_trait]
 impl PackageManagerOps for JavaPackageManager {
+    async fn update_index(&self, _ctx: &dyn Context) -> Result<()> {
+        Ok(())
+    }
+
     async fn list_categories(&self, _ctx: &dyn Context) -> Result<()> {
         todo!()
     }
