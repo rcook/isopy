@@ -25,7 +25,7 @@ use crate::tng::consts::{
     CACHE_DIR_NAME, GO_PACKAGE_MANAGER_NAME, JAVA_PACKAGE_MANAGER_NAME, PYTHON_PACKAGE_MANAGER_NAME,
 };
 use anyhow::{anyhow, Result};
-use isopy_lib2::tng::PackageManagerFactory;
+use isopy_lib::tng::PackageManagerFactory;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 

@@ -21,7 +21,7 @@
 //
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_lib2::tng::{Context, PackageManagerOps, PackageVersion};
+use isopy_lib::tng::{Context, PackageManagerOps, PackageVersion};
 use std::path::Path;
 
 pub(crate) struct JavaPackageManager;

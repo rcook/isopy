@@ -27,7 +27,6 @@ isopy-go2 = { path = "../isopy-go2" }
 isopy-java = { path = "../isopy-java" }
 isopy-java2 = { path = "../isopy-java2" }
 isopy-lib = { path = "../isopy-lib" }
-isopy-lib2 = { path = "../isopy-lib2" }
 isopy-python = { path = "../isopy-python" }
 isopy-python2 = { path = "../isopy-python2" }
 joat-logger = "0.0.5"

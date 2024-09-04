@@ -21,7 +21,7 @@
 //
 use crate::tng::app_context::AppContext;
 use anyhow::Result;
-use isopy_lib2::tng::{PackageManager, PackageVersion};
+use isopy_lib::tng::{PackageManager, PackageVersion};
 use std::path::Path;
 
 pub struct AppPackageManager {

@@ -34,7 +34,7 @@ pub(crate) use consts::CONFIG_DIR_NAME;
 
 #[allow(unused)]
 async fn demo(app: &crate::tng::app::App) -> anyhow::Result<()> {
-    use isopy_lib2::tng::PackageVersion;
+    use isopy_lib::tng::PackageVersion;
     use std::env::current_dir;
 
     let package_manager = app.get_package_manager("python").await?;

@@ -1217,7 +1217,6 @@ dependencies = [
  "isopy-java",
  "isopy-java2",
  "isopy-lib",
- "isopy-lib2",
  "isopy-python",
  "isopy-python2",
  "joat-logger",
@@ -1265,7 +1264,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "isopy-lib2",
+ "isopy-lib",
  "rstest",
 ]
 
@@ -1296,7 +1295,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "isopy-lib2",
+ "isopy-lib",
  "rstest",
 ]
 
@@ -1319,17 +1318,6 @@ dependencies = [
  "serde_json",
  "sha2",
  "thiserror",
-]
-
-[[package]]
-name = "isopy-lib2"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "hex",
- "rstest",
- "sha2",
  "tokio",
  "url",
 ]
@@ -1366,7 +1354,7 @@ dependencies = [
  "async-trait",
  "decompress",
  "include_dir",
- "isopy-lib2",
+ "isopy-lib",
  "regex",
  "rstest",
  "serde_json",

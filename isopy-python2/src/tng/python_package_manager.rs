@@ -24,7 +24,7 @@ use crate::tng::archive_metadata::ArchiveMetadata;
 use crate::tng::checksum::get_checksum;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
-use isopy_lib2::tng::{Context, DownloadOptions, PackageManagerOps, PackageVersion};
+use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, PackageVersion};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;

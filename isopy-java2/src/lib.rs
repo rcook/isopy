@@ -21,6 +21,6 @@
 //
 mod tng;
 
-pub fn make_package_manager_factory() -> isopy_lib2::tng::PackageManagerFactory {
+pub fn make_package_manager_factory() -> isopy_lib::tng::PackageManagerFactory {
     crate::tng::JavaPackageManagerFactory::new()
 }

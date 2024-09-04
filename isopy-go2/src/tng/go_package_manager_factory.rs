@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::tng::go_package_manager::GoPackageManager;
-use isopy_lib2::tng::{PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use isopy_lib::tng::{PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
 
 pub(crate) struct GoPackageManagerFactory;
 
