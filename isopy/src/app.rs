@@ -24,7 +24,7 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
-use crate::tng::App as AppTNG;
+use crate::tng::{App as AppTNG, CONFIG_DIR_NAME};
 use crate::unpack::unpack_file;
 use anyhow::{anyhow, bail, Result};
 use dirs::config_dir;
@@ -49,7 +49,7 @@ impl App {
         let app_tng = AppTNG::new(
             &config_dir()
                 .ok_or_else(|| anyhow!("Could not determine config directory"))?
-                .join(".isopy-tng"),
+                .join(CONFIG_DIR_NAME),
         )?;
         Ok(Self {
             offline,

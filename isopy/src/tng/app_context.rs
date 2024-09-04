@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::tng::cache_info::CacheInfo;
-use crate::tng::consts::CACHE_FILE_NAME;
+use crate::tng::consts::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::tng::download::Download;
 use crate::tng::file::File;
 use anyhow::{anyhow, bail, Result};
@@ -60,7 +60,7 @@ impl AppContext {
 
         let mut request = Client::new()
             .get(ReqwestUrl::parse(url.as_str())?)
-            .header(USER_AGENT, "isopy-tng");
+            .header(USER_AGENT, ISOPY_USER_AGENT);
 
         if let Some(accept) = &options.accept {
             request = request.header(ACCEPT, accept.as_str())

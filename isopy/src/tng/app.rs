@@ -29,13 +29,13 @@ use isopy_lib2::tng::PackageManagerFactory;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-pub struct App {
+pub(crate) struct App {
     cache_dir: PathBuf,
     package_manager_factories: HashMap<&'static str, PackageManagerFactory>,
 }
 
 impl App {
-    pub fn new(config_dir: &Path) -> Result<Self> {
+    pub(crate) fn new(config_dir: &Path) -> Result<Self> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME);
         let package_manager_factories = HashMap::from([
             (
@@ -57,7 +57,7 @@ impl App {
         })
     }
 
-    pub async fn get_package_manager(&self, name: &str) -> Result<AppPackageManager> {
+    pub(crate) async fn get_package_manager(&self, name: &str) -> Result<AppPackageManager> {
         let package_manager_factory = self
             .package_manager_factories
             .get(name)

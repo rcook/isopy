@@ -29,7 +29,8 @@ mod download;
 mod file;
 mod manifest;
 
-pub use app::App;
+pub(crate) use app::App;
+pub(crate) use consts::CONFIG_DIR_NAME;
 
 #[allow(unused)]
 async fn demo(app: &crate::tng::app::App) -> anyhow::Result<()> {
