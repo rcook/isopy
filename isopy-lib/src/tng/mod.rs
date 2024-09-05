@@ -21,9 +21,9 @@
 //
 mod accept;
 mod checksum;
-mod context;
 mod download_options;
 mod file_name_parts;
+mod host;
 mod manager;
 mod plugin;
 mod sanitize;
@@ -32,9 +32,9 @@ mod version_triple;
 
 pub use accept::Accept;
 pub use checksum::Checksum;
-pub use context::{Context, ContextOps};
 pub use download_options::DownloadOptions;
 pub use file_name_parts::FileNameParts;
+pub use host::{Host, HostOps};
 pub use manager::{Manager, ManagerOps};
 pub use plugin::{Plugin, PluginOps};
 pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};

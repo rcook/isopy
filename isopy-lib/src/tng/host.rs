@@ -27,9 +27,9 @@ use std::sync::Arc;
 use url::Url;
 
 #[async_trait]
-pub trait ContextOps: Send + Sync {
+pub trait HostOps: Send + Sync {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-pub type Context = Arc<Box<dyn ContextOps>>;
+pub type Host = Arc<Box<dyn HostOps>>;

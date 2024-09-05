@@ -24,7 +24,7 @@ use crate::tng::consts::{
     CACHE_DIR_NAME, GO_PLUGIN_MONIKER, JAVA_PLUGIN_MONIKER, PYTHON_PLUGIN_MONIKER,
 };
 use anyhow::{anyhow, Result};
-use isopy_lib::tng::{Context, Plugin};
+use isopy_lib::tng::{Host, Plugin};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
@@ -43,7 +43,7 @@ impl PluginManager {
                 me: &Weak<PluginManager>,
                 moniker: &'static str,
                 cache_dir: &Path,
-                make: fn(Context) -> Plugin,
+                make: fn(Host) -> Plugin,
             ) -> PluginInfo {
                 (
                     moniker,

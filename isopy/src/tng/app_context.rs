@@ -27,7 +27,7 @@ use crate::tng::plugin_manager::PluginManager;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use isopy_lib::tng::{Context, ContextOps, DownloadOptions, FileNameParts};
+use isopy_lib::tng::{DownloadOptions, FileNameParts, Host, HostOps};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use reqwest::{Response, Url as ReqwestUrl};
@@ -48,7 +48,7 @@ impl AppContext {
         app: Weak<PluginManager>,
         moniker: S,
         cache_dir: P,
-    ) -> Context {
+    ) -> Host {
         Arc::new(Box::new(Self {
             _app: app,
             _moniker: moniker.into(),
@@ -205,7 +205,7 @@ impl AppContext {
 }
 
 #[async_trait]
-impl ContextOps for AppContext {
+impl HostOps for AppContext {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {

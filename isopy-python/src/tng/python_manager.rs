@@ -24,7 +24,7 @@ use crate::tng::archive_metadata::ArchiveMetadata;
 use crate::tng::checksum::get_checksum;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{Context, DownloadOptions, ManagerOps, Version, VersionTriple};
+use isopy_lib::tng::{Host, DownloadOptions, ManagerOps, Version, VersionTriple};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;
@@ -48,11 +48,11 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
 });
 
 pub(crate) struct PythonManager {
-    ctx: Context,
+    ctx: Host,
 }
 
 impl PythonManager {
-    pub(crate) fn new(ctx: Context) -> Self {
+    pub(crate) fn new(ctx: Host) -> Self {
         Self { ctx }
     }
 
