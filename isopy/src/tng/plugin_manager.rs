@@ -28,6 +28,8 @@ use isopy_lib::tng::{Host, PackageManager, Plugin};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
+use super::Moniker;
+
 type PluginInfo = (&'static str, Plugin);
 
 type PluginInfos = Vec<PluginInfo>;
@@ -71,10 +73,12 @@ impl PluginManager {
 
     pub(crate) fn new_package_manager(
         &self,
-        moniker: &str,
+        moniker: &Moniker,
         config_dir: &Path,
     ) -> Result<PackageManager> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker);
-        Ok(self.get_plugin(moniker)?.new_package_manager(&cache_dir))
+        Ok(self
+            .get_plugin(moniker.to_str())?
+            .new_package_manager(&cache_dir))
     }
 }

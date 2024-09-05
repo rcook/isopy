@@ -26,13 +26,15 @@ use isopy_lib::tng::Version;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
+use super::Moniker;
+
 pub(crate) struct PackageId {
-    moniker: String,
+    moniker: Moniker,
     version: Version,
 }
 
 impl PackageId {
-    pub(crate) fn moniker(&self) -> &str {
+    pub(crate) fn moniker(&self) -> &Moniker {
         &self.moniker
     }
 
@@ -45,23 +47,22 @@ impl FromStr for PackageId {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
-        let Some((moniker, version_str)) = s.split_once(':') else {
+        let Some((moniker_str, version_str)) = s.split_once(':') else {
             bail!("Invalid package ID {s}")
         };
 
-        let plugin_manager = PluginManager::new();
-        let Ok(plugin) = plugin_manager.get_plugin(moniker) else {
-            bail!("Unknown plugin moniker {moniker}");
+        let Ok(moniker) = moniker_str.parse::<Moniker>() else {
+            bail!("Unknown plugin moniker {moniker_str}");
         };
+
+        let plugin_manager = PluginManager::new();
+        let plugin = plugin_manager.get_plugin(moniker.to_str())?;
 
         let Ok(version) = plugin.parse_version(version_str) else {
             bail!("Invalid version string {s} for plugin {moniker}");
         };
 
-        Ok(Self {
-            moniker: String::from(moniker),
-            version,
-        })
+        Ok(Self { moniker, version })
     }
 }
 

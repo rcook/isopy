@@ -21,6 +21,7 @@
 //
 use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME, ISOPY_OFFLINE_ENV_NAME};
 use crate::package_id::PackageId;
+use crate::tng::Moniker;
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell as ClapCompleteShell;
@@ -184,7 +185,7 @@ pub enum Command {
     #[command(name = "update", about = "(Incubating feature) Update package indices")]
     Update {
         #[arg(help = "Moniker of package manager to update")]
-        moniker: Option<String>,
+        moniker: Option<Moniker>,
     },
 
     #[command(

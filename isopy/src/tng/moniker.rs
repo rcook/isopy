@@ -22,9 +22,17 @@
 use crate::tng::plugin_manager::PluginManager;
 use anyhow::{bail, Error, Result};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::path::Path;
 use std::str::FromStr;
 
+#[derive(Clone, Debug)]
 pub(crate) struct Moniker(String);
+
+impl Moniker {
+    pub(crate) fn to_str(&self) -> &str {
+        &self.0
+    }
+}
 
 impl FromStr for Moniker {
     type Err = Error;
@@ -41,5 +49,11 @@ impl FromStr for Moniker {
 impl Display for Moniker {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
+    }
+}
+
+impl AsRef<Path> for Moniker {
+    fn as_ref(&self) -> &Path {
+        Path::new(&self.0)
     }
 }

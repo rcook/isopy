@@ -21,11 +21,12 @@
 //
 use crate::app::App;
 use crate::status::{return_success, Status};
+use crate::tng::Moniker;
 use anyhow::Result;
 use log::info;
 
-pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status> {
-    async fn update_index(app: &App, moniker: &str) -> Result<()> {
+pub(crate) async fn update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+    async fn update_index(app: &App, moniker: &Moniker) -> Result<()> {
         app.plugin_manager()
             .new_package_manager(moniker, app.config_dir())?
             .update_index()
@@ -39,8 +40,8 @@ pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status
             update_index(app, &moniker).await?;
         }
         None => {
-            for moniker in app.plugin_manager().get_plugin_monikers() {
-                update_index(app, &moniker).await?;
+            for s in app.plugin_manager().get_plugin_monikers() {
+                update_index(app, &s.parse()?).await?;
             }
         }
     }
