@@ -25,11 +25,8 @@ mod archive_info;
 mod archive_metadata;
 mod archive_type;
 mod checksum;
-mod python_package_manager;
-mod python_package_manager_factory;
+mod entrypoint;
+mod python_manager;
+mod python_plugin;
 
-pub(crate) use python_package_manager_factory::PythonPackageManagerFactory;
-
-pub fn make_package_manager_factory() -> isopy_lib::tng::PackageManagerFactory {
-    crate::tng::PythonPackageManagerFactory::new()
-}
+pub use entrypoint::new_plugin;

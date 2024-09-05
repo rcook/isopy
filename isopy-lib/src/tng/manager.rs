@@ -19,19 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::python_package_manager::PythonPackageManager;
-use isopy_lib::tng::{PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use crate::tng::context::Context;
+use crate::tng::version_triple::VersionTriple;
+use anyhow::Result;
+use async_trait::async_trait;
+use std::path::Path;
 
-pub(crate) struct PythonPackageManagerFactory;
-
-impl PythonPackageManagerFactory {
-    pub(crate) fn new() -> PackageManagerFactory {
-        Box::new(Self)
-    }
+#[async_trait]
+pub trait PackageManagerOps: Send + Sync {
+    async fn update_index(&self, ctx: &dyn Context) -> Result<()>;
+    async fn list_categories(&self, ctx: &dyn Context) -> Result<()>;
+    async fn list_packages(&self, ctx: &dyn Context) -> Result<()>;
+    async fn download_package(&self, ctx: &dyn Context, version: &VersionTriple) -> Result<()>;
+    async fn install_package(
+        &self,
+        ctx: &dyn Context,
+        version: &VersionTriple,
+        dir: &Path,
+    ) -> Result<()>;
 }
 
-impl PackageManagerFactoryOps for PythonPackageManagerFactory {
-    fn make_package_manager(&self) -> PackageManager {
-        Box::new(PythonPackageManager::default())
-    }
-}
+pub type Manager = Box<dyn PackageManagerOps>;

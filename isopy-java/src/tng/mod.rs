@@ -19,11 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod java_package_manager;
-mod java_package_manager_factory;
+mod entrypoint;
+mod java_manager;
+mod java_plugin;
 
-pub(crate) use java_package_manager_factory::JavaPackageManagerFactory;
-
-pub fn make_package_manager_factory() -> isopy_lib::tng::PackageManagerFactory {
-    crate::tng::JavaPackageManagerFactory::new()
-}
+pub use entrypoint::new_plugin;

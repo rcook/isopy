@@ -19,24 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::context::Context;
-use crate::tng::version_triple::VersionTriple;
+use crate::tng::python_manager::PythonManager;
 use anyhow::Result;
-use async_trait::async_trait;
-use std::path::Path;
+use isopy_lib::tng::{Manager, Plugin, PluginOps, Version};
 
-#[async_trait]
-pub trait PackageManagerOps: Send + Sync {
-    async fn update_index(&self, ctx: &dyn Context) -> Result<()>;
-    async fn list_categories(&self, ctx: &dyn Context) -> Result<()>;
-    async fn list_packages(&self, ctx: &dyn Context) -> Result<()>;
-    async fn download_package(&self, ctx: &dyn Context, version: &VersionTriple) -> Result<()>;
-    async fn install_package(
-        &self,
-        ctx: &dyn Context,
-        version: &VersionTriple,
-        dir: &Path,
-    ) -> Result<()>;
+pub(crate) struct PythonPlugin;
+
+impl PythonPlugin {
+    pub(crate) fn new_plugin() -> Plugin {
+        Box::new(Self)
+    }
 }
 
-pub type PackageManager = Box<dyn PackageManagerOps>;
+impl PluginOps for PythonPlugin {
+    fn parse_version(&self, _s: &str) -> Result<Version> {
+        todo!()
+    }
+
+    fn new_manager(&self) -> Manager {
+        Box::new(PythonManager::default())
+    }
+}

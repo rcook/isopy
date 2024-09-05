@@ -25,10 +25,10 @@ use crate::tng::consts::{
     CACHE_DIR_NAME, GO_PACKAGE_MANAGER_NAME, JAVA_PACKAGE_MANAGER_NAME, PYTHON_PACKAGE_MANAGER_NAME,
 };
 use anyhow::{anyhow, Result};
-use isopy_lib::tng::PackageManagerFactory;
+use isopy_lib::tng::Plugin;
 use std::path::{Path, PathBuf};
 
-pub(crate) type PackageManagerFactoryInfos = Vec<(&'static str, PackageManagerFactory)>;
+pub(crate) type PackageManagerFactoryInfos = Vec<(&'static str, Plugin)>;
 
 pub(crate) struct App {
     cache_dir: PathBuf,
@@ -39,18 +39,9 @@ impl App {
     pub(crate) fn new(config_dir: &Path) -> Result<Self> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME);
         let package_manager_factories = Vec::from([
-            (
-                GO_PACKAGE_MANAGER_NAME,
-                isopy_go::tng::make_package_manager_factory(),
-            ),
-            (
-                JAVA_PACKAGE_MANAGER_NAME,
-                isopy_java::tng::make_package_manager_factory(),
-            ),
-            (
-                PYTHON_PACKAGE_MANAGER_NAME,
-                isopy_python::tng::make_package_manager_factory(),
-            ),
+            (GO_PACKAGE_MANAGER_NAME, isopy_go::tng::new_plugin()),
+            (JAVA_PACKAGE_MANAGER_NAME, isopy_java::tng::new_plugin()),
+            (PYTHON_PACKAGE_MANAGER_NAME, isopy_python::tng::new_plugin()),
         ]);
         Ok(Self {
             cache_dir,
@@ -73,7 +64,7 @@ impl App {
             .ok_or_else(|| anyhow!("No package manager factory with name {name}"))?;
         let cache_dir = self.cache_dir.join(name);
         let ctx = AppContext::new(cache_dir);
-        let package_manager = package_manager_factory.make_package_manager();
+        let package_manager = package_manager_factory.new_manager();
         Ok(AppPackageManager::new(ctx, package_manager))
     }
 }

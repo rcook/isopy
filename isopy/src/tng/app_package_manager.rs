@@ -21,16 +21,16 @@
 //
 use crate::tng::app_context::AppContext;
 use anyhow::Result;
-use isopy_lib::tng::{PackageManager, VersionTriple};
+use isopy_lib::tng::{Manager, VersionTriple};
 use std::path::Path;
 
 pub(crate) struct AppPackageManager {
     ctx: AppContext,
-    inner: PackageManager,
+    inner: Manager,
 }
 
 impl AppPackageManager {
-    pub(crate) fn new(ctx: AppContext, inner: PackageManager) -> Self {
+    pub(crate) fn new(ctx: AppContext, inner: Manager) -> Self {
         Self { ctx, inner }
     }
 

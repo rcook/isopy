@@ -19,19 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::go_package_manager::GoPackageManager;
-use isopy_lib::tng::{PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use crate::tng::java_manager::JavaManager;
+use anyhow::Result;
+use isopy_lib::tng::{Manager, Plugin, PluginOps, Version};
 
-pub(crate) struct GoPackageManagerFactory;
+pub(crate) struct JavaPlugin;
 
-impl GoPackageManagerFactory {
-    pub(crate) fn new() -> PackageManagerFactory {
+impl JavaPlugin {
+    pub(crate) fn new_plugin() -> Plugin {
         Box::new(Self)
     }
 }
 
-impl PackageManagerFactoryOps for GoPackageManagerFactory {
-    fn make_package_manager(&self) -> PackageManager {
-        Box::new(GoPackageManager::default())
+impl PluginOps for JavaPlugin {
+    fn parse_version(&self, _s: &str) -> Result<Version> {
+        todo!()
+    }
+
+    fn new_manager(&self) -> Manager {
+        Box::new(JavaManager::default())
     }
 }

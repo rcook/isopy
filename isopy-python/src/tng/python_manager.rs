@@ -47,9 +47,9 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
         .expect("Invalid index URL")
 });
 
-pub(crate) struct PythonPackageManager;
+pub(crate) struct PythonManager;
 
-impl PythonPackageManager {
+impl PythonManager {
     async fn get_index(ctx: &dyn Context, update: bool) -> Result<Value> {
         let options = DownloadOptions::json().update(update);
         let path = ctx.download_file(&INDEX_URL, &options).await?;
@@ -162,7 +162,7 @@ impl PythonPackageManager {
 }
 
 #[async_trait]
-impl PackageManagerOps for PythonPackageManager {
+impl PackageManagerOps for PythonManager {
     async fn update_index(&self, ctx: &dyn Context) -> Result<()> {
         Self::get_index(ctx, true).await?;
         Ok(())
@@ -262,7 +262,7 @@ impl PackageManagerOps for PythonPackageManager {
     }
 }
 
-impl Default for PythonPackageManager {
+impl Default for PythonManager {
     fn default() -> Self {
         Self
     }

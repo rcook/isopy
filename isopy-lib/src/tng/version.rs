@@ -19,24 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod accept;
-mod checksum;
-mod context;
-mod download_options;
-mod file_name_parts;
-mod manager;
-mod plugin;
-mod sanitize;
-mod version;
-mod version_triple;
+use std::any::Any;
 
-pub use accept::Accept;
-pub use checksum::Checksum;
-pub use context::Context;
-pub use download_options::DownloadOptions;
-pub use file_name_parts::FileNameParts;
-pub use manager::{Manager, PackageManagerOps};
-pub use plugin::{Plugin, PluginOps};
-pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
-pub use version::Version;
-pub use version_triple::VersionTriple;
+pub trait VersionOps {
+    fn as_any(&self) -> &dyn Any;
+}
+
+pub type Version = Box<dyn VersionOps>;

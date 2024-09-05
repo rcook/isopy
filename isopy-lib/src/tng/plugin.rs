@@ -1,3 +1,5 @@
+use anyhow::Result;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,19 +21,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::java_package_manager::JavaPackageManager;
-use isopy_lib::tng::{PackageManager, PackageManagerFactory, PackageManagerFactoryOps};
+use crate::tng::manager::Manager;
+use crate::tng::version::Version;
 
-pub(crate) struct JavaPackageManagerFactory;
-
-impl JavaPackageManagerFactory {
-    pub(crate) fn new() -> PackageManagerFactory {
-        Box::new(Self)
-    }
+pub trait PluginOps: Sync {
+    fn parse_version(&self, s: &str) -> Result<Version>;
+    fn new_manager(&self) -> Manager;
 }
 
-impl PackageManagerFactoryOps for JavaPackageManagerFactory {
-    fn make_package_manager(&self) -> PackageManager {
-        Box::new(JavaPackageManager::default())
-    }
-}
+pub type Plugin = Box<dyn PluginOps>;

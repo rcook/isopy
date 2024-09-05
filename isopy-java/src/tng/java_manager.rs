@@ -24,10 +24,10 @@ use async_trait::async_trait;
 use isopy_lib::tng::{Context, PackageManagerOps, VersionTriple};
 use std::path::Path;
 
-pub(crate) struct JavaPackageManager;
+pub(crate) struct JavaManager;
 
 #[async_trait]
-impl PackageManagerOps for JavaPackageManager {
+impl PackageManagerOps for JavaManager {
     async fn update_index(&self, _ctx: &dyn Context) -> Result<()> {
         Ok(())
     }
@@ -54,7 +54,7 @@ impl PackageManagerOps for JavaPackageManager {
     }
 }
 
-impl Default for JavaPackageManager {
+impl Default for JavaManager {
     fn default() -> Self {
         Self
     }
