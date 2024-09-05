@@ -75,8 +75,8 @@ impl App {
         })
     }
 
-    pub(crate) fn get_plugin_monikers(&self) -> Vec<String> {
-        self.plugins.iter().map(|(m, _)| String::from(*m)).collect()
+    pub(crate) fn get_plugin_monikers(&self) -> Vec<&str> {
+        self.plugins.iter().map(|(m, _)| *m).collect()
     }
 
     pub(crate) fn get_plugin(&self, moniker: &str) -> Result<&Plugin> {
