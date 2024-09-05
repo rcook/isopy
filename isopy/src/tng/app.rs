@@ -47,7 +47,11 @@ impl App {
             ) -> PluginInfo {
                 (
                     moniker,
-                    make(AppContext::new(Weak::clone(&me), moniker, cache_dir)),
+                    make(AppContext::new(
+                        Weak::clone(&me),
+                        moniker,
+                        cache_dir.join(moniker),
+                    )),
                 )
             }
 
