@@ -33,6 +33,7 @@ use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 pub struct App {
     offline: bool,
@@ -40,13 +41,13 @@ pub struct App {
     cache_dir: PathBuf,
     repo: Repo,
     project_config_path: PathBuf,
-    app_tng: AppTNG,
+    app_tng: Arc<AppTNG>,
 }
 
 impl App {
     pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-        let app_tng = AppTNG::new(&default_config_dir()?)?;
+        let app_tng = AppTNG::new(&default_config_dir()?);
         Ok(Self {
             offline,
             cwd,

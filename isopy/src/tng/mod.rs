@@ -21,7 +21,6 @@
 //
 mod app;
 mod app_context;
-mod app_package_manager;
 mod cache_info;
 mod consts;
 mod date_time_format;
@@ -30,34 +29,4 @@ mod file;
 mod manifest;
 
 pub(crate) use app::App;
-pub(crate) use app_package_manager::AppPackageManager;
 pub(crate) use consts::CONFIG_DIR_NAME;
-
-#[allow(unused)]
-async fn demo(app: &crate::tng::app::App) -> anyhow::Result<()> {
-    use isopy_lib::tng::VersionTriple;
-    use std::env::current_dir;
-
-    let package_manager = app.get_package_manager("python")?;
-    package_manager.list_categories().await?;
-    package_manager.list_packages().await?;
-    package_manager
-        .download_package(&VersionTriple {
-            major: 3,
-            minor: 12,
-            revision: 5,
-        })
-        .await?;
-    package_manager
-        .install_package(
-            &VersionTriple {
-                major: 3,
-                minor: 12,
-                revision: 5,
-            },
-            &current_dir()?.join("TEST"),
-        )
-        .await?;
-
-    Ok(())
-}

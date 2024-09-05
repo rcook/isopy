@@ -20,8 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use std::any::Any;
+use std::fmt::Display;
 
-pub trait VersionOps {
+pub trait VersionOps: Display + Sync {
     fn as_any(&self) -> &dyn Any;
 }
 

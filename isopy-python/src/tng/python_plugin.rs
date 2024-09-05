@@ -21,22 +21,25 @@
 //
 use crate::tng::python_manager::PythonManager;
 use anyhow::Result;
-use isopy_lib::tng::{Manager, Plugin, PluginOps, Version};
+use isopy_lib::tng::{Context, Manager, Plugin, PluginOps, Version, VersionTriple};
+use std::sync::Arc;
 
-pub(crate) struct PythonPlugin;
+pub(crate) struct PythonPlugin {
+    ctx: Context,
+}
 
 impl PythonPlugin {
-    pub(crate) fn new_plugin() -> Plugin {
-        Box::new(Self)
+    pub(crate) fn new(ctx: Context) -> Plugin {
+        Box::new(Self { ctx })
     }
 }
 
 impl PluginOps for PythonPlugin {
-    fn parse_version(&self, _s: &str) -> Result<Version> {
-        todo!()
+    fn parse_version(&self, s: &str) -> Result<Version> {
+        Ok(Box::new(s.parse::<VersionTriple>()?))
     }
 
     fn new_manager(&self) -> Manager {
-        Box::new(PythonManager::default())
+        Box::new(PythonManager::new(Arc::clone(&self.ctx)))
     }
 }

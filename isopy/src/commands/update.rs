@@ -21,26 +21,27 @@
 //
 use crate::app::App;
 use crate::status::{return_success, Status};
-use crate::tng::AppPackageManager;
 use anyhow::Result;
 use log::info;
 
-pub(crate) async fn update(app: &App, name: &Option<String>) -> Result<Status> {
-    async fn update_index(name: &str, package_manager: &AppPackageManager) -> Result<()> {
-        package_manager.update_index().await?;
-        info!("Updated index for package manager {name}");
+pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status> {
+    async fn update_index(app: &App, moniker: &str) -> Result<()> {
+        app.app_tng()
+            .get_plugin(moniker)?
+            .new_manager()
+            .update_index()
+            .await?;
+        info!("Updated index for package manager {moniker}");
         Ok(())
     }
 
-    match name {
-        Some(n) => {
-            let package_manager = app.app_tng().get_package_manager(n)?;
-            update_index(n, &package_manager).await?;
+    match moniker {
+        Some(moniker) => {
+            update_index(app, &moniker).await?;
         }
         None => {
-            for n in app.app_tng().get_package_manager_factory_names() {
-                let package_manager = app.app_tng().get_package_manager(&n)?;
-                update_index(&n, &package_manager).await?;
+            for moniker in app.app_tng().get_plugin_monikers() {
+                update_index(app, &moniker).await?;
             }
         }
     }

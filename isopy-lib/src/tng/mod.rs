@@ -32,10 +32,10 @@ mod version_triple;
 
 pub use accept::Accept;
 pub use checksum::Checksum;
-pub use context::Context;
+pub use context::{Context, ContextOps};
 pub use download_options::DownloadOptions;
 pub use file_name_parts::FileNameParts;
-pub use manager::{Manager, PackageManagerOps};
+pub use manager::{Manager, ManagerOps};
 pub use plugin::{Plugin, PluginOps};
 pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 pub use version::Version;

@@ -19,24 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::context::Context;
-use crate::tng::version_triple::VersionTriple;
+use crate::tng::version::Version;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::path::Path;
 
 #[async_trait]
-pub trait PackageManagerOps: Send + Sync {
-    async fn update_index(&self, ctx: &dyn Context) -> Result<()>;
-    async fn list_categories(&self, ctx: &dyn Context) -> Result<()>;
-    async fn list_packages(&self, ctx: &dyn Context) -> Result<()>;
-    async fn download_package(&self, ctx: &dyn Context, version: &VersionTriple) -> Result<()>;
-    async fn install_package(
-        &self,
-        ctx: &dyn Context,
-        version: &VersionTriple,
-        dir: &Path,
-    ) -> Result<()>;
+pub trait ManagerOps: Send + Sync {
+    async fn update_index(&self) -> Result<()>;
+    async fn list_categories(&self) -> Result<()>;
+    async fn list_packages(&self) -> Result<()>;
+    async fn download_package(&self, version: &Version) -> Result<()>;
+    async fn install_package(&self, version: &Version, dir: &Path) -> Result<()>;
 }
 
-pub type Manager = Box<dyn PackageManagerOps>;
+pub type Manager = Box<dyn ManagerOps>;

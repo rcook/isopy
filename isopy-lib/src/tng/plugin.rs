@@ -1,5 +1,3 @@
-use anyhow::Result;
-
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -23,8 +21,9 @@ use anyhow::Result;
 //
 use crate::tng::manager::Manager;
 use crate::tng::version::Version;
+use anyhow::Result;
 
-pub trait PluginOps: Sync {
+pub trait PluginOps: Send + Sync {
     fn parse_version(&self, s: &str) -> Result<Version>;
     fn new_manager(&self) -> Manager;
 }

@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::tng::app::App;
 use crate::tng::cache_info::CacheInfo;
 use crate::tng::consts::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::tng::download::Download;
@@ -26,27 +27,33 @@ use crate::tng::file::File;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use isopy_lib::tng::{Context, DownloadOptions, FileNameParts};
+use isopy_lib::tng::{Context, ContextOps, DownloadOptions, FileNameParts};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
 use std::fs::{create_dir_all, remove_file, write};
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Weak};
 use url::Url;
 
 pub(crate) struct AppContext {
+    _app: Weak<App>,
+    _moniker: String,
     cache_dir: PathBuf,
 }
 
 impl AppContext {
-    pub(crate) fn new<P>(cache_dir: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        Self {
+    pub(crate) fn new<S: Into<String>, P: Into<PathBuf>>(
+        app: Weak<App>,
+        moniker: S,
+        cache_dir: P,
+    ) -> Context {
+        Arc::new(Box::new(Self {
+            _app: app,
+            _moniker: moniker.into(),
             cache_dir: cache_dir.into(),
-        }
+        }))
     }
 
     async fn download_to_path(url: &Url, path: &Path, options: &DownloadOptions) -> Result<()> {
@@ -198,7 +205,7 @@ impl AppContext {
 }
 
 #[async_trait]
-impl Context for AppContext {
+impl ContextOps for AppContext {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {

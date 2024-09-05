@@ -22,9 +22,9 @@
 use crate::tng::archive_info::ArchiveInfo;
 use crate::tng::archive_metadata::ArchiveMetadata;
 use crate::tng::checksum::get_checksum;
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{Context, DownloadOptions, PackageManagerOps, VersionTriple};
+use isopy_lib::tng::{Context, DownloadOptions, ManagerOps, Version, VersionTriple};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;
@@ -47,15 +47,13 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
         .expect("Invalid index URL")
 });
 
-pub(crate) struct PythonManager;
+pub(crate) struct PythonManager {
+    ctx: Context,
+}
 
 impl PythonManager {
-    async fn get_index(ctx: &dyn Context, update: bool) -> Result<Value> {
-        let options = DownloadOptions::json().update(update);
-        let path = ctx.download_file(&INDEX_URL, &options).await?;
-        let s = read_to_string(path).await?;
-        let index = serde_json::from_str(&s)?;
-        Ok(index)
+    pub(crate) fn new(ctx: Context) -> Self {
+        Self { ctx }
     }
 
     fn get_archives(item: &Value) -> Result<Vec<ArchiveInfo>> {
@@ -159,19 +157,27 @@ impl PythonManager {
             .next()
             .expect("Vector must contain at least one element"))
     }
+
+    async fn get_index(&self, update: bool) -> Result<Value> {
+        let options = DownloadOptions::json().update(update);
+        let path = self.ctx.download_file(&INDEX_URL, &options).await?;
+        let s = read_to_string(path).await?;
+        let index = serde_json::from_str(&s)?;
+        Ok(index)
+    }
 }
 
 #[async_trait]
-impl PackageManagerOps for PythonManager {
-    async fn update_index(&self, ctx: &dyn Context) -> Result<()> {
-        Self::get_index(ctx, true).await?;
+impl ManagerOps for PythonManager {
+    async fn update_index(&self) -> Result<()> {
+        self.get_index(true).await?;
         Ok(())
     }
 
-    async fn list_categories(&self, ctx: &dyn Context) -> Result<()> {
+    async fn list_categories(&self) -> Result<()> {
         let mut groups = HashSet::new();
         let mut keywords = HashSet::new();
-        let index = Self::get_index(ctx, false).await?;
+        let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
             groups.insert(g!(g!(item.get("tag_name")).as_str()));
             for archive in Self::get_archives(item)? {
@@ -210,10 +216,10 @@ impl PackageManagerOps for PythonManager {
         Ok(())
     }
 
-    async fn list_packages(&self, ctx: &dyn Context) -> Result<()> {
+    async fn list_packages(&self) -> Result<()> {
         let platform_keywords = Self::get_platform_keywords();
         let mut archives = Vec::new();
-        let index = Self::get_index(ctx, false).await?;
+        let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
                 if archive
@@ -234,24 +240,27 @@ impl PackageManagerOps for PythonManager {
         Ok(())
     }
 
-    async fn download_package(&self, ctx: &dyn Context, version: &VersionTriple) -> Result<()> {
-        let index = Self::get_index(ctx, false).await?;
+    async fn download_package(&self, version: &Version) -> Result<()> {
+        let version = version
+            .as_any()
+            .downcast_ref::<VersionTriple>()
+            .ok_or_else(|| anyhow!("Invalid version type"))?;
+        let index = self.get_index(false).await?;
         let archive = Self::get_archive(&index, version)?;
         let checksum = get_checksum(&archive)?;
         let options = DownloadOptions::default().checksum(Some(checksum));
-        _ = ctx.download_file(archive.url(), &options).await?;
+        _ = self.ctx.download_file(archive.url(), &options).await?;
         Ok(())
     }
 
-    async fn install_package(
-        &self,
-        ctx: &dyn Context,
-        version: &VersionTriple,
-        dir: &Path,
-    ) -> Result<()> {
-        let index = Self::get_index(ctx, false).await?;
+    async fn install_package(&self, version: &Version, dir: &Path) -> Result<()> {
+        let version = version
+            .as_any()
+            .downcast_ref::<VersionTriple>()
+            .ok_or_else(|| anyhow!("Invalid version type"))?;
+        let index = self.get_index(false).await?;
         let archive = Self::get_archive(&index, version)?;
-        let archive_path = ctx.get_file(archive.url()).await?;
+        let archive_path = self.ctx.get_file(archive.url()).await?;
         archive
             .metadata()
             .archive_type()
@@ -259,11 +268,5 @@ impl PackageManagerOps for PythonManager {
             .await?;
         println!("{}", archive_path.display());
         Ok(())
-    }
-}
-
-impl Default for PythonManager {
-    fn default() -> Self {
-        Self
     }
 }

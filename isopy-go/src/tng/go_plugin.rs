@@ -26,7 +26,7 @@ use isopy_lib::tng::{Manager, Plugin, PluginOps, Version};
 pub(crate) struct GoPlugin;
 
 impl GoPlugin {
-    pub(crate) fn new_plugin() -> Plugin {
+    pub(crate) fn new() -> Plugin {
         Box::new(Self)
     }
 }

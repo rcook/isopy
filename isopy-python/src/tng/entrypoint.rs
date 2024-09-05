@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::tng::python_plugin::PythonPlugin;
-use isopy_lib::tng::Plugin;
+use isopy_lib::tng::{Context, Plugin};
 
-pub fn new_plugin() -> Plugin {
-    PythonPlugin::new_plugin()
+pub fn new_plugin(ctx: Context) -> Plugin {
+    PythonPlugin::new(ctx)
 }

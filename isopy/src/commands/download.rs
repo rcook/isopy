@@ -26,10 +26,11 @@ use anyhow::Result;
 use log::info;
 
 pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
-    let package_manager_name = package_id.plugin_host().prefix();
-    let package_manager = app.app_tng().get_package_manager(package_manager_name)?;
-    let version = package_id.descriptor().to_string().parse()?;
-    package_manager.download_package(&version).await?;
-    info!("Package {package_manager_name}:{version} is now available locally",);
+    let moniker = package_id.plugin_host().prefix();
+    let plugin = app.app_tng().get_plugin(moniker)?;
+    let version = plugin.parse_version(&package_id.descriptor().to_string())?;
+    let manager = plugin.new_manager();
+    manager.download_package(&version).await?;
+    info!("Package {moniker}:{version} is now available locally",);
     return_success!();
 }

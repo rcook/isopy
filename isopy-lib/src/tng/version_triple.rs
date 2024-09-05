@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::tng::version::VersionOps;
 use anyhow::{bail, Error, Result};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
@@ -54,6 +55,12 @@ impl FromStr for VersionTriple {
             minor,
             revision,
         })
+    }
+}
+
+impl VersionOps for VersionTriple {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }
 

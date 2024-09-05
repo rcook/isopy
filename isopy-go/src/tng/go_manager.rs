@@ -21,35 +21,30 @@
 //
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_lib::tng::{Context, PackageManagerOps, VersionTriple};
+use isopy_lib::tng::{ManagerOps, Version};
 use std::path::Path;
 
 pub(crate) struct GoPackageManager;
 
 #[async_trait]
-impl PackageManagerOps for GoPackageManager {
-    async fn update_index(&self, _ctx: &dyn Context) -> Result<()> {
+impl ManagerOps for GoPackageManager {
+    async fn update_index(&self) -> Result<()> {
         Ok(())
     }
 
-    async fn list_categories(&self, _ctx: &dyn Context) -> Result<()> {
+    async fn list_categories(&self) -> Result<()> {
         todo!()
     }
 
-    async fn list_packages(&self, _ctx: &dyn Context) -> Result<()> {
+    async fn list_packages(&self) -> Result<()> {
         todo!()
     }
 
-    async fn download_package(&self, _ctx: &dyn Context, _version: &VersionTriple) -> Result<()> {
+    async fn download_package(&self, _version: &Version) -> Result<()> {
         todo!()
     }
 
-    async fn install_package(
-        &self,
-        _ctx: &dyn Context,
-        _version: &VersionTriple,
-        _dir: &Path,
-    ) -> Result<()> {
+    async fn install_package(&self, _version: &Version, _dir: &Path) -> Result<()> {
         todo!()
     }
 }

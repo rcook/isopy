@@ -124,7 +124,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
-        Update { name } => update(&app, &name).await,
+        Update { moniker } => update(&app, &moniker).await,
         Wrap {
             wrapper_file_name,
             script_path,
