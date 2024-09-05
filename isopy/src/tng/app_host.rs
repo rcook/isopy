@@ -19,38 +19,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
-use async_trait::async_trait;
-use isopy_lib::tng::{ManagerOps, Version};
+use crate::tng::app_manager_context::AppManagerContext;
+use crate::tng::plugin_manager::PluginManager;
+use isopy_lib::tng::{Host, HostOps, ManagerContext};
 use std::path::Path;
+use std::sync::{Arc, Weak};
 
-pub(crate) struct JavaManager;
+pub(crate) struct AppHost {
+    plugin_manager: Weak<PluginManager>,
+    moniker: String,
+}
 
-#[async_trait]
-impl ManagerOps for JavaManager {
-    async fn update_index(&self) -> Result<()> {
-        Ok(())
-    }
-
-    async fn list_categories(&self) -> Result<()> {
-        todo!()
-    }
-
-    async fn list_packages(&self) -> Result<()> {
-        todo!()
-    }
-
-    async fn download_package(&self, _version: &Version) -> Result<()> {
-        todo!()
-    }
-
-    async fn install_package(&self, _version: &Version, _dir: &Path) -> Result<()> {
-        todo!()
+impl AppHost {
+    pub(crate) fn new<S: Into<String>>(plugin_manager: Weak<PluginManager>, moniker: S) -> Host {
+        Host::new(Arc::new(Box::new(Self {
+            plugin_manager,
+            moniker: moniker.into(),
+        })))
     }
 }
 
-impl Default for JavaManager {
-    fn default() -> Self {
-        Self
+impl HostOps for AppHost {
+    fn new_manager_context(&self, cache_dir: &Path) -> ManagerContext {
+        AppManagerContext::new(Weak::clone(&self.plugin_manager), &self.moniker, cache_dir)
     }
 }

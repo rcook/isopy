@@ -24,7 +24,6 @@ use anyhow::Result;
 use async_trait::async_trait;
 use std::ops::Deref;
 use std::path::PathBuf;
-use std::sync::Arc;
 use url::Url;
 
 #[async_trait]
@@ -33,16 +32,16 @@ pub trait ManagerContextOps: Send + Sync {
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-pub struct ManagerContext(Arc<Box<dyn ManagerContextOps>>);
+pub struct ManagerContext(Box<dyn ManagerContextOps>);
 
 impl ManagerContext {
-    pub fn new(inner: Arc<Box<dyn ManagerContextOps>>) -> Self {
+    pub fn new(inner: Box<dyn ManagerContextOps>) -> Self {
         Self(inner)
     }
 }
 
 impl Deref for ManagerContext {
-    type Target = Arc<Box<dyn ManagerContextOps>>;
+    type Target = Box<dyn ManagerContextOps>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

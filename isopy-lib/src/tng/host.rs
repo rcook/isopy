@@ -19,38 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
-use async_trait::async_trait;
-use isopy_lib::tng::{ManagerOps, Version};
+use crate::tng::manager_context::ManagerContext;
+use std::ops::Deref;
 use std::path::Path;
+use std::sync::Arc;
 
-pub(crate) struct GoPackageManager;
+pub trait HostOps: Send + Sync {
+    fn new_manager_context(&self, cache_dir: &Path) -> ManagerContext;
+}
 
-#[async_trait]
-impl ManagerOps for GoPackageManager {
-    async fn update_index(&self) -> Result<()> {
-        Ok(())
-    }
+pub struct Host(Arc<Box<dyn HostOps>>);
 
-    async fn list_categories(&self) -> Result<()> {
-        todo!()
-    }
-
-    async fn list_packages(&self) -> Result<()> {
-        todo!()
-    }
-
-    async fn download_package(&self, _version: &Version) -> Result<()> {
-        todo!()
-    }
-
-    async fn install_package(&self, _version: &Version, _dir: &Path) -> Result<()> {
-        todo!()
+impl Host {
+    pub fn new(inner: Arc<Box<dyn HostOps>>) -> Self {
+        Self(inner)
     }
 }
 
-impl Default for GoPackageManager {
-    fn default() -> Self {
-        Self
+impl Deref for Host {
+    type Target = Arc<Box<dyn HostOps>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::fs::default_config_dir;
 use crate::package_id::PackageId;
 use crate::status::{return_success, Status};
 use anyhow::Result;
@@ -36,8 +37,12 @@ pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status
     let (moniker, version_str) = parse_package_id(package_id);
     let plugin = app.plugin_manager().get_plugin(moniker)?;
     let version = plugin.parse_version(&version_str)?;
-    let manager = plugin.new_manager();
-    manager.download_package(&version).await?;
+
+    app.plugin_manager()
+        .new_manager(moniker, &default_config_dir()?)?
+        .download_package(&version)
+        .await?;
+
     info!("Package {moniker}:{} is now available locally", *version);
     return_success!();
 }

@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod entrypoint;
-mod go_manager;
 mod go_plugin;
 
 pub use entrypoint::new_plugin;

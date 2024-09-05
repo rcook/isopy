@@ -19,12 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::app_context::AppContext;
+use crate::tng::app_host::AppHost;
 use crate::tng::consts::{
     CACHE_DIR_NAME, GO_PLUGIN_MONIKER, JAVA_PLUGIN_MONIKER, PYTHON_PLUGIN_MONIKER,
 };
 use anyhow::{anyhow, Result};
-use isopy_lib::tng::{ManagerContext, Plugin};
+use isopy_lib::tng::{Host, Manager, Plugin};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
@@ -37,39 +37,20 @@ pub(crate) struct PluginManager {
 }
 
 impl PluginManager {
-    pub(crate) fn new(config_dir: &Path) -> Arc<Self> {
+    pub(crate) fn new() -> Arc<Self> {
         Arc::new_cyclic(|me| {
             fn make_plugin(
                 me: &Weak<PluginManager>,
                 moniker: &'static str,
-                cache_dir: &Path,
-                make: fn(ManagerContext) -> Plugin,
+                make: fn(Host) -> Plugin,
             ) -> PluginInfo {
-                (
-                    moniker,
-                    make(AppContext::new(
-                        Weak::clone(&me),
-                        moniker,
-                        cache_dir.join(moniker),
-                    )),
-                )
+                (moniker, make(AppHost::new(Weak::clone(&me), moniker)))
             }
 
-            let cache_dir = config_dir.join(CACHE_DIR_NAME);
             let plugins = Vec::from([
-                make_plugin(me, GO_PLUGIN_MONIKER, &cache_dir, isopy_go::tng::new_plugin),
-                make_plugin(
-                    me,
-                    JAVA_PLUGIN_MONIKER,
-                    &cache_dir,
-                    isopy_java::tng::new_plugin,
-                ),
-                make_plugin(
-                    me,
-                    PYTHON_PLUGIN_MONIKER,
-                    &cache_dir,
-                    isopy_python::tng::new_plugin,
-                ),
+                make_plugin(me, GO_PLUGIN_MONIKER, isopy_go::tng::new_plugin),
+                make_plugin(me, JAVA_PLUGIN_MONIKER, isopy_java::tng::new_plugin),
+                make_plugin(me, PYTHON_PLUGIN_MONIKER, isopy_python::tng::new_plugin),
             ]);
             Self { plugins }
         })
@@ -86,5 +67,10 @@ impl PluginManager {
             .find(|(m, _)| *m == moniker)
             .ok_or_else(|| anyhow!("No plugin with moniker {moniker}"))?;
         Ok(plugin)
+    }
+
+    pub(crate) fn new_manager(&self, moniker: &str, config_dir: &Path) -> Result<Manager> {
+        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker);
+        Ok(self.get_plugin(moniker)?.new_manager(&cache_dir))
     }
 }

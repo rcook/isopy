@@ -19,9 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::java_manager::JavaManager;
 use anyhow::Result;
-use isopy_lib::tng::{Manager, Plugin, PluginOps, Version};
+use async_trait::async_trait;
+use isopy_lib::tng::{Manager, ManagerOps, Plugin, PluginOps, Version};
+use log::info;
+use std::path::Path;
 
 pub(crate) struct JavaPlugin;
 
@@ -36,7 +38,33 @@ impl PluginOps for JavaPlugin {
         todo!()
     }
 
-    fn new_manager(&self) -> Manager {
-        Manager::new(Box::new(JavaManager::default()))
+    fn new_manager(&self, _config_dir: &Path) -> Manager {
+        struct DummyManager;
+
+        #[async_trait]
+        impl ManagerOps for DummyManager {
+            async fn update_index(&self) -> Result<()> {
+                info!("JavaPlugin: not implemented!");
+                Ok(())
+            }
+
+            async fn list_categories(&self) -> Result<()> {
+                todo!()
+            }
+
+            async fn list_packages(&self) -> Result<()> {
+                todo!()
+            }
+
+            async fn download_package(&self, _version: &Version) -> Result<()> {
+                todo!()
+            }
+
+            async fn install_package(&self, _version: &Version, _dir: &Path) -> Result<()> {
+                todo!()
+            }
+        }
+
+        Manager::new(Box::new(DummyManager))
     }
 }

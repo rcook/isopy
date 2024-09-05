@@ -34,26 +34,26 @@ use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
 use std::fs::{create_dir_all, remove_file, write};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Weak};
+use std::sync::Weak;
 use url::Url;
 
-pub(crate) struct AppContext {
+pub(crate) struct AppManagerContext {
     _app: Weak<PluginManager>,
     _moniker: String,
     cache_dir: PathBuf,
 }
 
-impl AppContext {
+impl AppManagerContext {
     pub(crate) fn new<S: Into<String>, P: Into<PathBuf>>(
         app: Weak<PluginManager>,
         moniker: S,
         cache_dir: P,
     ) -> ManagerContext {
-        ManagerContext::new(Arc::new(Box::new(Self {
+        ManagerContext::new(Box::new(Self {
             _app: app,
             _moniker: moniker.into(),
             cache_dir: cache_dir.into(),
-        })))
+        }))
     }
 
     async fn download_to_path(url: &Url, path: &Path, options: &DownloadOptions) -> Result<()> {
@@ -205,7 +205,7 @@ impl AppContext {
 }
 
 #[async_trait]
-impl ManagerContextOps for AppContext {
+impl ManagerContextOps for AppManagerContext {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {
