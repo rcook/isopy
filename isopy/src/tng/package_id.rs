@@ -56,7 +56,7 @@ impl FromStr for PackageId {
         };
 
         let plugin_manager = PluginManager::new();
-        let plugin = plugin_manager.get_plugin(moniker.to_str())?;
+        let plugin = plugin_manager.get_plugin(moniker.as_str())?;
 
         let Ok(version) = plugin.parse_version(version_str) else {
             bail!("Invalid version string {s} for plugin {moniker}");

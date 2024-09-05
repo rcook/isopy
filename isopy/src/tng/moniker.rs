@@ -29,7 +29,7 @@ use std::str::FromStr;
 pub(crate) struct Moniker(String);
 
 impl Moniker {
-    pub(crate) fn to_str(&self) -> &str {
+    pub(crate) fn as_str(&self) -> &str {
         &self.0
     }
 }

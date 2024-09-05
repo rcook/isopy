@@ -78,7 +78,7 @@ impl PluginManager {
     ) -> Result<PackageManager> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker);
         Ok(self
-            .get_plugin(moniker.to_str())?
+            .get_plugin(moniker.as_str())?
             .new_package_manager(&cache_dir))
     }
 }
