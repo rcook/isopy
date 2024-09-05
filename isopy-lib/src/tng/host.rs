@@ -22,6 +22,7 @@
 use crate::tng::download_options::DownloadOptions;
 use anyhow::Result;
 use async_trait::async_trait;
+use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;
 use url::Url;
@@ -32,4 +33,18 @@ pub trait HostOps: Send + Sync {
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-pub type Host = Arc<Box<dyn HostOps>>;
+pub struct Host(Arc<Box<dyn HostOps>>);
+
+impl Host {
+    pub fn new(inner: Arc<Box<dyn HostOps>>) -> Self {
+        Self(inner)
+    }
+}
+
+impl Deref for Host {
+    type Target = Arc<Box<dyn HostOps>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}

@@ -40,6 +40,8 @@ impl PluginOps for PythonPlugin {
     }
 
     fn new_manager(&self) -> Manager {
-        Manager::new(Box::new(PythonManager::new(Arc::clone(&self.ctx))))
+        Manager::new(Box::new(PythonManager::new(Host::new(Arc::clone(
+            &self.ctx,
+        )))))
     }
 }

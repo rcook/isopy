@@ -49,11 +49,11 @@ impl AppContext {
         moniker: S,
         cache_dir: P,
     ) -> Host {
-        Arc::new(Box::new(Self {
+        Host::new(Arc::new(Box::new(Self {
             _app: app,
             _moniker: moniker.into(),
             cache_dir: cache_dir.into(),
-        }))
+        })))
     }
 
     async fn download_to_path(url: &Url, path: &Path, options: &DownloadOptions) -> Result<()> {
