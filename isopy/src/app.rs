@@ -25,7 +25,7 @@ use crate::fs::default_config_dir;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
-use crate::tng::App as AppTNG;
+use crate::tng::PluginManager;
 use crate::unpack::unpack_file;
 use anyhow::{bail, Result};
 use isopy_lib::{Descriptor, Package, PluginFactory};
@@ -41,20 +41,20 @@ pub struct App {
     cache_dir: PathBuf,
     repo: Repo,
     project_config_path: PathBuf,
-    app_tng: Arc<AppTNG>,
+    plugin_manager: Arc<PluginManager>,
 }
 
 impl App {
     pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-        let app_tng = AppTNG::new(&default_config_dir()?);
+        let plugin_manager = PluginManager::new(&default_config_dir()?);
         Ok(Self {
             offline,
             cwd,
             cache_dir: cache_dir.to_path_buf(),
             repo,
             project_config_path,
-            app_tng,
+            plugin_manager,
         })
     }
 
@@ -231,8 +231,8 @@ impl App {
     }
 
     #[allow(unused)]
-    pub(crate) fn app_tng(&self) -> &AppTNG {
-        &self.app_tng
+    pub(crate) fn plugin_manager(&self) -> &PluginManager {
+        &self.plugin_manager
     }
 
     fn find_link_for_dir(&self, dir: &Path) -> Result<Option<Link>> {

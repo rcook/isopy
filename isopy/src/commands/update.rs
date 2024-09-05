@@ -26,7 +26,7 @@ use log::info;
 
 pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status> {
     async fn update_index(app: &App, moniker: &str) -> Result<()> {
-        app.app_tng()
+        app.plugin_manager()
             .get_plugin(moniker)?
             .new_manager()
             .update_index()
@@ -40,7 +40,7 @@ pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status
             update_index(app, &moniker).await?;
         }
         None => {
-            for moniker in app.app_tng().get_plugin_monikers() {
+            for moniker in app.plugin_manager().get_plugin_monikers() {
                 update_index(app, &moniker).await?;
             }
         }

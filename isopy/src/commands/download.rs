@@ -34,7 +34,7 @@ pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status
     }
 
     let (moniker, version_str) = parse_package_id(package_id);
-    let plugin = app.app_tng().get_plugin(moniker)?;
+    let plugin = app.plugin_manager().get_plugin(moniker)?;
     let version = plugin.parse_version(&version_str)?;
     let manager = plugin.new_manager();
     manager.download_package(&version).await?;

@@ -19,11 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::app::App;
 use crate::tng::cache_info::CacheInfo;
 use crate::tng::consts::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::tng::download::Download;
 use crate::tng::file::File;
+use crate::tng::plugin_manager::PluginManager;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -38,14 +38,14 @@ use std::sync::{Arc, Weak};
 use url::Url;
 
 pub(crate) struct AppContext {
-    _app: Weak<App>,
+    _app: Weak<PluginManager>,
     _moniker: String,
     cache_dir: PathBuf,
 }
 
 impl AppContext {
     pub(crate) fn new<S: Into<String>, P: Into<PathBuf>>(
-        app: Weak<App>,
+        app: Weak<PluginManager>,
         moniker: S,
         cache_dir: P,
     ) -> Context {

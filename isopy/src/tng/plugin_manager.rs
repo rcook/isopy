@@ -32,15 +32,15 @@ type PluginInfo = (&'static str, Plugin);
 
 type PluginInfos = Vec<PluginInfo>;
 
-pub(crate) struct App {
+pub(crate) struct PluginManager {
     plugins: PluginInfos,
 }
 
-impl App {
+impl PluginManager {
     pub(crate) fn new(config_dir: &Path) -> Arc<Self> {
         Arc::new_cyclic(|me| {
             fn make_plugin(
-                me: &Weak<App>,
+                me: &Weak<PluginManager>,
                 moniker: &'static str,
                 cache_dir: &Path,
                 make: fn(Context) -> Plugin,
