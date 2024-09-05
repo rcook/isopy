@@ -21,7 +21,7 @@
 //
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_lib::tng::{Manager, ManagerOps, Plugin, PluginOps, Version};
+use isopy_lib::tng::{PackageManager, PackageManagerOps, Plugin, PluginOps, Version};
 use log::info;
 use std::path::Path;
 
@@ -38,11 +38,11 @@ impl PluginOps for GoPlugin {
         todo!()
     }
 
-    fn new_manager(&self, _config_dir: &Path) -> Manager {
+    fn new_package_manager(&self, _config_dir: &Path) -> PackageManager {
         struct DummyManager;
 
         #[async_trait]
-        impl ManagerOps for DummyManager {
+        impl PackageManagerOps for DummyManager {
             async fn update_index(&self) -> Result<()> {
                 info!("GoPlugin: not implemented!");
                 Ok(())
@@ -65,6 +65,6 @@ impl PluginOps for GoPlugin {
             }
         }
 
-        Manager::new(Box::new(DummyManager))
+        PackageManager::new(Box::new(DummyManager))
     }
 }

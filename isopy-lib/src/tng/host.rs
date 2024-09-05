@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::manager_context::ManagerContext;
+use crate::tng::package_manager_context::PackageManagerContext;
 use std::ops::Deref;
 use std::path::Path;
 use std::sync::Arc;
 
 pub trait HostOps: Send + Sync {
-    fn new_manager_context(&self, cache_dir: &Path) -> ManagerContext;
+    fn new_package_manager_context(&self, cache_dir: &Path) -> PackageManagerContext;
 }
 
 pub struct Host(Arc<Box<dyn HostOps>>);

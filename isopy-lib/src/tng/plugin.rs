@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::manager::Manager;
+use crate::tng::package_manager::PackageManager;
 use crate::tng::version::Version;
 use anyhow::Result;
 use std::ops::Deref;
@@ -27,7 +27,7 @@ use std::path::Path;
 
 pub trait PluginOps: Send + Sync {
     fn parse_version(&self, s: &str) -> Result<Version>;
-    fn new_manager(&self, cache_dir: &Path) -> Manager;
+    fn new_package_manager(&self, cache_dir: &Path) -> PackageManager;
 }
 
 pub struct Plugin(Box<dyn PluginOps>);

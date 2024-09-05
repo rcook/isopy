@@ -24,7 +24,7 @@ use crate::tng::consts::{
     CACHE_DIR_NAME, GO_PLUGIN_MONIKER, JAVA_PLUGIN_MONIKER, PYTHON_PLUGIN_MONIKER,
 };
 use anyhow::{anyhow, Result};
-use isopy_lib::tng::{Host, Manager, Plugin};
+use isopy_lib::tng::{Host, PackageManager, Plugin};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
@@ -69,8 +69,12 @@ impl PluginManager {
         Ok(plugin)
     }
 
-    pub(crate) fn new_manager(&self, moniker: &str, config_dir: &Path) -> Result<Manager> {
+    pub(crate) fn new_package_manager(
+        &self,
+        moniker: &str,
+        config_dir: &Path,
+    ) -> Result<PackageManager> {
         let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker);
-        Ok(self.get_plugin(moniker)?.new_manager(&cache_dir))
+        Ok(self.get_plugin(moniker)?.new_package_manager(&cache_dir))
     }
 }

@@ -27,7 +27,9 @@ use crate::tng::plugin_manager::PluginManager;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use isopy_lib::tng::{DownloadOptions, FileNameParts, ManagerContext, ManagerContextOps};
+use isopy_lib::tng::{
+    DownloadOptions, FileNameParts, PackageManagerContext, PackageManagerContextOps,
+};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use reqwest::{Response, Url as ReqwestUrl};
@@ -48,8 +50,8 @@ impl AppManagerContext {
         app: Weak<PluginManager>,
         moniker: S,
         cache_dir: P,
-    ) -> ManagerContext {
-        ManagerContext::new(Box::new(Self {
+    ) -> PackageManagerContext {
+        PackageManagerContext::new(Box::new(Self {
             _app: app,
             _moniker: moniker.into(),
             cache_dir: cache_dir.into(),
@@ -205,7 +207,7 @@ impl AppManagerContext {
 }
 
 #[async_trait]
-impl ManagerContextOps for AppManagerContext {
+impl PackageManagerContextOps for AppManagerContext {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {

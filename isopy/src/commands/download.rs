@@ -27,7 +27,7 @@ use log::info;
 
 pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
     app.plugin_manager()
-        .new_manager(package_id.moniker(), app.config_dir())?
+        .new_package_manager(package_id.moniker(), app.config_dir())?
         .download_package(package_id.version())
         .await?;
 

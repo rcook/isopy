@@ -21,7 +21,7 @@
 //
 use crate::tng::app_manager_context::AppManagerContext;
 use crate::tng::plugin_manager::PluginManager;
-use isopy_lib::tng::{Host, HostOps, ManagerContext};
+use isopy_lib::tng::{Host, HostOps, PackageManagerContext};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
@@ -40,7 +40,7 @@ impl AppHost {
 }
 
 impl HostOps for AppHost {
-    fn new_manager_context(&self, cache_dir: &Path) -> ManagerContext {
+    fn new_package_manager_context(&self, cache_dir: &Path) -> PackageManagerContext {
         AppManagerContext::new(Weak::clone(&self.plugin_manager), &self.moniker, cache_dir)
     }
 }

@@ -19,31 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::version::Version;
+use crate::tng::download_options::DownloadOptions;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::ops::Deref;
-use std::path::Path;
+use std::path::PathBuf;
+use url::Url;
 
 #[async_trait]
-pub trait ManagerOps: Send + Sync {
-    async fn update_index(&self) -> Result<()>;
-    async fn list_categories(&self) -> Result<()>;
-    async fn list_packages(&self) -> Result<()>;
-    async fn download_package(&self, version: &Version) -> Result<()>;
-    async fn install_package(&self, version: &Version, dir: &Path) -> Result<()>;
+pub trait PackageManagerContextOps: Send + Sync {
+    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
+    async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-pub struct Manager(Box<dyn ManagerOps>);
+pub struct PackageManagerContext(Box<dyn PackageManagerContextOps>);
 
-impl Manager {
-    pub fn new(inner: Box<dyn ManagerOps>) -> Self {
+impl PackageManagerContext {
+    pub fn new(inner: Box<dyn PackageManagerContextOps>) -> Self {
         Self(inner)
     }
 }
 
-impl Deref for Manager {
-    type Target = Box<dyn ManagerOps>;
+impl Deref for PackageManagerContext {
+    type Target = Box<dyn PackageManagerContextOps>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

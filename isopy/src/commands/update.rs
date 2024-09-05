@@ -28,7 +28,7 @@ use log::info;
 pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status> {
     async fn update_index(app: &App, moniker: &str) -> Result<()> {
         app.plugin_manager()
-            .new_manager(moniker, &default_config_dir()?)?
+            .new_package_manager(moniker, &default_config_dir()?)?
             .update_index()
             .await?;
         info!("Updated index for package manager {moniker}");
