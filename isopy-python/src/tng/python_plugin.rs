@@ -25,12 +25,12 @@ use isopy_lib::tng::{Host, Manager, Plugin, PluginOps, Version, VersionTriple};
 use std::sync::Arc;
 
 pub(crate) struct PythonPlugin {
-    ctx: Host,
+    host: Host,
 }
 
 impl PythonPlugin {
-    pub(crate) fn new(ctx: Host) -> Plugin {
-        Plugin::new(Box::new(Self { ctx }))
+    pub(crate) fn new(host: Host) -> Plugin {
+        Plugin::new(Box::new(Self { host }))
     }
 }
 
@@ -41,7 +41,7 @@ impl PluginOps for PythonPlugin {
 
     fn new_manager(&self) -> Manager {
         Manager::new(Box::new(PythonManager::new(Host::new(Arc::clone(
-            &self.ctx,
+            &self.host,
         )))))
     }
 }
