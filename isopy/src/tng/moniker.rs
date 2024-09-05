@@ -19,18 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app_host;
-mod app_manager_context;
-mod cache_info;
-mod consts;
-mod date_time_format;
-mod download;
-mod file;
-mod manifest;
-mod moniker;
-mod package_id;
-mod plugin_manager;
+use crate::tng::plugin_manager::PluginManager;
+use anyhow::{bail, Error, Result};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::str::FromStr;
 
-pub(crate) use consts::CONFIG_DIR_NAME;
-pub(crate) use package_id::PackageId;
-pub(crate) use plugin_manager::PluginManager;
+pub(crate) struct Moniker(String);
+
+impl FromStr for Moniker {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        if PluginManager::new().get_plugin(s).is_err() {
+            bail!("Unknown plugin moniker {s}");
+        };
+
+        Ok(Self(String::from(s)))
+    }
+}
+
+impl Display for Moniker {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.0)
+    }
+}
