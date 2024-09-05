@@ -26,9 +26,16 @@ use anyhow::Result;
 use log::info;
 
 pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
-    let moniker = package_id.plugin_host().prefix();
+    fn parse_package_id(package_id: &PackageId) -> (&str, String) {
+        (
+            package_id.plugin_host().prefix(),
+            package_id.descriptor().to_string(),
+        )
+    }
+
+    let (moniker, version_str) = parse_package_id(package_id);
     let plugin = app.app_tng().get_plugin(moniker)?;
-    let version = plugin.parse_version(&package_id.descriptor().to_string())?;
+    let version = plugin.parse_version(&version_str)?;
     let manager = plugin.new_manager();
     manager.download_package(&version).await?;
     info!("Package {moniker}:{} is now available locally", *version);
