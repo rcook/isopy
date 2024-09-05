@@ -22,6 +22,7 @@
 use crate::tng::version::Version;
 use anyhow::Result;
 use async_trait::async_trait;
+use std::ops::Deref;
 use std::path::Path;
 
 #[async_trait]
@@ -33,4 +34,18 @@ pub trait ManagerOps: Send + Sync {
     async fn install_package(&self, version: &Version, dir: &Path) -> Result<()>;
 }
 
-pub type Manager = Box<dyn ManagerOps>;
+pub struct Manager(Box<dyn ManagerOps>);
+
+impl Manager {
+    pub fn new(inner: Box<dyn ManagerOps>) -> Self {
+        Self(inner)
+    }
+}
+
+impl Deref for Manager {
+    type Target = Box<dyn ManagerOps>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}

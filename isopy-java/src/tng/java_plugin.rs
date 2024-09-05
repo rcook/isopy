@@ -27,7 +27,7 @@ pub(crate) struct JavaPlugin;
 
 impl JavaPlugin {
     pub(crate) fn new() -> Plugin {
-        Box::new(Self)
+        Plugin::new(Box::new(Self))
     }
 }
 
@@ -37,6 +37,6 @@ impl PluginOps for JavaPlugin {
     }
 
     fn new_manager(&self) -> Manager {
-        Box::new(JavaManager::default())
+        Manager::new(Box::new(JavaManager::default()))
     }
 }

@@ -22,10 +22,25 @@
 use crate::tng::manager::Manager;
 use crate::tng::version::Version;
 use anyhow::Result;
+use std::ops::Deref;
 
 pub trait PluginOps: Send + Sync {
     fn parse_version(&self, s: &str) -> Result<Version>;
     fn new_manager(&self) -> Manager;
 }
 
-pub type Plugin = Box<dyn PluginOps>;
+pub struct Plugin(Box<dyn PluginOps>);
+
+impl Plugin {
+    pub fn new(inner: Box<dyn PluginOps>) -> Self {
+        Self(inner)
+    }
+}
+
+impl Deref for Plugin {
+    type Target = Box<dyn PluginOps>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}

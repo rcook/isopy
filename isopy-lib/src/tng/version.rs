@@ -21,9 +21,24 @@
 //
 use std::any::Any;
 use std::fmt::Display;
+use std::ops::Deref;
 
 pub trait VersionOps: Display + Sync {
     fn as_any(&self) -> &dyn Any;
 }
 
-pub type Version = Box<dyn VersionOps>;
+pub struct Version(Box<dyn VersionOps>);
+
+impl Version {
+    pub fn new(inner: Box<dyn VersionOps>) -> Self {
+        Self(inner)
+    }
+}
+
+impl Deref for Version {
+    type Target = Box<dyn VersionOps>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}

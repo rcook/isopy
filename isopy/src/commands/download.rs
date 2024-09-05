@@ -31,6 +31,6 @@ pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status
     let version = plugin.parse_version(&package_id.descriptor().to_string())?;
     let manager = plugin.new_manager();
     manager.download_package(&version).await?;
-    info!("Package {moniker}:{version} is now available locally",);
+    info!("Package {moniker}:{} is now available locally", *version);
     return_success!();
 }

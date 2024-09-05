@@ -27,7 +27,7 @@ pub(crate) struct GoPlugin;
 
 impl GoPlugin {
     pub(crate) fn new() -> Plugin {
-        Box::new(Self)
+        Plugin::new(Box::new(Self))
     }
 }
 
@@ -37,6 +37,6 @@ impl PluginOps for GoPlugin {
     }
 
     fn new_manager(&self) -> Manager {
-        Box::new(GoPackageManager::default())
+        Manager::new(Box::new(GoPackageManager::default()))
     }
 }

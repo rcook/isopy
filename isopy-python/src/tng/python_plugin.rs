@@ -30,16 +30,16 @@ pub(crate) struct PythonPlugin {
 
 impl PythonPlugin {
     pub(crate) fn new(ctx: Context) -> Plugin {
-        Box::new(Self { ctx })
+        Plugin::new(Box::new(Self { ctx }))
     }
 }
 
 impl PluginOps for PythonPlugin {
     fn parse_version(&self, s: &str) -> Result<Version> {
-        Ok(Box::new(s.parse::<VersionTriple>()?))
+        Ok(Version::new(Box::new(s.parse::<VersionTriple>()?)))
     }
 
     fn new_manager(&self) -> Manager {
-        Box::new(PythonManager::new(Arc::clone(&self.ctx)))
+        Manager::new(Box::new(PythonManager::new(Arc::clone(&self.ctx))))
     }
 }
