@@ -28,21 +28,21 @@ use std::sync::Arc;
 use url::Url;
 
 #[async_trait]
-pub trait HostOps: Send + Sync {
+pub trait ManagerContextOps: Send + Sync {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-pub struct Host(Arc<Box<dyn HostOps>>);
+pub struct ManagerContext(Arc<Box<dyn ManagerContextOps>>);
 
-impl Host {
-    pub fn new(inner: Arc<Box<dyn HostOps>>) -> Self {
+impl ManagerContext {
+    pub fn new(inner: Arc<Box<dyn ManagerContextOps>>) -> Self {
         Self(inner)
     }
 }
 
-impl Deref for Host {
-    type Target = Arc<Box<dyn HostOps>>;
+impl Deref for ManagerContext {
+    type Target = Arc<Box<dyn ManagerContextOps>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

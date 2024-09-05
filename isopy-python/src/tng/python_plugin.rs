@@ -21,15 +21,15 @@
 //
 use crate::tng::python_manager::PythonManager;
 use anyhow::Result;
-use isopy_lib::tng::{Host, Manager, Plugin, PluginOps, Version, VersionTriple};
+use isopy_lib::tng::{ManagerContext, Manager, Plugin, PluginOps, Version, VersionTriple};
 use std::sync::Arc;
 
 pub(crate) struct PythonPlugin {
-    host: Host,
+    host: ManagerContext,
 }
 
 impl PythonPlugin {
-    pub(crate) fn new(host: Host) -> Plugin {
+    pub(crate) fn new(host: ManagerContext) -> Plugin {
         Plugin::new(Box::new(Self { host }))
     }
 }
@@ -40,7 +40,7 @@ impl PluginOps for PythonPlugin {
     }
 
     fn new_manager(&self) -> Manager {
-        Manager::new(Box::new(PythonManager::new(Host::new(Arc::clone(
+        Manager::new(Box::new(PythonManager::new(ManagerContext::new(Arc::clone(
             &self.host,
         )))))
     }
