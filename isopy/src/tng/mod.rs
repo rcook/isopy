@@ -27,7 +27,9 @@ mod date_time_format;
 mod download;
 mod file;
 mod manifest;
+mod package_id;
 mod plugin_manager;
 
 pub(crate) use consts::CONFIG_DIR_NAME;
+pub(crate) use package_id::PackageId;
 pub(crate) use plugin_manager::PluginManager;

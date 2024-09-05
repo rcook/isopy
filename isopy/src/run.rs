@@ -93,7 +93,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Check { clean, .. } => check(&app, clean),
         Completions { shell } => Ok(completions(shell)),
-        Download { package_id } => download(&app, &package_id).await,
+        Download { package_id } => download(&app, &package_id.try_into()?).await,
         Env { command } => match command {
             EnvCommand::Delete { project_dir } => env_delete(&app, &project_dir).await,
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,

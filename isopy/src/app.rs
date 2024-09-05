@@ -21,6 +21,7 @@
 //
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
+use crate::fs::default_config_dir;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
@@ -35,6 +36,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 pub struct App {
+    config_dir: PathBuf,
     offline: bool,
     cwd: PathBuf,
     cache_dir: PathBuf,
@@ -48,6 +50,7 @@ impl App {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         let plugin_manager = PluginManager::new();
         Ok(Self {
+            config_dir: default_config_dir()?,
             offline,
             cwd,
             cache_dir: cache_dir.to_path_buf(),
@@ -59,6 +62,10 @@ impl App {
 
     pub const fn offline(&self) -> bool {
         self.offline
+    }
+
+    pub fn config_dir(&self) -> &Path {
+        &self.config_dir
     }
 
     pub fn cwd(&self) -> &Path {
