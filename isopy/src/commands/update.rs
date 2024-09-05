@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::default_config_dir;
 use crate::status::{return_success, Status};
 use anyhow::Result;
 use log::info;
@@ -28,7 +27,7 @@ use log::info;
 pub(crate) async fn update(app: &App, moniker: &Option<String>) -> Result<Status> {
     async fn update_index(app: &App, moniker: &str) -> Result<()> {
         app.plugin_manager()
-            .new_package_manager(moniker, &default_config_dir()?)?
+            .new_package_manager(moniker, app.config_dir())?
             .update_index()
             .await?;
         info!("Updated index for package manager {moniker}");
