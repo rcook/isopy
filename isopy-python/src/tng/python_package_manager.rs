@@ -25,7 +25,8 @@ use crate::tng::checksum::get_checksum;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{
-    DownloadOptions, PackageManagerContext, PackageManagerOps, Version, VersionTriple,
+    DownloadOptions, PackageManagerContext, PackageManagerOps, PackageSummary, Version,
+    VersionTriple,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -218,9 +219,14 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(())
     }
 
-    async fn list_packages(&self) -> Result<()> {
+    async fn list_packages(&self) -> Result<Vec<PackageSummary>> {
+        struct Record {
+            archive: ArchiveInfo,
+            in_cache: bool,
+        }
+
         let platform_keywords = Self::get_platform_keywords();
-        let mut archives = Vec::new();
+        let mut records = Vec::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
@@ -229,17 +235,38 @@ impl PackageManagerOps for PythonPackageManager {
                     .keywords()
                     .is_superset(&platform_keywords)
                 {
-                    archives.push(archive);
+                    let in_cache = self.ctx.get_file(archive.url()).await.is_ok();
+                    records.push(Record { archive, in_cache });
                 }
             }
         }
 
-        archives.sort_by_cached_key(|x| x.metadata().full_version().clone());
-        archives.reverse();
-        for archive in archives {
-            println!("{}", archive.metadata().name());
+        records.sort_by(|a, b| {
+            if a.in_cache == b.in_cache {
+                b.archive
+                    .metadata()
+                    .full_version()
+                    .cmp(a.archive.metadata().full_version())
+            } else {
+                b.in_cache.cmp(&a.in_cache)
+            }
+        });
+
+        Ok(records
+            .into_iter()
+            .map(|r| PackageSummary::new(r.archive.metadata().name(), r.archive.url(), r.in_cache))
+            .collect())
+
+        /*
+        for record in records {
+            println!(
+                "{} in_cache={}",
+                record.archive.metadata().name(),
+                record.in_cache
+            );
         }
         Ok(())
+        */
     }
 
     async fn download_package(&self, version: &Version) -> Result<()> {

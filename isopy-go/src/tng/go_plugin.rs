@@ -22,7 +22,8 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::tng::{
-    PackageManager, PackageManagerContext, PackageManagerOps, Plugin, PluginOps, Version,
+    PackageManager, PackageManagerContext, PackageManagerOps, PackageSummary, Plugin, PluginOps,
+    Version,
 };
 use log::warn;
 use std::path::Path;
@@ -54,9 +55,9 @@ impl PluginOps for GoPlugin {
                 todo!()
             }
 
-            async fn list_packages(&self) -> Result<()> {
+            async fn list_packages(&self) -> Result<Vec<PackageSummary>> {
                 warn!("GoPlugin: not implemented!");
-                Ok(())
+                Ok(vec![])
             }
 
             async fn download_package(&self, _version: &Version) -> Result<()> {
