@@ -193,8 +193,8 @@ impl PackageManagerOps for PythonPackageManager {
         if !tags.is_empty() {
             println!("Tags:");
             tags.sort();
-            for keyword in tags {
-                println!("  {}", keyword)
+            for tag in tags {
+                println!("  {}", tag)
             }
         }
 
@@ -202,8 +202,8 @@ impl PackageManagerOps for PythonPackageManager {
         if !tags.is_empty() {
             println!("Platform tags:");
             tags.sort();
-            for platform_keyword in tags {
-                println!("  {}", platform_keyword)
+            for tag in tags {
+                println!("  {}", tag)
             }
         }
 
