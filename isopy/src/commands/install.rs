@@ -19,31 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod env;
-pub mod package;
-pub mod project;
-pub mod wrap;
+use crate::app::App;
+use crate::status::{return_success, Status};
+use crate::tng::PackageId;
+use anyhow::Result;
+use log::info;
+use std::path::Path;
 
-mod check;
-mod completions;
-mod download;
-mod info;
-mod install;
-mod packages;
-mod prompt;
-mod run;
-mod scratch;
-mod shell;
-mod update;
+pub(crate) async fn install(app: &App, package_id: &PackageId, dir: &Path) -> Result<Status> {
+    app.plugin_manager()
+        .new_package_manager(package_id.moniker(), app.config_dir())
+        .install_package(package_id.version(), dir)
+        .await?;
 
-pub(crate) use check::check;
-pub(crate) use completions::completions;
-pub(crate) use download::download;
-pub(crate) use info::info;
-pub(crate) use install::install;
-pub(crate) use packages::packages;
-pub(crate) use prompt::prompt;
-pub(crate) use run::run;
-pub(crate) use scratch::scratch;
-pub(crate) use shell::shell;
-pub(crate) use update::update;
+    info!(
+        "Package {} successfully installed to {}",
+        package_id,
+        dir.display()
+    );
+
+    return_success!();
+}

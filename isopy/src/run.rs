@@ -28,8 +28,8 @@ use crate::commands::package::{download as package_download, list as package_lis
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
 use crate::commands::{
-    check, completions, download, info, packages, prompt, run as run_command, scratch, shell,
-    update,
+    check, completions, download, info, install, packages, prompt, run as run_command, scratch,
+    shell, update,
 };
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
@@ -104,6 +104,9 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Incubating { command } => match command {
             IncubatingCommand::Download { package_id } => {
                 download(&app, &package_id.try_into()?).await
+            }
+            IncubatingCommand::Install { package_id, dir } => {
+                install(&app, &package_id.try_into()?, &dir).await
             }
             IncubatingCommand::Packages { moniker, filter } => {
                 packages(&app, &moniker.map(Into::<Moniker>::into), filter.into()).await

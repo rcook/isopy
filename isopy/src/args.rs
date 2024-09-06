@@ -465,6 +465,15 @@ pub(crate) enum IncubatingCommand {
         package_id: PackageId,
     },
 
+    #[command(name = "install", about = "Install package")]
+    Install {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+
+        #[arg(help = "Installation directory")]
+        dir: PathBuf,
+    },
+
     #[command(name = "packages", about = "List packages")]
     Packages {
         #[arg(help = "Package manager")]

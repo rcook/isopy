@@ -32,5 +32,6 @@ pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status
         .await?;
 
     info!("Package {} is now available locally", package_id);
+
     return_success!();
 }
