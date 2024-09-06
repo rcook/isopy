@@ -116,16 +116,16 @@ pub enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
-    #[command(name = "download", about = "(Incubating feature) Download package")]
-    Download {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
     #[command(name = "env", about = "Environment commands")]
     Env {
         #[command(subcommand)]
         command: EnvCommand,
+    },
+
+    #[command(name = "incubating", about = "Incubating features")]
+    Incubating {
+        #[command(subcommand)]
+        command: IncubatingCommand,
     },
 
     #[command(name = "info", about = "Show information")]
@@ -180,12 +180,6 @@ pub enum Command {
             overrides_with = "verbose"
         )]
         _no_verbose: bool,
-    },
-
-    #[command(name = "update", about = "(Incubating feature) Update package indices")]
-    Update {
-        #[arg(help = "Package manager to update")]
-        moniker: Option<Moniker>,
     },
 
     #[command(
@@ -461,6 +455,21 @@ impl From<Shell> for IsopyLibShell {
             Shell::Cmd => Self::Cmd,
         }
     }
+}
+
+#[derive(Debug, Subcommand)]
+pub enum IncubatingCommand {
+    #[command(name = "download", about = "Download package")]
+    Download {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
+    #[command(name = "update", about = "Update package indices")]
+    Update {
+        #[arg(help = "Package manager to update")]
+        moniker: Option<Moniker>,
+    },
 }
 
 fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {

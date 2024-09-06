@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::{Args, Command};
+use crate::args::{Args, Command, IncubatingCommand};
 use crate::commands::env::{
     delete as env_delete, install as env_install, link as env_link, list as env_list,
 };
@@ -94,12 +94,19 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Check { clean, .. } => check(&app, clean),
         Completions { shell } => Ok(completions(shell)),
-        Download { package_id } => download(&app, &package_id.try_into()?).await,
         Env { command } => match command {
             EnvCommand::Delete { project_dir } => env_delete(&app, &project_dir).await,
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
             EnvCommand::List { verbose, .. } => env_list(&app, verbose),
             EnvCommand::Link { dir_id } => env_link(&app, &dir_id),
+        },
+        Incubating { command } => match command {
+            IncubatingCommand::Download { package_id } => {
+                download(&app, &package_id.try_into()?).await
+            }
+            IncubatingCommand::Update { moniker } => {
+                update(&app, &moniker.map(Into::<Moniker>::into)).await
+            }
         },
         Info => info(&app),
         Package { command } => match command {
@@ -125,7 +132,6 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
-        Update { moniker } => update(&app, &moniker.map(Into::<Moniker>::into)).await,
         Wrap {
             wrapper_file_name,
             script_path,
