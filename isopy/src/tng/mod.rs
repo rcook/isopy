@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod app_host;
-mod app_manager_context;
 mod cache_info;
 mod consts;
 mod date_time_format;
@@ -29,6 +28,7 @@ mod file;
 mod manifest;
 mod moniker;
 mod package_id;
+mod package_manager_helper;
 mod plugin_manager;
 
 pub(crate) use consts::CONFIG_DIR_NAME;

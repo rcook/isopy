@@ -39,18 +39,18 @@ use std::path::{Path, PathBuf};
 use std::sync::Weak;
 use url::Url;
 
-pub(crate) struct AppManagerContext {
-    _app: Weak<PluginManager>,
+pub(crate) struct PackageManagerHelper {
+    _plugin_manager: Weak<PluginManager>,
     cache_dir: PathBuf,
 }
 
-impl AppManagerContext {
+impl PackageManagerHelper {
     pub(crate) fn new<P: Into<PathBuf>>(
-        app: Weak<PluginManager>,
+        plugin_manager: Weak<PluginManager>,
         cache_dir: P,
     ) -> PackageManagerContext {
         PackageManagerContext::new(Box::new(Self {
-            _app: app,
+            _plugin_manager: plugin_manager,
             cache_dir: cache_dir.into(),
         }))
     }
@@ -204,7 +204,7 @@ impl AppManagerContext {
 }
 
 #[async_trait]
-impl PackageManagerContextOps for AppManagerContext {
+impl PackageManagerContextOps for PackageManagerHelper {
     async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::app_manager_context::AppManagerContext;
+use crate::tng::package_manager_helper::PackageManagerHelper;
 use crate::tng::plugin_manager::PluginManager;
 use isopy_lib::tng::{Host, HostOps, PackageManagerContext};
 use std::path::Path;
@@ -37,6 +37,6 @@ impl AppHost {
 
 impl HostOps for AppHost {
     fn new_package_manager_context(&self, cache_dir: &Path) -> PackageManagerContext {
-        AppManagerContext::new(Weak::clone(&self.plugin_manager), cache_dir)
+        PackageManagerHelper::new(Weak::clone(&self.plugin_manager), cache_dir)
     }
 }
