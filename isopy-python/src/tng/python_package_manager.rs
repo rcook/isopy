@@ -49,11 +49,11 @@ const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
         .expect("Invalid index URL")
 });
 
-pub(crate) struct PythonManager {
+pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
 }
 
-impl PythonManager {
+impl PythonPackageManager {
     pub(crate) fn new(ctx: PackageManagerContext) -> Self {
         Self { ctx }
     }
@@ -170,7 +170,7 @@ impl PythonManager {
 }
 
 #[async_trait]
-impl PackageManagerOps for PythonManager {
+impl PackageManagerOps for PythonPackageManager {
     async fn update_index(&self) -> Result<()> {
         self.get_index(true).await?;
         Ok(())

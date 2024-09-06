@@ -26,7 +26,7 @@ mod archive_metadata;
 mod archive_type;
 mod checksum;
 mod entrypoint;
-mod python_manager;
+mod python_package_manager;
 mod python_plugin;
 
 pub use entrypoint::new_plugin;

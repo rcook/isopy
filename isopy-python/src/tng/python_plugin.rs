@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::python_manager::PythonManager;
+use crate::tng::python_package_manager::PythonPackageManager;
 use anyhow::Result;
 use isopy_lib::tng::{
     PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
@@ -39,6 +39,6 @@ impl PluginOps for PythonPlugin {
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(Box::new(PythonManager::new(ctx)))
+        PackageManager::new(Box::new(PythonPackageManager::new(ctx)))
     }
 }
