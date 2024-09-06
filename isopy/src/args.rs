@@ -470,7 +470,13 @@ pub(crate) enum IncubatingCommand {
         #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
 
-        #[arg(help = "Subset of packages to list", default_value_t = PackageFilter::All, value_enum)]
+        #[arg(
+            help = "Subset of packages to list",
+            short = 'f',
+            long = "filter",
+            default_value_t = PackageFilter::Local,
+            value_enum
+        )]
         filter: PackageFilter,
     },
 
