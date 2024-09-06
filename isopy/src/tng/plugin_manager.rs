@@ -22,11 +22,12 @@
 use crate::tng::consts::CACHE_DIR_NAME;
 use crate::tng::plugin_host::PluginHost;
 use crate::tng::Moniker;
-use isopy_lib::tng::{Host, PackageManager, Plugin};
+use isopy_lib::tng::{PackageManager, Plugin};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
 pub(crate) struct PluginManager {
+    me: Weak<Self>,
     go_plugin: Plugin,
     java_plugin: Plugin,
     python_plugin: Plugin,
@@ -34,16 +35,11 @@ pub(crate) struct PluginManager {
 
 impl PluginManager {
     pub(crate) fn new() -> Arc<Self> {
-        Arc::new_cyclic(|me| {
-            fn make_plugin(me: &Weak<PluginManager>, f: fn(Host) -> Plugin) -> Plugin {
-                f(PluginHost::new(Weak::clone(&me)))
-            }
-
-            Self {
-                go_plugin: make_plugin(me, isopy_go::tng::new_plugin),
-                java_plugin: make_plugin(me, isopy_java::tng::new_plugin),
-                python_plugin: make_plugin(me, isopy_python::tng::new_plugin),
-            }
+        Arc::new_cyclic(|me| Self {
+            me: Weak::clone(&me),
+            go_plugin: isopy_go::tng::new_plugin(),
+            java_plugin: isopy_java::tng::new_plugin(),
+            python_plugin: isopy_python::tng::new_plugin(),
         })
     }
 
@@ -62,6 +58,8 @@ impl PluginManager {
     ) -> PackageManager {
         let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
         let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(&cache_dir)
+        let host = PluginHost::new(Weak::clone(&self.me));
+        let ctx = host.new_package_manager_context(&cache_dir);
+        plugin.new_package_manager(ctx)
     }
 }

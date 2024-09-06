@@ -21,16 +21,15 @@
 //
 use crate::tng::python_manager::PythonManager;
 use anyhow::Result;
-use isopy_lib::tng::{Host, PackageManager, Plugin, PluginOps, Version, VersionTriple};
-use std::path::Path;
+use isopy_lib::tng::{
+    PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
+};
 
-pub(crate) struct PythonPlugin {
-    host: Host,
-}
+pub(crate) struct PythonPlugin;
 
 impl PythonPlugin {
-    pub(crate) fn new(host: Host) -> Plugin {
-        Plugin::new(Box::new(Self { host }))
+    pub(crate) fn new() -> Plugin {
+        Plugin::new(Box::new(Self))
     }
 }
 
@@ -39,8 +38,7 @@ impl PluginOps for PythonPlugin {
         Ok(Version::new(Box::new(s.parse::<VersionTriple>()?)))
     }
 
-    fn new_package_manager(&self, cache_dir: &Path) -> PackageManager {
-        let ctx = self.host.new_package_manager_context(cache_dir);
+    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
         PackageManager::new(Box::new(PythonManager::new(ctx)))
     }
 }

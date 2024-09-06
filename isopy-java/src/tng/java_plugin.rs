@@ -21,7 +21,9 @@
 //
 use anyhow::Result;
 use async_trait::async_trait;
-use isopy_lib::tng::{PackageManager, PackageManagerOps, Plugin, PluginOps, Version};
+use isopy_lib::tng::{
+    PackageManager, PackageManagerContext, PackageManagerOps, Plugin, PluginOps, Version,
+};
 use log::info;
 use std::path::Path;
 
@@ -38,7 +40,7 @@ impl PluginOps for JavaPlugin {
         todo!()
     }
 
-    fn new_package_manager(&self, _config_dir: &Path) -> PackageManager {
+    fn new_package_manager(&self, _ctx: PackageManagerContext) -> PackageManager {
         struct DummyManager;
 
         #[async_trait]

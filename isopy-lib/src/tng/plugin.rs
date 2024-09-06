@@ -20,14 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::tng::package_manager::PackageManager;
+use crate::tng::package_manager_context::PackageManagerContext;
 use crate::tng::version::Version;
 use anyhow::Result;
 use std::ops::Deref;
-use std::path::Path;
 
 pub trait PluginOps: Send + Sync {
     fn parse_version(&self, s: &str) -> Result<Version>;
-    fn new_package_manager(&self, cache_dir: &Path) -> PackageManager;
+    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
 
 pub struct Plugin(Box<dyn PluginOps>);
