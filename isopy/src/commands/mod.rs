@@ -34,6 +34,7 @@ mod prompt;
 mod run;
 mod scratch;
 mod shell;
+mod tags;
 mod update;
 
 pub(crate) use check::check;
@@ -46,4 +47,5 @@ pub(crate) use prompt::prompt;
 pub(crate) use run::run;
 pub(crate) use scratch::scratch;
 pub(crate) use shell::shell;
+pub(crate) use tags::tags;
 pub(crate) use update::update;

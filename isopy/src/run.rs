@@ -29,7 +29,7 @@ use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
 use crate::commands::{
     check, completions, download, info, install, packages, prompt, run as run_command, scratch,
-    shell, update,
+    shell, tags, update,
 };
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
@@ -112,6 +112,9 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             } => install(&app, &package_id.try_into()?, &dir, &tags).await,
             IncubatingCommand::Packages { moniker, filter } => {
                 packages(&app, &moniker.map(Into::<Moniker>::into), filter.into()).await
+            }
+            IncubatingCommand::Tags { moniker } => {
+                tags(&app, &moniker.map(Into::<Moniker>::into)).await
             }
             IncubatingCommand::Update { moniker } => {
                 update(&app, &moniker.map(Into::<Moniker>::into)).await

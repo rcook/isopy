@@ -168,7 +168,16 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(())
     }
 
-    async fn list_tags(&self) -> Result<()> {
+    async fn list_tags(&self) -> Result<HashSet<String>> {
+        let mut tags = HashSet::new();
+        let index = self.get_index(false).await?;
+        for item in g!(index.as_array()) {
+            for archive in Self::get_archives(item)? {
+                tags.extend(archive.metadata().tags().to_owned());
+            }
+        }
+        Ok(tags)
+        /*
         let mut groups = HashSet::new();
         let mut tags = HashSet::new();
         let index = self.get_index(false).await?;
@@ -208,6 +217,7 @@ impl PackageManagerOps for PythonPackageManager {
         }
 
         Ok(())
+        */
     }
 
     async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>> {

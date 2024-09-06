@@ -26,6 +26,7 @@ use isopy_lib::tng::{
     Plugin, PluginOps, Version,
 };
 use log::warn;
+use std::collections::HashSet;
 use std::path::Path;
 
 pub(crate) struct GoPlugin;
@@ -51,8 +52,9 @@ impl PluginOps for GoPlugin {
                 Ok(())
             }
 
-            async fn list_tags(&self) -> Result<()> {
-                todo!()
+            async fn list_tags(&self) -> Result<HashSet<String>> {
+                warn!("GoPlugin: not implemented!");
+                Ok(HashSet::new())
             }
 
             async fn list_packages(&self, _filter: PackageFilter) -> Result<Vec<PackageSummary>> {
@@ -61,6 +63,7 @@ impl PluginOps for GoPlugin {
             }
 
             async fn download_package(&self, _version: &Version) -> Result<()> {
+                warn!("GoPlugin: not implemented!");
                 todo!()
             }
 
@@ -70,6 +73,7 @@ impl PluginOps for GoPlugin {
                 _tags: &Option<Vec<String>>,
                 _dir: &Path,
             ) -> Result<()> {
+                warn!("GoPlugin: not implemented!");
                 todo!()
             }
         }

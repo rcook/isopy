@@ -33,7 +33,7 @@ pub(crate) async fn packages(
     filter: PackageFilter,
 ) -> Result<Status> {
     async fn list_packages(app: &App, moniker: &Moniker, filter: PackageFilter) -> Result<()> {
-        info!("Package manager {moniker}");
+        info!("Package manager: {moniker}");
         for package_summary in app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())

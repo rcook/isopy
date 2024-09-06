@@ -498,6 +498,12 @@ pub(crate) enum IncubatingCommand {
         filter: PackageFilter,
     },
 
+    #[command(name = "tags", about = "List tags")]
+    Tags {
+        #[arg(help = "Package manager")]
+        moniker: Option<Moniker>,
+    },
+
     #[command(name = "update", about = "Update package indices")]
     Update {
         #[arg(help = "Package manager")]

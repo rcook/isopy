@@ -26,7 +26,7 @@ use isopy_lib::tng::{
     Plugin, PluginOps, Version,
 };
 use log::warn;
-use std::path::Path;
+use std::{collections::HashSet, path::Path};
 
 pub(crate) struct JavaPlugin;
 
@@ -51,16 +51,18 @@ impl PluginOps for JavaPlugin {
                 Ok(())
             }
 
-            async fn list_tags(&self) -> Result<()> {
-                todo!()
+            async fn list_tags(&self) -> Result<HashSet<String>> {
+                warn!("JavaPlugin: not implemented!");
+                Ok(HashSet::new())
             }
 
             async fn list_packages(&self, _filter: PackageFilter) -> Result<Vec<PackageSummary>> {
-                warn!("GoPlugin: not implemented!");
+                warn!("JavaPlugin: not implemented!");
                 Ok(vec![])
             }
 
             async fn download_package(&self, _version: &Version) -> Result<()> {
+                warn!("JavaPlugin: not implemented!");
                 todo!()
             }
 
@@ -70,6 +72,7 @@ impl PluginOps for JavaPlugin {
                 _tags: &Option<Vec<String>>,
                 _dir: &Path,
             ) -> Result<()> {
+                warn!("JavaPlugin: not implemented!");
                 todo!()
             }
         }

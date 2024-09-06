@@ -19,41 +19,41 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::package_summary::PackageSummary;
-use crate::tng::version::Version;
-use crate::tng::PackageFilter;
+use crate::app::App;
+use crate::status::{return_success, Status};
+use crate::tng::Moniker;
 use anyhow::Result;
-use async_trait::async_trait;
-use std::collections::HashSet;
-use std::ops::Deref;
-use std::path::Path;
+use log::info;
+use strum::IntoEnumIterator;
 
-#[async_trait]
-pub trait PackageManagerOps: Send + Sync {
-    async fn update_index(&self) -> Result<()>;
-    async fn list_tags(&self) -> Result<HashSet<String>>;
-    async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>>;
-    async fn download_package(&self, version: &Version) -> Result<()>;
-    async fn install_package(
-        &self,
-        version: &Version,
-        tags: &Option<Vec<String>>,
-        dir: &Path,
-    ) -> Result<()>;
-}
+pub(crate) async fn tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+    async fn list_tags(app: &App, moniker: &Moniker) -> Result<()> {
+        info!("Package manager: {moniker}");
+        let mut tags = app
+            .plugin_manager()
+            .new_package_manager(moniker, app.config_dir())
+            .list_tags()
+            .await?
+            .into_iter()
+            .collect::<Vec<_>>();
+        tags.sort();
 
-pub struct PackageManager(Box<dyn PackageManagerOps>);
-
-impl PackageManager {
-    pub fn new(inner: Box<dyn PackageManagerOps>) -> Self {
-        Self(inner)
+        for tag in tags {
+            println!("  {tag}")
+        }
+        Ok(())
     }
-}
 
-impl Deref for PackageManager {
-    type Target = Box<dyn PackageManagerOps>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    match moniker {
+        Some(moniker) => {
+            list_tags(app, moniker).await?;
+        }
+        None => {
+            for moniker in Moniker::iter() {
+                list_tags(app, &moniker).await?;
+            }
+        }
     }
+
+    return_success!();
 }
