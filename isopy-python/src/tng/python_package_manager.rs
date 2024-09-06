@@ -168,14 +168,14 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(())
     }
 
-    async fn list_categories(&self) -> Result<()> {
+    async fn list_tags(&self) -> Result<()> {
         let mut groups = HashSet::new();
-        let mut keywords = HashSet::new();
+        let mut tags = HashSet::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
             groups.insert(g!(g!(item.get("tag_name")).as_str()));
             for archive in Self::get_archives(item)? {
-                keywords.extend(archive.metadata().tags().to_owned());
+                tags.extend(archive.metadata().tags().to_owned());
             }
         }
 
@@ -189,11 +189,11 @@ impl PackageManagerOps for PythonPackageManager {
             }
         }
 
-        let mut keywords = Vec::from_iter(keywords);
-        if !keywords.is_empty() {
+        let mut tags = Vec::from_iter(tags);
+        if !tags.is_empty() {
             println!("Tags:");
-            keywords.sort();
-            for keyword in keywords {
+            tags.sort();
+            for keyword in tags {
                 println!("  {}", keyword)
             }
         }

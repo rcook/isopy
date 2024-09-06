@@ -30,7 +30,7 @@ use std::path::Path;
 #[async_trait]
 pub trait PackageManagerOps: Send + Sync {
     async fn update_index(&self) -> Result<()>;
-    async fn list_categories(&self) -> Result<()>;
+    async fn list_tags(&self) -> Result<()>;
     async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>>;
     async fn download_package(&self, version: &Version) -> Result<()>;
     async fn install_package(

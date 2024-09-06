@@ -51,7 +51,7 @@ impl PluginOps for JavaPlugin {
                 Ok(())
             }
 
-            async fn list_categories(&self) -> Result<()> {
+            async fn list_tags(&self) -> Result<()> {
                 todo!()
             }
 

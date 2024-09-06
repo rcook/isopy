@@ -69,18 +69,18 @@ impl FromStr for ArchiveMetadata {
 
         let (prefix, archive_type) = parse_archive_type(s)?;
 
-        let mut keywords = prefix.split('-').map(str::to_owned).collect::<HashSet<_>>();
-        if !keywords.remove("cpython") {
+        let mut tags = prefix.split('-').map(str::to_owned).collect::<HashSet<_>>();
+        if !tags.remove("cpython") {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let full_version = ArchiveFullVersion::from_keywords(&mut keywords)?;
+        let full_version = ArchiveFullVersion::from_tags(&mut tags)?;
 
         Ok(Self {
             name,
             archive_type,
             full_version,
-            tags: keywords,
+            tags,
         })
     }
 }
