@@ -39,7 +39,6 @@ pub(crate) async fn update(app: &App, moniker: &Option<Moniker>) -> Result<Statu
     match moniker {
         Some(moniker) => {
             update_index(app, moniker).await?;
-            todo!()
         }
         None => {
             for moniker in Moniker::iter() {
