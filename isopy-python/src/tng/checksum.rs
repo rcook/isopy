@@ -40,8 +40,8 @@ pub(crate) fn get_checksum(archive: &ArchiveInfo) -> Result<Checksum> {
             .collect::<HashMap<_, _>>()
     }
 
-    let group_str = archive.metadata().full_version().build_tag.as_str();
-    let file_name = format!("{group_str}.sha256sums");
+    let build_tag_str = archive.metadata().full_version().build_tag().as_str();
+    let file_name = format!("{build_tag_str}.sha256sums");
     let file = SHA256SUMS_DIR
         .get_file(&file_name)
         .ok_or_else(|| anyhow!("Resource file {} not found", file_name))?;

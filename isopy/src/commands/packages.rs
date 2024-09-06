@@ -24,7 +24,6 @@ use crate::status::{return_success, Status};
 use crate::tng::Moniker;
 use anyhow::Result;
 use isopy_lib::tng::{PackageFilter, PackageKind};
-use log::info;
 use strum::IntoEnumIterator;
 
 pub(crate) async fn packages(
@@ -39,20 +38,27 @@ pub(crate) async fn packages(
         filter: PackageFilter,
         tags: &Option<Vec<String>>,
     ) -> Result<()> {
-        info!("Package manager: {moniker}");
-        for package_summary in app
+        let package_summaries = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
             .list_packages(filter, tags)
-            .await?
-        {
-            if package_summary.kind() == PackageKind::Local {
-                println!("{} (downloaded locally)", package_summary.name())
-            } else {
-                println!("{}", package_summary.name())
+            .await?;
+
+        println!("Package manager: {moniker}");
+
+        if package_summaries.is_empty() {
+            println!("  (No matching packages)")
+        } else {
+            for package_summary in package_summaries {
+                if package_summary.kind() == PackageKind::Local {
+                    println!("{} (downloaded locally)", package_summary.name())
+                } else {
+                    println!("{}", package_summary.name())
+                }
+                println!("  {}", package_summary.url())
             }
-            println!("  {}", package_summary.url())
         }
+
         Ok(())
     }
 

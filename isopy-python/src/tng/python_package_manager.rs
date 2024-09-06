@@ -30,6 +30,7 @@ use isopy_lib::tng::{
 };
 use serde_json::Value;
 use std::collections::HashSet;
+use std::iter::once;
 use std::path::Path;
 use std::sync::LazyLock;
 use tokio::fs::read_to_string;
@@ -126,7 +127,7 @@ impl PythonPackageManager {
         for item in g!(index.as_array()) {
             archives.extend(Self::get_archives(item)?.into_iter().filter(|archive| {
                 let m = archive.metadata();
-                Self::metadata_has_tags(m, &tags) && m.full_version().version == *version
+                Self::metadata_has_tags(m, &tags) && m.full_version().version() == version
             }));
         }
 
@@ -147,6 +148,7 @@ impl PythonPackageManager {
             .tags()
             .iter()
             .map(|t| t.as_str())
+            .chain(once(metadata.full_version().build_tag().as_str()))
             .collect::<HashSet<_>>()
             .is_superset(tags)
     }
@@ -175,7 +177,7 @@ impl PackageManagerOps for PythonPackageManager {
             for archive in Self::get_archives(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
                 other_tags.insert(String::from(
-                    archive.metadata().full_version().build_tag.as_str(),
+                    archive.metadata().full_version().build_tag().as_str(),
                 ));
             }
         }

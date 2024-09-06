@@ -26,8 +26,8 @@ use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct ArchiveFullVersion {
-    pub(crate) version: VersionTriple,
-    pub(crate) build_tag: ArchiveBuildTag,
+    version: VersionTriple,
+    build_tag: ArchiveBuildTag,
 }
 
 impl ArchiveFullVersion {
@@ -83,5 +83,13 @@ impl ArchiveFullVersion {
         let version = version.expect("Version must be found");
         let build_tag = build_tag.expect("Group must be found");
         Ok(Self { version, build_tag })
+    }
+
+    pub(crate) fn version(&self) -> &VersionTriple {
+        &self.version
+    }
+
+    pub(crate) fn build_tag(&self) -> &ArchiveBuildTag {
+        &self.build_tag
     }
 }
