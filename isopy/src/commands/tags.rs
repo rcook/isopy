@@ -27,19 +27,35 @@ use strum::IntoEnumIterator;
 
 pub(crate) async fn tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn list_tags(app: &App, moniker: &Moniker) -> Result<()> {
-        let mut tags = app
+        let tags = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
             .list_tags()
-            .await?
-            .into_iter()
-            .collect::<Vec<_>>();
-        tags.sort();
+            .await?;
 
         println!("Package manager: {moniker}");
-        for tag in tags {
-            println!("  {tag}")
+
+        if !tags.tags().is_empty() {
+            println!("  Tags:");
+            for tag in tags.tags() {
+                println!("    {tag}")
+            }
         }
+
+        if !tags.default_tags().is_empty() {
+            println!("  Default tags:");
+            for tag in tags.default_tags() {
+                println!("    {tag}")
+            }
+        }
+
+        if !tags.other_tags().is_empty() {
+            println!("  Other tags:");
+            for tag in tags.other_tags() {
+                println!("    {tag}")
+            }
+        }
+
         Ok(())
     }
 

@@ -26,7 +26,7 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{
     DownloadOptions, PackageFilter, PackageKind, PackageManagerContext, PackageManagerOps,
-    PackageSummary, Version, VersionTriple,
+    PackageSummary, Tags, Version, VersionTriple,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -168,56 +168,33 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(())
     }
 
-    async fn list_tags(&self) -> Result<HashSet<String>> {
+    async fn list_tags(&self) -> Result<Tags> {
         let mut tags = HashSet::new();
+        let mut other_tags = HashSet::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
             }
-        }
-        Ok(tags)
-        /*
-        let mut groups = HashSet::new();
-        let mut tags = HashSet::new();
-        let index = self.get_index(false).await?;
-        for item in g!(index.as_array()) {
-            groups.insert(g!(g!(item.get("tag_name")).as_str()));
-            for archive in Self::get_archives(item)? {
-                tags.extend(archive.metadata().tags().to_owned());
-            }
+            other_tags.insert(String::from(g!(g!(item.get("tag_name")).as_str())));
         }
 
-        let mut groups = Vec::from_iter(groups);
-        if !groups.is_empty() {
-            println!("Groups:");
-            groups.sort();
-            groups.reverse();
-            for group in groups {
-                println!("  {}", group);
-            }
-        }
+        let mut tags = Vec::from_iter(tags.into_iter());
+        tags.sort();
+        let tags = tags;
 
-        let mut tags = Vec::from_iter(tags);
-        if !tags.is_empty() {
-            println!("Tags:");
-            tags.sort();
-            for tag in tags {
-                println!("  {}", tag)
-            }
-        }
+        let mut other_tags = Vec::from_iter(other_tags.into_iter());
+        other_tags.sort();
+        let other_tags = other_tags;
 
-        let mut tags = Vec::from_iter(Self::get_default_tags());
-        if !tags.is_empty() {
-            println!("Platform tags:");
-            tags.sort();
-            for tag in tags {
-                println!("  {}", tag)
-            }
-        }
+        let mut default_tags = Self::get_default_tags()
+            .into_iter()
+            .map(|t| String::from(t))
+            .collect::<Vec<_>>();
+        default_tags.sort();
+        let default_tags = default_tags;
 
-        Ok(())
-        */
+        Ok(Tags::new(tags, default_tags, other_tags))
     }
 
     async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>> {

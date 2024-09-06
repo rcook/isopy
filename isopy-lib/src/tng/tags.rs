@@ -19,41 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::package_summary::PackageSummary;
-use crate::tng::tags::Tags;
-use crate::tng::version::Version;
-use crate::tng::PackageFilter;
-use anyhow::Result;
-use async_trait::async_trait;
-use std::ops::Deref;
-use std::path::Path;
-
-#[async_trait]
-pub trait PackageManagerOps: Send + Sync {
-    async fn update_index(&self) -> Result<()>;
-    async fn list_tags(&self) -> Result<Tags>;
-    async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>>;
-    async fn download_package(&self, version: &Version) -> Result<()>;
-    async fn install_package(
-        &self,
-        version: &Version,
-        tags: &Option<Vec<String>>,
-        dir: &Path,
-    ) -> Result<()>;
+pub struct Tags {
+    tags: Vec<String>,
+    default_tags: Vec<String>,
+    other_tags: Vec<String>,
 }
 
-pub struct PackageManager(Box<dyn PackageManagerOps>);
+impl Tags {
+    pub fn new(tags: Vec<String>, default_tags: Vec<String>, other_tags: Vec<String>) -> Self {
+        Self {
+            tags,
+            default_tags,
+            other_tags,
+        }
+    }
 
-impl PackageManager {
-    pub fn new(inner: Box<dyn PackageManagerOps>) -> Self {
-        Self(inner)
+    pub fn tags(&self) -> &Vec<String> {
+        &self.tags
+    }
+
+    pub fn default_tags(&self) -> &Vec<String> {
+        &self.default_tags
+    }
+
+    pub fn other_tags(&self) -> &Vec<String> {
+        &self.other_tags
     }
 }
 
-impl Deref for PackageManager {
-    type Target = Box<dyn PackageManagerOps>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl Default for Tags {
+    fn default() -> Self {
+        Self {
+            tags: vec![],
+            default_tags: vec![],
+            other_tags: vec![],
+        }
     }
 }

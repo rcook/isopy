@@ -30,6 +30,7 @@ mod package_manager_context;
 mod package_summary;
 mod plugin;
 mod sanitize;
+mod tags;
 mod version;
 mod version_triple;
 
@@ -44,5 +45,6 @@ pub use package_manager_context::{PackageManagerContext, PackageManagerContextOp
 pub use package_summary::PackageSummary;
 pub use plugin::{Plugin, PluginOps};
 pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
+pub use tags::Tags;
 pub use version::Version;
 pub use version_triple::VersionTriple;
