@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::app_host::AppHost;
 use crate::tng::consts::CACHE_DIR_NAME;
+use crate::tng::plugin_host::PluginHost;
 use crate::tng::Moniker;
 use isopy_lib::tng::{Host, PackageManager, Plugin};
 use std::path::Path;
@@ -36,7 +36,7 @@ impl PluginManager {
     pub(crate) fn new() -> Arc<Self> {
         Arc::new_cyclic(|me| {
             fn make_plugin(me: &Weak<PluginManager>, f: fn(Host) -> Plugin) -> Plugin {
-                f(AppHost::new(Weak::clone(&me)))
+                f(PluginHost::new(Weak::clone(&me)))
             }
 
             Self {

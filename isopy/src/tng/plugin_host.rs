@@ -25,17 +25,17 @@ use isopy_lib::tng::{Host, HostOps, PackageManagerContext};
 use std::path::Path;
 use std::sync::{Arc, Weak};
 
-pub(crate) struct AppHost {
+pub(crate) struct PluginHost {
     plugin_manager: Weak<PluginManager>,
 }
 
-impl AppHost {
+impl PluginHost {
     pub(crate) fn new(plugin_manager: Weak<PluginManager>) -> Host {
         Host::new(Arc::new(Box::new(Self { plugin_manager })))
     }
 }
 
-impl HostOps for AppHost {
+impl HostOps for PluginHost {
     fn new_package_manager_context(&self, cache_dir: &Path) -> PackageManagerContext {
         PackageManagerHelper::new(Weak::clone(&self.plugin_manager), cache_dir)
     }

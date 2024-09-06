@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod app_host;
 mod cache_info;
 mod consts;
 mod date_time_format;
@@ -29,6 +28,7 @@ mod manifest;
 mod moniker;
 mod package_id;
 mod package_manager_helper;
+mod plugin_host;
 mod plugin_manager;
 
 pub(crate) use consts::CONFIG_DIR_NAME;
