@@ -23,12 +23,10 @@ use crate::app::App;
 use crate::status::{return_success, Status};
 use crate::tng::Moniker;
 use anyhow::Result;
-use log::info;
 use strum::IntoEnumIterator;
 
 pub(crate) async fn tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn list_tags(app: &App, moniker: &Moniker) -> Result<()> {
-        info!("Package manager: {moniker}");
         let mut tags = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
@@ -38,6 +36,7 @@ pub(crate) async fn tags(app: &App, moniker: &Option<Moniker>) -> Result<Status>
             .collect::<Vec<_>>();
         tags.sort();
 
+        println!("Package manager: {moniker}");
         for tag in tags {
             println!("  {tag}")
         }
