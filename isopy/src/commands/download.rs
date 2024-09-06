@@ -25,10 +25,14 @@ use crate::tng::PackageId;
 use anyhow::Result;
 use log::info;
 
-pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) async fn download(
+    app: &App,
+    package_id: &PackageId,
+    tags: &Option<Vec<String>>,
+) -> Result<Status> {
     app.plugin_manager()
         .new_package_manager(package_id.moniker(), app.config_dir())
-        .download_package(package_id.version())
+        .download_package(package_id.version(), tags)
         .await?;
 
     info!("Package {} is now available locally", package_id);

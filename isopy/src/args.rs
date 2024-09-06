@@ -463,6 +463,15 @@ pub(crate) enum IncubatingCommand {
     Download {
         #[arg(help = "Package ID")]
         package_id: PackageId,
+
+        #[arg(
+            help = "Optional tags",
+            short = 't',
+            long = "tags",
+            num_args = 0..,
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
     },
 
     #[command(name = "install", about = "Install package")]
@@ -496,6 +505,15 @@ pub(crate) enum IncubatingCommand {
             value_enum
         )]
         filter: PackageFilter,
+
+        #[arg(
+            help = "Optional tags",
+            short = 't',
+            long = "tags",
+            num_args = 0..,
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
     },
 
     #[command(name = "tags", about = "List tags")]

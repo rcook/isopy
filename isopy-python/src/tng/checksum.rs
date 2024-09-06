@@ -40,7 +40,7 @@ pub(crate) fn get_checksum(archive: &ArchiveInfo) -> Result<Checksum> {
             .collect::<HashMap<_, _>>()
     }
 
-    let group_str = archive.metadata().full_version().group.as_str();
+    let group_str = archive.metadata().full_version().build_tag.as_str();
     let file_name = format!("{group_str}.sha256sums");
     let file = SHA256SUMS_DIR
         .get_file(&file_name)

@@ -110,19 +110,18 @@ impl PythonPackageManager {
         HashSet::from(["x86_64", "pc", "windows", "msvc", "shared", "install_only"])
     }
 
+    fn get_tags(tags: &Option<Vec<String>>) -> HashSet<&str> {
+        tags.as_ref()
+            .map(|t| t.iter().map(|item| item.as_str()).collect::<HashSet<_>>())
+            .unwrap_or_else(|| Self::get_default_tags())
+    }
+
     fn get_archive(
         index: &Value,
         version: &VersionTriple,
         tags: &Option<Vec<String>>,
     ) -> Result<ArchiveInfo> {
-        let tags = tags
-            .as_ref()
-            .map(|t| {
-                let temp = t.iter().map(|item| item.as_str()).collect::<HashSet<_>>();
-                temp
-            })
-            .unwrap_or_else(|| Self::get_default_tags());
-
+        let tags = Self::get_tags(tags);
         let mut archives = Vec::new();
         for item in g!(index.as_array()) {
             archives.extend(Self::get_archives(item)?.into_iter().filter(|archive| {
@@ -175,8 +174,10 @@ impl PackageManagerOps for PythonPackageManager {
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
+                other_tags.insert(String::from(
+                    archive.metadata().full_version().build_tag.as_str(),
+                ));
             }
-            other_tags.insert(String::from(g!(g!(item.get("tag_name")).as_str())));
         }
 
         let mut tags = Vec::from_iter(tags.into_iter());
@@ -197,8 +198,12 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(Tags::new(tags, default_tags, other_tags))
     }
 
-    async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>> {
-        let tags = Self::get_default_tags();
+    async fn list_packages(
+        &self,
+        filter: PackageFilter,
+        tags: &Option<Vec<String>>,
+    ) -> Result<Vec<PackageSummary>> {
+        let tags = Self::get_tags(tags);
         let mut records = Vec::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
@@ -236,13 +241,13 @@ impl PackageManagerOps for PythonPackageManager {
             .collect())
     }
 
-    async fn download_package(&self, version: &Version) -> Result<()> {
+    async fn download_package(&self, version: &Version, tags: &Option<Vec<String>>) -> Result<()> {
         let version = version
             .as_any()
             .downcast_ref::<VersionTriple>()
             .ok_or_else(|| anyhow!("Invalid version type"))?;
         let index = self.get_index(false).await?;
-        let archive = Self::get_archive(&index, version, &None)?;
+        let archive = Self::get_archive(&index, version, tags)?;
         let checksum = get_checksum(&archive)?;
         let options = DownloadOptions::default().checksum(Some(checksum));
         _ = self.ctx.download_file(archive.url(), &options).await?;

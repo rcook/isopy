@@ -56,12 +56,20 @@ impl PluginOps for GoPlugin {
                 Ok(Tags::default())
             }
 
-            async fn list_packages(&self, _filter: PackageFilter) -> Result<Vec<PackageSummary>> {
+            async fn list_packages(
+                &self,
+                _filter: PackageFilter,
+                _tags: &Option<Vec<String>>,
+            ) -> Result<Vec<PackageSummary>> {
                 warn!("GoPlugin: not implemented!");
                 Ok(vec![])
             }
 
-            async fn download_package(&self, _version: &Version) -> Result<()> {
+            async fn download_package(
+                &self,
+                _version: &Version,
+                _tags: &Option<Vec<String>>,
+            ) -> Result<()> {
                 warn!("GoPlugin: not implemented!");
                 todo!()
             }

@@ -21,7 +21,9 @@
 //
 use anyhow::{bail, Error, Result};
 use regex::Regex;
-use std::{cmp::Ordering, str::FromStr, sync::LazyLock};
+use std::cmp::Ordering;
+use std::str::FromStr;
+use std::sync::LazyLock;
 
 static NEW_STYLE_GROUP_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}$").expect("Invalid regex"));
@@ -30,27 +32,27 @@ static OLD_STYLE_GROUP_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}T\\d{4}$").expect("Invalid regex"));
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub(crate) struct ArchiveGroup {
-    inner: ArchiveGroupInner,
+pub(crate) struct ArchiveBuildTag {
+    inner: Inner,
 }
 
-impl ArchiveGroup {
+impl ArchiveBuildTag {
     pub(crate) fn as_str(&self) -> &str {
         self.inner.as_str()
     }
 }
 
-impl FromStr for ArchiveGroup {
+impl FromStr for ArchiveBuildTag {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
         if NEW_STYLE_GROUP_REGEX.is_match(s) {
             Ok(Self {
-                inner: ArchiveGroupInner::NewStyle(String::from(s)),
+                inner: Inner::NewStyle(String::from(s)),
             })
         } else if OLD_STYLE_GROUP_REGEX.is_match(s) {
             Ok(Self {
-                inner: ArchiveGroupInner::OldStyle(String::from(s)),
+                inner: Inner::OldStyle(String::from(s)),
             })
         } else {
             bail!("Cannot parse {s} as group")
@@ -59,12 +61,12 @@ impl FromStr for ArchiveGroup {
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-enum ArchiveGroupInner {
+enum Inner {
     OldStyle(String),
     NewStyle(String),
 }
 
-impl ArchiveGroupInner {
+impl Inner {
     fn as_str(&self) -> &str {
         match self {
             Self::OldStyle(s) => &s,
@@ -73,7 +75,7 @@ impl ArchiveGroupInner {
     }
 }
 
-impl Ord for ArchiveGroupInner {
+impl Ord for Inner {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (Self::OldStyle(a), Self::OldStyle(b)) => a.cmp(b),
@@ -84,7 +86,7 @@ impl Ord for ArchiveGroupInner {
     }
 }
 
-impl PartialOrd for ArchiveGroupInner {
+impl PartialOrd for Inner {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

@@ -31,13 +31,19 @@ pub(crate) async fn packages(
     app: &App,
     moniker: &Option<Moniker>,
     filter: PackageFilter,
+    tags: &Option<Vec<String>>,
 ) -> Result<Status> {
-    async fn list_packages(app: &App, moniker: &Moniker, filter: PackageFilter) -> Result<()> {
+    async fn list_packages(
+        app: &App,
+        moniker: &Moniker,
+        filter: PackageFilter,
+        tags: &Option<Vec<String>>,
+    ) -> Result<()> {
         info!("Package manager: {moniker}");
         for package_summary in app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
-            .list_packages(filter)
+            .list_packages(filter, tags)
             .await?
         {
             if package_summary.kind() == PackageKind::Local {
@@ -52,11 +58,11 @@ pub(crate) async fn packages(
 
     match moniker {
         Some(moniker) => {
-            list_packages(app, moniker, filter).await?;
+            list_packages(app, moniker, filter, tags).await?;
         }
         None => {
             for moniker in Moniker::iter() {
-                list_packages(app, &moniker, filter).await?;
+                list_packages(app, &moniker, filter, tags).await?;
             }
         }
     }

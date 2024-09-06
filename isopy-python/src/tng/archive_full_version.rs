@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::archive_group::ArchiveGroup;
+use crate::tng::archive_build_tag::ArchiveBuildTag;
 use anyhow::Result;
 use isopy_lib::tng::VersionTriple;
 use std::collections::HashSet;
@@ -27,25 +27,25 @@ use std::collections::HashSet;
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct ArchiveFullVersion {
     pub(crate) version: VersionTriple,
-    pub(crate) group: ArchiveGroup,
+    pub(crate) build_tag: ArchiveBuildTag,
 }
 
 impl ArchiveFullVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut full_version = None;
         let mut version = None;
-        let mut group = None;
+        let mut build_tag = None;
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
                 if let Ok(temp_version) = prefix.parse() {
-                    if let Ok(temp_group) = suffix.parse() {
-                        assert!(full_version.is_none() && version.is_none() && group.is_none());
+                    if let Ok(temp_build_tag) = suffix.parse() {
+                        assert!(full_version.is_none() && version.is_none() && build_tag.is_none());
                         tags_to_remove.push(tag.clone());
                         full_version = Some(Self {
                             version: temp_version,
-                            group: temp_group,
+                            build_tag: temp_build_tag,
                         });
                         break;
                     }
@@ -56,15 +56,15 @@ impl ArchiveFullVersion {
                 assert!(full_version.is_none() && version.is_none());
                 tags_to_remove.push(tag.clone());
                 version = Some(temp_version);
-                if group.is_some() {
+                if build_tag.is_some() {
                     break;
                 }
             }
 
-            if let Ok(temp_group) = tag.parse() {
-                assert!(full_version.is_none() && group.is_none());
+            if let Ok(temp_build_tag) = tag.parse() {
+                assert!(full_version.is_none() && build_tag.is_none());
                 tags_to_remove.push(tag.clone());
-                group = Some(temp_group);
+                build_tag = Some(temp_build_tag);
                 if version.is_some() {
                     break;
                 }
@@ -76,12 +76,12 @@ impl ArchiveFullVersion {
         }
 
         if let Some(result) = full_version {
-            assert!(version.is_none() && group.is_none());
+            assert!(version.is_none() && build_tag.is_none());
             return Ok(result);
         }
 
         let version = version.expect("Version must be found");
-        let group = group.expect("Group must be found");
-        Ok(Self { version, group })
+        let build_tag = build_tag.expect("Group must be found");
+        Ok(Self { version, build_tag })
     }
 }
