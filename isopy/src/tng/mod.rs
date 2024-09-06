@@ -28,7 +28,6 @@ mod manifest;
 mod moniker;
 mod package_id;
 mod package_manager_helper;
-mod plugin_host;
 mod plugin_manager;
 
 pub(crate) use consts::CONFIG_DIR_NAME;

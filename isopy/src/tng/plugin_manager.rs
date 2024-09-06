@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::tng::consts::CACHE_DIR_NAME;
-use crate::tng::plugin_host::PluginHost;
+use crate::tng::package_manager_helper::PackageManagerHelper;
 use crate::tng::Moniker;
 use isopy_lib::tng::{PackageManager, Plugin};
 use std::path::Path;
@@ -57,9 +57,8 @@ impl PluginManager {
         config_dir: &Path,
     ) -> PackageManager {
         let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
+        let ctx = PackageManagerHelper::new(Weak::clone(&self.me), &cache_dir);
         let plugin = self.get_plugin(moniker);
-        let host = PluginHost::new(Weak::clone(&self.me));
-        let ctx = host.new_package_manager_context(&cache_dir);
         plugin.new_package_manager(ctx)
     }
 }
