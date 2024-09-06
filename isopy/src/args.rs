@@ -470,6 +470,15 @@ pub(crate) enum IncubatingCommand {
         #[arg(help = "Package ID")]
         package_id: PackageId,
 
+        #[arg(
+            help = "Optional tags",
+            short = 't',
+            long = "tags",
+            num_args = 0..,
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
+
         #[arg(help = "Installation directory")]
         dir: PathBuf,
     },

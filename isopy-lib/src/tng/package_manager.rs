@@ -33,7 +33,12 @@ pub trait PackageManagerOps: Send + Sync {
     async fn list_categories(&self) -> Result<()>;
     async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>>;
     async fn download_package(&self, version: &Version) -> Result<()>;
-    async fn install_package(&self, version: &Version, dir: &Path) -> Result<()>;
+    async fn install_package(
+        &self,
+        version: &Version,
+        tags: &Option<Vec<String>>,
+        dir: &Path,
+    ) -> Result<()>;
 }
 
 pub struct PackageManager(Box<dyn PackageManagerOps>);

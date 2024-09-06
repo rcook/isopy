@@ -86,66 +86,48 @@ impl PythonPackageManager {
     }
 
     #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
-    fn get_platform_keywords() -> HashSet<String> {
-        HashSet::from([
-            String::from("aarch64"),
-            String::from("unknown"),
-            String::from("linux"),
-            String::from("gnu"),
-            String::from("install_only"),
-        ])
+    fn get_default_tags() -> HashSet<&'static str> {
+        HashSet::from(["aarch64", "unknown", "linux", "gnu", "install_only"])
     }
 
     #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-    fn get_platform_keywords() -> HashSet<String> {
-        HashSet::from([
-            String::from("x86_64"),
-            String::from("unknown"),
-            String::from("linux"),
-            String::from("gnu"),
-            String::from("install_only"),
-        ])
+    fn get_default_tags() -> HashSet<&'static str> {
+        HashSet::from(["x86_64", "unknown", "linux", "gnu", "install_only"])
     }
 
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-    fn get_platform_keywords() -> HashSet<String> {
-        HashSet::from([
-            String::from("aarch64"),
-            String::from("apple"),
-            String::from("darwin"),
-            String::from("install_only"),
-        ])
+    fn get_default_tags() -> HashSet<&'static str> {
+        HashSet::from(["aarch64", "apple", "darwin", "install_only"])
     }
 
     #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-    fn get_platform_keywords() -> HashSet<String> {
-        HashSet::from([
-            String::from("x86_64"),
-            String::from("apple"),
-            String::from("darwin"),
-            String::from("install_only"),
-        ])
+    fn get_default_tags() -> HashSet<&'static str> {
+        HashSet::from(["x86_64", "apple", "darwin", "install_only"])
     }
 
     #[cfg(target_os = "windows")]
-    fn get_platform_keywords() -> HashSet<String> {
-        HashSet::from([
-            String::from("x86_64"),
-            String::from("pc"),
-            String::from("windows"),
-            String::from("msvc"),
-            String::from("shared"),
-            String::from("install_only"),
-        ])
+    fn get_default_tags() -> HashSet<&'static str> {
+        HashSet::from(["x86_64", "pc", "windows", "msvc", "shared", "install_only"])
     }
 
-    fn get_archive(index: &Value, version: &VersionTriple) -> Result<ArchiveInfo> {
-        let keywords = Self::get_platform_keywords();
+    fn get_archive(
+        index: &Value,
+        version: &VersionTriple,
+        tags: &Option<Vec<String>>,
+    ) -> Result<ArchiveInfo> {
+        let tags = tags
+            .as_ref()
+            .map(|t| {
+                let temp = t.iter().map(|item| item.as_str()).collect::<HashSet<_>>();
+                temp
+            })
+            .unwrap_or_else(|| Self::get_default_tags());
+
         let mut archives = Vec::new();
         for item in g!(index.as_array()) {
             archives.extend(Self::get_archives(item)?.into_iter().filter(|archive| {
                 let m = archive.metadata();
-                m.keywords().is_superset(&keywords) && m.full_version().version == *version
+                Self::metadata_has_tags(m, &tags) && m.full_version().version == *version
             }));
         }
 
@@ -159,6 +141,15 @@ impl PythonPackageManager {
             .into_iter()
             .next()
             .expect("Vector must contain at least one element"))
+    }
+
+    fn metadata_has_tags(metadata: &ArchiveMetadata, tags: &HashSet<&str>) -> bool {
+        metadata
+            .tags()
+            .iter()
+            .map(|t| t.as_str())
+            .collect::<HashSet<_>>()
+            .is_superset(tags)
     }
 
     async fn get_index(&self, update: bool) -> Result<Value> {
@@ -184,7 +175,7 @@ impl PackageManagerOps for PythonPackageManager {
         for item in g!(index.as_array()) {
             groups.insert(g!(g!(item.get("tag_name")).as_str()));
             for archive in Self::get_archives(item)? {
-                keywords.extend(archive.metadata().keywords().to_owned());
+                keywords.extend(archive.metadata().tags().to_owned());
             }
         }
 
@@ -200,18 +191,18 @@ impl PackageManagerOps for PythonPackageManager {
 
         let mut keywords = Vec::from_iter(keywords);
         if !keywords.is_empty() {
-            println!("Keywords:");
+            println!("Tags:");
             keywords.sort();
             for keyword in keywords {
                 println!("  {}", keyword)
             }
         }
 
-        let mut platform_keywords = Vec::from_iter(Self::get_platform_keywords());
-        if !platform_keywords.is_empty() {
-            println!("Platform keywords:");
-            platform_keywords.sort();
-            for platform_keyword in platform_keywords {
+        let mut tags = Vec::from_iter(Self::get_default_tags());
+        if !tags.is_empty() {
+            println!("Platform tags:");
+            tags.sort();
+            for platform_keyword in tags {
                 println!("  {}", platform_keyword)
             }
         }
@@ -220,16 +211,12 @@ impl PackageManagerOps for PythonPackageManager {
     }
 
     async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>> {
-        let platform_keywords = Self::get_platform_keywords();
+        let tags = Self::get_default_tags();
         let mut records = Vec::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
-                if archive
-                    .metadata()
-                    .keywords()
-                    .is_superset(&platform_keywords)
-                {
+                if Self::metadata_has_tags(archive.metadata(), &tags) {
                     let is_local = self.ctx.get_file(archive.url()).await.is_ok();
                     let kind = if is_local {
                         PackageKind::Local
@@ -268,20 +255,25 @@ impl PackageManagerOps for PythonPackageManager {
             .downcast_ref::<VersionTriple>()
             .ok_or_else(|| anyhow!("Invalid version type"))?;
         let index = self.get_index(false).await?;
-        let archive = Self::get_archive(&index, version)?;
+        let archive = Self::get_archive(&index, version, &None)?;
         let checksum = get_checksum(&archive)?;
         let options = DownloadOptions::default().checksum(Some(checksum));
         _ = self.ctx.download_file(archive.url(), &options).await?;
         Ok(())
     }
 
-    async fn install_package(&self, version: &Version, dir: &Path) -> Result<()> {
+    async fn install_package(
+        &self,
+        version: &Version,
+        tags: &Option<Vec<String>>,
+        dir: &Path,
+    ) -> Result<()> {
         let version = version
             .as_any()
             .downcast_ref::<VersionTriple>()
             .ok_or_else(|| anyhow!("Invalid version type"))?;
         let index = self.get_index(false).await?;
-        let archive = Self::get_archive(&index, version)?;
+        let archive = Self::get_archive(&index, version, tags)?;
         let archive_path = self.ctx.get_file(archive.url()).await?;
         archive
             .metadata()

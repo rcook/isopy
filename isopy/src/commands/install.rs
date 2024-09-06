@@ -26,10 +26,15 @@ use anyhow::Result;
 use log::info;
 use std::path::Path;
 
-pub(crate) async fn install(app: &App, package_id: &PackageId, dir: &Path) -> Result<Status> {
+pub(crate) async fn install(
+    app: &App,
+    package_id: &PackageId,
+    dir: &Path,
+    tags: &Option<Vec<String>>,
+) -> Result<Status> {
     app.plugin_manager()
         .new_package_manager(package_id.moniker(), app.config_dir())
-        .install_package(package_id.version(), dir)
+        .install_package(package_id.version(), &tags, dir)
         .await?;
 
     info!(

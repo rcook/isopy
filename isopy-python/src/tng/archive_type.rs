@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
+use anyhow::{bail, Result};
 use decompress::{decompress, ExtractOptsBuilder};
 use std::path::Path;
 use strum_macros::EnumIter;
@@ -41,6 +41,10 @@ impl ArchiveType {
     }
 
     pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
+        if dir.exists() {
+            bail!("Output directory {} already exists", dir.display())
+        }
+
         let options = ExtractOptsBuilder::default().strip(1).build()?;
         decompress(archive_path, dir, &options)?;
         Ok(())

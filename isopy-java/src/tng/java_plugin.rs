@@ -64,7 +64,12 @@ impl PluginOps for JavaPlugin {
                 todo!()
             }
 
-            async fn install_package(&self, _version: &Version, _dir: &Path) -> Result<()> {
+            async fn install_package(
+                &self,
+                _version: &Version,
+                _tags: &Option<Vec<String>>,
+                _dir: &Path,
+            ) -> Result<()> {
                 todo!()
             }
         }

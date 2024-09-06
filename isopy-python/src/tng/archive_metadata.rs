@@ -31,7 +31,7 @@ pub(crate) struct ArchiveMetadata {
     name: String,
     archive_type: ArchiveType,
     full_version: ArchiveFullVersion,
-    keywords: HashSet<String>,
+    tags: HashSet<String>,
 }
 
 impl ArchiveMetadata {
@@ -47,8 +47,8 @@ impl ArchiveMetadata {
         &self.full_version
     }
 
-    pub(crate) fn keywords(&self) -> &HashSet<String> {
-        &self.keywords
+    pub(crate) fn tags(&self) -> &HashSet<String> {
+        &self.tags
     }
 }
 
@@ -80,7 +80,7 @@ impl FromStr for ArchiveMetadata {
             name,
             archive_type,
             full_version,
-            keywords,
+            tags: keywords,
         })
     }
 }

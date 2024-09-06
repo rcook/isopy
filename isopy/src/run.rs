@@ -105,9 +105,11 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             IncubatingCommand::Download { package_id } => {
                 download(&app, &package_id.try_into()?).await
             }
-            IncubatingCommand::Install { package_id, dir } => {
-                install(&app, &package_id.try_into()?, &dir).await
-            }
+            IncubatingCommand::Install {
+                package_id,
+                dir,
+                tags,
+            } => install(&app, &package_id.try_into()?, &dir, &tags).await,
             IncubatingCommand::Packages { moniker, filter } => {
                 packages(&app, &moniker.map(Into::<Moniker>::into), filter.into()).await
             }
