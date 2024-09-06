@@ -58,7 +58,7 @@ fn default_cache_dir() -> Option<PathBuf> {
     Some(isopy_dir)
 }
 
-pub async fn run() -> Result<Status> {
+pub(crate) async fn run() -> Result<Status> {
     set_up()?;
 
     let args = Args::parse();
@@ -105,8 +105,8 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             IncubatingCommand::Download { package_id } => {
                 download(&app, &package_id.try_into()?).await
             }
-            IncubatingCommand::Packages { moniker } => {
-                packages(&app, &moniker.map(Into::<Moniker>::into)).await
+            IncubatingCommand::Packages { moniker, filter } => {
+                packages(&app, &moniker.map(Into::<Moniker>::into), filter.into()).await
             }
             IncubatingCommand::Update { moniker } => {
                 update(&app, &moniker.map(Into::<Moniker>::into)).await

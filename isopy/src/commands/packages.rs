@@ -23,19 +23,24 @@ use crate::app::App;
 use crate::status::{return_success, Status};
 use crate::tng::Moniker;
 use anyhow::Result;
+use isopy_lib::tng::{PackageFilter, PackageKind};
 use log::info;
 use strum::IntoEnumIterator;
 
-pub(crate) async fn packages(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
-    async fn list_packages(app: &App, moniker: &Moniker) -> Result<()> {
+pub(crate) async fn packages(
+    app: &App,
+    moniker: &Option<Moniker>,
+    filter: PackageFilter,
+) -> Result<Status> {
+    async fn list_packages(app: &App, moniker: &Moniker, filter: PackageFilter) -> Result<()> {
         info!("Package manager {moniker}");
         for package_summary in app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
-            .list_packages()
+            .list_packages(filter)
             .await?
         {
-            if package_summary.in_cache() {
+            if package_summary.kind() == PackageKind::Local {
                 println!("{} (downloaded locally)", package_summary.name())
             } else {
                 println!("{}", package_summary.name())
@@ -47,11 +52,11 @@ pub(crate) async fn packages(app: &App, moniker: &Option<Moniker>) -> Result<Sta
 
     match moniker {
         Some(moniker) => {
-            list_packages(app, moniker).await?;
+            list_packages(app, moniker, filter).await?;
         }
         None => {
             for moniker in Moniker::iter() {
-                list_packages(app, &moniker).await?;
+                list_packages(app, &moniker, filter).await?;
             }
         }
     }

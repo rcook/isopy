@@ -21,6 +21,7 @@
 //
 use crate::tng::package_summary::PackageSummary;
 use crate::tng::version::Version;
+use crate::tng::PackageFilter;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::ops::Deref;
@@ -30,7 +31,7 @@ use std::path::Path;
 pub trait PackageManagerOps: Send + Sync {
     async fn update_index(&self) -> Result<()>;
     async fn list_categories(&self) -> Result<()>;
-    async fn list_packages(&self) -> Result<Vec<PackageSummary>>;
+    async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>>;
     async fn download_package(&self, version: &Version) -> Result<()>;
     async fn install_package(&self, version: &Version, dir: &Path) -> Result<()>;
 }

@@ -45,7 +45,7 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
     about = format!("{PACKAGE_DESCRIPTION} {PACKAGE_VERSION}"),
     after_help = format!("{PACKAGE_HOME_PAGE}\nhttps://github.com/rcook/isopy{}", PACKAGE_BUILD_VERSION.map(|x| format!("\n\n{}", x)).unwrap_or_else(|| String::from("")))
 )]
-pub struct Args {
+pub(crate) struct Args {
     #[arg(
         global = true,
         help = "Perform operations without connecting to network",
@@ -53,7 +53,7 @@ pub struct Args {
         default_value_t = false,
         env = ISOPY_OFFLINE_ENV_NAME
     )]
-    pub offline: bool,
+    pub(crate) offline: bool,
 
     #[arg(
         global = true,
@@ -63,7 +63,7 @@ pub struct Args {
         value_parser = parse_absolute_path,
         env = ISOPY_CACHE_DIR_ENV_NAME
     )]
-    pub cache_dir: Option<PathBuf>,
+    pub(crate) cache_dir: Option<PathBuf>,
 
     #[arg(
         global = true,
@@ -72,7 +72,7 @@ pub struct Args {
         long = "cwd",
         value_parser = parse_absolute_path
     )]
-    pub cwd: Option<PathBuf>,
+    pub(crate) cwd: Option<PathBuf>,
 
     #[arg(
         global = true,
@@ -83,14 +83,14 @@ pub struct Args {
         value_enum,
         env = ISOPY_LOG_LEVEL_ENV_NAME
     )]
-    pub log_level: LogLevel,
+    pub(crate) log_level: LogLevel,
 
     #[command(subcommand)]
-    pub command: Command,
+    pub(crate) command: Command,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum Command {
+pub(crate) enum Command {
     #[command(
         name = "check",
         about = "Check integrity of metadata directory and optionally clean up"
@@ -229,7 +229,7 @@ pub enum Command {
 }
 
 #[derive(Debug, Subcommand)]
-pub enum EnvCommand {
+pub(crate) enum EnvCommand {
     #[command(
         name = "delete",
         about = "Delete environment corresponding to project directory"
@@ -272,7 +272,7 @@ pub enum EnvCommand {
 }
 
 #[derive(Debug, Subcommand)]
-pub enum PackageCommand {
+pub(crate) enum PackageCommand {
     #[command(name = "download", about = "Download package")]
     Download {
         #[arg(help = "Package ID")]
@@ -305,7 +305,7 @@ pub enum PackageCommand {
 }
 
 #[derive(Debug, Subcommand)]
-pub enum ProjectCommand {
+pub(crate) enum ProjectCommand {
     #[command(name = "add", about = "Add package to project")]
     Add {
         #[arg(help = "Package ID")]
@@ -317,45 +317,45 @@ pub enum ProjectCommand {
 }
 
 #[derive(ClapArgs, Debug)]
-pub struct PromptConfig {
+pub(crate) struct PromptConfig {
     #[arg(
         help = "String to output before non-empty prompt",
         short = 'b',
         long = "before"
     )]
-    pub before: Option<String>,
+    pub(crate) before: Option<String>,
 
     #[arg(
         help = "String to output after non-empty prompt",
         short = 'a',
         long = "after"
     )]
-    pub after: Option<String>,
+    pub(crate) after: Option<String>,
 
     #[arg(
         help = "Message to display when running in isopy shell",
         long = "shell"
     )]
-    pub shell_message: Option<String>,
+    pub(crate) shell_message: Option<String>,
 
     #[arg(
         help = "Message to display when isopy environment available",
         long = "available"
     )]
-    pub available_message: Option<String>,
+    pub(crate) available_message: Option<String>,
 
     #[arg(
         help = "Message to display if isopy configuration file is available",
         long = "config"
     )]
-    pub config_message: Option<String>,
+    pub(crate) config_message: Option<String>,
 
     #[arg(help = "Message to display when isopy error occurs", long = "error")]
-    pub error_message: Option<String>,
+    pub(crate) error_message: Option<String>,
 }
 
 #[derive(Clone, Debug, ValueEnum)]
-pub enum LogLevel {
+pub(crate) enum LogLevel {
     #[clap(name = "off")]
     Off,
 
@@ -389,7 +389,7 @@ impl From<LogLevel> for LevelFilter {
 }
 
 #[derive(Clone, Debug, ValueEnum)]
-pub enum Platform {
+pub(crate) enum Platform {
     #[clap(name = "linux")]
     Linux,
 
@@ -428,7 +428,7 @@ impl From<Platform> for IsopyLibPlatform {
 }
 
 #[derive(Clone, Debug, ValueEnum)]
-pub enum Shell {
+pub(crate) enum Shell {
     #[clap(name = "bash")]
     Bash,
 
@@ -458,7 +458,7 @@ impl From<Shell> for IsopyLibShell {
 }
 
 #[derive(Debug, Subcommand)]
-pub enum IncubatingCommand {
+pub(crate) enum IncubatingCommand {
     #[command(name = "download", about = "Download package")]
     Download {
         #[arg(help = "Package ID")]
@@ -469,6 +469,9 @@ pub enum IncubatingCommand {
     Packages {
         #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
+
+        #[arg(help = "Subset of packages to list", default_value_t = PackageFilter::All, value_enum)]
+        filter: PackageFilter,
     },
 
     #[command(name = "update", about = "Update package indices")]
@@ -476,6 +479,28 @@ pub enum IncubatingCommand {
         #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
     },
+}
+
+#[derive(Clone, Debug, ValueEnum)]
+pub(crate) enum PackageFilter {
+    #[clap(name = "all")]
+    All,
+
+    #[clap(name = "local")]
+    Local,
+
+    #[clap(name = "remote")]
+    Remote,
+}
+
+impl From<PackageFilter> for isopy_lib::tng::PackageFilter {
+    fn from(value: PackageFilter) -> Self {
+        match value {
+            PackageFilter::All => isopy_lib::tng::PackageFilter::All,
+            PackageFilter::Local => isopy_lib::tng::PackageFilter::Local,
+            PackageFilter::Remote => isopy_lib::tng::PackageFilter::Remote,
+        }
+    }
 }
 
 fn parse_absolute_path(s: &str) -> Result<PathBuf, String> {

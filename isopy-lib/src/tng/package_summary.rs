@@ -19,21 +19,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::tng::PackageKind;
 use url::Url;
 
 pub struct PackageSummary {
+    kind: PackageKind,
     name: String,
     url: Url,
-    in_cache: bool,
 }
 
 impl PackageSummary {
-    pub fn new<S: Into<String>>(name: S, url: &Url, in_cache: bool) -> Self {
+    pub fn new<S: Into<String>>(kind: PackageKind, name: S, url: &Url) -> Self {
         Self {
+            kind,
             name: name.into(),
             url: url.clone(),
-            in_cache,
         }
+    }
+    pub fn kind(&self) -> PackageKind {
+        self.kind
     }
 
     pub fn name(&self) -> &str {
@@ -42,9 +46,5 @@ impl PackageSummary {
 
     pub fn url(&self) -> &Url {
         &self.url
-    }
-
-    pub fn in_cache(&self) -> bool {
-        self.in_cache
     }
 }

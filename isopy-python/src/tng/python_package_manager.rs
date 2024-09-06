@@ -25,8 +25,8 @@ use crate::tng::checksum::get_checksum;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{
-    DownloadOptions, PackageManagerContext, PackageManagerOps, PackageSummary, Version,
-    VersionTriple,
+    DownloadOptions, PackageFilter, PackageKind, PackageManagerContext, PackageManagerOps,
+    PackageSummary, Version, VersionTriple,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -219,12 +219,7 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(())
     }
 
-    async fn list_packages(&self) -> Result<Vec<PackageSummary>> {
-        struct Record {
-            archive: ArchiveInfo,
-            in_cache: bool,
-        }
-
+    async fn list_packages(&self, filter: PackageFilter) -> Result<Vec<PackageSummary>> {
         let platform_keywords = Self::get_platform_keywords();
         let mut records = Vec::new();
         let index = self.get_index(false).await?;
@@ -235,38 +230,36 @@ impl PackageManagerOps for PythonPackageManager {
                     .keywords()
                     .is_superset(&platform_keywords)
                 {
-                    let in_cache = self.ctx.get_file(archive.url()).await.is_ok();
-                    records.push(Record { archive, in_cache });
+                    let is_local = self.ctx.get_file(archive.url()).await.is_ok();
+                    let kind = if is_local {
+                        PackageKind::Local
+                    } else {
+                        PackageKind::Remote
+                    };
+                    match filter {
+                        PackageFilter::All => records.push((kind, archive)),
+                        PackageFilter::Local if is_local => records.push((kind, archive)),
+                        PackageFilter::Remote if !is_local => records.push((kind, archive)),
+                        _ => {}
+                    }
                 }
             }
         }
 
         records.sort_by(|a, b| {
-            if a.in_cache == b.in_cache {
-                b.archive
-                    .metadata()
+            if a.0 == b.0 {
+                b.1.metadata()
                     .full_version()
-                    .cmp(a.archive.metadata().full_version())
+                    .cmp(a.1.metadata().full_version())
             } else {
-                b.in_cache.cmp(&a.in_cache)
+                b.0.cmp(&a.0)
             }
         });
 
         Ok(records
             .into_iter()
-            .map(|r| PackageSummary::new(r.archive.metadata().name(), r.archive.url(), r.in_cache))
+            .map(|r| PackageSummary::new(r.0, r.1.metadata().name(), r.1.url()))
             .collect())
-
-        /*
-        for record in records {
-            println!(
-                "{} in_cache={}",
-                record.archive.metadata().name(),
-                record.in_cache
-            );
-        }
-        Ok(())
-        */
     }
 
     async fn download_package(&self, version: &Version) -> Result<()> {
