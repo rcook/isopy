@@ -465,9 +465,15 @@ pub enum IncubatingCommand {
         package_id: PackageId,
     },
 
+    #[command(name = "packages", about = "List packages")]
+    Packages {
+        #[arg(help = "Package manager")]
+        moniker: Option<Moniker>,
+    },
+
     #[command(name = "update", about = "Update package indices")]
     Update {
-        #[arg(help = "Package manager to update")]
+        #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
     },
 }

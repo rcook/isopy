@@ -19,30 +19,34 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub mod env;
-pub mod package;
-pub mod project;
-pub mod wrap;
+use crate::app::App;
+use crate::status::{return_success, Status};
+use crate::tng::Moniker;
+use anyhow::Result;
+use log::info;
+use strum::IntoEnumIterator;
 
-mod check;
-mod completions;
-mod download;
-mod info;
-mod packages;
-mod prompt;
-mod run;
-mod scratch;
-mod shell;
-mod update;
+pub(crate) async fn packages(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+    async fn list_packages(app: &App, moniker: &Moniker) -> Result<()> {
+        info!("Package manager {moniker}");
+        app.plugin_manager()
+            .new_package_manager(moniker, app.config_dir())
+            .list_packages()
+            .await?;
+        Ok(())
+    }
 
-pub use check::check;
-pub use completions::completions;
-pub use info::info;
-pub use prompt::prompt;
-pub use run::run;
-pub use scratch::scratch;
-pub use shell::shell;
+    match moniker {
+        Some(moniker) => {
+            list_packages(app, moniker).await?;
+            todo!()
+        }
+        None => {
+            for moniker in Moniker::iter() {
+                list_packages(app, &moniker).await?;
+            }
+        }
+    }
 
-pub(crate) use download::download;
-pub(crate) use packages::packages;
-pub(crate) use update::update;
+    return_success!();
+}

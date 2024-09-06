@@ -24,7 +24,7 @@ use async_trait::async_trait;
 use isopy_lib::tng::{
     PackageManager, PackageManagerContext, PackageManagerOps, Plugin, PluginOps, Version,
 };
-use log::info;
+use log::warn;
 use std::path::Path;
 
 pub(crate) struct GoPlugin;
@@ -46,7 +46,7 @@ impl PluginOps for GoPlugin {
         #[async_trait]
         impl PackageManagerOps for DummyManager {
             async fn update_index(&self) -> Result<()> {
-                info!("GoPlugin: not implemented!");
+                warn!("GoPlugin: not implemented!");
                 Ok(())
             }
 
@@ -55,7 +55,8 @@ impl PluginOps for GoPlugin {
             }
 
             async fn list_packages(&self) -> Result<()> {
-                todo!()
+                warn!("GoPlugin: not implemented!");
+                Ok(())
             }
 
             async fn download_package(&self, _version: &Version) -> Result<()> {
