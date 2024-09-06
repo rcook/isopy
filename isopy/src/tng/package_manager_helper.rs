@@ -23,7 +23,6 @@ use crate::tng::cache_info::CacheInfo;
 use crate::tng::consts::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::tng::download::Download;
 use crate::tng::file::File;
-use crate::tng::plugin_manager::PluginManager;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -36,21 +35,15 @@ use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
 use std::fs::{create_dir_all, remove_file, write};
 use std::path::{Path, PathBuf};
-use std::sync::Weak;
 use url::Url;
 
 pub(crate) struct PackageManagerHelper {
-    _plugin_manager: Weak<PluginManager>,
     cache_dir: PathBuf,
 }
 
 impl PackageManagerHelper {
-    pub(crate) fn new<P: Into<PathBuf>>(
-        plugin_manager: Weak<PluginManager>,
-        cache_dir: P,
-    ) -> PackageManagerContext {
+    pub(crate) fn new<P: Into<PathBuf>>(cache_dir: P) -> PackageManagerContext {
         PackageManagerContext::new(Box::new(Self {
-            _plugin_manager: plugin_manager,
             cache_dir: cache_dir.into(),
         }))
     }

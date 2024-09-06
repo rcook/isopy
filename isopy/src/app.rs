@@ -33,7 +33,6 @@ use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
 
 pub struct App {
     config_dir: PathBuf,
@@ -42,7 +41,7 @@ pub struct App {
     cache_dir: PathBuf,
     repo: Repo,
     project_config_path: PathBuf,
-    plugin_manager: Arc<PluginManager>,
+    plugin_manager: PluginManager,
 }
 
 impl App {
