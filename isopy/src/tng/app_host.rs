@@ -27,20 +27,16 @@ use std::sync::{Arc, Weak};
 
 pub(crate) struct AppHost {
     plugin_manager: Weak<PluginManager>,
-    moniker: String,
 }
 
 impl AppHost {
-    pub(crate) fn new<S: Into<String>>(plugin_manager: Weak<PluginManager>, moniker: S) -> Host {
-        Host::new(Arc::new(Box::new(Self {
-            plugin_manager,
-            moniker: moniker.into(),
-        })))
+    pub(crate) fn new(plugin_manager: Weak<PluginManager>) -> Host {
+        Host::new(Arc::new(Box::new(Self { plugin_manager })))
     }
 }
 
 impl HostOps for AppHost {
     fn new_package_manager_context(&self, cache_dir: &Path) -> PackageManagerContext {
-        AppManagerContext::new(Weak::clone(&self.plugin_manager), &self.moniker, cache_dir)
+        AppManagerContext::new(Weak::clone(&self.plugin_manager), cache_dir)
     }
 }

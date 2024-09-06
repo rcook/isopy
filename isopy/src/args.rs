@@ -184,7 +184,7 @@ pub enum Command {
 
     #[command(name = "update", about = "(Incubating feature) Update package indices")]
     Update {
-        #[arg(help = "Moniker of package manager to update")]
+        #[arg(help = "Package manager to update")]
         moniker: Option<Moniker>,
     },
 

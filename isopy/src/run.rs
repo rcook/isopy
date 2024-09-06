@@ -34,6 +34,7 @@ use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
+use crate::tng::Moniker;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_logger::init_ui;
@@ -124,7 +125,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
-        Update { moniker } => update(&app, &moniker).await,
+        Update { moniker } => update(&app, &moniker.map(Into::<Moniker>::into)).await,
         Wrap {
             wrapper_file_name,
             script_path,

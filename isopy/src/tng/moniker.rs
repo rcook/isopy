@@ -19,18 +19,48 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::plugin_manager::PluginManager;
 use anyhow::{bail, Error, Result};
+use clap::ValueEnum;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
 use std::str::FromStr;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
-#[derive(Clone, Debug)]
-pub(crate) struct Moniker(String);
+const GO_STR: &str = "go";
+const JAVA_STR: &str = "java";
+const PYTHON_STR: &str = "python";
+
+#[derive(Clone, Debug, EnumIter, ValueEnum)]
+
+pub(crate) enum Moniker {
+    #[clap(name = GO_STR)]
+    Go,
+
+    #[clap(name = JAVA_STR)]
+    Java,
+
+    #[clap(name = PYTHON_STR)]
+    Python,
+}
 
 impl Moniker {
     pub(crate) fn as_str(&self) -> &str {
-        &self.0
+        match self {
+            Self::Go => GO_STR,
+            Self::Java => JAVA_STR,
+            Self::Python => PYTHON_STR,
+        }
+    }
+
+    pub(crate) fn dir(&self) -> &Path {
+        Path::new(self.as_str())
+    }
+}
+
+impl Display for Moniker {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.as_str())
     }
 }
 
@@ -38,22 +68,11 @@ impl FromStr for Moniker {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
-        if PluginManager::new().get_plugin(s).is_err() {
-            bail!("Unknown plugin moniker {s}");
-        };
-
-        Ok(Self(String::from(s)))
-    }
-}
-
-impl Display for Moniker {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl AsRef<Path> for Moniker {
-    fn as_ref(&self) -> &Path {
-        Path::new(&self.0)
+        for value in Self::iter() {
+            if value.as_str() == s {
+                return Ok(value);
+            }
+        }
+        bail!("Invalid package manager moniker {s}")
     }
 }

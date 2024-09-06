@@ -24,11 +24,12 @@ use crate::status::{return_success, Status};
 use crate::tng::Moniker;
 use anyhow::Result;
 use log::info;
+use strum::IntoEnumIterator;
 
 pub(crate) async fn update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn update_index(app: &App, moniker: &Moniker) -> Result<()> {
         app.plugin_manager()
-            .new_package_manager(moniker, app.config_dir())?
+            .new_package_manager(moniker, app.config_dir())
             .update_index()
             .await?;
         info!("Updated index for package manager {moniker}");
@@ -37,13 +38,15 @@ pub(crate) async fn update(app: &App, moniker: &Option<Moniker>) -> Result<Statu
 
     match moniker {
         Some(moniker) => {
-            update_index(app, &moniker).await?;
+            update_index(app, moniker).await?;
+            todo!()
         }
         None => {
-            for s in app.plugin_manager().get_plugin_monikers() {
-                update_index(app, &s.parse()?).await?;
+            for moniker in Moniker::iter() {
+                update_index(app, &moniker).await?;
             }
         }
     }
+
     return_success!();
 }

@@ -20,13 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::package_id::PackageId as LegacyPackageId;
+use crate::tng::moniker::Moniker;
 use crate::tng::plugin_manager::PluginManager;
 use anyhow::{bail, Error, Result};
 use isopy_lib::tng::Version;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
-
-use super::Moniker;
 
 pub(crate) struct PackageId {
     moniker: Moniker,
@@ -51,12 +50,9 @@ impl FromStr for PackageId {
             bail!("Invalid package ID {s}")
         };
 
-        let Ok(moniker) = moniker_str.parse::<Moniker>() else {
-            bail!("Unknown plugin moniker {moniker_str}");
-        };
-
+        let moniker = moniker_str.parse::<Moniker>()?;
         let plugin_manager = PluginManager::new();
-        let plugin = plugin_manager.get_plugin(moniker.as_str())?;
+        let plugin = plugin_manager.get_plugin(&moniker);
 
         let Ok(version) = plugin.parse_version(version_str) else {
             bail!("Invalid version string {s} for plugin {moniker}");

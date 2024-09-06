@@ -20,9 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 pub(crate) const CACHE_DIR_NAME: &str = "cache";
-pub(crate) const GO_PLUGIN_MONIKER: &str = "go";
-pub(crate) const JAVA_PLUGIN_MONIKER: &str = "java";
-pub(crate) const PYTHON_PLUGIN_MONIKER: &str = "python";
 pub(crate) const CACHE_FILE_NAME: &str = "cache.json";
 pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
 pub(crate) const ISOPY_USER_AGENT: &str = "isopy";

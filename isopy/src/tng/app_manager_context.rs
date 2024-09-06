@@ -41,19 +41,16 @@ use url::Url;
 
 pub(crate) struct AppManagerContext {
     _app: Weak<PluginManager>,
-    _moniker: String,
     cache_dir: PathBuf,
 }
 
 impl AppManagerContext {
-    pub(crate) fn new<S: Into<String>, P: Into<PathBuf>>(
+    pub(crate) fn new<P: Into<PathBuf>>(
         app: Weak<PluginManager>,
-        moniker: S,
         cache_dir: P,
     ) -> PackageManagerContext {
         PackageManagerContext::new(Box::new(Self {
             _app: app,
-            _moniker: moniker.into(),
             cache_dir: cache_dir.into(),
         }))
     }
