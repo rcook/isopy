@@ -52,7 +52,7 @@ pub async fn install(app: &App) -> Result<Status> {
     for package_rec in project_rec.packages {
         let Some(plugin_host) = plugin_hosts.get(&package_rec.id) else {
             return_user_error!(
-                "no project configuration file in directory {}",
+                "No project configuration file in directory {}",
                 app.cwd().display()
             );
         };
