@@ -22,7 +22,7 @@
 use super::api::{ImageType, Release, Singleton};
 use super::client::{all_versions, AdoptiumClient, Query};
 use crate::constants::{ADOPTIUM_INDEX_FILE_NAME, ADOPTIUM_SERVER_URL, TWELVE_HOURS};
-use crate::serialization::{IndexRec, VersionRec};
+use crate::serialization::{Index, Version};
 use anyhow::{bail, Result};
 use chrono::Utc;
 use joatmon::{read_yaml_file, safe_write_file};
@@ -63,7 +63,7 @@ impl AdoptiumIndexManager {
         }
     }
 
-    pub async fn read_versions(&self) -> Result<Vec<VersionRec>> {
+    pub async fn read_versions(&self) -> Result<Vec<Version>> {
         let index = self.read_index().await?;
         let mut versions = index.versions;
         versions.sort_by(|a, b| b.openjdk_version.cmp(&a.openjdk_version));
@@ -79,12 +79,12 @@ impl AdoptiumIndexManager {
         Ok(())
     }
 
-    async fn read_index(&self) -> Result<IndexRec> {
+    async fn read_index(&self) -> Result<Index> {
         if !self.index_path.exists() {
             return self.refresh_index(false).await;
         }
 
-        let index = read_yaml_file::<IndexRec>(&self.index_path)?;
+        let index = read_yaml_file::<Index>(&self.index_path)?;
         if Utc::now() - index.last_updated_at < *TWELVE_HOURS {
             return Ok(index);
         }
@@ -92,14 +92,14 @@ impl AdoptiumIndexManager {
         self.refresh_index(true).await
     }
 
-    async fn refresh_index(&self, overwrite: bool) -> Result<IndexRec> {
+    async fn refresh_index(&self, overwrite: bool) -> Result<Index> {
         let index = self.download_index().await?;
         safe_write_file(&self.index_path, serde_yaml::to_string(&index)?, overwrite)?;
         Ok(index)
     }
 
-    async fn download_index(&self) -> Result<IndexRec> {
-        fn make_version(release: &Release) -> Option<VersionRec> {
+    async fn download_index(&self) -> Result<Index> {
+        fn make_version(release: &Release) -> Option<Version> {
             let binary = release.binaries.single()?;
 
             let package = binary.package.as_ref()?;
@@ -112,7 +112,7 @@ impl AdoptiumIndexManager {
 
             let checksum = package.checksum.as_ref()?;
 
-            Some(VersionRec {
+            Some(Version {
                 openjdk_version: release.version_data.openjdk_version.clone(),
                 file_name: package.name.clone(),
                 url,
@@ -135,7 +135,7 @@ impl AdoptiumIndexManager {
             .filter_map(make_version)
             .collect::<Vec<_>>();
 
-        Ok(IndexRec {
+        Ok(Index {
             last_updated_at,
             versions,
         })

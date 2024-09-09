@@ -19,12 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod env_config_rec;
-mod index_rec;
-mod project_config_rec;
-mod version_rec;
+mod env_config;
+mod index;
+mod project_config;
+mod version;
 
-pub use self::env_config_rec::EnvConfigRec;
-pub use self::index_rec::IndexRec;
-pub use self::project_config_rec::ProjectConfigRec;
-pub use self::version_rec::VersionRec;
+pub use env_config::EnvConfig;
+pub use index::Index;
+pub use project_config::ProjectConfig;
+pub use version::Version;

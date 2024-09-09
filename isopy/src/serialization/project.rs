@@ -19,11 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::RepositoryRec;
+use crate::serialization::Package;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct RepositoriesRec {
-    #[serde(rename = "repositories")]
-    pub repositories: Vec<RepositoryRec>,
+pub struct Project {
+    #[serde(rename = "packages")]
+    pub packages: Vec<Package>,
 }

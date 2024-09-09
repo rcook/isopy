@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod index_rec;
-mod version_rec;
+mod index;
+mod version;
 
-pub use self::index_rec::IndexRec;
-pub use self::version_rec::VersionRec;
+pub use index::Index;
+pub use version::Version;

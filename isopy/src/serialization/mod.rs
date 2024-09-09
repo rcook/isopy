@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod env_rec;
-mod package_rec;
-mod project_rec;
+mod env;
+mod package;
+mod project;
 
-pub use self::env_rec::EnvRec;
-pub use self::package_rec::PackageRec;
-pub use self::project_rec::ProjectRec;
+pub use env::Env;
+pub use package::Package;
+pub use project::Project;

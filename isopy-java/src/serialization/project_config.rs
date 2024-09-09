@@ -21,13 +21,9 @@
 //
 use crate::java_descriptor::JavaDescriptor;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct EnvConfigRec {
-    #[serde(rename = "dir")]
-    pub dir: PathBuf,
-
+pub struct ProjectConfig {
     #[serde(rename = "descriptor")]
     pub descriptor: JavaDescriptor,
 }

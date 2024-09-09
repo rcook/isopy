@@ -21,7 +21,7 @@
 //
 use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::registry::Registry;
-use crate::serialization::EnvRec;
+use crate::serialization::Env;
 use anyhow::Result;
 use isopy_lib::{EnvInfo, Platform, Shell};
 use joat_repo::{DirInfo, Manifest};
@@ -30,8 +30,8 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 pub trait DirInfoExt {
-    fn read_env_config(&self) -> Result<EnvRec>;
-    fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()>;
+    fn read_env_config(&self) -> Result<Env>;
+    fn write_env_config(&self, env_rec: &Env, overwrite: bool) -> Result<()>;
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
     fn make_script_command(
         &self,
@@ -42,11 +42,11 @@ pub trait DirInfoExt {
 }
 
 impl DirInfoExt for DirInfo {
-    fn read_env_config(&self) -> Result<EnvRec> {
+    fn read_env_config(&self) -> Result<Env> {
         read_env_config(self.data_dir())
     }
 
-    fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()> {
+    fn write_env_config(&self, env_rec: &Env, overwrite: bool) -> Result<()> {
         write_env_config(self.data_dir(), env_rec, overwrite)
     }
 
@@ -65,11 +65,11 @@ impl DirInfoExt for DirInfo {
 }
 
 impl DirInfoExt for Manifest {
-    fn read_env_config(&self) -> Result<EnvRec> {
+    fn read_env_config(&self) -> Result<Env> {
         read_env_config(self.data_dir())
     }
 
-    fn write_env_config(&self, env_rec: &EnvRec, overwrite: bool) -> Result<()> {
+    fn write_env_config(&self, env_rec: &Env, overwrite: bool) -> Result<()> {
         write_env_config(self.data_dir(), env_rec, overwrite)
     }
 
@@ -91,11 +91,11 @@ fn make_env_config_path(data_dir: &Path) -> PathBuf {
     data_dir.join(&*ENV_CONFIG_FILE_NAME)
 }
 
-fn read_env_config(data_dir: &Path) -> Result<EnvRec> {
+fn read_env_config(data_dir: &Path) -> Result<Env> {
     Ok(read_yaml_file(&make_env_config_path(data_dir))?)
 }
 
-fn write_env_config(data_dir: &Path, env_rec: &EnvRec, overwrite: bool) -> Result<()> {
+fn write_env_config(data_dir: &Path, env_rec: &Env, overwrite: bool) -> Result<()> {
     safe_write_file(
         &make_env_config_path(data_dir),
         serde_yaml::to_string(env_rec)?,

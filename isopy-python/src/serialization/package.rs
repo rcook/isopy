@@ -19,15 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_descriptor::PythonDescriptor;
-use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use crate::serialization::Asset;
+use crate::tag::Tag;
+use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct EnvConfigRec {
-    #[serde(rename = "dir")]
-    pub dir: PathBuf,
+#[derive(Debug, Deserialize)]
+pub struct Package {
+    #[serde(rename = "tag_name")]
+    pub tag: Tag,
 
-    #[serde(rename = "descriptor")]
-    pub descriptor: PythonDescriptor,
+    #[serde(rename = "assets")]
+    pub assets: Vec<Asset>,
 }

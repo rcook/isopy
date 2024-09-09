@@ -19,26 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use reqwest::Url;
+use crate::python_descriptor::PythonDescriptor;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct VersionRec {
-    #[serde(rename = "version")]
-    pub version: String,
+pub struct EnvConfig {
+    #[serde(rename = "dir")]
+    pub dir: PathBuf,
 
-    #[serde(rename = "stable")]
-    pub stable: bool,
-
-    #[serde(rename = "file_name")]
-    pub file_name: String,
-
-    #[serde(rename = "url")]
-    pub url: Url,
-
-    #[serde(rename = "size")]
-    pub size: u64,
-
-    #[serde(rename = "checksum")]
-    pub checksum: String,
+    #[serde(rename = "descriptor")]
+    pub descriptor: PythonDescriptor,
 }

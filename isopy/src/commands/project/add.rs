@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
-use crate::serialization::{PackageRec, ProjectRec};
+use crate::serialization::{Package, Project};
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use log::info;
@@ -35,12 +35,12 @@ pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
         return_user_error!("environment already has a package with ID \"{id}\" configured");
     }
 
-    packages.push(PackageRec {
+    packages.push(Package {
         id: String::from(id),
         props: package_id.descriptor().get_project_props()?,
     });
 
-    app.write_project_config(&ProjectRec { packages }, true)?;
+    app.write_project_config(&Project { packages }, true)?;
     info!(
         "added package \"{id}\" to project at {}",
         app.cwd().display()

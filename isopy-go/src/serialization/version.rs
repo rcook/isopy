@@ -19,11 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::PackageRec;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct ProjectRec {
-    #[serde(rename = "packages")]
-    pub packages: Vec<PackageRec>,
+pub struct Version {
+    #[serde(rename = "version")]
+    pub version: String,
+
+    #[serde(rename = "stable")]
+    pub stable: bool,
+
+    #[serde(rename = "file_name")]
+    pub file_name: String,
+
+    #[serde(rename = "url")]
+    pub url: Url,
+
+    #[serde(rename = "size")]
+    pub size: u64,
+
+    #[serde(rename = "checksum")]
+    pub checksum: String,
 }

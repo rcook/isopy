@@ -24,7 +24,7 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
-use crate::serialization::EnvRec;
+use crate::serialization::Env;
 use crate::table::{table_columns, table_divider, table_line, table_title, Table, TableSettings};
 use anyhow::{anyhow, Result};
 use colored::{Color, Colorize};
@@ -56,7 +56,7 @@ pub fn print_repo(table: &mut Table, repo: &Repo) {
 pub fn print_metadir(
     table: &mut Table,
     manifest: &Manifest,
-    env_rec: &Option<EnvRec>,
+    env_rec: &Option<Env>,
     idx: Option<usize>,
 ) {
     if let Some(i) = idx {
@@ -88,7 +88,7 @@ pub fn print_metadir(
     table_columns!(table, "Created at", manifest.created_at());
 }
 
-pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<EnvRec>) {
+pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<Env>) {
     if let Some(env_rec) = env_rec {
         table_columns!(table, "Project directory", env_rec.project_dir.display());
 

@@ -19,11 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::LastModified;
+use super::version::Version;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct IndexRec {
-    #[serde(rename = "last_modified")]
-    pub last_modified: LastModified,
+pub struct Index {
+    #[serde(rename = "last_updated_at")]
+    pub last_updated_at: DateTime<Utc>,
+
+    #[serde(rename = "versions")]
+    pub versions: Vec<Version>,
 }

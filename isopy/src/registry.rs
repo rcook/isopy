@@ -24,7 +24,7 @@ use crate::constants::{
 };
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::{PluginHost, PluginHostRef};
-use crate::serialization::PackageRec;
+use crate::serialization::Package;
 use anyhow::{bail, Result};
 use isopy_go::GoPluginFactory;
 use isopy_java::JavaPluginFactory;
@@ -84,7 +84,7 @@ impl Registry {
     pub fn make_env_info(
         &self,
         data_dir: &Path,
-        package_rec: &PackageRec,
+        package_rec: &Package,
         base_dir: Option<&Path>,
     ) -> Result<Option<EnvInfo>> {
         let Some(plugin_host) = self
@@ -104,7 +104,7 @@ impl Registry {
 
     pub fn make_script_command(
         &self,
-        package_rec: &PackageRec,
+        package_rec: &Package,
         script_path: &Path,
         platform: Platform,
         shell: Shell,

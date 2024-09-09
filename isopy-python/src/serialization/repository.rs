@@ -26,7 +26,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(tag = "type")]
-pub enum RepositoryRec {
+pub enum Repository {
     #[serde(rename = "github")]
     GitHub {
         #[serde(rename = "name")]

@@ -33,7 +33,9 @@ use crate::python_version::PythonVersion;
 use crate::repository::Repository;
 use crate::repository_info::RepositoryInfo;
 use crate::repository_name::RepositoryName;
-use crate::serialization::{IndexRec, PackageRec, RepositoriesRec, RepositoryRec};
+use crate::serialization::{
+    Index, Package as Package_serialization, Repositories, Repository as Repository_serialization,
+};
 use crate::tag::Tag;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -70,7 +72,7 @@ impl PythonPlugin {
 
     fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_path = self.dir.join(RELEASES_FILE_NAME);
-        let package_recs = read_json_file::<Vec<PackageRec>>(&index_path)?;
+        let package_recs = read_json_file::<Vec<Package_serialization>>(&index_path)?;
 
         let mut assets = Vec::new();
         for package_rec in package_recs {
@@ -93,15 +95,15 @@ impl PythonPlugin {
     fn read_repositories(&self) -> Result<Vec<RepositoryInfo>> {
         fn make_repository(
             offline: bool,
-            rec: RepositoryRec,
+            rec: Repository_serialization,
         ) -> (RepositoryName, bool, Box<dyn Repository>) {
             match rec {
-                RepositoryRec::GitHub { name, url, enabled } => (
+                Repository_serialization::GitHub { name, url, enabled } => (
                     name,
                     enabled,
                     Box::new(GitHubRepository::new(offline, &url)),
                 ),
-                RepositoryRec::Local { name, dir, enabled } => {
+                Repository_serialization::Local { name, dir, enabled } => {
                     (name, enabled, Box::new(LocalRepository::new(&dir)))
                 }
             }
@@ -109,16 +111,16 @@ impl PythonPlugin {
 
         let repositories_yaml_path = self.dir.join(REPOSITORIES_FILE_NAME);
         let repositories_rec = if repositories_yaml_path.is_file() {
-            read_yaml_file::<RepositoriesRec>(&repositories_yaml_path)?
+            read_yaml_file::<Repositories>(&repositories_yaml_path)?
         } else {
-            let repositories_rec = RepositoriesRec {
+            let repositories_rec = Repositories {
                 repositories: vec![
-                    RepositoryRec::GitHub {
+                    Repository_serialization::GitHub {
                         name: RepositoryName::Default,
                         url: dir_url(&RELEASES_URL),
                         enabled: true,
                     },
-                    RepositoryRec::Local {
+                    Repository_serialization::Local {
                         name: RepositoryName::Example,
                         dir: PathBuf::from("/path/to/local/repository"),
                         enabled: false,
@@ -190,7 +192,7 @@ impl PythonPlugin {
     ) -> Result<Option<LastModified>> {
         let index_path = self.index_path(repository_name);
         Ok(if index_path.is_file() {
-            Some(read_yaml_file::<IndexRec>(&index_path)?.last_modified)
+            Some(read_yaml_file::<Index>(&index_path)?.last_modified)
         } else {
             None
         })
@@ -204,7 +206,7 @@ impl PythonPlugin {
         let index_yaml_path = self.index_path(repository_name);
         safe_write_file(
             &index_yaml_path,
-            serde_yaml::to_string(&IndexRec {
+            serde_yaml::to_string(&Index {
                 last_modified: last_modified.clone(),
             })?,
             true,

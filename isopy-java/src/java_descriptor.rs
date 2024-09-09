@@ -21,7 +21,7 @@
 //
 use crate::error::{other_error, IsopyJavaError};
 use crate::java_version::JavaVersion;
-use crate::serialization::{EnvConfigRec, ProjectConfigRec};
+use crate::serialization::{EnvConfig, ProjectConfig};
 use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibResult};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -84,7 +84,7 @@ impl Descriptor for JavaDescriptor {
     }
 
     fn get_env_props(&self, bin_subdir: &Path) -> IsopyLibResult<Value> {
-        serde_json::to_value(EnvConfigRec {
+        serde_json::to_value(EnvConfig {
             dir: bin_subdir.to_path_buf(),
             descriptor: self.clone(),
         })
@@ -92,7 +92,7 @@ impl Descriptor for JavaDescriptor {
     }
 
     fn get_project_props(&self) -> IsopyLibResult<Value> {
-        serde_json::to_value(ProjectConfigRec {
+        serde_json::to_value(ProjectConfig {
             descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)

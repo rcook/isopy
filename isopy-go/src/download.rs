@@ -24,7 +24,7 @@ use crate::constants::DOWNLOADS_URL;
 use crate::error::other_error;
 use crate::filter::Filter;
 use crate::result::IsopyGoResult;
-use crate::serialization::{IndexRec, VersionRec};
+use crate::serialization::{Index, Version as Version_serialization};
 use chrono::Utc;
 use isopy_lib::dir_url;
 use joatmon::safe_write_file;
@@ -38,7 +38,7 @@ pub async fn download_index(filter: &Filter, index_path: &Path) -> IsopyGoResult
         filter: &Filter,
         version: &Version,
         file: &File,
-    ) -> IsopyGoResult<Option<VersionRec>> {
+    ) -> IsopyGoResult<Option<Version_serialization>> {
         let Some(os) = file.os.as_ref() else {
             return Ok(None);
         };
@@ -64,7 +64,7 @@ pub async fn download_index(filter: &Filter, index_path: &Path) -> IsopyGoResult
         };
 
         let url = server_url.join(&file.file_name).map_err(other_error)?;
-        Ok(Some(VersionRec {
+        Ok(Some(Version_serialization {
             version: version.version.clone(),
             stable: version.stable,
             file_name: file.file_name.clone(),
@@ -105,7 +105,7 @@ pub async fn download_index(filter: &Filter, index_path: &Path) -> IsopyGoResult
     }
 
     let last_updated_at = Utc::now();
-    let index_rec = IndexRec {
+    let index_rec = Index {
         last_updated_at,
         versions: version_recs,
     };

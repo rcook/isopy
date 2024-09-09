@@ -19,15 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::version_rec::VersionRec;
-use chrono::{DateTime, Utc};
+use crate::serialization::Package;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct IndexRec {
-    #[serde(rename = "last_updated_at")]
-    pub last_updated_at: DateTime<Utc>,
+pub struct Env {
+    #[serde(rename = "project_dir")]
+    pub project_dir: PathBuf,
 
-    #[serde(rename = "versions")]
-    pub versions: Vec<VersionRec>,
+    #[serde(rename = "packages")]
+    pub packages: Vec<Package>,
 }

@@ -19,15 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::AssetRec;
-use crate::tag::Tag;
-use serde::Deserialize;
+use super::version::Version;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
-pub struct PackageRec {
-    #[serde(rename = "tag_name")]
-    pub tag: Tag,
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Index {
+    #[serde(rename = "last_updated_at")]
+    pub last_updated_at: DateTime<Utc>,
 
-    #[serde(rename = "assets")]
-    pub assets: Vec<AssetRec>,
+    #[serde(rename = "versions")]
+    pub versions: Vec<Version>,
 }

@@ -23,7 +23,7 @@ use crate::adoptium::api::ImageType;
 use crate::constants::{ADOPTIUM_SERVER_URL, JDK_PLUGIN_TYPE, JRE_PLUGIN_TYPE, PLUGIN_NAME};
 use crate::java_descriptor::JavaDescriptor;
 use crate::java_plugin::JavaPlugin;
-use crate::serialization::{EnvConfigRec, ProjectConfigRec};
+use crate::serialization::{EnvConfig, ProjectConfig};
 use anyhow::anyhow;
 use isopy_lib::{
     other_error as isopy_lib_other_error, Descriptor, EnvInfo, IsopyLibResult, Platform, Plugin,
@@ -67,7 +67,7 @@ impl PluginFactory for JavaPluginFactory {
     }
 
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
-        let project_config_rec = serde_json::from_value::<ProjectConfigRec>(props.clone())
+        let project_config_rec = serde_json::from_value::<ProjectConfig>(props.clone())
             .map_err(isopy_lib_other_error)?;
         Ok(Box::new(project_config_rec.descriptor))
     }
@@ -85,7 +85,7 @@ impl PluginFactory for JavaPluginFactory {
         _base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo> {
         #[cfg(target_os = "macos")]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfig) -> Vec<PathBuf> {
             vec![data_dir
                 .join(&env_config_rec.dir)
                 .join("Contents")
@@ -94,12 +94,12 @@ impl PluginFactory for JavaPluginFactory {
         }
 
         #[cfg(any(target_os = "linux", target_os = "windows"))]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfigRec) -> Vec<PathBuf> {
+        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfig) -> Vec<PathBuf> {
             vec![data_dir.join(&env_config_rec.dir).join("bin")]
         }
 
         let env_config_rec =
-            serde_json::from_value::<EnvConfigRec>(props.clone()).map_err(isopy_lib_other_error)?;
+            serde_json::from_value::<EnvConfig>(props.clone()).map_err(isopy_lib_other_error)?;
 
         let openjdk_dir = data_dir.join(&env_config_rec.dir);
         let openjdk_dir_str = String::from(

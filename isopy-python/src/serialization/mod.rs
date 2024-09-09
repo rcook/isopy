@@ -19,18 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod asset_rec;
-mod env_config_rec;
-mod index_rec;
-mod package_rec;
-mod project_config_rec;
-mod repositories_rec;
-mod repository_rec;
+mod asset;
+mod env_config;
+mod index;
+mod package;
+mod project_config;
+mod repositories;
+mod repository;
 
-pub use self::asset_rec::AssetRec;
-pub use self::env_config_rec::EnvConfigRec;
-pub use self::index_rec::IndexRec;
-pub use self::package_rec::PackageRec;
-pub use self::project_config_rec::ProjectConfigRec;
-pub use self::repositories_rec::RepositoriesRec;
-pub use self::repository_rec::RepositoryRec;
+pub use asset::Asset;
+pub use env_config::EnvConfig;
+pub use index::Index;
+pub use package::Package;
+pub use project_config::ProjectConfig;
+pub use repositories::Repositories;
+pub use repository::Repository;

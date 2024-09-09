@@ -19,14 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::python_descriptor::PythonDescriptor;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct PackageRec {
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(flatten)]
-    pub props: Value,
+pub struct ProjectConfig {
+    #[serde(rename = "descriptor")]
+    pub descriptor: PythonDescriptor,
 }

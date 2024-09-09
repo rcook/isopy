@@ -19,11 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_descriptor::PythonDescriptor;
+use crate::java_version::JavaVersion;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct ProjectConfigRec {
-    #[serde(rename = "descriptor")]
-    pub descriptor: PythonDescriptor,
+pub struct Version {
+    #[serde(rename = "openjdk_version")]
+    pub openjdk_version: JavaVersion,
+
+    #[serde(rename = "file_name")]
+    pub file_name: String,
+
+    #[serde(rename = "url")]
+    pub url: Url,
+
+    #[serde(rename = "size")]
+    pub size: u64,
+
+    #[serde(rename = "checksum")]
+    pub checksum: String,
 }

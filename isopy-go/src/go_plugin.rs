@@ -23,7 +23,7 @@ use crate::constants::{ASSETS_DIR, INDEX_FILE_NAME};
 use crate::download::download_index;
 use crate::filter::Filter;
 use crate::go_version::GoVersion;
-use crate::serialization::{IndexRec, VersionRec};
+use crate::serialization::{Index, Version};
 use async_trait::async_trait;
 use isopy_lib::{
     download_stream, other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor,
@@ -46,7 +46,7 @@ pub struct GoPlugin {
 
 struct PackageInfo {
     package: Package,
-    version_rec: VersionRec,
+    version_rec: Version,
     version: GoVersion,
 }
 
@@ -67,7 +67,7 @@ impl GoPlugin {
             .await
             .map_err(isopy_lib_other_error)?;
 
-        let index_rec = read_yaml_file::<IndexRec>(&index_path).map_err(isopy_lib_other_error)?;
+        let index_rec = read_yaml_file::<Index>(&index_path).map_err(isopy_lib_other_error)?;
 
         let mut infos = Vec::new();
         for version_rec in index_rec.versions {

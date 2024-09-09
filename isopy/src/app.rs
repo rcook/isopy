@@ -23,7 +23,7 @@ use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::default_config_dir;
 use crate::plugin_host::PluginHost;
-use crate::serialization::{EnvRec, PackageRec, ProjectRec};
+use crate::serialization::{Env, Package, Project};
 use crate::shell::IsopyEnv;
 use crate::tng::{Moniker, PluginManager};
 use anyhow::{bail, Result};
@@ -82,13 +82,13 @@ impl App {
         self.project_config_path.is_file()
     }
 
-    pub(crate) fn read_project_config(&self) -> Result<ProjectRec> {
+    pub(crate) fn read_project_config(&self) -> Result<Project> {
         Ok(read_yaml_file(&self.project_config_path)?)
     }
 
     pub(crate) fn write_project_config(
         &self,
-        project_rec: &ProjectRec,
+        project_rec: &Project,
         overwrite: bool,
     ) -> Result<()> {
         safe_write_file(
@@ -159,13 +159,13 @@ impl App {
             .on_after_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
-        packages.push(PackageRec {
+        packages.push(Package {
             id: String::from(plugin_host.prefix()),
             props: descriptor.get_env_props(bin_subdir)?,
         });
 
         dir_info.write_env_config(
-            &EnvRec {
+            &Env {
                 project_dir: project_dir.clone(),
                 packages,
             },

@@ -19,11 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::java_descriptor::JavaDescriptor;
-use serde::{Deserialize, Serialize};
+use reqwest::Url;
+use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ProjectConfigRec {
-    #[serde(rename = "descriptor")]
-    pub descriptor: JavaDescriptor,
+#[derive(Debug, Deserialize)]
+pub struct Asset {
+    #[serde(rename = "browser_download_url")]
+    pub url: Url,
+
+    #[serde(rename = "name")]
+    pub name: String,
+
+    #[serde(rename = "size")]
+    pub size: i64,
 }
