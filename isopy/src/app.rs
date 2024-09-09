@@ -33,7 +33,7 @@ use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, Yam
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-pub struct App {
+pub(crate) struct App {
     config_dir: PathBuf,
     offline: bool,
     cwd: PathBuf,
@@ -44,7 +44,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
+    pub(crate) fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         let plugin_manager = PluginManager::new();
         Ok(Self {
@@ -58,35 +58,39 @@ impl App {
         })
     }
 
-    pub const fn offline(&self) -> bool {
+    pub(crate) const fn offline(&self) -> bool {
         self.offline
     }
 
-    pub fn config_dir(&self) -> &Path {
+    pub(crate) fn config_dir(&self) -> &Path {
         &self.config_dir
     }
 
-    pub fn cwd(&self) -> &Path {
+    pub(crate) fn cwd(&self) -> &Path {
         &self.cwd
     }
 
-    pub fn cache_dir(&self) -> &Path {
+    pub(crate) fn cache_dir(&self) -> &Path {
         &self.cache_dir
     }
 
-    pub const fn repo(&self) -> &Repo {
+    pub(crate) const fn repo(&self) -> &Repo {
         &self.repo
     }
 
-    pub fn has_project_config_file(&self) -> bool {
+    pub(crate) fn has_project_config_file(&self) -> bool {
         self.project_config_path.is_file()
     }
 
-    pub fn read_project_config(&self) -> Result<ProjectRec> {
+    pub(crate) fn read_project_config(&self) -> Result<ProjectRec> {
         Ok(read_yaml_file(&self.project_config_path)?)
     }
 
-    pub fn write_project_config(&self, project_rec: &ProjectRec, overwrite: bool) -> Result<()> {
+    pub(crate) fn write_project_config(
+        &self,
+        project_rec: &ProjectRec,
+        overwrite: bool,
+    ) -> Result<()> {
         safe_write_file(
             &self.project_config_path,
             serde_yaml::to_string(project_rec)?,
@@ -95,7 +99,7 @@ impl App {
         Ok(())
     }
 
-    pub async fn add_package(
+    pub(crate) async fn add_package(
         &self,
         plugin_host: &PluginHost,
         descriptor: &dyn Descriptor,
@@ -171,7 +175,7 @@ impl App {
         Ok(())
     }
 
-    pub fn find_link(&self, link_id: &LinkId) -> RepoResult<Option<Link>> {
+    pub(crate) fn find_link(&self, link_id: &LinkId) -> RepoResult<Option<Link>> {
         // THIS IS A TEMPORARY HACK!
         // joat-repo-rs needs a method to get a DirInfo given a link ID or something
         for link in self.repo.list_links()? {
@@ -183,15 +187,15 @@ impl App {
         Ok(None)
     }
 
-    pub fn get_dir_info(&self, project_dir: &Path) -> Result<Option<DirInfo>> {
+    pub(crate) fn get_dir_info(&self, project_dir: &Path) -> Result<Option<DirInfo>> {
         Ok(self.repo.get(project_dir)?)
     }
 
-    pub fn remove_project_env(&self, project_dir: &Path) -> Result<bool> {
+    pub(crate) fn remove_project_env(&self, project_dir: &Path) -> Result<bool> {
         Ok(self.repo.remove(project_dir)?)
     }
 
-    pub fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
+    pub(crate) fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
         if let Some(isopy_env) = isopy_env {
             let Some(link) = self.find_link(isopy_env.link_id())? else {
                 return Ok(None);
