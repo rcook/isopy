@@ -50,7 +50,6 @@ mod python_version;
 mod repository;
 mod repository_info;
 mod repository_name;
-mod result;
 mod serialization;
 mod tag;
 

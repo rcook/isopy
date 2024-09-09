@@ -232,7 +232,6 @@ impl App {
         Ok(dir_info)
     }
 
-    #[allow(unused)]
     pub(crate) fn plugin_manager(&self) -> &PluginManager {
         &self.plugin_manager
     }
