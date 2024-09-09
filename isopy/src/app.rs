@@ -100,12 +100,12 @@ impl App {
         plugin_host: &PluginHost,
         descriptor: &dyn Descriptor,
     ) -> Result<()> {
-        let project_dir = self.cwd.clone();
+        let project_dir = &self.cwd;
         let mut packages = Vec::new();
 
         let dir_info = if let Some(dir_info) = self.repo.get(&project_dir)? {
             let env_rec = dir_info.read_env_config()?;
-            if env_rec.project_dir != project_dir {
+            if env_rec.project_dir != *project_dir {
                 bail!(
                     "Environment directory {} does not correspond to project directory {}",
                     dir_info.data_dir().display(),
@@ -164,7 +164,7 @@ impl App {
 
         dir_info.write_env_config(
             &EnvRec {
-                project_dir,
+                project_dir: project_dir.clone(),
                 packages,
             },
             true,
