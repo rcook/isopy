@@ -23,13 +23,10 @@ use crate::descriptor::Descriptor;
 use crate::package::Package;
 use crate::result::IsopyLibResult;
 use async_trait::async_trait;
-use std::path::Path;
 
 #[async_trait]
 pub trait Plugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package>;
-    async fn on_before_install(&self, output_dir: &Path, bin_subdir: &Path) -> IsopyLibResult<()>;
-    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> IsopyLibResult<()>;
 }

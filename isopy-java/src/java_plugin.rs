@@ -173,16 +173,4 @@ impl Plugin for JavaPlugin {
             descriptor: Arc::new(Box::new(descriptor.clone())),
         })
     }
-
-    async fn on_before_install(
-        &self,
-        _output_dir: &Path,
-        _bin_subdir: &Path,
-    ) -> IsopyLibResult<()> {
-        Ok(())
-    }
-
-    async fn on_after_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> IsopyLibResult<()> {
-        Ok(())
-    }
 }

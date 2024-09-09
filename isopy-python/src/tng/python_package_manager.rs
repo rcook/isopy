@@ -279,4 +279,39 @@ impl PackageManagerOps for PythonPackageManager {
             .await?;
         Ok(())
     }
+
+    async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()> {
+        Ok(())
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()> {
+        use std::os::unix::fs::symlink;
+
+        use log::trace;
+
+        let bin_dir = output_dir.join(bin_subdir).join("bin");
+        let link = bin_dir.join("python");
+        if !link.exists() {
+            let original = bin_dir.join("python3");
+            trace!("Creating link {} to {}", link.display(), original.display());
+            symlink(&original, &link)?;
+            trace!("Created link {} to {}", link.display(), original.display());
+        }
+        Ok(())
+    }
+
+    #[cfg(target_os = "windows")]
+    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()> {
+        use std::fs::write;
+
+        let cmd_path = output_dir.join(bin_subdir).join("python3.cmd");
+        if !cmd_path.exists() {
+            const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
+            trace!("Creating wrapper script {}", cmd_path.display());
+            write(&cmd_path, WRAPPER)?;
+            trace!("Created wrapper script {}", cmd_path.display());
+        }
+        Ok(())
+    }
 }

@@ -83,6 +83,20 @@ impl PluginOps for JavaPlugin {
                 warn!("JavaPlugin: not implemented!");
                 todo!()
             }
+
+            async fn on_before_install(
+                &self,
+                _output_dir: &Path,
+                _bin_subdir: &Path,
+            ) -> Result<()> {
+                warn!("JavaPlugin: not implemented!");
+                todo!()
+            }
+
+            async fn on_after_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()> {
+                warn!("JavaPlugin: not implemented!");
+                todo!()
+            }
         }
 
         PackageManager::new(Box::new(DummyManager))

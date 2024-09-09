@@ -46,6 +46,8 @@ pub trait PackageManagerOps: Send + Sync {
         tags: &OptionalTags,
         dir: &Path,
     ) -> Result<()>;
+    async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()>;
+    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
 
 pub struct PackageManager(Box<dyn PackageManagerOps>);

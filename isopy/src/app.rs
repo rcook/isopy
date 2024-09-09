@@ -27,7 +27,7 @@ use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
 use crate::tng::{Moniker, PluginManager};
 use anyhow::{bail, Result};
-use isopy_lib::{Descriptor, PluginFactory};
+use isopy_lib::Descriptor;
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
@@ -141,10 +141,8 @@ impl App {
             .new_package_manager(&moniker, &self.config_dir);
 
         let bin_subdir = Path::new(plugin_host.prefix());
-        let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
 
-        let legacy_plugin = plugin_host.make_plugin(self.offline, &plugin_dir);
-        legacy_plugin
+        package_manager
             .on_before_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
@@ -153,7 +151,7 @@ impl App {
             .install_package(&version, &None, &output_path)
             .await?;
 
-        legacy_plugin
+        package_manager
             .on_after_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
