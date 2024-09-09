@@ -108,7 +108,7 @@ impl App {
             let env_rec = dir_info.read_env_config()?;
             if env_rec.project_dir != project_dir {
                 bail!(
-                    "environment directory {} does not correspond to project directory {}",
+                    "Environment directory {} does not correspond to project directory {}",
                     dir_info.data_dir().display(),
                     project_dir.display()
                 );
@@ -119,7 +119,7 @@ impl App {
         } else {
             let Some(dir_info) = self.repo.init(&project_dir)? else {
                 bail!(
-                    "could not initialize environment for directory {}",
+                    "Could not initialize environment for directory {}",
                     project_dir.display()
                 )
             };
@@ -129,7 +129,7 @@ impl App {
 
         if packages.iter().any(|p| p.id == plugin_host.prefix()) {
             bail!(
-                "environment already has a package with ID {} configured",
+                "Environment already has a package with ID {} configured",
                 plugin_host.prefix()
             );
         }
