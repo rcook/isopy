@@ -522,7 +522,7 @@ dependencies = [
 [[package]]
 name = "decompress"
 version = "0.6.0"
-source = "git+https://github.com/rcook/decompress.git?rev=138bd44d10f0ced498a0e3f378c1caf54327b9bb#138bd44d10f0ced498a0e3f378c1caf54327b9bb"
+source = "git+https://github.com/rcook/decompress.git?rev=899bfe1e83a5ece3128d3523f2488f802545ccd7#899bfe1e83a5ece3128d3523f2488f802545ccd7"
 dependencies = [
  "ar",
  "bzip2",

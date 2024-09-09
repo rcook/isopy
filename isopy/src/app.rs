@@ -25,10 +25,9 @@ use crate::fs::default_config_dir;
 use crate::plugin_host::PluginHost;
 use crate::serialization::{EnvRec, PackageRec, ProjectRec};
 use crate::shell::IsopyEnv;
-use crate::tng::PluginManager;
-use crate::unpack::unpack_file;
+use crate::tng::{Moniker, PluginManager};
 use anyhow::{bail, Result};
-use isopy_lib::{Descriptor, Package, PluginFactory};
+use isopy_lib::{Descriptor, PluginFactory};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
@@ -134,27 +133,27 @@ impl App {
             );
         }
 
-        let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
-        let plugin = plugin_host.make_plugin(self.offline, &plugin_dir);
-        let Package {
-            asset_path,
-            descriptor,
-        } = plugin.download_package(descriptor).await?;
+        let moniker: Moniker = plugin_host.prefix().parse()?;
+        let plugin = self.plugin_manager.get_plugin(&moniker);
+        let version = plugin.parse_version(&descriptor.to_string())?;
+        let package_manager = self
+            .plugin_manager
+            .new_package_manager(&moniker, &self.config_dir);
 
         let bin_subdir = Path::new(plugin_host.prefix());
+        let plugin_dir = self.repo.shared_dir().join(plugin_host.prefix());
 
-        plugin
+        let legacy_plugin = plugin_host.make_plugin(self.offline, &plugin_dir);
+        legacy_plugin
             .on_before_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
-        unpack_file(
-            descriptor.as_ref().as_ref(),
-            &asset_path,
-            dir_info.data_dir(),
-            bin_subdir,
-        )?;
+        let output_path = dir_info.data_dir().join(bin_subdir);
+        package_manager
+            .install_package(&version, &None, &output_path)
+            .await?;
 
-        plugin
+        legacy_plugin
             .on_after_install(dir_info.data_dir(), bin_subdir)
             .await?;
 

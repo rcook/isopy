@@ -15,7 +15,7 @@ version = "0.3.25"
 anyhow = "1.0.86"
 async-trait = "0.1.82"
 bytes = "1.7.1"
-decompress = { git = "https://github.com/rcook/decompress.git", rev = "138bd44d10f0ced498a0e3f378c1caf54327b9bb" }
+decompress = { git = "https://github.com/rcook/decompress.git", rev = "899bfe1e83a5ece3128d3523f2488f802545ccd7" }
 include_dir = "0.7.4"
 isopy-lib = { path = "../isopy-lib" }
 joatmon = "0.0.34"

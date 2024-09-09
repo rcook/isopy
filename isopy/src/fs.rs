@@ -61,26 +61,6 @@ pub fn is_executable_file(path: &Path) -> Result<bool> {
     Ok(path.is_file() && inner(path)?)
 }
 
-pub fn set_file_mode(path: &Path, mode: u32) -> Result<()> {
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    fn inner(path: &Path, mode: u32) -> Result<()> {
-        use std::fs::{set_permissions, Permissions};
-        use std::os::unix::fs::PermissionsExt;
-
-        set_permissions(path, Permissions::from_mode(mode))?;
-        Ok(())
-    }
-
-    #[cfg(target_os = "windows")]
-    #[allow(clippy::missing_const_for_fn)]
-    #[allow(clippy::unnecessary_wraps)]
-    fn inner(_path: &Path, _mode: u32) -> Result<()> {
-        Ok(())
-    }
-
-    inner(path, mode)
-}
-
 pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<()> {

@@ -53,7 +53,6 @@ mod status;
 mod table;
 mod terminal;
 mod tng;
-mod unpack;
 mod wrapper_file_name;
 
 #[tokio::main]

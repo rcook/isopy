@@ -28,6 +28,8 @@ use async_trait::async_trait;
 use std::ops::Deref;
 use std::path::Path;
 
+pub type OptionalTags = Option<Vec<String>>;
+
 #[async_trait]
 pub trait PackageManagerOps: Send + Sync {
     async fn update_index(&self) -> Result<()>;
@@ -35,13 +37,13 @@ pub trait PackageManagerOps: Send + Sync {
     async fn list_packages(
         &self,
         filter: PackageFilter,
-        tags: &Option<Vec<String>>,
+        tags: &OptionalTags,
     ) -> Result<Vec<PackageSummary>>;
-    async fn download_package(&self, version: &Version, tags: &Option<Vec<String>>) -> Result<()>;
+    async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()>;
     async fn install_package(
         &self,
         version: &Version,
-        tags: &Option<Vec<String>>,
+        tags: &OptionalTags,
         dir: &Path,
     ) -> Result<()>;
 }

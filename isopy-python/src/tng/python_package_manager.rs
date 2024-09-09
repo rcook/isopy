@@ -25,8 +25,8 @@ use crate::tng::checksum::get_checksum;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{
-    DownloadOptions, PackageFilter, PackageKind, PackageManagerContext, PackageManagerOps,
-    PackageSummary, Tags, Version, VersionTriple,
+    DownloadOptions, OptionalTags, PackageFilter, PackageKind, PackageManagerContext,
+    PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -42,6 +42,15 @@ macro_rules! g {
             Some(value) => value,
             None => bail!("Invalid index"),
         }
+    };
+}
+
+macro_rules! downcast_version {
+    ($version : expr) => {
+        $version
+            .as_any()
+            .downcast_ref::<VersionTriple>()
+            .ok_or_else(|| anyhow!("Invalid version type"))?
     };
 }
 
@@ -111,7 +120,7 @@ impl PythonPackageManager {
         HashSet::from(["x86_64", "pc", "windows", "msvc", "shared", "install_only"])
     }
 
-    fn get_tags(tags: &Option<Vec<String>>) -> HashSet<&str> {
+    fn get_tags(tags: &OptionalTags) -> HashSet<&str> {
         tags.as_ref()
             .map(|t| t.iter().map(|item| item.as_str()).collect::<HashSet<_>>())
             .unwrap_or_else(|| Self::get_default_tags())
@@ -120,7 +129,7 @@ impl PythonPackageManager {
     fn get_archive(
         index: &Value,
         version: &VersionTriple,
-        tags: &Option<Vec<String>>,
+        tags: &OptionalTags,
     ) -> Result<ArchiveInfo> {
         let tags = Self::get_tags(tags);
         let mut archives = Vec::new();
@@ -203,7 +212,7 @@ impl PackageManagerOps for PythonPackageManager {
     async fn list_packages(
         &self,
         filter: PackageFilter,
-        tags: &Option<Vec<String>>,
+        tags: &OptionalTags,
     ) -> Result<Vec<PackageSummary>> {
         let tags = Self::get_tags(tags);
         let mut records = Vec::new();
@@ -243,11 +252,8 @@ impl PackageManagerOps for PythonPackageManager {
             .collect())
     }
 
-    async fn download_package(&self, version: &Version, tags: &Option<Vec<String>>) -> Result<()> {
-        let version = version
-            .as_any()
-            .downcast_ref::<VersionTriple>()
-            .ok_or_else(|| anyhow!("Invalid version type"))?;
+    async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()> {
+        let version = downcast_version!(version);
         let index = self.get_index(false).await?;
         let archive = Self::get_archive(&index, version, tags)?;
         let checksum = get_checksum(&archive)?;
@@ -259,13 +265,10 @@ impl PackageManagerOps for PythonPackageManager {
     async fn install_package(
         &self,
         version: &Version,
-        tags: &Option<Vec<String>>,
+        tags: &OptionalTags,
         dir: &Path,
     ) -> Result<()> {
-        let version = version
-            .as_any()
-            .downcast_ref::<VersionTriple>()
-            .ok_or_else(|| anyhow!("Invalid version type"))?;
+        let version = downcast_version!(version);
         let index = self.get_index(false).await?;
         let archive = Self::get_archive(&index, version, tags)?;
         let archive_path = self.ctx.get_file(archive.url()).await?;
@@ -274,7 +277,6 @@ impl PackageManagerOps for PythonPackageManager {
             .archive_type()
             .unpack(&archive_path, dir)
             .await?;
-        println!("{}", archive_path.display());
         Ok(())
     }
 }

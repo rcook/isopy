@@ -40,7 +40,7 @@ pub use download_options::DownloadOptions;
 pub use file_name_parts::FileNameParts;
 pub use package_filter::PackageFilter;
 pub use package_kind::PackageKind;
-pub use package_manager::{PackageManager, PackageManagerOps};
+pub use package_manager::{OptionalTags, PackageManager, PackageManagerOps};
 pub use package_manager_context::{PackageManagerContext, PackageManagerContextOps};
 pub use package_summary::PackageSummary;
 pub use plugin::{Plugin, PluginOps};
