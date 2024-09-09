@@ -35,7 +35,7 @@ pub async fn install(app: &App) -> Result<Status> {
         );
     }
 
-    let Some(project_rec) = existing(app.read_project_config())? else {
+    let Some(project) = existing(app.read_project_config())? else {
         return_user_error!(
             "No project configuration file in directory {}",
             app.cwd().display()
@@ -49,8 +49,8 @@ pub async fn install(app: &App) -> Result<Status> {
         .collect::<HashMap<_, _>>();
 
     let mut descriptors = Vec::new();
-    for package_rec in project_rec.packages {
-        let Some(plugin_host) = plugin_hosts.get(&package_rec.id) else {
+    for package in project.packages {
+        let Some(plugin_host) = plugin_hosts.get(&package.id) else {
             return_user_error!(
                 "No project configuration file in directory {}",
                 app.cwd().display()
@@ -59,7 +59,7 @@ pub async fn install(app: &App) -> Result<Status> {
 
         descriptors.push((
             *plugin_host,
-            plugin_host.read_project_config(&package_rec.props)?,
+            plugin_host.read_project_config(&package.props)?,
         ));
     }
 
