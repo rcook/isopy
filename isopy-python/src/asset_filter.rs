@@ -42,24 +42,6 @@ pub struct AssetFilter {
 }
 
 impl AssetFilter {
-    #[allow(unused)]
-    #[must_use]
-    pub const fn all() -> Self {
-        Self {
-            archive_type: None,
-            family: None,
-            version: None,
-            tag: None,
-            arch: None,
-            platform: None,
-            os: None,
-            flavour: None,
-            subflavour0: None,
-            subflavour1: None,
-            variant: None,
-        }
-    }
-
     #[cfg(target_os = "linux")]
     #[must_use]
     pub const fn default_for_platform() -> Self {
