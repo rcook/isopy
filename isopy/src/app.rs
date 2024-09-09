@@ -104,8 +104,8 @@ impl App {
         let mut packages = Vec::new();
 
         let dir_info = if let Some(dir_info) = self.repo.get(&project_dir)? {
-            let env_rec = dir_info.read_env_config()?;
-            if env_rec.project_dir != *project_dir {
+            let env = dir_info.read_env_config()?;
+            if env.project_dir != *project_dir {
                 bail!(
                     "Environment directory {} does not correspond to project directory {}",
                     dir_info.data_dir().display(),
@@ -113,7 +113,7 @@ impl App {
                 );
             }
 
-            packages.extend(env_rec.packages);
+            packages.extend(env.packages);
             dir_info
         } else {
             let Some(dir_info) = self.repo.init(&project_dir)? else {
