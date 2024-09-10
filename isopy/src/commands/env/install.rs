@@ -25,7 +25,8 @@ use crate::status::{return_success, Status};
 use anyhow::Result;
 
 pub async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
-    app.add_package(package_id.plugin_host(), package_id.descriptor())
+    let moniker = package_id.plugin_host().prefix().parse()?;
+    app.install_package(&moniker, package_id.descriptor())
         .await?;
     return_success!();
 }

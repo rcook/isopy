@@ -64,7 +64,8 @@ pub async fn install(app: &App) -> Result<Status> {
     }
 
     for (plugin_host, descriptor) in descriptors {
-        app.add_package(plugin_host, descriptor.as_ref()).await?;
+        let moniker = plugin_host.prefix().parse()?;
+        app.install_package(&moniker, descriptor.as_ref()).await?;
     }
 
     return_success!();

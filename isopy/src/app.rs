@@ -22,7 +22,6 @@
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::default_config_dir;
-use crate::plugin_host::PluginHost;
 use crate::serialization::{Env, Package, Project};
 use crate::shell::IsopyEnv;
 use crate::tng::{Moniker, PluginManager};
@@ -99,9 +98,9 @@ impl App {
         Ok(())
     }
 
-    pub(crate) async fn add_package(
+    pub(crate) async fn install_package(
         &self,
-        plugin_host: &PluginHost,
+        moniker: &Moniker,
         descriptor: &dyn Descriptor,
     ) -> Result<()> {
         let project_dir = &self.cwd;
@@ -130,21 +129,20 @@ impl App {
             dir_info
         };
 
-        if packages.iter().any(|p| p.id == plugin_host.prefix()) {
+        if packages.iter().any(|p| p.id == moniker.as_str()) {
             bail!(
                 "Environment already has a package with ID {} configured",
-                plugin_host.prefix()
+                moniker.as_str()
             );
         }
 
-        let moniker: Moniker = plugin_host.prefix().parse()?;
         let plugin = self.plugin_manager.get_plugin(&moniker);
         let version = plugin.parse_version(&descriptor.to_string())?;
         let package_manager = self
             .plugin_manager
             .new_package_manager(&moniker, &self.config_dir);
 
-        let bin_subdir = Path::new(plugin_host.prefix());
+        let bin_subdir = Path::new(moniker.as_str());
 
         package_manager
             .on_before_install(dir_info.data_dir(), bin_subdir)
@@ -160,7 +158,7 @@ impl App {
             .await?;
 
         packages.push(Package {
-            id: String::from(plugin_host.prefix()),
+            id: String::from(moniker.as_str()),
             props: descriptor.get_env_props(bin_subdir)?,
         });
 
