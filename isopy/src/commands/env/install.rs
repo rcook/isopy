@@ -26,7 +26,8 @@ use anyhow::Result;
 
 pub async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
     let moniker = package_id.plugin_host().prefix().parse()?;
-    app.install_package(&moniker, package_id.descriptor())
-        .await?;
+    let plugin = app.plugin_manager().get_plugin(&moniker);
+    let version = plugin.parse_version(&package_id.descriptor().to_string())?;
+    app.install_package(&moniker, &version).await?;
     return_success!();
 }
