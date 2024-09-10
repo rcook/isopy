@@ -21,11 +21,8 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::registry::Registry;
 use crate::status::{return_success, return_user_error, Status};
-use anyhow::Result;
-use isopy_lib::PluginFactory;
-use std::collections::HashMap;
+use anyhow::{bail, Result};
 
 pub async fn install(app: &App) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
@@ -42,27 +39,25 @@ pub async fn install(app: &App) -> Result<Status> {
         );
     };
 
-    let plugin_hosts = Registry::global()
-        .plugin_hosts
+    let package_infos = project
+        .packages
         .iter()
-        .map(|h| (String::from(h.prefix()), h))
-        .collect::<HashMap<_, _>>();
+        .map(|package| {
+            // TBD: Hack. Rename "descriptor" to "version" etc.
+            let Some(version_value) = package.props.get("descriptor") else {
+                bail!("Missing descriptor")
+            };
 
-    let mut package_infos = Vec::new();
-    for package in project.packages {
-        let Some(plugin_host) = plugin_hosts.get(&package.moniker) else {
-            return_user_error!(
-                "No project configuration file in directory {}",
-                app.cwd().display()
-            );
-        };
+            let Some(version_str) = version_value.as_str() else {
+                bail!("Invalid descriptor")
+            };
 
-        let descriptor = plugin_host.read_project_config(&package.props)?;
-        let moniker = package.moniker.parse()?;
-        let plugin = app.plugin_manager().get_plugin(&moniker);
-        let version = plugin.parse_version(&descriptor.to_string())?;
-        package_infos.push((moniker, version));
-    }
+            let moniker = package.moniker.parse()?;
+            let plugin = app.plugin_manager().get_plugin(&moniker);
+            let version = plugin.parse_version(version_str)?;
+            Ok((moniker, version))
+        })
+        .collect::<Result<Vec<_>>>()?;
 
     for (moniker, version) in package_infos {
         app.install_package(&moniker, &version).await?;
