@@ -46,8 +46,8 @@ pub struct GoPlugin {
 
 struct PackageInfo {
     package: Package,
-    version_rec: Version,
-    version: GoVersion,
+    version: Version,
+    go_version: GoVersion,
 }
 
 impl GoPlugin {
@@ -67,17 +67,17 @@ impl GoPlugin {
             .await
             .map_err(isopy_lib_other_error)?;
 
-        let index_rec = read_yaml_file::<Index>(&index_path).map_err(isopy_lib_other_error)?;
+        let index = read_yaml_file::<Index>(&index_path).map_err(isopy_lib_other_error)?;
 
         let mut infos = Vec::new();
-        for version_rec in index_rec.versions {
-            let asset_path = self.assets_dir.join(&version_rec.file_name);
-            let version = version_rec
+        for version in index.versions {
+            let asset_path = self.assets_dir.join(&version.file_name);
+            let go_version = version
                 .version
                 .parse::<GoVersion>()
                 .map_err(isopy_lib_other_error)?;
 
-            let descriptor: Arc<Box<dyn Descriptor>> = Arc::new(Box::new(version.clone()));
+            let descriptor: Arc<Box<dyn Descriptor>> = Arc::new(Box::new(go_version.clone()));
 
             let package = Package {
                 asset_path,
@@ -86,12 +86,12 @@ impl GoPlugin {
 
             infos.push(PackageInfo {
                 package,
-                version_rec,
                 version,
+                go_version,
             });
         }
 
-        infos.sort_by(|a, b| b.version.cmp(&a.version));
+        infos.sort_by(|a, b| b.go_version.cmp(&a.go_version));
 
         Ok(infos)
     }
@@ -125,7 +125,7 @@ impl Plugin for GoPlugin {
                 let asset_file_name = entry.file_name();
                 if let Some(x) = map
                     .get(&asset_file_name)
-                    .map(|x| (Arc::clone(&x.package.descriptor), &x.version))
+                    .map(|x| (Arc::clone(&x.package.descriptor), &x.go_version))
                 {
                     items.push((
                         Package {
@@ -151,13 +151,13 @@ impl Plugin for GoPlugin {
             .expect("must be GoVersion");
 
         let infos = self.get_available_package_infos().await?;
-        let Some(item) = infos.iter().find(|x| x.version == *version) else {
+        let Some(item) = infos.iter().find(|x| x.go_version == *version) else {
             return Err(IsopyLibError::VersionNotFound(version.to_string()));
         };
 
-        let asset_path = self.assets_dir.join(&item.version_rec.file_name);
+        let asset_path = self.assets_dir.join(&item.version.file_name);
         if asset_path.exists() {
-            info!("asset {} already downloaded", item.version_rec.file_name);
+            info!("asset {} already downloaded", item.version.file_name);
             return Ok(Package {
                 asset_path,
                 descriptor: Arc::new(Box::new(version.clone())),
@@ -165,12 +165,12 @@ impl Plugin for GoPlugin {
         }
 
         let client = Client::new();
-        let request = client.get(item.version_rec.url.clone());
+        let request = client.get(item.version.url.clone());
         let response = request.send().await.map_err(isopy_lib_other_error)?;
         let mut wrapped: Box<dyn Response> = Box::new(ReqwestResponse::new(None, response));
         download_stream("Go asset", &mut wrapped, &asset_path).await?;
 
-        let is_valid = verify_sha256_file_checksum(&item.version_rec.checksum, &asset_path)?;
+        let is_valid = verify_sha256_file_checksum(&item.version.checksum, &asset_path)?;
         if !is_valid {
             remove_file(&asset_path).map_err(isopy_lib_other_error)?;
             return Err(IsopyLibError::ChecksumValidationFailed(asset_path));

@@ -29,7 +29,7 @@ use anyhow::Result;
 
 pub fn prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
     let isopy_env = IsopyEnv::get_vars()?;
-    let env_rec = if let Some(d) = app.find_dir_info(isopy_env.as_ref())? {
+    let env = if let Some(d) = app.find_dir_info(isopy_env.as_ref())? {
         existing(d.read_env_config())?
     } else {
         None
@@ -37,11 +37,7 @@ pub fn prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
 
     let has_project_config_file = app.has_project_config_file();
 
-    let prompt_message = match (
-        isopy_env.is_some(),
-        env_rec.is_some(),
-        has_project_config_file,
-    ) {
+    let prompt_message = match (isopy_env.is_some(), env.is_some(), has_project_config_file) {
         (true, true, _) => Some(prompt_config.shell_message.as_deref().unwrap_or("(isopy)")),
         (true, false, _) => Some(prompt_config.error_message.as_deref().unwrap_or("(!)")),
         (false, true, _) => Some(prompt_config.available_message.as_deref().unwrap_or("(*)")),

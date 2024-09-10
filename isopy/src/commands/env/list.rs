@@ -46,8 +46,8 @@ fn list_verbose(app: &App) -> Result<()> {
         table_title!(table, "Metadirectories");
         for (idx, manifest) in manifests.iter().enumerate() {
             table_divider!(table, "({}) {}", idx + 1, manifest.meta_id());
-            let env_rec = existing(manifest.read_env_config())?;
-            print_metadir(&mut table, manifest, &env_rec, None);
+            let env = existing(manifest.read_env_config())?;
+            print_metadir(&mut table, manifest, &env, None);
         }
     }
 

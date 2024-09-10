@@ -85,14 +85,10 @@ impl App {
         Ok(read_yaml_file(&self.project_config_path)?)
     }
 
-    pub(crate) fn write_project_config(
-        &self,
-        project_rec: &Project,
-        overwrite: bool,
-    ) -> Result<()> {
+    pub(crate) fn write_project_config(&self, project: &Project, overwrite: bool) -> Result<()> {
         safe_write_file(
             &self.project_config_path,
-            serde_yaml::to_string(project_rec)?,
+            serde_yaml::to_string(project)?,
             overwrite,
         )?;
         Ok(())

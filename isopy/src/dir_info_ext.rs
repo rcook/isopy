@@ -31,7 +31,7 @@ use std::path::{Path, PathBuf};
 
 pub trait DirInfoExt {
     fn read_env_config(&self) -> Result<Env>;
-    fn write_env_config(&self, env_rec: &Env, overwrite: bool) -> Result<()>;
+    fn write_env_config(&self, env: &Env, overwrite: bool) -> Result<()>;
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
     fn make_script_command(
         &self,
@@ -46,8 +46,8 @@ impl DirInfoExt for DirInfo {
         read_env_config(self.data_dir())
     }
 
-    fn write_env_config(&self, env_rec: &Env, overwrite: bool) -> Result<()> {
-        write_env_config(self.data_dir(), env_rec, overwrite)
+    fn write_env_config(&self, env: &Env, overwrite: bool) -> Result<()> {
+        write_env_config(self.data_dir(), env, overwrite)
     }
 
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
@@ -69,8 +69,8 @@ impl DirInfoExt for Manifest {
         read_env_config(self.data_dir())
     }
 
-    fn write_env_config(&self, env_rec: &Env, overwrite: bool) -> Result<()> {
-        write_env_config(self.data_dir(), env_rec, overwrite)
+    fn write_env_config(&self, env: &Env, overwrite: bool) -> Result<()> {
+        write_env_config(self.data_dir(), env, overwrite)
     }
 
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
@@ -95,26 +95,25 @@ fn read_env_config(data_dir: &Path) -> Result<Env> {
     Ok(read_yaml_file(&make_env_config_path(data_dir))?)
 }
 
-fn write_env_config(data_dir: &Path, env_rec: &Env, overwrite: bool) -> Result<()> {
+fn write_env_config(data_dir: &Path, env: &Env, overwrite: bool) -> Result<()> {
     safe_write_file(
         &make_env_config_path(data_dir),
-        serde_yaml::to_string(env_rec)?,
+        serde_yaml::to_string(env)?,
         overwrite,
     )?;
     Ok(())
 }
 
 fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-    let env_rec = read_env_config(data_dir)?;
+    let env = read_env_config(data_dir)?;
 
     let mut all_env_info = EnvInfo {
         path_dirs: Vec::new(),
         vars: Vec::new(),
     };
 
-    for package_rec in &env_rec.packages {
-        let Some(env_info) = Registry::global().make_env_info(data_dir, package_rec, base_dir)?
-        else {
+    for package in &env.packages {
+        let Some(env_info) = Registry::global().make_env_info(data_dir, package, base_dir)? else {
             return Ok(None);
         };
 
@@ -131,11 +130,11 @@ fn make_script_command(
     platform: Platform,
     shell: Shell,
 ) -> Result<Option<OsString>> {
-    let env_rec = read_env_config(data_dir)?;
+    let env = read_env_config(data_dir)?;
 
-    for package_rec in &env_rec.packages {
+    for package in &env.packages {
         let result =
-            Registry::global().make_script_command(package_rec, script_path, platform, shell)?;
+            Registry::global().make_script_command(package, script_path, platform, shell)?;
         if result.is_some() {
             return Ok(result);
         }

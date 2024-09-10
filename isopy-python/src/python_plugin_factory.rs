@@ -50,9 +50,9 @@ impl PluginFactory for PythonPluginFactory {
     }
 
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
-        let project_config_rec = serde_json::from_value::<ProjectConfig>(props.clone())
+        let project_config = serde_json::from_value::<ProjectConfig>(props.clone())
             .map_err(isopy_lib_other_error)?;
-        Ok(Box::new(project_config_rec.descriptor))
+        Ok(Box::new(project_config.descriptor))
     }
 
     fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
@@ -69,22 +69,22 @@ impl PluginFactory for PythonPluginFactory {
         _base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo> {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfig) -> Vec<PathBuf> {
-            vec![data_dir.join(&env_config_rec.dir).join("bin")]
+        fn make_path_dirs(data_dir: &Path, env_config: &EnvConfig) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_config.dir).join("bin")]
         }
 
         #[cfg(target_os = "windows")]
-        fn make_path_dirs(data_dir: &Path, env_config_rec: &EnvConfig) -> Vec<PathBuf> {
+        fn make_path_dirs(data_dir: &Path, env_config: &EnvConfig) -> Vec<PathBuf> {
             vec![
-                data_dir.join(&env_config_rec.dir),
-                data_dir.join(&env_config_rec.dir).join("Scripts"),
+                data_dir.join(&env_config.dir),
+                data_dir.join(&env_config.dir).join("Scripts"),
             ]
         }
 
-        let env_config_rec =
+        let env_config =
             serde_json::from_value::<EnvConfig>(props.clone()).map_err(isopy_lib_other_error)?;
 
-        let path_dirs = make_path_dirs(data_dir, &env_config_rec);
+        let path_dirs = make_path_dirs(data_dir, &env_config);
         /*
         let vars = if let Some(d) = base_dir {
             vec![(

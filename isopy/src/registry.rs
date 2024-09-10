@@ -84,36 +84,28 @@ impl Registry {
     pub fn make_env_info(
         &self,
         data_dir: &Path,
-        package_rec: &Package,
+        package: &Package,
         base_dir: Option<&Path>,
     ) -> Result<Option<EnvInfo>> {
-        let Some(plugin_host) = self
-            .plugin_hosts
-            .iter()
-            .find(|p| p.prefix() == package_rec.id)
-        else {
+        let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == package.id) else {
             return Ok(None);
         };
 
         Ok(Some(plugin_host.make_env_info(
             data_dir,
-            &package_rec.props,
+            &package.props,
             base_dir,
         )?))
     }
 
     pub fn make_script_command(
         &self,
-        package_rec: &Package,
+        package: &Package,
         script_path: &Path,
         platform: Platform,
         shell: Shell,
     ) -> Result<Option<OsString>> {
-        let Some(plugin_host) = self
-            .plugin_hosts
-            .iter()
-            .find(|p| p.prefix() == package_rec.id)
-        else {
+        let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == package.id) else {
             return Ok(None);
         };
 

@@ -94,25 +94,25 @@ pub async fn download_index(filter: &Filter, index_path: &Path) -> IsopyGoResult
         .await
         .map_err(other_error)?;
 
-    let mut version_recs = Vec::new();
+    let mut transformed_versions = Vec::new();
 
     for version in versions {
         for file in &version.files {
-            if let Some(version_rec) = transform(&server_url, filter, &version, file)? {
-                version_recs.push(version_rec);
+            if let Some(version) = transform(&server_url, filter, &version, file)? {
+                transformed_versions.push(version);
             }
         }
     }
 
     let last_updated_at = Utc::now();
-    let index_rec = Index {
+    let index = Index {
         last_updated_at,
-        versions: version_recs,
+        versions: transformed_versions,
     };
 
     safe_write_file(
         index_path,
-        serde_yaml::to_string(&index_rec).map_err(other_error)?,
+        serde_yaml::to_string(&index).map_err(other_error)?,
         false,
     )
     .map_err(other_error)?;

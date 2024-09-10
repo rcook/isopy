@@ -56,20 +56,20 @@ pub fn print_repo(table: &mut Table, repo: &Repo) {
 pub fn print_metadir(
     table: &mut Table,
     manifest: &Manifest,
-    env_rec: &Option<Env>,
+    env: &Option<Env>,
     idx: Option<usize>,
 ) {
     if let Some(i) = idx {
         table_divider!(table, "({i})");
     }
 
-    if let Some(env_rec) = env_rec {
-        table_columns!(table, "Project directory", env_rec.project_dir.display());
+    if let Some(env) = env {
+        table_columns!(table, "Project directory", env.project_dir.display());
 
-        for package_rec in &env_rec.packages {
-            table_columns!(table, "Package", &package_rec.id);
+        for package in &env.packages {
+            table_columns!(table, "Package", &package.id);
 
-            if let Some(obj) = package_rec.props.as_object() {
+            if let Some(obj) = package.props.as_object() {
                 for (k, v) in obj {
                     table_line!(table, "{k}: {}", prettify_value(v));
                 }
@@ -88,17 +88,17 @@ pub fn print_metadir(
     table_columns!(table, "Created at", manifest.created_at());
 }
 
-pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<Env>) {
-    if let Some(env_rec) = env_rec {
-        table_columns!(table, "Project directory", env_rec.project_dir.display());
+pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {
+    if let Some(env) = env {
+        table_columns!(table, "Project directory", env.project_dir.display());
 
-        for package_rec in &env_rec.packages {
+        for package in &env.packages {
             if let Ok(Some(env_info)) =
-                Registry::global().make_env_info(dir_info.data_dir(), package_rec, None)
+                Registry::global().make_env_info(dir_info.data_dir(), package, None)
             {
-                table_columns!(table, "Package", &package_rec.id);
+                table_columns!(table, "Package", &package.id);
 
-                if let Some(obj) = package_rec.props.as_object() {
+                if let Some(obj) = package.props.as_object() {
                     for (k, v) in obj {
                         table_line!(table, "{k}: {}", prettify_value(v));
                     }
@@ -132,8 +132,8 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env_rec: &Option<En
 
 pub fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {
     table_title!(table, "Environment info");
-    let env_rec = existing(dir_info.read_env_config())?;
-    print_dir_info(table, dir_info, &env_rec);
+    let env = existing(dir_info.read_env_config())?;
+    print_dir_info(table, dir_info, &env);
     Ok(())
 }
 

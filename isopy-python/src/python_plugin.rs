@@ -72,18 +72,18 @@ impl PythonPlugin {
 
     fn read_assets(&self) -> Result<Vec<Asset>> {
         let index_path = self.dir.join(RELEASES_FILE_NAME);
-        let package_recs = read_json_file::<Vec<Package_serialization>>(&index_path)?;
+        let packages = read_json_file::<Vec<Package_serialization>>(&index_path)?;
 
         let mut assets = Vec::new();
-        for package_rec in package_recs {
-            for asset_rec in package_rec.assets {
-                if !AssetMeta::definitely_not_an_asset_name(&asset_rec.name) {
-                    let meta = asset_rec.name.parse::<AssetMeta>()?;
+        for package in packages {
+            for asset in package.assets {
+                if !AssetMeta::definitely_not_an_asset_name(&asset.name) {
+                    let meta = asset.name.parse::<AssetMeta>()?;
                     assets.push(Asset {
-                        name: asset_rec.name,
-                        tag: package_rec.tag.clone(),
-                        url: asset_rec.url,
-                        size: asset_rec.size,
+                        name: asset.name,
+                        tag: package.tag.clone(),
+                        url: asset.url,
+                        size: asset.size,
                         meta,
                     });
                 }
@@ -110,10 +110,10 @@ impl PythonPlugin {
         }
 
         let repositories_yaml_path = self.dir.join(REPOSITORIES_FILE_NAME);
-        let repositories_rec = if repositories_yaml_path.is_file() {
+        let repositories = if repositories_yaml_path.is_file() {
             read_yaml_file::<Repositories>(&repositories_yaml_path)?
         } else {
-            let repositories_rec = Repositories {
+            let repositories = Repositories {
                 repositories: vec![
                     Repository_serialization::GitHub {
                         name: RepositoryName::Default,
@@ -129,13 +129,13 @@ impl PythonPlugin {
             };
             safe_write_file(
                 &repositories_yaml_path,
-                serde_yaml::to_string(&repositories_rec)?,
+                serde_yaml::to_string(&repositories)?,
                 false,
             )?;
-            repositories_rec
+            repositories
         };
 
-        let all_repositories = repositories_rec
+        let all_repositories = repositories
             .repositories
             .into_iter()
             .map(|rec| make_repository(self.offline, rec));
