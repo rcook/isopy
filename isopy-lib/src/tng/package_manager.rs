@@ -26,7 +26,6 @@ use crate::tng::version::Version;
 use crate::tng::PackageFilter;
 use anyhow::Result;
 use async_trait::async_trait;
-use derive_more::Deref;
 use std::path::Path;
 
 pub type OptionalTags = Option<Vec<String>>;
@@ -51,11 +50,4 @@ pub trait PackageManagerOps: Send + Sync {
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
 
-#[derive(Deref)]
-pub struct PackageManager(Box<dyn PackageManagerOps>);
-
-impl PackageManager {
-    pub fn new(inner: Box<dyn PackageManagerOps>) -> Self {
-        Self(inner)
-    }
-}
+crate::tng::macros::dyn_trait_struct!(PackageManager, PackageManagerOps);

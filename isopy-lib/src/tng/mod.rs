@@ -23,6 +23,7 @@ mod accept;
 mod checksum;
 mod download_options;
 mod file_name_parts;
+mod macros;
 mod package_filter;
 mod package_info;
 mod package_kind;

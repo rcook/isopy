@@ -23,18 +23,10 @@ use crate::tng::package_manager::PackageManager;
 use crate::tng::package_manager_context::PackageManagerContext;
 use crate::tng::version::Version;
 use anyhow::Result;
-use derive_more::Deref;
 
 pub trait PluginOps: Send + Sync {
     fn parse_version(&self, s: &str) -> Result<Version>;
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
 
-#[derive(Deref)]
-pub struct Plugin(Box<dyn PluginOps>);
-
-impl Plugin {
-    pub fn new(inner: Box<dyn PluginOps>) -> Self {
-        Self(inner)
-    }
-}
+crate::tng::macros::dyn_trait_struct!(Plugin, PluginOps);

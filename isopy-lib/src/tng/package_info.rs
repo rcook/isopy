@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use derive_more::Deref;
 use serde_json::Value;
 use std::path::Path;
 
@@ -28,11 +27,4 @@ pub trait PackageInfoOps {
     fn get_env_props(&self, bin_subdir: &Path) -> Result<Value>;
 }
 
-#[derive(Deref)]
-pub struct PackageInfo(Box<dyn PackageInfoOps>);
-
-impl PackageInfo {
-    pub fn new(inner: Box<dyn PackageInfoOps>) -> Self {
-        Self(inner)
-    }
-}
+crate::tng::macros::dyn_trait_struct!(PackageInfo, PackageInfoOps);

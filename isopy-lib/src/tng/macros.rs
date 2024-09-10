@@ -19,16 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::download_options::DownloadOptions;
-use anyhow::Result;
-use async_trait::async_trait;
-use std::path::PathBuf;
-use url::Url;
+macro_rules! dyn_trait_struct {
+    ($name : ident, $trait: ident) => {
+        #[derive(derive_more::Deref)]
+        pub struct $name(Box<dyn $trait>);
 
-#[async_trait]
-pub trait PackageManagerContextOps: Send + Sync {
-    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
-    async fn get_file(&self, url: &Url) -> Result<PathBuf>;
+        impl $name {
+            pub fn new(inner: Box<dyn $trait>) -> Self {
+                Self(inner)
+            }
+        }
+    };
 }
 
-crate::tng::macros::dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);
+pub(crate) use dyn_trait_struct;

@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use derive_more::Deref;
 use std::any::Any;
 use std::fmt::Display;
 
@@ -27,12 +26,4 @@ pub trait VersionOps: Display + Sync {
     fn as_any(&self) -> &dyn Any;
 }
 
-#[derive(Deref)]
-
-pub struct Version(Box<dyn VersionOps>);
-
-impl Version {
-    pub fn new(inner: Box<dyn VersionOps>) -> Self {
-        Self(inner)
-    }
-}
+crate::tng::macros::dyn_trait_struct!(Version, VersionOps);
