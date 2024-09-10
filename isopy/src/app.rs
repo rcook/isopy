@@ -104,9 +104,8 @@ impl App {
         descriptor: &dyn Descriptor,
     ) -> Result<()> {
         let project_dir = &self.cwd;
-        let mut packages = Vec::new();
 
-        let dir_info = if let Some(dir_info) = self.repo.get(&project_dir)? {
+        let (dir_info, mut packages) = if let Some(dir_info) = self.repo.get(&project_dir)? {
             let env = dir_info.read_env_config()?;
             if env.project_dir != *project_dir {
                 bail!(
@@ -116,8 +115,7 @@ impl App {
                 );
             }
 
-            packages.extend(env.packages);
-            dir_info
+            (dir_info, env.packages)
         } else {
             let Some(dir_info) = self.repo.init(&project_dir)? else {
                 bail!(
@@ -126,7 +124,7 @@ impl App {
                 )
             };
 
-            dir_info
+            (dir_info, Vec::new())
         };
 
         if packages.iter().any(|p| p.id == moniker.as_str()) {
