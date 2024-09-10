@@ -286,9 +286,8 @@ impl PackageManagerOps for PythonPackageManager {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()> {
-        use std::os::unix::fs::symlink;
-
         use log::trace;
+        use std::os::unix::fs::symlink;
 
         let bin_dir = output_dir.join(bin_subdir).join("bin");
         let link = bin_dir.join("python");
@@ -303,6 +302,7 @@ impl PackageManagerOps for PythonPackageManager {
 
     #[cfg(target_os = "windows")]
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()> {
+        use log::trace;
         use std::fs::write;
 
         let cmd_path = output_dir.join(bin_subdir).join("python3.cmd");
