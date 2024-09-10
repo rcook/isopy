@@ -15,6 +15,7 @@ version = "0.3.25"
 anyhow = "1.0.86"
 async-trait = "0.1.82"
 bytes = "1.7.1"
+derive_more = { version = "1.0.0", features = ["deref"] }
 futures-util = "0.3.30"
 hex = "0.4.3"
 joat-logger = "0.0.5"

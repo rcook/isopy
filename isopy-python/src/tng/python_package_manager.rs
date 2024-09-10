@@ -25,7 +25,7 @@ use crate::tng::checksum::get_checksum;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{
-    DownloadOptions, OptionalTags, PackageFilter, PackageKind, PackageManagerContext,
+    DownloadOptions, OptionalTags, PackageFilter, PackageInfo, PackageKind, PackageManagerContext,
     PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
 };
 use serde_json::Value;
@@ -267,7 +267,7 @@ impl PackageManagerOps for PythonPackageManager {
         version: &Version,
         tags: &OptionalTags,
         dir: &Path,
-    ) -> Result<()> {
+    ) -> Result<PackageInfo> {
         let version = downcast_version!(version);
         let index = self.get_index(false).await?;
         let archive = Self::get_archive(&index, version, tags)?;
@@ -277,7 +277,7 @@ impl PackageManagerOps for PythonPackageManager {
             .archive_type()
             .unpack(&archive_path, dir)
             .await?;
-        Ok(())
+        Ok(PackageInfo::new(Box::new(archive)))
     }
 
     async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()> {

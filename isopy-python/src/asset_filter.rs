@@ -202,22 +202,38 @@ mod tests {
 
     #[test]
     fn test_basics() {
+        fn make_all_asset_filter() -> AssetFilter {
+            AssetFilter {
+                archive_type: None,
+                family: None,
+                version: None,
+                tag: None,
+                arch: None,
+                platform: None,
+                os: None,
+                flavour: None,
+                subflavour0: None,
+                subflavour1: None,
+                variant: None,
+            }
+        }
+
         let (a0, a1, a2, a3) = make_test_artifacts();
 
         assert_eq!(
             vec![&a0, &a1, &a2, &a3],
-            AssetFilter::all().filter(vec![&a0, &a1, &a2, &a3])
+            make_all_asset_filter().filter(vec![&a0, &a1, &a2, &a3])
         );
 
-        let mut asset_filter = AssetFilter::all();
+        let mut asset_filter = make_all_asset_filter();
         asset_filter.archive_type = Some(ArchiveType::TarGZ);
         assert_eq!(vec![&a1], asset_filter.filter(vec![&a0, &a1, &a2]));
 
-        let mut asset_filter = AssetFilter::all();
+        let mut asset_filter = make_all_asset_filter();
         asset_filter.archive_type = Some(ArchiveType::TarZST);
         assert_eq!(vec![&a0, &a2], asset_filter.filter(vec![&a0, &a1, &a2]));
 
-        let mut asset_filter = AssetFilter::all();
+        let mut asset_filter = make_all_asset_filter();
         asset_filter.tag = Some(
             "20210724T1424"
                 .parse::<Tag>()

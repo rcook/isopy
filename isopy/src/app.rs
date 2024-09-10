@@ -147,7 +147,7 @@ impl App {
             .await?;
 
         let output_path = dir_info.data_dir().join(bin_subdir);
-        package_manager
+        let package_info = package_manager
             .install_package(&version, &None, &output_path)
             .await?;
 
@@ -157,7 +157,7 @@ impl App {
 
         packages.push(Package {
             id: String::from(moniker.as_str()),
-            props: descriptor.get_env_props(bin_subdir)?,
+            props: package_info.get_env_props(bin_subdir)?,
         });
 
         dir_info.write_env_config(

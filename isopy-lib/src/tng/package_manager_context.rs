@@ -22,7 +22,7 @@
 use crate::tng::download_options::DownloadOptions;
 use anyhow::Result;
 use async_trait::async_trait;
-use std::ops::Deref;
+use derive_more::Deref;
 use std::path::PathBuf;
 use url::Url;
 
@@ -32,18 +32,11 @@ pub trait PackageManagerContextOps: Send + Sync {
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
+#[derive(Deref)]
 pub struct PackageManagerContext(Box<dyn PackageManagerContextOps>);
 
 impl PackageManagerContext {
     pub fn new(inner: Box<dyn PackageManagerContextOps>) -> Self {
         Self(inner)
-    }
-}
-
-impl Deref for PackageManagerContext {
-    type Target = Box<dyn PackageManagerContextOps>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }

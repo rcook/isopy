@@ -19,22 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::package_manager::PackageManager;
-use crate::tng::package_manager_context::PackageManagerContext;
-use crate::tng::version::Version;
 use anyhow::Result;
 use derive_more::Deref;
+use serde_json::Value;
+use std::path::Path;
 
-pub trait PluginOps: Send + Sync {
-    fn parse_version(&self, s: &str) -> Result<Version>;
-    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
+pub trait PackageInfoOps {
+    fn get_env_props(&self, bin_subdir: &Path) -> Result<Value>;
 }
 
 #[derive(Deref)]
-pub struct Plugin(Box<dyn PluginOps>);
+pub struct PackageInfo(Box<dyn PackageInfoOps>);
 
-impl Plugin {
-    pub fn new(inner: Box<dyn PluginOps>) -> Self {
+impl PackageInfo {
+    pub fn new(inner: Box<dyn PackageInfoOps>) -> Self {
         Self(inner)
     }
 }

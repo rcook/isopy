@@ -19,7 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::archive_metadata::ArchiveMetadata;
+use crate::{serialization::EnvConfig, tng::archive_metadata::ArchiveMetadata};
+use anyhow::Result;
+use isopy_lib::tng::PackageInfoOps;
+use serde_json::Value;
+use std::path::Path;
 use url::Url;
 
 #[derive(Clone, Debug)]
@@ -42,5 +46,14 @@ impl ArchiveInfo {
 
     pub(crate) fn metadata(&self) -> &ArchiveMetadata {
         &self.metadata
+    }
+}
+
+impl PackageInfoOps for ArchiveInfo {
+    fn get_env_props(&self, bin_subdir: &Path) -> Result<Value> {
+        Ok(serde_json::to_value(EnvConfig {
+            dir: bin_subdir.to_path_buf(),
+            url: self.url.clone(),
+        })?)
     }
 }

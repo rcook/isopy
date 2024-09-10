@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_version::PythonVersion;
-use crate::serialization::{EnvConfig, ProjectConfig};
+use crate::serialization::ProjectConfig;
 use crate::tag::Tag;
 use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibError, IsopyLibResult};
 use serde::{Deserialize, Serialize};
@@ -100,12 +100,15 @@ impl Descriptor for PythonDescriptor {
         path.to_path_buf()
     }
 
-    fn get_env_props(&self, bin_subdir: &Path) -> IsopyLibResult<Value> {
+    fn get_env_props(&self, _bin_subdir: &Path) -> IsopyLibResult<Value> {
+        /*
         serde_json::to_value(EnvConfig {
             dir: bin_subdir.to_path_buf(),
             descriptor: self.clone(),
         })
         .map_err(isopy_lib_other_error)
+        */
+        todo!();
     }
 
     fn get_project_props(&self) -> IsopyLibResult<Value> {
