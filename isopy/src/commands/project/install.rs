@@ -48,7 +48,7 @@ pub async fn install(app: &App) -> Result<Status> {
         .map(|h| (String::from(h.prefix()), h))
         .collect::<HashMap<_, _>>();
 
-    let mut descriptors = Vec::new();
+    let mut package_infos = Vec::new();
     for package in project.packages {
         let Some(plugin_host) = plugin_hosts.get(&package.id) else {
             return_user_error!(
@@ -57,16 +57,14 @@ pub async fn install(app: &App) -> Result<Status> {
             );
         };
 
-        descriptors.push((
-            *plugin_host,
-            plugin_host.read_project_config(&package.props)?,
-        ));
-    }
-
-    for (plugin_host, descriptor) in descriptors {
+        let descriptor = plugin_host.read_project_config(&package.props)?;
         let moniker = plugin_host.prefix().parse()?;
         let plugin = app.plugin_manager().get_plugin(&moniker);
         let version = plugin.parse_version(&descriptor.to_string())?;
+        package_infos.push((moniker, version));
+    }
+
+    for (moniker, version) in package_infos {
         app.install_package(&moniker, &version).await?;
     }
 
