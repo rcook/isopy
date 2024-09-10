@@ -67,7 +67,7 @@ pub fn print_metadir(
         table_columns!(table, "Project directory", env.project_dir.display());
 
         for package in &env.packages {
-            table_columns!(table, "Package", &package.id);
+            table_columns!(table, "Package", &package.moniker);
 
             if let Some(obj) = package.props.as_object() {
                 for (k, v) in obj {
@@ -96,7 +96,7 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) 
             if let Ok(Some(env_info)) =
                 Registry::global().make_env_info(dir_info.data_dir(), package, None)
             {
-                table_columns!(table, "Package", &package.id);
+                table_columns!(table, "Package", &package.moniker);
 
                 if let Some(obj) = package.props.as_object() {
                     for (k, v) in obj {

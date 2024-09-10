@@ -50,7 +50,7 @@ pub async fn install(app: &App) -> Result<Status> {
 
     let mut package_infos = Vec::new();
     for package in project.packages {
-        let Some(plugin_host) = plugin_hosts.get(&package.id) else {
+        let Some(plugin_host) = plugin_hosts.get(&package.moniker) else {
             return_user_error!(
                 "No project configuration file in directory {}",
                 app.cwd().display()
@@ -58,7 +58,7 @@ pub async fn install(app: &App) -> Result<Status> {
         };
 
         let descriptor = plugin_host.read_project_config(&package.props)?;
-        let moniker = plugin_host.prefix().parse()?;
+        let moniker = package.moniker.parse()?;
         let plugin = app.plugin_manager().get_plugin(&moniker);
         let version = plugin.parse_version(&descriptor.to_string())?;
         package_infos.push((moniker, version));

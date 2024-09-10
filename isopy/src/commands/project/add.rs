@@ -31,12 +31,12 @@ pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
     let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
 
     let id = package_id.plugin_host().prefix();
-    if packages.iter().any(|p| p.id == id) {
+    if packages.iter().any(|p| p.moniker == id) {
         return_user_error!("environment already has a package with ID \"{id}\" configured");
     }
 
     packages.push(Package {
-        id: String::from(id),
+        moniker: String::from(id),
         props: package_id.descriptor().get_project_props()?,
     });
 

@@ -119,7 +119,7 @@ impl App {
             (dir_info, Vec::new())
         };
 
-        if packages.iter().any(|p| p.id == moniker.as_str()) {
+        if packages.iter().any(|p| p.moniker == moniker.as_str()) {
             bail!(
                 "Environment already has a package with ID {} configured",
                 moniker.as_str()
@@ -146,7 +146,7 @@ impl App {
             .await?;
 
         packages.push(Package {
-            id: String::from(moniker.as_str()),
+            moniker: String::from(moniker.as_str()),
             props: package_info.get_env_props(bin_subdir)?,
         });
 

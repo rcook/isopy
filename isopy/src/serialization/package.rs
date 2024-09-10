@@ -24,8 +24,8 @@ use serde_json::Value;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Package {
-    #[serde(rename = "id")]
-    pub id: String,
+    #[serde(rename = "id")] // TBD: Rename to "moniker"
+    pub moniker: String,
 
     #[serde(flatten)]
     pub props: Value,

@@ -87,7 +87,11 @@ impl Registry {
         package: &Package,
         base_dir: Option<&Path>,
     ) -> Result<Option<EnvInfo>> {
-        let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == package.id) else {
+        let Some(plugin_host) = self
+            .plugin_hosts
+            .iter()
+            .find(|p| p.prefix() == package.moniker)
+        else {
             return Ok(None);
         };
 
@@ -105,7 +109,11 @@ impl Registry {
         platform: Platform,
         shell: Shell,
     ) -> Result<Option<OsString>> {
-        let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == package.id) else {
+        let Some(plugin_host) = self
+            .plugin_hosts
+            .iter()
+            .find(|p| p.prefix() == package.moniker)
+        else {
             return Ok(None);
         };
 
