@@ -22,7 +22,7 @@
 use crate::env::{read_env_bool, ISOPY_BACKTRACE_ENV_NAME};
 use colored::Colorize;
 
-pub enum Status {
+pub(crate) enum Status {
     Success,
     UserError,
 }
@@ -55,7 +55,7 @@ macro_rules! return_user_error {
 }
 pub(crate) use return_user_error;
 
-pub fn show_error(error: &anyhow::Error) {
+pub(crate) fn show_error(error: &anyhow::Error) {
     eprintln!("{}", format!("{error}").bright_red());
     if read_env_bool(ISOPY_BACKTRACE_ENV_NAME) {
         eprintln!("stack backtrace:\n{}", error.backtrace());

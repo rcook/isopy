@@ -28,7 +28,7 @@ use colored::Colorize;
 use ctrlc::set_handler;
 use log::info;
 
-pub fn shell(app: App, verbose: bool) -> Result<Status> {
+pub(crate) fn shell(app: App, verbose: bool) -> Result<Status> {
     if let Some(isopy_env) = IsopyEnv::get_vars()? {
         if let Some(link) = app.find_link(isopy_env.link_id())? {
             return_user_error!(

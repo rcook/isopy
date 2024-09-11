@@ -23,6 +23,6 @@ mod env;
 mod package;
 mod project;
 
-pub use env::Env;
-pub use package::Package;
-pub use project::Project;
+pub(crate) use env::Env;
+pub(crate) use package::Package;
+pub(crate) use project::Project;

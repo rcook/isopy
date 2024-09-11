@@ -53,22 +53,22 @@ lazy_static! {
     ]);
 }
 
-pub struct Registry {
-    pub plugin_hosts: Vec<PluginHostRef>,
+pub(crate) struct Registry {
+    pub(crate) plugin_hosts: Vec<PluginHostRef>,
 }
 
 impl Registry {
-    pub fn global() -> &'static Self {
+    pub(crate) fn global() -> &'static Self {
         &GLOBAL
     }
 
-    pub fn new(plugin_hosts: Vec<PluginHost>) -> Self {
+    pub(crate) fn new(plugin_hosts: Vec<PluginHost>) -> Self {
         Self {
             plugin_hosts: plugin_hosts.into_iter().map(Arc::new).collect::<Vec<_>>(),
         }
     }
 
-    pub fn parse_descriptor(&self, s: &str) -> Result<DescriptorInfo> {
+    pub(crate) fn parse_descriptor(&self, s: &str) -> Result<DescriptorInfo> {
         let Some((plugin_host, tail)) = self.find_plugin_host(s) else {
             bail!("unsupported descriptor format {s}");
         };
@@ -81,7 +81,7 @@ impl Registry {
         })
     }
 
-    pub fn make_env_info(
+    pub(crate) fn make_env_info(
         &self,
         data_dir: &Path,
         package: &Package,
@@ -102,7 +102,7 @@ impl Registry {
         )?))
     }
 
-    pub fn make_script_command(
+    pub(crate) fn make_script_command(
         &self,
         package: &Package,
         script_path: &Path,

@@ -22,7 +22,7 @@
 const TRUE_LITERALS: [&str; 6] = ["y", "yes", "t", "true", "on", "1"];
 const FALSE_LITERALS: [&str; 6] = ["n", "no", "f", "false", "off", "0"];
 
-pub fn str_to_bool(s: &str) -> Option<bool> {
+pub(crate) fn str_to_bool(s: &str) -> Option<bool> {
     let s = s.trim().to_lowercase();
     let t = s.as_str();
     if TRUE_LITERALS.contains(&t) {

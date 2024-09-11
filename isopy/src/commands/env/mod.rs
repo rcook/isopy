@@ -24,7 +24,7 @@ mod install;
 mod link;
 mod list;
 
-pub use self::delete::delete;
-pub use self::install::install;
-pub use self::link::link;
-pub use self::list::list;
+pub(crate) use delete::delete;
+pub(crate) use install::install;
+pub(crate) use link::link;
+pub(crate) use list::list;

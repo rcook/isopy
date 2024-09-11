@@ -23,23 +23,23 @@ use super::internal::Table;
 use colored::Color;
 
 #[derive(Clone, Debug)]
-pub struct TableSettings {
-    pub title_indent: usize,
-    pub divider_indent: usize,
-    pub columns_indent: usize,
-    pub line_indent: usize,
-    pub title_colour: Color,
-    pub divider_colour: Color,
-    pub default_column_colour: Color,
-    pub column_colours: Vec<Color>,
-    pub default_heading_colour: Color,
-    pub heading_colours: Vec<Color>,
-    pub line_colour: Color,
-    pub column_separator: String,
+pub(crate) struct TableSettings {
+    pub(crate) title_indent: usize,
+    pub(crate) divider_indent: usize,
+    pub(crate) columns_indent: usize,
+    pub(crate) line_indent: usize,
+    pub(crate) title_colour: Color,
+    pub(crate) divider_colour: Color,
+    pub(crate) default_column_colour: Color,
+    pub(crate) column_colours: Vec<Color>,
+    pub(crate) default_heading_colour: Color,
+    pub(crate) heading_colours: Vec<Color>,
+    pub(crate) line_colour: Color,
+    pub(crate) column_separator: String,
 }
 
 impl TableSettings {
-    pub fn build(&self) -> Table {
+    pub(crate) fn build(&self) -> Table {
         Table::new(self)
     }
 }

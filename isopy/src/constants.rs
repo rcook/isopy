@@ -24,18 +24,18 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 lazy_static! {
-    pub static ref CACHE_DIR: PathBuf = PathBuf::from(".isopy");
-    pub static ref ENV_CONFIG_FILE_NAME: OsString = OsString::from("env.yaml");
-    pub static ref PROJECT_CONFIG_FILE_NAME: OsString = OsString::from(".isopy.yaml");
+    pub(crate) static ref CACHE_DIR: PathBuf = PathBuf::from(".isopy");
+    pub(crate) static ref ENV_CONFIG_FILE_NAME: OsString = OsString::from("env.yaml");
+    pub(crate) static ref PROJECT_CONFIG_FILE_NAME: OsString = OsString::from(".isopy.yaml");
 }
 
-pub const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
+pub(crate) const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
-pub const JDK_DESCRIPTOR_PREFIX: &str = "jdk";
+pub(crate) const JDK_DESCRIPTOR_PREFIX: &str = "jdk";
 
-pub const JRE_DESCRIPTOR_PREFIX: &str = "jre";
+pub(crate) const JRE_DESCRIPTOR_PREFIX: &str = "jre";
 
-pub const GO_DESCRIPTOR_PREFIX: &str = "go";
+pub(crate) const GO_DESCRIPTOR_PREFIX: &str = "go";
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-pub const EXECUTABLE_MASK: u32 = 0o100;
+pub(crate) const EXECUTABLE_MASK: u32 = 0o100;

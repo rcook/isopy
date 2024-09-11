@@ -26,22 +26,22 @@ use std::path::Path;
 use std::sync::Arc;
 use url::Url;
 
-pub struct PluginHost {
+pub(crate) struct PluginHost {
     prefix: String,
     plugin_factory: Box<dyn PluginFactory>,
 }
 
-pub type PluginHostRef = Arc<PluginHost>;
+pub(crate) type PluginHostRef = Arc<PluginHost>;
 
 impl PluginHost {
-    pub fn new(prefix: &str, plugin_factory: Box<dyn PluginFactory>) -> Self {
+    pub(crate) fn new(prefix: &str, plugin_factory: Box<dyn PluginFactory>) -> Self {
         Self {
             prefix: String::from(prefix),
             plugin_factory,
         }
     }
 
-    pub fn prefix(&self) -> &str {
+    pub(crate) fn prefix(&self) -> &str {
         &self.prefix
     }
 }

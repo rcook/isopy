@@ -22,11 +22,11 @@
 use anyhow::{anyhow, bail, Result};
 use sysinfo::{get_current_pid, Pid, Process, ProcessesToUpdate, System};
 
-pub fn get_pid() -> Result<Pid> {
+pub(crate) fn get_pid() -> Result<Pid> {
     get_current_pid().or(Err(anyhow!("Failed to get process ID")))
 }
 
-pub fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
+pub(crate) fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
     if system.refresh_processes(ProcessesToUpdate::Some(&[pid])) == 1 {
         system
             .process(pid)
@@ -36,7 +36,7 @@ pub fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
     }
 }
 
-pub fn get_parent_pid(process: &Process) -> Result<Pid> {
+pub(crate) fn get_parent_pid(process: &Process) -> Result<Pid> {
     process
         .parent()
         .ok_or_else(|| anyhow!("failed to get parent PID"))

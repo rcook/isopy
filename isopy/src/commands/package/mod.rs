@@ -22,5 +22,5 @@
 mod download;
 mod list;
 
-pub use self::download::download;
-pub use self::list::{list, ListType};
+pub(crate) use download::download;
+pub(crate) use list::{list, ListType};

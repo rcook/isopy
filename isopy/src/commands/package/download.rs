@@ -25,7 +25,7 @@ use crate::status::{return_success, Status};
 use anyhow::Result;
 use isopy_lib::PluginFactory;
 
-pub async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) async fn download(app: &App, package_id: &PackageId) -> Result<Status> {
     let plugin_host = package_id.plugin_host();
     let plugin_dir = app.repo().shared_dir().join(plugin_host.prefix());
     let plugin = plugin_host.make_plugin(app.offline(), &plugin_dir);

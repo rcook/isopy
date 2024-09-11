@@ -26,7 +26,7 @@ use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use std::ffi::OsString;
 
-pub fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
+pub(crate) fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
     let mut command = Command::new(OsString::from(program));
     for arg in args {
         command.arg(OsString::from(arg));

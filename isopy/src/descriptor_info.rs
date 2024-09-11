@@ -24,9 +24,9 @@ use isopy_lib::DescriptorRef;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 
 #[derive(Clone)]
-pub struct DescriptorInfo {
-    pub plugin_host: PluginHostRef,
-    pub descriptor: DescriptorRef,
+pub(crate) struct DescriptorInfo {
+    pub(crate) plugin_host: PluginHostRef,
+    pub(crate) descriptor: DescriptorRef,
 }
 
 impl Debug for DescriptorInfo {

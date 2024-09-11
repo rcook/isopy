@@ -26,16 +26,16 @@ use isopy_lib::Descriptor;
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
-pub struct PackageId {
+pub(crate) struct PackageId {
     descriptor_info: DescriptorInfo,
 }
 
 impl PackageId {
-    pub fn plugin_host(&self) -> &PluginHost {
+    pub(crate) fn plugin_host(&self) -> &PluginHost {
         &self.descriptor_info.plugin_host
     }
 
-    pub fn descriptor(&self) -> &dyn Descriptor {
+    pub(crate) fn descriptor(&self) -> &dyn Descriptor {
         self.descriptor_info.descriptor.as_ref().as_ref()
     }
 }

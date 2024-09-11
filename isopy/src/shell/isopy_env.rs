@@ -26,20 +26,20 @@ use std::env::{set_var, var, VarError};
 const ISOPY_ENV_NAME: &str = "ISOPY_ENV";
 
 #[derive(Clone, Debug)]
-pub struct IsopyEnv {
+pub(crate) struct IsopyEnv {
     link_id: LinkId,
     meta_id: MetaId,
 }
 
 impl IsopyEnv {
-    pub fn from_dir_info(dir_info: &DirInfo) -> Self {
+    pub(crate) fn from_dir_info(dir_info: &DirInfo) -> Self {
         Self {
             link_id: dir_info.link_id().clone(),
             meta_id: dir_info.meta_id().clone(),
         }
     }
 
-    pub fn get_vars() -> Result<Option<Self>> {
+    pub(crate) fn get_vars() -> Result<Option<Self>> {
         let value = match var(ISOPY_ENV_NAME) {
             Ok(value) => value,
             Err(VarError::NotPresent) => return Ok(None),
@@ -56,15 +56,15 @@ impl IsopyEnv {
         Ok(Some(Self { link_id, meta_id }))
     }
 
-    pub const fn link_id(&self) -> &LinkId {
+    pub(crate) const fn link_id(&self) -> &LinkId {
         &self.link_id
     }
 
-    pub const fn meta_id(&self) -> &MetaId {
+    pub(crate) const fn meta_id(&self) -> &MetaId {
         &self.meta_id
     }
 
-    pub fn set_vars(&self) {
+    pub(crate) fn set_vars(&self) {
         set_var(ISOPY_ENV_NAME, format!("{}-{}", self.meta_id, self.link_id));
     }
 }

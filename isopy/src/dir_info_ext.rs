@@ -29,7 +29,7 @@ use joatmon::{read_yaml_file, safe_write_file};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-pub trait DirInfoExt {
+pub(crate) trait DirInfoExt {
     fn read_env_config(&self) -> Result<Env>;
     fn write_env_config(&self, env: &Env, overwrite: bool) -> Result<()>;
     fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;

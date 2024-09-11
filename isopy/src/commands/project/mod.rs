@@ -22,5 +22,5 @@
 mod add;
 mod install;
 
-pub use self::add::add;
-pub use self::install::install;
+pub(crate) use add::add;
+pub(crate) use install::install;

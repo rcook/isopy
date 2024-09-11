@@ -29,12 +29,12 @@ use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{Package, PluginFactory};
 
-pub enum ListType {
+pub(crate) enum ListType {
     LocalOnly,
     All,
 }
 
-pub async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Status> {
+pub(crate) async fn list(app: &App, list_type: ListType, verbose: bool) -> Result<Status> {
     let mut table = make_list_table();
 
     for plugin_host in &Registry::global().plugin_hosts {

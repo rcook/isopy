@@ -25,7 +25,7 @@ use anyhow::Result;
 use std::path::Path;
 
 #[allow(clippy::no_effect_underscore_binding)]
-pub async fn delete(app: &App, project_dir: &Path) -> Result<Status> {
+pub(crate) async fn delete(app: &App, project_dir: &Path) -> Result<Status> {
     let Some(_) = app.get_dir_info(project_dir)? else {
         return_user_error!(
             "no environment exists for project directory {}",

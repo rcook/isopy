@@ -27,7 +27,7 @@ use std::str::FromStr;
 serializable_newtype!(WrapperFileName, OsString);
 
 impl WrapperFileName {
-    pub fn as_os_str(&self) -> &OsStr {
+    pub(crate) fn as_os_str(&self) -> &OsStr {
         self.0.as_os_str()
     }
 }

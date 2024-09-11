@@ -24,14 +24,14 @@ use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use std::env::{remove_var, set_var, var, VarError};
 
-pub const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
-pub const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
-pub const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
-pub const ISOPY_OFFLINE_ENV_NAME: &str = "ISOPY_OFFLINE";
-pub const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
+pub(crate) const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
+pub(crate) const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
+pub(crate) const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
+pub(crate) const ISOPY_OFFLINE_ENV_NAME: &str = "ISOPY_OFFLINE";
+pub(crate) const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
-pub const BOOL_TRUE_VALUE: &str = "true";
-pub const BOOL_FALSE_VALUE: &str = "false";
+pub(crate) const BOOL_TRUE_VALUE: &str = "true";
+pub(crate) const BOOL_FALSE_VALUE: &str = "false";
 
 enum EnvType {
     Ignore,
@@ -110,7 +110,7 @@ impl Action {
     }
 }
 
-pub fn set_up_env() -> Result<()> {
+pub(crate) fn set_up_env() -> Result<()> {
     for action in Action::make_all(&ENVS)? {
         action.run();
     }
@@ -124,15 +124,15 @@ pub fn set_up_env() -> Result<()> {
     Ok(())
 }
 
-pub fn read_env_bool(key: &str) -> bool {
+pub(crate) fn read_env_bool(key: &str) -> bool {
     var(key) == Ok(String::from(BOOL_TRUE_VALUE))
 }
 
-pub fn get_env_keys() -> Vec<String> {
+pub(crate) fn get_env_keys() -> Vec<String> {
     ENVS.iter().map(|e| String::from(e.0)).collect::<Vec<_>>()
 }
 
-pub fn read_env(key: &str) -> Result<Option<String>> {
+pub(crate) fn read_env(key: &str) -> Result<Option<String>> {
     match var(key) {
         Ok(s) => Ok(Some(s)),
         Err(VarError::NotPresent) => Ok(None),

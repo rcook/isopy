@@ -23,7 +23,7 @@ use crate::serialization::Package;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Project {
+pub(crate) struct Project {
     #[serde(rename = "packages")]
-    pub packages: Vec<Package>,
+    pub(crate) packages: Vec<Package>,
 }

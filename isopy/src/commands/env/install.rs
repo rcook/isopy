@@ -24,7 +24,7 @@ use crate::package_id::PackageId;
 use crate::status::{return_success, Status};
 use anyhow::Result;
 
-pub async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
     let moniker = package_id.plugin_host().prefix().parse()?;
     let plugin = app.plugin_manager().get_plugin(&moniker);
     let version = plugin.parse_version(&package_id.descriptor().to_string())?;

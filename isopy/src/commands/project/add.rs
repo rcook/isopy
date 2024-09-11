@@ -27,7 +27,7 @@ use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use log::info;
 
-pub fn add(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) fn add(app: &App, package_id: &PackageId) -> Result<Status> {
     let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
 
     let id = package_id.plugin_host().prefix();

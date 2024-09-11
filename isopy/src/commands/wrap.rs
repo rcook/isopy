@@ -55,7 +55,7 @@ struct TemplateContext {
     command: String,
 }
 
-pub fn wrap(
+pub(crate) fn wrap(
     app: &App,
     wrapper_file_name: &WrapperFileName,
     script_path: &Path,

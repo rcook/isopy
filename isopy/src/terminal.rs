@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 #[allow(clippy::missing_const_for_fn)]
-pub fn reset_terminal() {
+pub(crate) fn reset_terminal() {
     #[cfg(windows)]
     {
         // This always returns Ok(()): https://github.com/mackwic/colored/blob/master/src/control.rs#L12

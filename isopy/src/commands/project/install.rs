@@ -24,7 +24,7 @@ use crate::fs::existing;
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::{bail, Result};
 
-pub async fn install(app: &App) -> Result<Status> {
+pub(crate) async fn install(app: &App) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
         return_user_error!(
             "Project in directory {} already has an environment",

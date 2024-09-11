@@ -35,7 +35,7 @@ use std::ffi::OsStr;
 use std::fs::metadata;
 use std::sync::Arc;
 
-pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
+pub(crate) fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
         table_divider!(table, "({i})");
     }
@@ -45,7 +45,7 @@ pub fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     table_columns!(table, "Created at", link.created_at());
 }
 
-pub fn print_repo(table: &mut Table, repo: &Repo) {
+pub(crate) fn print_repo(table: &mut Table, repo: &Repo) {
     table_columns!(table, "Lock file", repo.lock_path().display());
     table_columns!(table, "Configuration file", repo.config_path().display());
     table_columns!(table, "Links directory", repo.links_dir().display());
@@ -53,7 +53,7 @@ pub fn print_repo(table: &mut Table, repo: &Repo) {
     table_columns!(table, "Shared directory", repo.shared_dir().display());
 }
 
-pub fn print_metadir(
+pub(crate) fn print_metadir(
     table: &mut Table,
     manifest: &Manifest,
     env: &Option<Env>,
@@ -88,7 +88,7 @@ pub fn print_metadir(
     table_columns!(table, "Created at", manifest.created_at());
 }
 
-pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {
+pub(crate) fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {
     if let Some(env) = env {
         table_columns!(table, "Project directory", env.project_dir.display());
 
@@ -130,14 +130,14 @@ pub fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) 
     table_columns!(table, "Project directory", dir_info.project_dir().display());
 }
 
-pub fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {
+pub(crate) fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {
     table_title!(table, "Environment info");
     let env = existing(dir_info.read_env_config())?;
     print_dir_info(table, dir_info, &env);
     Ok(())
 }
 
-pub fn make_list_table() -> Table {
+pub(crate) fn make_list_table() -> Table {
     TableSettings {
         divider_indent: 0,
         columns_indent: 2,
@@ -148,7 +148,7 @@ pub fn make_list_table() -> Table {
     .build()
 }
 
-pub fn make_prop_table() -> Table {
+pub(crate) fn make_prop_table() -> Table {
     TableSettings {
         title_indent: 0,
         divider_indent: 2,
@@ -162,7 +162,7 @@ pub fn make_prop_table() -> Table {
     .build()
 }
 
-pub fn prettify_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
+pub(crate) fn prettify_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
     let descriptor_info = DescriptorInfo {
         plugin_host: Arc::clone(plugin_host),
         descriptor: Arc::clone(&package.descriptor),
@@ -170,7 +170,7 @@ pub fn prettify_descriptor(plugin_host: &PluginHostRef, package: &Package) -> St
     descriptor_info.to_string()
 }
 
-pub fn prettify_package(package: &Package, verbose: bool) -> Result<String> {
+pub(crate) fn prettify_package(package: &Package, verbose: bool) -> Result<String> {
     let is_file = package.asset_path.is_file();
 
     let asset_path_display = (if verbose && is_file {
@@ -200,7 +200,7 @@ pub fn prettify_package(package: &Package, verbose: bool) -> Result<String> {
     })
 }
 
-pub fn prettify_value(value: &Value) -> String {
+pub(crate) fn prettify_value(value: &Value) -> String {
     if let Some(s) = value.as_str() {
         String::from(s)
     } else {
@@ -209,7 +209,7 @@ pub fn prettify_value(value: &Value) -> String {
 }
 
 #[allow(clippy::cast_precision_loss)]
-pub fn humanize_size_base_2(bytes: u64) -> String {
+pub(crate) fn humanize_size_base_2(bytes: u64) -> String {
     const KB: u64 = 1024;
     const MB: u64 = 1024 * 1024;
     const GB: u64 = 1024 * 1024 * 1024;

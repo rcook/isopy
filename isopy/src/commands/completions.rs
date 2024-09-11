@@ -25,7 +25,7 @@ use clap::CommandFactory;
 use clap_complete::{generate, Shell};
 use std::io::stdout;
 
-pub fn completions(shell: Option<Shell>) -> Status {
+pub(crate) fn completions(shell: Option<Shell>) -> Status {
     let shell = shell.unwrap_or(Shell::Bash);
     let mut command = Args::command();
     let name = command.get_name().to_string();

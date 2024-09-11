@@ -24,10 +24,10 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Env {
+pub(crate) struct Env {
     #[serde(rename = "project_dir")]
-    pub project_dir: PathBuf,
+    pub(crate) project_dir: PathBuf,
 
     #[serde(rename = "packages")]
-    pub packages: Vec<Package>,
+    pub(crate) packages: Vec<Package>,
 }

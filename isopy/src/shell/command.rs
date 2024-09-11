@@ -28,32 +28,32 @@ use std::process::ExitStatus;
 
 use super::IsopyEnv;
 
-pub struct Command {
+pub(crate) struct Command {
     program: Option<OsString>,
     args: Vec<OsString>,
 }
 
 impl Command {
-    pub const fn new(program: OsString) -> Self {
+    pub(crate) const fn new(program: OsString) -> Self {
         Self {
             program: Some(program),
             args: Vec::new(),
         }
     }
 
-    pub const fn new_shell() -> Self {
+    pub(crate) const fn new_shell() -> Self {
         Self {
             program: None,
             args: Vec::new(),
         }
     }
 
-    pub fn arg(&mut self, arg: OsString) -> &mut Self {
+    pub(crate) fn arg(&mut self, arg: OsString) -> &mut Self {
         self.args.push(arg);
         self
     }
 
-    pub fn exec(&self, isopy_env: &IsopyEnv, env_info: &EnvInfo) -> Result<ExitStatus> {
+    pub(crate) fn exec(&self, isopy_env: &IsopyEnv, env_info: &EnvInfo) -> Result<ExitStatus> {
         prepend_paths(&env_info.path_dirs)?;
 
         isopy_env.set_vars();

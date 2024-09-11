@@ -28,13 +28,13 @@ use std::path::PathBuf;
 use sysinfo::System;
 
 #[derive(Debug)]
-pub struct WindowsShellInfo {
-    pub path: PathBuf,
-    pub kind: WindowsShellKind,
+pub(crate) struct WindowsShellInfo {
+    pub(crate) path: PathBuf,
+    pub(crate) kind: WindowsShellKind,
 }
 
 #[derive(Debug)]
-pub enum WindowsShellKind {
+pub(crate) enum WindowsShellKind {
     Cmd,
     PowerShell,
 }
@@ -50,7 +50,7 @@ lazy_static! {
         PathBuf::from(var("ComSpec").expect("lazy_static: ComSpec must be defined"));
 }
 
-pub fn get_windows_shell_info() -> Result<WindowsShellInfo> {
+pub(crate) fn get_windows_shell_info() -> Result<WindowsShellInfo> {
     let mut system = System::new();
     let pid = get_pid()?;
     let mut process = get_process_from_pid(&mut system, pid)?;
