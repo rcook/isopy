@@ -1173,8 +1173,6 @@ dependencies = [
  "dirs",
  "exec",
  "home",
- "isopy-go",
- "isopy-java",
  "isopy-lib",
  "isopy-python",
  "joat-logger",
@@ -1195,46 +1193,6 @@ dependencies = [
  "sysinfo",
  "tinytemplate",
  "tokio",
- "url",
-]
-
-[[package]]
-name = "isopy-go"
-version = "0.3.25"
-dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "isopy-lib",
- "joatmon",
- "lazy_static",
- "log",
- "reqwest",
- "serde",
- "serde_json",
- "serde_yaml",
- "thiserror",
- "url",
-]
-
-[[package]]
-name = "isopy-java"
-version = "0.3.25"
-dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "isopy-lib",
- "joatmon",
- "lazy_static",
- "log",
- "percent-encoding",
- "reqwest",
- "rstest",
- "serde",
- "serde_json",
- "serde_yaml",
- "thiserror",
  "url",
 ]
 

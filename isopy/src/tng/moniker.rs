@@ -27,19 +27,11 @@ use std::str::FromStr;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-const GO_STR: &str = "go";
-const JAVA_STR: &str = "java";
 const PYTHON_STR: &str = "python";
 
 #[derive(Clone, Debug, EnumIter, ValueEnum)]
 
 pub(crate) enum Moniker {
-    #[clap(name = GO_STR)]
-    Go,
-
-    #[clap(name = JAVA_STR)]
-    Java,
-
     #[clap(name = PYTHON_STR)]
     Python,
 }
@@ -47,8 +39,6 @@ pub(crate) enum Moniker {
 impl Moniker {
     pub(crate) fn as_str(&self) -> &str {
         match self {
-            Self::Go => GO_STR,
-            Self::Java => JAVA_STR,
             Self::Python => PYTHON_STR,
         }
     }

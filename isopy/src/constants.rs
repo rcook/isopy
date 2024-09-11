@@ -31,11 +31,5 @@ lazy_static! {
 
 pub(crate) const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
 
-pub(crate) const JDK_DESCRIPTOR_PREFIX: &str = "jdk";
-
-pub(crate) const JRE_DESCRIPTOR_PREFIX: &str = "jre";
-
-pub(crate) const GO_DESCRIPTOR_PREFIX: &str = "go";
-
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(crate) const EXECUTABLE_MASK: u32 = 0o100;

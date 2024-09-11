@@ -19,15 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{
-    GO_DESCRIPTOR_PREFIX, JDK_DESCRIPTOR_PREFIX, JRE_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX,
-};
+use crate::constants::PYTHON_DESCRIPTOR_PREFIX;
 use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::Package;
 use anyhow::{bail, Result};
-use isopy_go::GoPluginFactory;
-use isopy_java::JavaPluginFactory;
 use isopy_lib::{EnvInfo, Platform, PluginFactory, Shell};
 use isopy_python::PythonPluginFactory;
 use lazy_static::lazy_static;
@@ -36,21 +32,10 @@ use std::path::Path;
 use std::sync::Arc;
 
 lazy_static! {
-    static ref GLOBAL: Registry = Registry::new(vec![
-        PluginHost::new(
-            PYTHON_DESCRIPTOR_PREFIX,
-            Box::<PythonPluginFactory>::default(),
-        ),
-        PluginHost::new(
-            JDK_DESCRIPTOR_PREFIX,
-            Box::new(JavaPluginFactory::new_jdk())
-        ),
-        PluginHost::new(
-            JRE_DESCRIPTOR_PREFIX,
-            Box::new(JavaPluginFactory::new_jre())
-        ),
-        PluginHost::new(GO_DESCRIPTOR_PREFIX, Box::<GoPluginFactory>::default()),
-    ]);
+    static ref GLOBAL: Registry = Registry::new(vec![PluginHost::new(
+        PYTHON_DESCRIPTOR_PREFIX,
+        Box::<PythonPluginFactory>::default(),
+    )]);
 }
 
 pub(crate) struct Registry {
@@ -133,36 +118,21 @@ impl Registry {
 
 #[cfg(test)]
 mod tests {
-    use crate::constants::{
-        JDK_DESCRIPTOR_PREFIX, JRE_DESCRIPTOR_PREFIX, PYTHON_DESCRIPTOR_PREFIX,
-    };
+    use crate::constants::PYTHON_DESCRIPTOR_PREFIX;
     use crate::plugin_host::PluginHost;
     use crate::registry::Registry;
     use anyhow::Result;
-    use isopy_java::JavaPluginFactory;
     use isopy_python::PythonPluginFactory;
     use rstest::rstest;
 
     #[rstest]
     #[case("python:1.2.3:11223344", "1.2.3:11223344")]
     #[case("python:1.2.3:11223344", "python:1.2.3:11223344")]
-    #[case("jdk:19.0.1+10", "jdk:19.0.1+10")]
-    #[case("jre:19.0.1+10", "jre:19.0.1+10")]
     fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
-        let registry = Registry::new(vec![
-            PluginHost::new(
-                PYTHON_DESCRIPTOR_PREFIX,
-                Box::<PythonPluginFactory>::default(),
-            ),
-            PluginHost::new(
-                JDK_DESCRIPTOR_PREFIX,
-                Box::new(JavaPluginFactory::new_jdk()),
-            ),
-            PluginHost::new(
-                JRE_DESCRIPTOR_PREFIX,
-                Box::new(JavaPluginFactory::new_jre()),
-            ),
-        ]);
+        let registry = Registry::new(vec![PluginHost::new(
+            PYTHON_DESCRIPTOR_PREFIX,
+            Box::<PythonPluginFactory>::default(),
+        )]);
 
         let descriptor_info = registry.parse_descriptor(input)?;
         assert_eq!(expected_str, descriptor_info.to_string());

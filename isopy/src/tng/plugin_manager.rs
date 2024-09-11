@@ -26,24 +26,18 @@ use isopy_lib::tng::{PackageManager, Plugin};
 use std::path::Path;
 
 pub(crate) struct PluginManager {
-    go_plugin: Plugin,
-    java_plugin: Plugin,
     python_plugin: Plugin,
 }
 
 impl PluginManager {
     pub(crate) fn new() -> Self {
         Self {
-            go_plugin: isopy_go::tng::new_plugin(),
-            java_plugin: isopy_java::tng::new_plugin(),
             python_plugin: isopy_python::tng::new_plugin(),
         }
     }
 
     pub(crate) fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
         match moniker {
-            Moniker::Go => &self.go_plugin,
-            Moniker::Java => &self.java_plugin,
             Moniker::Python => &self.python_plugin,
         }
     }
