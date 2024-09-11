@@ -27,7 +27,6 @@ use std::env::{remove_var, set_var, var, VarError};
 pub(crate) const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
 pub(crate) const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
 pub(crate) const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
-pub(crate) const ISOPY_OFFLINE_ENV_NAME: &str = "ISOPY_OFFLINE";
 pub(crate) const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
 pub(crate) const BOOL_TRUE_VALUE: &str = "true";
@@ -43,7 +42,6 @@ lazy_static! {
         (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
         (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),
         (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
-        (ISOPY_OFFLINE_ENV_NAME, EnvType::Bool),
     ];
 }
 

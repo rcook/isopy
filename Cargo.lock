@@ -1214,6 +1214,7 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "thiserror",
+ "url",
 ]
 
 [[package]]

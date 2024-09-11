@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME, ISOPY_OFFLINE_ENV_NAME};
+use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME};
 use crate::package_id::PackageId;
 use crate::tng::Moniker;
 use crate::wrapper_file_name::WrapperFileName;
@@ -46,15 +46,6 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
     after_help = format!("{PACKAGE_HOME_PAGE}\nhttps://github.com/rcook/isopy{}", PACKAGE_BUILD_VERSION.map(|x| format!("\n\n{}", x)).unwrap_or_else(|| String::from("")))
 )]
 pub(crate) struct Args {
-    #[arg(
-        global = true,
-        help = "Perform operations without connecting to network",
-        long = "offline",
-        default_value_t = false,
-        env = ISOPY_OFFLINE_ENV_NAME
-    )]
-    pub(crate) offline: bool,
-
     #[arg(
         global = true,
         help = "Path to isopy cache directory",
@@ -130,12 +121,6 @@ pub(crate) enum Command {
 
     #[command(name = "info", about = "Show information")]
     Info,
-
-    #[command(name = "package", about = "Package commands")]
-    Package {
-        #[command(subcommand)]
-        command: PackageCommand,
-    },
 
     #[command(name = "project", about = "Project commands")]
     Project {
@@ -268,33 +253,6 @@ pub(crate) enum EnvCommand {
 
         #[arg(help = "Show brief output", long = "no-verbose")]
         _no_verbose: bool,
-    },
-}
-
-#[derive(Debug, Subcommand)]
-pub(crate) enum PackageCommand {
-    #[command(name = "list", about = "List local and (optionally) remote packages")]
-    List {
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
-
-        #[arg(
-            help = "Show all packages including remote packages",
-            short = 'a',
-            long = "all",
-            default_value_t = false
-        )]
-        all: bool,
     },
 }
 
@@ -508,6 +466,19 @@ pub(crate) enum IncubatingCommand {
             value_delimiter = ','
         )]
         tags: Option<Vec<String>>,
+
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
+        verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
     },
 
     #[command(name = "tags", about = "List tags")]

@@ -34,7 +34,6 @@ use std::path::{Path, PathBuf};
 
 pub(crate) struct App {
     config_dir: PathBuf,
-    offline: bool,
     cwd: PathBuf,
     cache_dir: PathBuf,
     repo: Repo,
@@ -43,22 +42,17 @@ pub(crate) struct App {
 }
 
 impl App {
-    pub(crate) fn new(offline: bool, cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
+    pub(crate) fn new(cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         let plugin_manager = PluginManager::new();
         Ok(Self {
             config_dir: default_config_dir()?,
-            offline,
             cwd,
             cache_dir: cache_dir.to_path_buf(),
             repo,
             project_config_path,
             plugin_manager,
         })
-    }
-
-    pub(crate) const fn offline(&self) -> bool {
-        self.offline
     }
 
     pub(crate) fn config_dir(&self) -> &Path {

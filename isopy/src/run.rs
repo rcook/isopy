@@ -25,7 +25,6 @@ use crate::commands::env::{
     delete as env_delete, install as env_install, link as env_link, list as env_list,
 };
 use crate::commands::incubating::{download, install, packages, tags, update};
-use crate::commands::package::{list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
 use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
@@ -80,14 +79,13 @@ pub(crate) async fn run() -> Result<Status> {
         None => current_dir()?,
     };
 
-    let app = App::new(args.offline, cwd, &cache_dir, repo)?;
+    let app = App::new(cwd, &cache_dir, repo)?;
     do_it(app, args.command).await
 }
 
 async fn do_it(app: App, command: Command) -> Result<Status> {
     use crate::args::Command::*;
     use crate::args::EnvCommand;
-    use crate::args::PackageCommand;
     use crate::args::ProjectCommand;
 
     match command {
@@ -112,12 +110,15 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
                 moniker,
                 filter,
                 tags,
+                verbose,
+                ..
             } => {
                 packages(
                     &app,
                     &moniker.map(Into::<Moniker>::into),
                     filter.into(),
                     &tags,
+                    verbose,
                 )
                 .await
             }
@@ -129,20 +130,6 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             }
         },
         Info => info(&app),
-        Package { command } => match command {
-            PackageCommand::List { verbose, all, .. } => {
-                package_list(
-                    &app,
-                    if all {
-                        ListType::All
-                    } else {
-                        ListType::LocalOnly
-                    },
-                    verbose,
-                )
-                .await
-            }
-        },
         Project { command } => match command {
             ProjectCommand::Add { package_id } => project_add(&app, &package_id),
             ProjectCommand::Install => project_install(&app).await,

@@ -19,21 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor_info::DescriptorInfo;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
-use crate::plugin_host::PluginHostRef;
 use crate::registry::Registry;
 use crate::serialization::Env;
 use crate::table::{table_columns, table_divider, table_line, table_title, Table, TableSettings};
-use anyhow::{anyhow, Result};
-use colored::{Color, Colorize};
-use isopy_lib::Package;
+use anyhow::Result;
+use colored::Color;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
 use serde_json::Value;
-use std::ffi::OsStr;
-use std::fs::metadata;
-use std::sync::Arc;
 
 pub(crate) fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
@@ -160,44 +154,6 @@ pub(crate) fn make_prop_table() -> Table {
         ..Default::default()
     }
     .build()
-}
-
-pub(crate) fn prettify_descriptor(plugin_host: &PluginHostRef, package: &Package) -> String {
-    let descriptor_info = DescriptorInfo {
-        plugin_host: Arc::clone(plugin_host),
-        descriptor: Arc::clone(&package.descriptor),
-    };
-    descriptor_info.to_string()
-}
-
-pub(crate) fn prettify_package(package: &Package, verbose: bool) -> Result<String> {
-    let is_file = package.asset_path.is_file();
-
-    let asset_path_display = (if verbose && is_file {
-        package.asset_path.to_str()
-    } else {
-        package.asset_path.file_name().and_then(OsStr::to_str)
-    })
-    .ok_or_else(|| anyhow!("cannot convert path {}", package.asset_path.display()))?;
-
-    let asset_path_pretty = if is_file {
-        asset_path_display.bright_white().bold()
-    } else {
-        asset_path_display.white()
-    };
-
-    let size = if is_file {
-        Some(metadata(&package.asset_path)?.len())
-    } else {
-        None
-    };
-
-    Ok(if let Some(size) = size {
-        let size_pretty = format!("{}", humanize_size_base_2(size).cyan());
-        format!("{asset_path_pretty} ({size_pretty})")
-    } else {
-        format!("{asset_path_pretty}")
-    })
 }
 
 pub(crate) fn prettify_value(value: &Value) -> String {

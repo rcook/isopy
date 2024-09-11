@@ -27,16 +27,29 @@ use isopy_lib::tng::{
 };
 use log::warn;
 use std::path::Path;
+use std::sync::LazyLock;
+use url::Url;
 
-pub(crate) struct JavaPlugin;
+const INDEX_URL: LazyLock<Url> =
+    LazyLock::new(|| "https://httpbin.org/".parse().expect("Invalid index URL"));
+
+pub(crate) struct JavaPlugin {
+    url: Url,
+}
 
 impl JavaPlugin {
     pub(crate) fn new() -> Plugin {
-        Plugin::new(Box::new(Self))
+        Plugin::new(Box::new(Self {
+            url: INDEX_URL.clone(),
+        }))
     }
 }
 
 impl PluginOps for JavaPlugin {
+    fn url(&self) -> &Url {
+        &self.url
+    }
+
     fn parse_version(&self, _s: &str) -> Result<Version> {
         todo!()
     }

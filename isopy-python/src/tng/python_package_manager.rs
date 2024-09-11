@@ -32,7 +32,6 @@ use serde_json::Value;
 use std::collections::HashSet;
 use std::iter::once;
 use std::path::Path;
-use std::sync::LazyLock;
 use tokio::fs::read_to_string;
 use url::Url;
 
@@ -54,19 +53,17 @@ macro_rules! downcast_version {
     };
 }
 
-const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
-    "https://api.github.com/repos/indygreg/python-build-standalone/releases"
-        .parse()
-        .expect("Invalid index URL")
-});
-
 pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
+    url: Url,
 }
 
 impl PythonPackageManager {
-    pub(crate) fn new(ctx: PackageManagerContext) -> Self {
-        Self { ctx }
+    pub(crate) fn new(ctx: PackageManagerContext, url: &Url) -> Self {
+        Self {
+            ctx,
+            url: url.clone(),
+        }
     }
 
     fn get_archives(item: &Value) -> Result<Vec<ArchiveInfo>> {
@@ -164,7 +161,7 @@ impl PythonPackageManager {
 
     async fn get_index(&self, update: bool) -> Result<Value> {
         let options = DownloadOptions::json().update(update);
-        let path = self.ctx.download_file(&INDEX_URL, &options).await?;
+        let path = self.ctx.download_file(&self.url, &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)
@@ -220,16 +217,15 @@ impl PackageManagerOps for PythonPackageManager {
         for item in g!(index.as_array()) {
             for archive in Self::get_archives(item)? {
                 if Self::metadata_has_tags(archive.metadata(), &tags) {
-                    let is_local = self.ctx.get_file(archive.url()).await.is_ok();
-                    let kind = if is_local {
-                        PackageKind::Local
-                    } else {
-                        PackageKind::Remote
+                    let (kind, path) = match self.ctx.get_file(archive.url()).await {
+                        Ok(p) => (PackageKind::Local, Some(p)),
+                        _ => (PackageKind::Remote, None),
                     };
+                    let is_local = kind == PackageKind::Local;
                     match filter {
-                        PackageFilter::All => records.push((kind, archive)),
-                        PackageFilter::Local if is_local => records.push((kind, archive)),
-                        PackageFilter::Remote if !is_local => records.push((kind, archive)),
+                        PackageFilter::All => records.push((kind, archive, path)),
+                        PackageFilter::Local if is_local => records.push((kind, archive, path)),
+                        PackageFilter::Remote if !is_local => records.push((kind, archive, path)),
                         _ => {}
                     }
                 }
@@ -248,7 +244,17 @@ impl PackageManagerOps for PythonPackageManager {
 
         Ok(records
             .into_iter()
-            .map(|r| PackageSummary::new(r.0, r.1.metadata().name(), r.1.url()))
+            .map(|(kind, archive, path)| {
+                PackageSummary::new(
+                    kind,
+                    archive.metadata().name(),
+                    archive.url(),
+                    Version::new(Box::new(
+                        archive.metadata().full_version().version().clone(),
+                    )),
+                    path,
+                )
+            })
             .collect())
     }
 

@@ -23,8 +23,10 @@ use crate::tng::package_manager::PackageManager;
 use crate::tng::package_manager_context::PackageManagerContext;
 use crate::tng::version::Version;
 use anyhow::Result;
+use url::Url;
 
 pub trait PluginOps: Send + Sync {
+    fn url(&self) -> &Url;
     fn parse_version(&self, s: &str) -> Result<Version>;
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }

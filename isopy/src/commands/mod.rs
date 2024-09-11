@@ -21,7 +21,6 @@
 //
 pub(crate) mod env;
 pub(crate) mod incubating;
-pub(crate) mod package;
 pub(crate) mod project;
 pub(crate) mod wrap;
 

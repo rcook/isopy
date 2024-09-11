@@ -24,21 +24,37 @@ use anyhow::Result;
 use isopy_lib::tng::{
     PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
 };
+use std::sync::LazyLock;
+use url::Url;
 
-pub(crate) struct PythonPlugin;
+const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
+    "https://api.github.com/repos/indygreg/python-build-standalone/releases"
+        .parse()
+        .expect("Invalid index URL")
+});
+
+pub(crate) struct PythonPlugin {
+    url: Url,
+}
 
 impl PythonPlugin {
     pub(crate) fn new() -> Plugin {
-        Plugin::new(Box::new(Self))
+        Plugin::new(Box::new(Self {
+            url: INDEX_URL.clone(),
+        }))
     }
 }
 
 impl PluginOps for PythonPlugin {
+    fn url(&self) -> &Url {
+        &self.url
+    }
+
     fn parse_version(&self, s: &str) -> Result<Version> {
         Ok(Version::new(Box::new(s.parse::<VersionTriple>()?)))
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(Box::new(PythonPackageManager::new(ctx)))
+        PackageManager::new(Box::new(PythonPackageManager::new(ctx, &self.url)))
     }
 }

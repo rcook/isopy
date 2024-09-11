@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,21 +21,32 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::PackageKind;
+use crate::tng::package_kind::PackageKind;
+use crate::tng::version::Version;
 use url::Url;
 
 pub struct PackageSummary {
     kind: PackageKind,
     name: String,
     url: Url,
+    version: Version,
+    path: Option<PathBuf>,
 }
 
 impl PackageSummary {
-    pub fn new<S: Into<String>>(kind: PackageKind, name: S, url: &Url) -> Self {
+    pub fn new<S: Into<String>, P: Into<PathBuf>>(
+        kind: PackageKind,
+        name: S,
+        url: &Url,
+        version: Version,
+        path: Option<P>,
+    ) -> Self {
         Self {
             kind,
             name: name.into(),
             url: url.clone(),
+            version,
+            path: path.map(|p| p.into()),
         }
     }
     pub fn kind(&self) -> PackageKind {
@@ -46,5 +59,13 @@ impl PackageSummary {
 
     pub fn url(&self) -> &Url {
         &self.url
+    }
+
+    pub fn version(&self) -> &Version {
+        &self.version
+    }
+
+    pub fn path(&self) -> &Option<PathBuf> {
+        &self.path
     }
 }
