@@ -25,7 +25,7 @@ use crate::commands::env::{
     delete as env_delete, install as env_install, link as env_link, list as env_list,
 };
 use crate::commands::incubating::{download, install, packages, tags, update};
-use crate::commands::package::{download as package_download, list as package_list, ListType};
+use crate::commands::package::{list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
 use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
@@ -130,7 +130,6 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         },
         Info => info(&app),
         Package { command } => match command {
-            PackageCommand::Download { package_id } => package_download(&app, &package_id).await,
             PackageCommand::List { verbose, all, .. } => {
                 package_list(
                     &app,

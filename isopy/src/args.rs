@@ -273,12 +273,6 @@ pub(crate) enum EnvCommand {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum PackageCommand {
-    #[command(name = "download", about = "Download package")]
-    Download {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
     #[command(name = "list", about = "List local and (optionally) remote packages")]
     List {
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
