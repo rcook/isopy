@@ -26,12 +26,7 @@ use std::str::FromStr;
 
 serializable_newtype!(Tag, String);
 
-impl Tag {
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
+impl Tag {}
 
 impl FromStr for Tag {
     type Err = IsopyPythonError;
@@ -48,17 +43,5 @@ impl TryToString for Tag {
 
     fn try_to_string(&self) -> Option<String> {
         Some(self.to_string_lossy())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::Tag;
-    use anyhow::Result;
-
-    #[test]
-    fn basics() -> Result<()> {
-        assert_eq!("foo", "foo".parse::<Tag>()?.as_str());
-        Ok(())
     }
 }

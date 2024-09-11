@@ -21,7 +21,6 @@
 //
 use crate::asset::Asset;
 use crate::asset_filter::AssetFilter;
-use crate::asset_helper::{download_asset, get_asset};
 use crate::asset_meta::AssetMeta;
 use crate::constants::{
     ASSETS_DIR, INDEX_FILE_NAME, RELEASES_FILE_NAME, RELEASES_URL, REPOSITORIES_FILE_NAME,
@@ -40,8 +39,8 @@ use crate::tag::Tag;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, download_stream, other_error as isopy_lib_other_error, Descriptor, IsopyLibResult,
-    LastModified, Package, Plugin,
+    dir_url, download_stream, other_error as isopy_lib_other_error, IsopyLibResult, LastModified,
+    Package, Plugin,
 };
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
@@ -316,27 +315,5 @@ impl Plugin for PythonPlugin {
         items.sort_by(|a, b| Self::compare_by_version_and_tag((b.1, b.2), (a.1, a.2)));
 
         Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
-    }
-
-    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
-        let descriptor = descriptor
-            .as_any()
-            .downcast_ref::<PythonDescriptor>()
-            .expect("must be PythonDescriptor");
-        let assets = self.read_assets()?;
-        let asset = get_asset(&assets, descriptor)?;
-        let repositories = self.read_repositories()?;
-        let repository = repositories
-            .first()
-            .ok_or_else(|| anyhow!("No asset repositories are configured"))?;
-        let asset_path = download_asset(repository, asset, &self.assets_dir).await?;
-
-        Ok(Package {
-            asset_path,
-            descriptor: Arc::new(Box::new(PythonDescriptor {
-                version: descriptor.version.clone(),
-                tag: Some(asset.tag.clone()),
-            })),
-        })
     }
 }

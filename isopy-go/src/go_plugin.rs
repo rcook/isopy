@@ -26,15 +26,12 @@ use crate::go_version::GoVersion;
 use crate::serialization::{Index, Version};
 use async_trait::async_trait;
 use isopy_lib::{
-    download_stream, other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor,
-    IsopyLibError, IsopyLibResult, Package, Plugin, ReqwestResponse, Response,
+    other_error as isopy_lib_other_error, Descriptor, IsopyLibResult, Package, Plugin,
 };
 use joatmon::read_yaml_file;
-use log::info;
-use reqwest::Client;
 use std::collections::HashMap;
 use std::ffi::OsString;
-use std::fs::{read_dir, remove_file};
+use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -46,6 +43,7 @@ pub struct GoPlugin {
 
 struct PackageInfo {
     package: Package,
+    #[allow(unused)]
     version: Version,
     go_version: GoVersion,
 }
@@ -144,6 +142,7 @@ impl Plugin for GoPlugin {
         }
     }
 
+    /*
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
         let version = descriptor
             .as_any()
@@ -186,4 +185,5 @@ impl Plugin for GoPlugin {
             descriptor: Arc::new(Box::new(version.clone())),
         })
     }
+    */
 }

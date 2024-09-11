@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::asset::Asset;
 use crate::constants::{ASSETS_DIR, RELEASES_FILE_NAME};
 use crate::repository::Repository;
 use anyhow::{anyhow, Result};
@@ -70,18 +69,6 @@ impl Repository for LocalRepository {
             content_length,
             index_path,
         ))))
-    }
-
-    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
-        let asset_path = self.assets_dir.join(&asset.name);
-        let m = metadata(&asset_path)?;
-        let last_modified = LastModified::try_from(&m.modified()?)?;
-        let content_length = m.len();
-        Ok(Box::new(LocalResponse::new(
-            Some(last_modified),
-            content_length,
-            asset_path,
-        )))
     }
 }
 

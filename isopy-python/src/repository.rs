@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::asset::Asset;
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{LastModified, Response};
@@ -30,6 +29,4 @@ pub trait Repository: Send + Sync {
         &self,
         last_modified: &Option<LastModified>,
     ) -> Result<Option<Box<dyn Response>>>;
-
-    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>>;
 }

@@ -35,9 +35,7 @@
 #![allow(clippy::option_if_let_else)]
 mod asset;
 mod asset_filter;
-mod asset_helper;
 mod asset_meta;
-mod checksum;
 mod constants;
 mod error;
 mod github;

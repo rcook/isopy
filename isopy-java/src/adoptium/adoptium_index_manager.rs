@@ -70,6 +70,7 @@ impl AdoptiumIndexManager {
         Ok(versions)
     }
 
+    #[allow(unused)]
     pub async fn download_asset(&self, url: &Url, output_path: &Path) -> Result<()> {
         if self.offline {
             bail!("cannot download assets in offline mode");

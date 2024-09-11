@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::asset::Asset;
 use crate::constants::ISOPY_USER_AGENT;
 use crate::repository::Repository;
 use anyhow::Result;
@@ -93,14 +92,5 @@ impl Repository for GitHubRepository {
             Some(new_last_modified),
             index_response,
         ))))
-    }
-
-    async fn get_asset(&self, asset: &Asset) -> Result<Box<dyn Response>> {
-        let request = self
-            .client
-            .get(asset.url.clone())
-            .header(USER_AGENT, ISOPY_USER_AGENT);
-        let response = request.send().await?;
-        Ok(Box::new(ReqwestResponse::new(None, response)))
     }
 }

@@ -25,14 +25,10 @@ use crate::constants::ASSETS_DIR;
 use crate::java_descriptor::JavaDescriptor;
 use crate::java_version::JavaVersion;
 use async_trait::async_trait;
-use isopy_lib::{
-    other_error as isopy_lib_other_error, verify_sha256_file_checksum, Descriptor, IsopyLibError,
-    IsopyLibResult, Package, Plugin,
-};
-use log::info;
+use isopy_lib::{other_error as isopy_lib_other_error, IsopyLibResult, Package, Plugin};
 use std::collections::HashMap;
 use std::ffi::OsString;
-use std::fs::{read_dir, remove_file};
+use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -127,6 +123,7 @@ impl Plugin for JavaPlugin {
         }
     }
 
+    /*
     async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package> {
         let descriptor = descriptor
             .as_any()
@@ -173,4 +170,5 @@ impl Plugin for JavaPlugin {
             descriptor: Arc::new(Box::new(descriptor.clone())),
         })
     }
+    */
 }

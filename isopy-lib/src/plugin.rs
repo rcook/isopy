@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor::Descriptor;
 use crate::package::Package;
 use crate::result::IsopyLibResult;
 use async_trait::async_trait;
@@ -28,5 +27,4 @@ use async_trait::async_trait;
 pub trait Plugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
     async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
-    async fn download_package(&self, descriptor: &dyn Descriptor) -> IsopyLibResult<Package>;
 }
