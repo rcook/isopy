@@ -24,13 +24,11 @@ use crate::args::{Args, Command, IncubatingCommand};
 use crate::commands::env::{
     delete as env_delete, install as env_install, link as env_link, list as env_list,
 };
+use crate::commands::incubating::{download, install, packages, tags, update};
 use crate::commands::package::{download as package_download, list as package_list, ListType};
 use crate::commands::project::{add as project_add, install as project_install};
 use crate::commands::wrap::wrap;
-use crate::commands::{
-    check, completions, download, info, install, packages, prompt, run as run_command, scratch,
-    shell, tags, update,
-};
+use crate::commands::{check, completions, info, prompt, run as run_command, scratch, shell};
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
 use crate::status::Status;

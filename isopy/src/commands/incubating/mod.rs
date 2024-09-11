@@ -19,24 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub(crate) mod env;
-pub(crate) mod incubating;
-pub(crate) mod package;
-pub(crate) mod project;
-pub(crate) mod wrap;
+mod download;
+mod install;
+mod packages;
+mod tags;
+mod update;
 
-mod check;
-mod completions;
-mod info;
-mod prompt;
-mod run;
-mod scratch;
-mod shell;
-
-pub(crate) use check::check;
-pub(crate) use completions::completions;
-pub(crate) use info::info;
-pub(crate) use prompt::prompt;
-pub(crate) use run::run;
-pub(crate) use scratch::scratch;
-pub(crate) use shell::shell;
+pub(crate) use download::download;
+pub(crate) use install::install;
+pub(crate) use packages::packages;
+pub(crate) use tags::tags;
+pub(crate) use update::update;
