@@ -45,17 +45,6 @@ pub struct AssetMeta {
     pub parsed_tag: Tag,
 }
 
-impl AssetMeta {
-    #[must_use]
-    pub fn definitely_not_an_asset_name(s: &str) -> bool {
-        if "libuuid-1.0.3.tar.gz" == s || "SHA256SUMS" == s || "xz-5.2.12.tar.gz" == s {
-            true
-        } else {
-            s.ends_with(".sha256")
-        }
-    }
-}
-
 macro_rules! asset_token {
     ($iter:expr, $type:ty, $asset:expr, $field:expr) => {
         match $iter.next() {
@@ -328,17 +317,5 @@ mod tests {
     fn test_parse(#[case] expected_result: AssetMeta, #[case] input: &str) -> Result<()> {
         assert_eq!(expected_result, input.parse::<AssetMeta>()?);
         Ok(())
-    }
-
-    #[rstest]
-    #[case(true, "libuuid-1.0.3.tar.gz")]
-    #[case(true, "SHA256SUMS")]
-    #[case(true, "foo.sha256")]
-    #[case(false, "foo")]
-    fn test_definitely_not_an_asset_name(#[case] expected_result: bool, #[case] input: &str) {
-        assert_eq!(
-            expected_result,
-            AssetMeta::definitely_not_an_asset_name(input)
-        );
     }
 }

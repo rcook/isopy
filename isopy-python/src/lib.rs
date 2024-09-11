@@ -34,19 +34,13 @@
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
 mod asset;
-mod asset_filter;
 mod asset_meta;
 mod constants;
 mod error;
-mod github;
-mod local;
 mod python_descriptor;
-mod python_plugin;
 mod python_plugin_factory;
 mod python_standalone_builds;
 mod python_version;
-mod repository;
-mod repository_info;
 mod repository_name;
 mod serialization;
 mod tag;

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Platform, Plugin, PluginFactory, Shell};
+use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Platform, PluginFactory, Shell};
 use serde_json::Value;
 use std::ffi::OsString;
 use std::path::Path;
@@ -80,9 +80,5 @@ impl PluginFactory for PluginHost {
     ) -> IsopyLibResult<Option<OsString>> {
         self.plugin_factory
             .make_script_command(script_path, platform, shell)
-    }
-
-    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
-        self.plugin_factory.make_plugin(offline, dir)
     }
 }

@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::plugin::Plugin;
 use crate::{Descriptor, EnvInfo, IsopyLibResult, Platform, Shell};
 use reqwest::Url;
 use serde_json::Value;
@@ -43,5 +42,4 @@ pub trait PluginFactory: Send + Sync {
         platform: Platform,
         shell: Shell,
     ) -> IsopyLibResult<Option<OsString>>;
-    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin>;
 }

@@ -21,11 +21,10 @@
 //
 use crate::constants::{PLUGIN_NAME, PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT, RELEASES_URL};
 use crate::python_descriptor::PythonDescriptor;
-use crate::python_plugin::PythonPlugin;
 use crate::serialization::{EnvConfig, ProjectConfig};
 use isopy_lib::{
     other_error as isopy_lib_other_error, render_absolute_path, Descriptor, EnvInfo,
-    IsopyLibResult, Platform, Plugin, PluginFactory, Shell,
+    IsopyLibResult, Platform, PluginFactory, Shell,
 };
 use serde_json::Value;
 use std::ffi::{OsStr, OsString};
@@ -134,9 +133,5 @@ impl PluginFactory for PythonPluginFactory {
         } else {
             Ok(None)
         }
-    }
-
-    fn make_plugin(&self, offline: bool, dir: &Path) -> Box<dyn Plugin> {
-        Box::new(PythonPlugin::new(offline, dir))
     }
 }

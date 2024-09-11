@@ -35,11 +35,6 @@ pub enum RepositoryName {
 
 impl RepositoryName {
     #[must_use]
-    pub const fn is_default(&self) -> bool {
-        matches!(self, Self::Default)
-    }
-
-    #[must_use]
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => DEFAULT_REPOSITORY_NAME,
@@ -109,18 +104,6 @@ mod tests {
         let name = input.as_str();
         assert_eq!(expected_name, name);
         assert!(REPOSITORY_NAME_REGEX.is_match(name));
-    }
-
-    #[rstest]
-    #[case(true, "default")]
-    #[case(false, "example")]
-    #[case(false, "other")]
-    fn is_default(#[case] expected_is_default: bool, #[case] input: &str) -> Result<()> {
-        assert_eq!(
-            expected_is_default,
-            input.parse::<RepositoryName>()?.is_default()
-        );
-        Ok(())
     }
 
     #[rstest]

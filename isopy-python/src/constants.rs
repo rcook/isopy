@@ -41,14 +41,6 @@ pub const DEFAULT_REPOSITORY_NAME: &str = "default";
 
 pub const EXAMPLE_REPOSITORY_NAME: &str = "example";
 
-pub const REPOSITORIES_FILE_NAME: &str = "repositories.yaml";
-
-pub const RELEASES_FILE_NAME: &str = "releases.json";
-
-pub const INDEX_FILE_NAME: &str = "index.yaml";
-
-pub const ISOPY_USER_AGENT: &str = "isopy";
-
 pub const PLUGIN_NAME: &str = "Python";
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
