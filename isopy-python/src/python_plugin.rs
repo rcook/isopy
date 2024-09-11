@@ -38,17 +38,11 @@ use crate::serialization::{
 use crate::tag::Tag;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use isopy_lib::{
-    dir_url, download_stream, other_error as isopy_lib_other_error, IsopyLibResult, LastModified,
-    Package, Plugin,
-};
+use isopy_lib::{dir_url, download_stream, IsopyLibResult, LastModified, Package, Plugin};
 use joatmon::label_file_name;
 use joatmon::read_yaml_file;
 use joatmon::{read_json_file, safe_write_file};
 use std::cmp::Ordering;
-use std::collections::HashMap;
-use std::ffi::OsString;
-use std::fs::read_dir;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -270,50 +264,6 @@ impl PythonPlugin {
 impl Plugin for PythonPlugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>> {
         let items = self.get_available_packages_extended().await?;
-        Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
-    }
-
-    async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>> {
-        let packages_with_version = self.get_available_packages_extended().await?;
-        let map = packages_with_version
-            .iter()
-            .filter_map(|p| {
-                p.0.asset_path
-                    .file_name()
-                    .map(OsString::from)
-                    .map(|f| (f, p))
-            })
-            .collect::<HashMap<_, _>>();
-
-        let mut items = Vec::new();
-
-        if self.assets_dir.exists() {
-            for result in read_dir(&self.assets_dir).map_err(isopy_lib_other_error)? {
-                let entry = result.map_err(isopy_lib_other_error)?;
-                let asset_path = entry.path();
-                let asset_file_name = entry.file_name();
-                if let Some(p) = map
-                    .get(&asset_file_name)
-                    .map(|p| (Arc::clone(&p.0.descriptor), &p.1, &p.2))
-                {
-                    if let Some(s) = asset_file_name.to_str() {
-                        if s.parse::<AssetMeta>().is_ok() {
-                            items.push((
-                                Package {
-                                    asset_path,
-                                    descriptor: p.0,
-                                },
-                                p.1,
-                                p.2,
-                            ));
-                        }
-                    }
-                }
-            }
-        }
-
-        items.sort_by(|a, b| Self::compare_by_version_and_tag((b.1, b.2), (a.1, a.2)));
-
         Ok(items.into_iter().map(|p| p.0).collect::<Vec<_>>())
     }
 }

@@ -26,5 +26,4 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait Plugin {
     async fn get_available_packages(&self) -> IsopyLibResult<Vec<Package>>;
-    async fn get_downloaded_packages(&self) -> IsopyLibResult<Vec<Package>>;
 }
