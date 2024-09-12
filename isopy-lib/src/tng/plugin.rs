@@ -48,4 +48,4 @@ pub trait PluginOps: Send + Sync {
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
 
-crate::tng::macros::dyn_trait_struct!(Plugin, PluginOps);
+crate::macros::dyn_trait_struct!(Plugin, PluginOps);

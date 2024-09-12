@@ -64,3 +64,18 @@ macro_rules! serializable_newtype {
         }
     };
 }
+
+macro_rules! dyn_trait_struct {
+    ($name : ident, $trait: ident) => {
+        #[derive(derive_more::Deref)]
+        pub struct $name(Box<dyn $trait>);
+
+        impl $name {
+            pub fn new<T: $trait + 'static>(inner: T) -> Self {
+                Self(Box::new(inner))
+            }
+        }
+    };
+}
+
+pub(crate) use dyn_trait_struct;

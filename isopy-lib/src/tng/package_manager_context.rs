@@ -31,4 +31,4 @@ pub trait PackageManagerContextOps: Send + Sync {
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-crate::tng::macros::dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);
+crate::macros::dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);

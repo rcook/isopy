@@ -24,7 +24,6 @@ mod checksum;
 mod download_options;
 mod env_props;
 mod file_name_parts;
-mod macros;
 mod package;
 mod package_filter;
 mod package_kind;

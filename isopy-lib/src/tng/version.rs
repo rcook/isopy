@@ -27,7 +27,7 @@ pub trait VersionOps: Debug + Display + Send + Sync {
     fn as_any(&self) -> &dyn Any;
 }
 
-crate::tng::macros::dyn_trait_struct!(Version, VersionOps);
+crate::macros::dyn_trait_struct!(Version, VersionOps);
 
 impl Clone for Version {
     fn clone(&self) -> Self {

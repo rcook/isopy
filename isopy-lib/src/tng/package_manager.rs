@@ -50,4 +50,4 @@ pub trait PackageManagerOps: Send + Sync {
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
 
-crate::tng::macros::dyn_trait_struct!(PackageManager, PackageManagerOps);
+crate::macros::dyn_trait_struct!(PackageManager, PackageManagerOps);

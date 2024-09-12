@@ -26,4 +26,4 @@ pub trait PackageOps {
     fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
 }
 
-crate::tng::macros::dyn_trait_struct!(Package, PackageOps);
+crate::macros::dyn_trait_struct!(Package, PackageOps);
