@@ -27,7 +27,7 @@ use crate::shell::IsopyEnv;
 use crate::status::{return_success_quiet, Status};
 use anyhow::Result;
 
-pub(crate) fn prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
+pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
     let isopy_env = IsopyEnv::get_vars()?;
     let env = if let Some(d) = app.find_dir_info(isopy_env.as_ref())? {
         existing(d.read_env_config())?

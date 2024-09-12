@@ -20,28 +20,22 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::package_id::PackageId;
-use crate::status::{return_success, Status};
+use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
-use log::info;
 use std::path::Path;
 
-pub(crate) async fn install(
-    app: &App,
-    package_id: &PackageId,
-    dir: &Path,
-    tags: &Option<Vec<String>>,
-) -> Result<Status> {
-    app.plugin_manager()
-        .new_package_manager(package_id.moniker(), app.config_dir())
-        .install_package(package_id.version(), tags, dir)
-        .await?;
+pub(crate) async fn do_delete(app: &App, project_dir: &Path) -> Result<Status> {
+    if app.get_dir_info(project_dir)?.is_none() {
+        return_user_error!(
+            "No environment exists for project directory {}",
+            project_dir.display()
+        )
+    }
 
-    info!(
-        "Package {} successfully installed to {}",
-        package_id,
-        dir.display()
+    app.remove_project_env(project_dir)?;
+
+    return_success!(
+        "Environment for project directory {} successfully removed",
+        project_dir.display()
     );
-
-    return_success!();
 }

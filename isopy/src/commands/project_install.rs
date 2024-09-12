@@ -20,12 +20,39 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::package_id::PackageId;
-use crate::status::{return_success, Status};
+use crate::fs::existing;
+use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 
-pub(crate) async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
-    app.install_package(package_id.moniker(), package_id.version())
-        .await?;
+pub(crate) async fn do_project_install(app: &App) -> Result<Status> {
+    if app.repo().get(app.cwd())?.is_some() {
+        return_user_error!(
+            "Project in directory {} already has an environment",
+            app.cwd().display()
+        );
+    }
+
+    let Some(project) = existing(app.read_project_config())? else {
+        return_user_error!(
+            "No project configuration file in directory {}",
+            app.cwd().display()
+        );
+    };
+
+    let package_infos = project
+        .packages
+        .iter()
+        .map(|package| {
+            let moniker = package.moniker.parse()?;
+            let plugin = app.plugin_manager().get_plugin(&moniker);
+            let version = plugin.parse_version(&package.version)?;
+            Ok((moniker, version))
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    for (moniker, version) in package_infos {
+        app.install_package(&moniker, &version).await?;
+    }
+
     return_success!();
 }

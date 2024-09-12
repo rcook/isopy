@@ -107,6 +107,15 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
+    #[command(
+        name = "delete",
+        about = "Delete environment corresponding to project directory"
+    )]
+    Delete {
+        #[arg(help = "Project directory", value_parser = parse_absolute_path)]
+        project_dir: PathBuf,
+    },
+
     #[command(name = "download", about = "Download package")]
     Download {
         #[arg(help = "Package ID")]
@@ -130,24 +139,6 @@ pub(crate) enum Command {
 
     #[command(name = "info", about = "Show information")]
     Info,
-
-    #[command(name = "install", about = "Install package")]
-    Install {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-
-        #[arg(
-            help = "Optional tags",
-            short = 't',
-            long = "tags",
-            num_args = 0..,
-            value_delimiter = ','
-        )]
-        tags: Option<Vec<String>>,
-
-        #[arg(help = "Installation directory")]
-        dir: PathBuf,
-    },
 
     #[command(name = "packages", about = "List packages")]
     Packages {
@@ -291,15 +282,6 @@ pub(crate) enum Command {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum EnvCommand {
-    #[command(
-        name = "delete",
-        about = "Delete environment corresponding to project directory"
-    )]
-    Delete {
-        #[arg(help = "Project directory", value_parser = parse_absolute_path)]
-        project_dir: PathBuf,
-    },
-
     #[command(name = "install", about = "Install package into environment")]
     Install {
         #[arg(help = "Package ID")]

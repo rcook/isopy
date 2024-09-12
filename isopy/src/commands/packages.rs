@@ -30,7 +30,7 @@ use isopy_lib::{PackageFilter, PackageSummary, Plugin};
 use std::fs::metadata;
 use strum::IntoEnumIterator;
 
-pub(crate) async fn packages(
+pub(crate) async fn do_packages(
     app: &App,
     moniker: &Option<Moniker>,
     filter: PackageFilter,

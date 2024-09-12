@@ -25,7 +25,7 @@ use crate::status::{return_success, Status};
 use anyhow::Result;
 use log::info;
 
-pub(crate) async fn download(
+pub(crate) async fn do_download(
     app: &App,
     package_id: &PackageId,
     tags: &Option<Vec<String>>,

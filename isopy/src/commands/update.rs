@@ -26,7 +26,7 @@ use anyhow::Result;
 use log::info;
 use strum::IntoEnumIterator;
 
-pub(crate) async fn update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn update_index(app: &App, moniker: &Moniker) -> Result<()> {
         app.plugin_manager()
             .new_package_manager(moniker, app.config_dir())

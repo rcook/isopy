@@ -25,7 +25,7 @@ use crate::status::{return_success, Status};
 use anyhow::Result;
 use strum::IntoEnumIterator;
 
-pub(crate) async fn tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn list_tags(app: &App, moniker: &Moniker) -> Result<()> {
         let tags = app
             .plugin_manager()

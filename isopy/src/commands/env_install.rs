@@ -20,32 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::existing;
 use crate::package_id::PackageId;
-use crate::serialization::{Project, ProjectPackage};
-use crate::status::{return_success, return_user_error, Status};
+use crate::status::{return_success, Status};
 use anyhow::Result;
-use log::info;
 
-pub(crate) fn add(app: &App, package_id: &PackageId) -> Result<Status> {
-    let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
-
-    let moniker_str = package_id.moniker().as_str();
-    if packages.iter().any(|p| p.moniker == moniker_str) {
-        return_user_error!(
-            "Environment already has a package from package manager \"{moniker_str}\""
-        );
-    }
-
-    packages.push(ProjectPackage {
-        moniker: String::from(moniker_str),
-        version: package_id.version().to_string(),
-    });
-
-    app.write_project_config(&Project { packages }, true)?;
-    info!(
-        "Added package \"{moniker_str}\" to project at {}",
-        app.cwd().display()
-    );
+pub(crate) async fn do_env_install(app: &App, package_id: &PackageId) -> Result<Status> {
+    app.install_package(package_id.moniker(), package_id.version())
+        .await?;
     return_success!();
 }

@@ -19,8 +19,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod add;
-mod install;
+use crate::app::App;
+use crate::print::make_prop_table;
+use crate::print::print_dir_info_and_env;
+use crate::status::{return_success, return_user_error, Status};
+use anyhow::Result;
+use joat_repo::MetaId;
 
-pub(crate) use add::add;
-pub(crate) use install::install;
+pub(crate) fn do_env_link(app: &App, dir_id: &MetaId) -> Result<Status> {
+    let Some(dir_info) = app.repo().link(dir_id, app.cwd())? else {
+        return_user_error!(
+            "directory {} is already linked to metadirectory with ID {}",
+            app.cwd().display(),
+            dir_id
+        );
+    };
+
+    let mut table = make_prop_table();
+    print_dir_info_and_env(app, &mut table, &dir_info)?;
+    table.print();
+
+    return_success!();
+}

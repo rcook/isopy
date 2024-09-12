@@ -21,15 +21,7 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command};
-use crate::commands::env::{
-    delete as env_delete, install as env_install, link as env_link, list as env_list,
-};
-use crate::commands::project::{add as project_add, install as project_install};
-use crate::commands::wrap::wrap;
-use crate::commands::{
-    check, completions, download, info, install, packages, prompt, run as run_command, scratch,
-    shell, tags, update,
-};
+use crate::commands::*;
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
 use crate::moniker::Moniker;
@@ -91,20 +83,15 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     use crate::args::ProjectCommand;
 
     match command {
-        Check { clean, .. } => check(&app, clean),
-        Completions { shell } => Ok(completions(shell)),
-        Download { package_id, tags } => download(&app, &package_id, &tags).await,
+        Check { clean, .. } => do_check(&app, clean),
+        Completions { shell } => Ok(do_completions(shell)),
+        Delete { project_dir } => do_delete(&app, &project_dir).await,
+        Download { package_id, tags } => do_download(&app, &package_id, &tags).await,
         Env { command } => match command {
-            EnvCommand::Delete { project_dir } => env_delete(&app, &project_dir).await,
-            EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
-            EnvCommand::List { verbose, .. } => env_list(&app, verbose),
-            EnvCommand::Link { dir_id } => env_link(&app, &dir_id),
+            EnvCommand::Install { package_id } => do_env_install(&app, &package_id).await,
+            EnvCommand::List { verbose, .. } => do_env_list(&app, verbose),
+            EnvCommand::Link { dir_id } => do_env_link(&app, &dir_id),
         },
-        Install {
-            package_id,
-            dir,
-            tags,
-        } => install(&app, &package_id, &dir, &tags).await,
         Packages {
             moniker,
             filter,
@@ -112,7 +99,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             verbose,
             ..
         } => {
-            packages(
+            do_packages(
                 &app,
                 &moniker.map(Into::<Moniker>::into),
                 filter.into(),
@@ -121,17 +108,17 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             )
             .await
         }
-        Info => info(&app),
+        Info => do_info(&app),
         Project { command } => match command {
-            ProjectCommand::Add { package_id } => project_add(&app, &package_id),
-            ProjectCommand::Install => project_install(&app).await,
+            ProjectCommand::Add { package_id } => do_project_add(&app, &package_id),
+            ProjectCommand::Install => do_project_install(&app).await,
         },
-        Prompt(prompt_config) => prompt(&app, &prompt_config),
-        Run { program, args } => run_command(app, &program, &args),
-        Scratch => scratch(&app).await,
-        Shell { verbose, .. } => shell(app, verbose),
-        Tags { moniker } => tags(&app, &moniker.map(Into::<Moniker>::into)).await,
-        Update { moniker } => update(&app, &moniker.map(Into::<Moniker>::into)).await,
+        Prompt(prompt_config) => do_prompt(&app, &prompt_config),
+        Run { program, args } => do_run(app, &program, &args),
+        Scratch => do_scratch(&app).await,
+        Shell { verbose, .. } => do_shell(app, verbose),
+        Tags { moniker } => do_tags(&app, &moniker.map(Into::<Moniker>::into)).await,
+        Update { moniker } => do_update(&app, &moniker.map(Into::<Moniker>::into)).await,
         Wrap {
             wrapper_file_name,
             script_path,
@@ -140,7 +127,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             shell,
             force,
             ..
-        } => wrap(
+        } => do_wrap(
             &app,
             &wrapper_file_name,
             &script_path,

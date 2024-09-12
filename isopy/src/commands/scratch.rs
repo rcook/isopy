@@ -26,7 +26,7 @@ use log::info;
 
 #[allow(clippy::unnecessary_wraps)]
 #[allow(clippy::unused_async)]
-pub(crate) async fn scratch(_app: &App) -> Result<Status> {
+pub(crate) async fn do_scratch(_app: &App) -> Result<Status> {
     info!("scratch");
     return_success!("this is a sample log message");
 }

@@ -19,32 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub(crate) mod env;
-pub(crate) mod project;
-pub(crate) mod wrap;
-
 mod check;
 mod completions;
+mod delete;
 mod download;
+mod env_install;
+mod env_link;
+mod env_list;
 mod info;
-mod install;
 mod packages;
+mod project_add;
+mod project_install;
 mod prompt;
 mod run;
 mod scratch;
 mod shell;
 mod tags;
 mod update;
+mod wrap;
 
-pub(crate) use check::check;
-pub(crate) use completions::completions;
-pub(crate) use download::download;
-pub(crate) use info::info;
-pub(crate) use install::install;
-pub(crate) use packages::packages;
-pub(crate) use prompt::prompt;
-pub(crate) use run::run;
-pub(crate) use scratch::scratch;
-pub(crate) use shell::shell;
-pub(crate) use tags::tags;
-pub(crate) use update::update;
+pub(crate) use check::do_check;
+pub(crate) use completions::do_completions;
+pub(crate) use delete::do_delete;
+pub(crate) use download::do_download;
+pub(crate) use env_install::do_env_install;
+pub(crate) use env_link::do_env_link;
+pub(crate) use env_list::do_env_list;
+pub(crate) use info::do_info;
+pub(crate) use packages::do_packages;
+pub(crate) use project_add::do_project_add;
+pub(crate) use project_install::do_project_install;
+pub(crate) use prompt::do_prompt;
+pub(crate) use run::do_run;
+pub(crate) use scratch::do_scratch;
+pub(crate) use shell::do_shell;
+pub(crate) use tags::do_tags;
+pub(crate) use update::do_update;
+pub(crate) use wrap::do_wrap;

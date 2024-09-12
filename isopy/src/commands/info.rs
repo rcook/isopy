@@ -28,7 +28,7 @@ use anyhow::Result;
 
 const NO_VALUE: &str = "(not set)";
 
-pub(crate) fn info(app: &App) -> Result<Status> {
+pub(crate) fn do_info(app: &App) -> Result<Status> {
     let mut table = make_prop_table();
 
     table_title!(table, "Current directory");
