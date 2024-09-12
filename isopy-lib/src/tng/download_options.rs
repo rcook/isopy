@@ -22,6 +22,7 @@
 use crate::tng::accept::Accept;
 use crate::tng::checksum::Checksum;
 
+#[derive(Default)]
 pub struct DownloadOptions {
     pub accept: Option<Accept>,
     pub update: bool,
@@ -29,32 +30,26 @@ pub struct DownloadOptions {
 }
 
 impl DownloadOptions {
+    #[must_use]
     pub fn json() -> Self {
         Self::default().accept(Some(Accept::ApplicationJson))
     }
 
+    #[must_use]
     pub fn accept(mut self, value: Option<Accept>) -> Self {
         self.accept = value;
         self
     }
 
+    #[must_use]
     pub fn update(mut self, value: bool) -> Self {
         self.update = value;
         self
     }
 
+    #[must_use]
     pub fn checksum(mut self, value: Option<Checksum>) -> Self {
         self.checksum = value;
         self
-    }
-}
-
-impl Default for DownloadOptions {
-    fn default() -> Self {
-        Self {
-            accept: None,
-            update: false,
-            checksum: None,
-        }
     }
 }

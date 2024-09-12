@@ -28,6 +28,7 @@ pub struct EnvProps {
 }
 
 impl EnvProps {
+    #[must_use]
     pub fn new(dir: &Path, url: &Url) -> Self {
         Self {
             dir: dir.to_path_buf(),
@@ -35,10 +36,12 @@ impl EnvProps {
         }
     }
 
+    #[must_use]
     pub fn dir(&self) -> &Path {
         &self.dir
     }
 
+    #[must_use]
     pub fn url(&self) -> &Url {
         &self.url
     }

@@ -46,7 +46,7 @@ impl FromStr for VersionTriple {
             bail!("Invalid package version {s}")
         }
 
-        let major = parts.get(0).expect("Expected major").parse()?;
+        let major = parts.first().expect("Expected major").parse()?;
         let minor = parts.get(1).expect("Expected minor").parse()?;
         let revision = parts.get(2).expect("Expected revision").parse()?;
 

@@ -46,25 +46,30 @@ impl PackageSummary {
             name: name.into(),
             url: url.clone(),
             version,
-            path: path.map(|p| p.into()),
+            path: path.map(std::convert::Into::into),
         }
     }
+    #[must_use]
     pub fn kind(&self) -> PackageKind {
         self.kind
     }
 
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    #[must_use]
     pub fn url(&self) -> &Url {
         &self.url
     }
 
+    #[must_use]
     pub fn version(&self) -> &Version {
         &self.version
     }
 
+    #[must_use]
     pub fn path(&self) -> &Option<PathBuf> {
         &self.path
     }

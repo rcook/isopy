@@ -19,23 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#[derive(Default)]
 pub struct SanitizeOptions {
     pub retain_dots: bool,
 }
 
 impl SanitizeOptions {
+    #[must_use]
     pub fn retain_dots(mut self, value: bool) -> Self {
         self.retain_dots = value;
         self
     }
 }
 
-impl Default for SanitizeOptions {
-    fn default() -> Self {
-        Self { retain_dots: false }
-    }
-}
-
+#[must_use]
 pub fn sanitize_with_options(s: &str, options: &SanitizeOptions) -> String {
     let mut in_placeholder = false;
     let mut output = String::new();
@@ -43,16 +40,15 @@ pub fn sanitize_with_options(s: &str, options: &SanitizeOptions) -> String {
         if ch.is_alphanumeric() || options.retain_dots && ch == '.' {
             output.push(ch);
             in_placeholder = false;
-        } else {
-            if !in_placeholder {
-                output.push('_');
-                in_placeholder = true;
-            }
+        } else if !in_placeholder {
+            output.push('_');
+            in_placeholder = true;
         }
     }
     output
 }
 
+#[must_use]
 pub fn sanitize(s: &str) -> String {
     sanitize_with_options(s, &SanitizeOptions::default())
 }

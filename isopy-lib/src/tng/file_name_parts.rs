@@ -60,6 +60,7 @@ pub struct FileNameParts {
 }
 
 impl FileNameParts {
+    #[must_use]
     pub fn from_str_safe(s: &str) -> Self {
         let file_name_parts = FileNamePartRefs::split(s);
         let options = SanitizeOptions::default().retain_dots(true);
@@ -69,7 +70,7 @@ impl FileNameParts {
         }
     }
 
-    pub fn from_url_safe(url: &Url) -> Result<FileNameParts> {
+    pub fn from_url_safe(url: &Url) -> Result<Self> {
         if !Self::can_be_sanitized(url) {
             bail!("Url {url} cannot be sanitized")
         }
@@ -86,7 +87,7 @@ impl FileNameParts {
         prefix.push_str(&file_name_parts.prefix);
 
         Ok(Self {
-            prefix: prefix,
+            prefix,
             suffix: file_name_parts.suffix,
         })
     }

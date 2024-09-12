@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#[derive(Default)]
 pub struct Tags {
     tags: Vec<String>,
     default_tags: Vec<String>,
@@ -26,6 +27,7 @@ pub struct Tags {
 }
 
 impl Tags {
+    #[must_use]
     pub fn new(tags: Vec<String>, default_tags: Vec<String>, other_tags: Vec<String>) -> Self {
         Self {
             tags,
@@ -34,25 +36,18 @@ impl Tags {
         }
     }
 
+    #[must_use]
     pub fn tags(&self) -> &Vec<String> {
         &self.tags
     }
 
+    #[must_use]
     pub fn default_tags(&self) -> &Vec<String> {
         &self.default_tags
     }
 
+    #[must_use]
     pub fn other_tags(&self) -> &Vec<String> {
         &self.other_tags
-    }
-}
-
-impl Default for Tags {
-    fn default() -> Self {
-        Self {
-            tags: vec![],
-            default_tags: vec![],
-            other_tags: vec![],
-        }
     }
 }

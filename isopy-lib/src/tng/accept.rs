@@ -24,6 +24,7 @@ pub enum Accept {
 }
 
 impl Accept {
+    #[must_use]
     pub fn as_str(&self) -> &str {
         match self {
             Self::ApplicationJson => "application/json",
