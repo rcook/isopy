@@ -20,10 +20,23 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use std::any::Any;
-use std::fmt::Display;
+use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 
-pub trait VersionOps: Display + Sync {
+pub trait VersionOps: Debug + Display + Send + Sync {
+    fn box_clone(&self) -> Box<dyn VersionOps>;
     fn as_any(&self) -> &dyn Any;
 }
 
 crate::tng::macros::dyn_trait_struct!(Version, VersionOps);
+
+impl Clone for Version {
+    fn clone(&self) -> Self {
+        Self(self.0.box_clone())
+    }
+}
+
+impl Debug for Version {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        Debug::fmt(&self.0, f)
+    }
+}

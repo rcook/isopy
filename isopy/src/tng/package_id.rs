@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::package_id::PackageId as LegacyPackageId;
 use crate::tng::moniker::Moniker;
 use crate::tng::plugin_manager::PluginManager;
 use anyhow::{bail, Error, Result};
@@ -27,6 +26,7 @@ use isopy_lib::tng::Version;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
+#[derive(Clone, Debug)]
 pub(crate) struct PackageId {
     moniker: Moniker,
     version: Version,
@@ -59,20 +59,6 @@ impl FromStr for PackageId {
         };
 
         Ok(Self { moniker, version })
-    }
-}
-
-impl TryFrom<LegacyPackageId> for PackageId {
-    type Error = Error;
-
-    fn try_from(value: LegacyPackageId) -> Result<Self> {
-        // Ugly hack
-        let s = format!(
-            "{}:{}",
-            value.plugin_host().prefix(),
-            value.descriptor().to_string()
-        );
-        Self::from_str(&s)
     }
 }
 

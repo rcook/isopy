@@ -99,13 +99,13 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         },
         Incubating { command } => match command {
             IncubatingCommand::Download { package_id, tags } => {
-                download(&app, &package_id.try_into()?, &tags).await
+                download(&app, &package_id, &tags).await
             }
             IncubatingCommand::Install {
                 package_id,
                 dir,
                 tags,
-            } => install(&app, &package_id.try_into()?, &dir, &tags).await,
+            } => install(&app, &package_id, &dir, &tags).await,
             IncubatingCommand::Packages {
                 moniker,
                 filter,

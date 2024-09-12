@@ -59,6 +59,10 @@ impl FromStr for VersionTriple {
 }
 
 impl VersionOps for VersionTriple {
+    fn box_clone(&self) -> Box<dyn VersionOps> {
+        Box::new(self.clone())
+    }
+
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
