@@ -27,9 +27,6 @@ pub enum IsopyPythonError {
     #[error("Invalid version \"{0}\"")]
     InvalidVersion(String),
 
-    #[error("Invalid repository name \"{0}\"")]
-    InvalidRepositoryName(String),
-
     #[error("Parse error \"{0}\"")]
     ParseError(String),
 

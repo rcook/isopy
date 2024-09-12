@@ -1,4 +1,3 @@
-use isopy_lib::tng::EnvProps;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -20,12 +19,12 @@ use isopy_lib::tng::EnvProps;
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use isopy_lib::tng::EnvProps;
 use isopy_lib::{Descriptor, EnvInfo, IsopyLibResult, Platform, PluginFactory, Shell};
 use serde_json::Value;
 use std::ffi::OsString;
 use std::path::Path;
 use std::sync::Arc;
-use url::Url;
 
 pub(crate) struct PluginHost {
     prefix: String,
@@ -52,16 +51,8 @@ impl PluginFactory for PluginHost {
         self.plugin_factory.name()
     }
 
-    fn source_url(&self) -> &Url {
-        self.plugin_factory.source_url()
-    }
-
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
         self.plugin_factory.read_project_config(props)
-    }
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
-        self.plugin_factory.parse_descriptor(s)
     }
 
     fn make_env_info(

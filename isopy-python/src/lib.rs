@@ -38,7 +38,6 @@ mod error;
 mod python_descriptor;
 mod python_plugin_factory;
 mod python_version;
-mod repository_name;
 mod serialization;
 mod tag;
 

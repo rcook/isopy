@@ -19,8 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PLUGIN_NAME, PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT, RELEASES_URL};
-use crate::python_descriptor::PythonDescriptor;
+use crate::constants::{PLUGIN_NAME, PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::serialization::ProjectConfig;
 use isopy_lib::tng::EnvProps;
 use isopy_lib::{
@@ -30,7 +29,6 @@ use isopy_lib::{
 use serde_json::Value;
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
-use url::Url;
 
 pub struct PythonPluginFactory;
 
@@ -45,21 +43,10 @@ impl PluginFactory for PythonPluginFactory {
         PLUGIN_NAME
     }
 
-    fn source_url(&self) -> &Url {
-        &RELEASES_URL
-    }
-
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
         let project_config = serde_json::from_value::<ProjectConfig>(props.clone())
             .map_err(isopy_lib_other_error)?;
         Ok(Box::new(project_config.descriptor))
-    }
-
-    fn parse_descriptor(&self, s: &str) -> IsopyLibResult<Box<dyn Descriptor>> {
-        Ok(Box::new(
-            s.parse::<PythonDescriptor>()
-                .map_err(isopy_lib_other_error)?,
-        ))
     }
 
     fn make_env_info(

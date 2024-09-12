@@ -20,28 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use lazy_static::lazy_static;
-use regex::Regex;
-use reqwest::Url;
 use std::ffi::OsString;
-use std::path::PathBuf;
 
 lazy_static! {
-    pub static ref RELEASES_URL: Url =
-        "https://api.github.com/repos/indygreg/python-build-standalone/releases"
-            .parse::<Url>()
-            .expect("lazy_static: URL must be valid");
-    pub static ref REPOSITORY_NAME_REGEX: Regex =
-        Regex::new("^[A-Za-z0-9-_]+$").expect("lazy_static: regular expression must be valid");
-    pub static ref ASSETS_DIR: PathBuf = PathBuf::from("assets");
-    pub static ref PYTHON_BIN_FILE_NAME: OsString = python_bin_file_name();
-    pub static ref PYTHON_SCRIPT_EXT: OsString = OsString::from("py");
+    pub(crate) static ref PYTHON_BIN_FILE_NAME: OsString = python_bin_file_name();
+    pub(crate) static ref PYTHON_SCRIPT_EXT: OsString = OsString::from("py");
 }
 
-pub const DEFAULT_REPOSITORY_NAME: &str = "default";
-
-pub const EXAMPLE_REPOSITORY_NAME: &str = "example";
-
-pub const PLUGIN_NAME: &str = "Python";
+pub(crate) const PLUGIN_NAME: &str = "Python";
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn python_bin_file_name() -> OsString {
@@ -51,19 +37,4 @@ fn python_bin_file_name() -> OsString {
 #[cfg(target_os = "windows")]
 fn python_bin_file_name() -> OsString {
     OsString::from("python.exe")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{RELEASES_URL, REPOSITORY_NAME_REGEX};
-
-    #[test]
-    fn releases_url() {
-        _ = RELEASES_URL.as_str().to_string();
-    }
-
-    #[test]
-    fn repository_name_regex() {
-        _ = REPOSITORY_NAME_REGEX.as_str().to_string();
-    }
 }
