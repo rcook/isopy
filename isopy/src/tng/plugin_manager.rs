@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::consts::CACHE_DIR_NAME;
+use crate::constants::CACHE_DIR_NAME;
 use crate::tng::package_manager_helper::PackageManagerHelper;
 use crate::tng::Moniker;
 use isopy_lib::tng::{PackageManager, Plugin};

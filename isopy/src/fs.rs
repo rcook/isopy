@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::CONFIG_DIR_NAME;
+use crate::constants::CONFIG_DIR_NAME;
 use anyhow::{anyhow, Result};
 use joatmon::{FileReadError, HasOtherError, YamlError};
 use std::path::{Path, PathBuf};

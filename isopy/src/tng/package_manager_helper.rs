@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::tng::cache_info::CacheInfo;
-use crate::tng::consts::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::tng::download::Download;
 use crate::tng::file::File;
 use anyhow::{anyhow, bail, Result};

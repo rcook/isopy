@@ -31,3 +31,8 @@ pub(crate) static PROJECT_CONFIG_FILE_NAME: LazyLock<OsString> =
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(crate) const EXECUTABLE_MASK: u32 = 0o100;
+
+pub(crate) const CACHE_DIR_NAME: &str = "cache";
+pub(crate) const CACHE_FILE_NAME: &str = "cache.json";
+pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
+pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
