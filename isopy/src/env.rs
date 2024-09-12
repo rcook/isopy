@@ -21,8 +21,8 @@
 //
 use crate::bool_util::str_to_bool;
 use anyhow::{bail, Result};
-use lazy_static::lazy_static;
 use std::env::{remove_var, set_var, var, VarError};
+use std::sync::LazyLock;
 
 pub(crate) const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
 pub(crate) const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
@@ -37,13 +37,13 @@ enum EnvType {
     Bool,
 }
 
-lazy_static! {
-    static ref ENVS: Vec<(&'static str, EnvType)> = vec![
+const ENVS: LazyLock<Vec<(&'static str, EnvType)>> = LazyLock::new(|| {
+    vec![
         (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
         (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),
         (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
-    ];
-}
+    ]
+});
 
 #[derive(Debug)]
 enum Op {

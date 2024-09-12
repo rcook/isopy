@@ -19,20 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use lazy_static::lazy_static;
 use std::ffi::OsString;
-
-lazy_static! {
-    pub(crate) static ref PYTHON_BIN_FILE_NAME: OsString = python_bin_file_name();
-    pub(crate) static ref PYTHON_SCRIPT_EXT: OsString = OsString::from("py");
-}
+use std::sync::LazyLock;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-fn python_bin_file_name() -> OsString {
-    OsString::from("python3")
-}
+pub(crate) const PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
+    LazyLock::new(|| OsString::from("python3"));
 
 #[cfg(target_os = "windows")]
-fn python_bin_file_name() -> OsString {
-    OsString::from("python.exe")
-}
+pub(crate) const PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
+    LazyLock::new(|| OsString::from("python.exe"));
+
+pub(crate) const PYTHON_SCRIPT_EXT: LazyLock<OsString> = LazyLock::new(|| OsString::from("py"));
