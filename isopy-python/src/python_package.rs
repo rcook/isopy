@@ -19,19 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::archive_metadata::ArchiveMetadata;
-use isopy_lib::tng::{EnvProps, PackageInfoOps};
+use crate::metadata::Metadata;
+use isopy_lib::tng::{EnvProps, PackageOps};
 use std::path::Path;
 use url::Url;
 
 #[derive(Clone, Debug)]
-pub(crate) struct ArchiveInfo {
+pub(crate) struct PythonPackage {
     url: Url,
-    metadata: ArchiveMetadata,
+    metadata: Metadata,
 }
 
-impl ArchiveInfo {
-    pub(crate) fn new(url: &Url, metadata: ArchiveMetadata) -> Self {
+impl PythonPackage {
+    pub(crate) fn new(url: &Url, metadata: Metadata) -> Self {
         Self {
             url: url.clone(),
             metadata,
@@ -42,12 +42,12 @@ impl ArchiveInfo {
         &self.url
     }
 
-    pub(crate) fn metadata(&self) -> &ArchiveMetadata {
+    pub(crate) fn metadata(&self) -> &Metadata {
         &self.metadata
     }
 }
 
-impl PackageInfoOps for ArchiveInfo {
+impl PackageOps for PythonPackage {
     fn get_env_props(&self, bin_subdir: &Path) -> EnvProps {
         EnvProps::new(bin_subdir, &self.url)
     }

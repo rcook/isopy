@@ -19,22 +19,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::archive_full_version::ArchiveFullVersion;
 use crate::archive_type::ArchiveType;
+use crate::full_version::FullVersion;
 use anyhow::{bail, Error, Result};
 use std::collections::HashSet;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug)]
-pub(crate) struct ArchiveMetadata {
+pub(crate) struct Metadata {
     name: String,
     archive_type: ArchiveType,
-    full_version: ArchiveFullVersion,
+    full_version: FullVersion,
     tags: HashSet<String>,
 }
 
-impl ArchiveMetadata {
+impl Metadata {
     pub(crate) fn name(&self) -> &str {
         &self.name
     }
@@ -43,7 +43,7 @@ impl ArchiveMetadata {
         &self.archive_type
     }
 
-    pub(crate) fn full_version(&self) -> &ArchiveFullVersion {
+    pub(crate) fn full_version(&self) -> &FullVersion {
         &self.full_version
     }
 
@@ -52,7 +52,7 @@ impl ArchiveMetadata {
     }
 }
 
-impl FromStr for ArchiveMetadata {
+impl FromStr for Metadata {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self> {
@@ -74,7 +74,7 @@ impl FromStr for ArchiveMetadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let full_version = ArchiveFullVersion::from_tags(&mut tags)?;
+        let full_version = FullVersion::from_tags(&mut tags)?;
 
         Ok(Self {
             name,

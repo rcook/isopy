@@ -33,14 +33,14 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
-mod archive_build_tag;
-mod archive_full_version;
-mod archive_info;
-mod archive_metadata;
 mod archive_type;
+mod build_tag;
 mod checksum;
 mod constants;
 mod entrypoint;
+mod full_version;
+mod metadata;
+mod python_package;
 mod python_package_manager;
 mod python_plugin;
 

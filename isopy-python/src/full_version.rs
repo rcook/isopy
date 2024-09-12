@@ -19,18 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::archive_build_tag::ArchiveBuildTag;
+use crate::build_tag::BuildTag;
 use anyhow::Result;
 use isopy_lib::tng::VersionTriple;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct ArchiveFullVersion {
+pub(crate) struct FullVersion {
     version: VersionTriple,
-    build_tag: ArchiveBuildTag,
+    build_tag: BuildTag,
 }
 
-impl ArchiveFullVersion {
+impl FullVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut full_version = None;
         let mut version = None;
@@ -89,7 +89,7 @@ impl ArchiveFullVersion {
         &self.version
     }
 
-    pub(crate) fn build_tag(&self) -> &ArchiveBuildTag {
+    pub(crate) fn build_tag(&self) -> &BuildTag {
         &self.build_tag
     }
 }

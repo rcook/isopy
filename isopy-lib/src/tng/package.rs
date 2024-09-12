@@ -22,8 +22,8 @@
 use crate::tng::env_props::EnvProps;
 use std::path::Path;
 
-pub trait PackageInfoOps {
+pub trait PackageOps {
     fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
 }
 
-crate::tng::macros::dyn_trait_struct!(PackageInfo, PackageInfoOps);
+crate::tng::macros::dyn_trait_struct!(Package, PackageOps);

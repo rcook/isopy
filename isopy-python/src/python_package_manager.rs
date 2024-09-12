@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::archive_info::ArchiveInfo;
-use crate::archive_metadata::ArchiveMetadata;
 use crate::checksum::get_checksum;
+use crate::metadata::Metadata;
+use crate::python_package::PythonPackage;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{
-    DownloadOptions, OptionalTags, PackageFilter, PackageInfo, PackageKind, PackageManagerContext,
+    DownloadOptions, OptionalTags, Package, PackageFilter, PackageKind, PackageManagerContext,
     PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
 };
 use serde_json::Value;
@@ -66,13 +66,12 @@ impl PythonPackageManager {
         }
     }
 
-    fn get_archives(item: &Value) -> Result<Vec<ArchiveInfo>> {
+    fn get_packages(item: &Value) -> Result<Vec<PythonPackage>> {
         fn filter_fn(name: &str) -> bool {
             name.starts_with("cpython-") && !name.ends_with(".sha256") && name != "SHA256SUMS"
         }
 
-        let assets = g!(g!(item.get("assets")).as_array());
-        let assets = assets
+        let assets = g!(g!(item.get("assets")).as_array())
             .into_iter()
             .map(|asset| {
                 let url = g!(g!(asset.get("browser_download_url")).as_str()).parse::<Url>()?;
@@ -80,16 +79,16 @@ impl PythonPackageManager {
                 Ok((url, name))
             })
             .collect::<Result<Vec<_>>>()?;
-        let archives = assets
+        let packages = assets
             .into_iter()
             .filter(|(_, name)| filter_fn(*name))
             .map(|(url, name)| {
-                let metadata = name.parse::<ArchiveMetadata>()?;
-                let archive_info = ArchiveInfo::new(&url, metadata);
+                let metadata = name.parse::<Metadata>()?;
+                let archive_info = PythonPackage::new(&url, metadata);
                 Ok(archive_info)
             })
             .collect::<Result<Vec<_>>>()?;
-        Ok(archives)
+        Ok(packages)
     }
 
     #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
@@ -123,33 +122,33 @@ impl PythonPackageManager {
             .unwrap_or_else(|| Self::get_default_tags())
     }
 
-    fn get_archive(
+    fn get_package(
         index: &Value,
         version: &VersionTriple,
         tags: &OptionalTags,
-    ) -> Result<ArchiveInfo> {
+    ) -> Result<PythonPackage> {
         let tags = Self::get_tags(tags);
-        let mut archives = Vec::new();
+        let mut packages = Vec::new();
         for item in g!(index.as_array()) {
-            archives.extend(Self::get_archives(item)?.into_iter().filter(|archive| {
+            packages.extend(Self::get_packages(item)?.into_iter().filter(|archive| {
                 let m = archive.metadata();
                 Self::metadata_has_tags(m, &tags) && m.full_version().version() == version
             }));
         }
 
-        if archives.is_empty() {
+        if packages.is_empty() {
             bail!("No matching archives found")
         }
 
-        archives.sort_by_cached_key(|archive| archive.metadata().full_version().clone());
-        archives.reverse();
-        Ok(archives
+        packages.sort_by_cached_key(|archive| archive.metadata().full_version().clone());
+        packages.reverse();
+        Ok(packages
             .into_iter()
             .next()
             .expect("Vector must contain at least one element"))
     }
 
-    fn metadata_has_tags(metadata: &ArchiveMetadata, tags: &HashSet<&str>) -> bool {
+    fn metadata_has_tags(metadata: &Metadata, tags: &HashSet<&str>) -> bool {
         metadata
             .tags()
             .iter()
@@ -180,7 +179,7 @@ impl PackageManagerOps for PythonPackageManager {
         let mut other_tags = HashSet::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
-            for archive in Self::get_archives(item)? {
+            for archive in Self::get_packages(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
                 other_tags.insert(String::from(
                     archive.metadata().full_version().build_tag().as_str(),
@@ -215,17 +214,17 @@ impl PackageManagerOps for PythonPackageManager {
         let mut records = Vec::new();
         let index = self.get_index(false).await?;
         for item in g!(index.as_array()) {
-            for archive in Self::get_archives(item)? {
-                if Self::metadata_has_tags(archive.metadata(), &tags) {
-                    let (kind, path) = match self.ctx.get_file(archive.url()).await {
+            for package in Self::get_packages(item)? {
+                if Self::metadata_has_tags(package.metadata(), &tags) {
+                    let (kind, path) = match self.ctx.get_file(package.url()).await {
                         Ok(p) => (PackageKind::Local, Some(p)),
                         _ => (PackageKind::Remote, None),
                     };
                     let is_local = kind == PackageKind::Local;
                     match filter {
-                        PackageFilter::All => records.push((kind, archive, path)),
-                        PackageFilter::Local if is_local => records.push((kind, archive, path)),
-                        PackageFilter::Remote if !is_local => records.push((kind, archive, path)),
+                        PackageFilter::All => records.push((kind, package, path)),
+                        PackageFilter::Local if is_local => records.push((kind, package, path)),
+                        PackageFilter::Remote if !is_local => records.push((kind, package, path)),
                         _ => {}
                     }
                 }
@@ -259,10 +258,10 @@ impl PackageManagerOps for PythonPackageManager {
     async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()> {
         let version = downcast_version!(version);
         let index = self.get_index(false).await?;
-        let archive = Self::get_archive(&index, version, tags)?;
-        let checksum = get_checksum(&archive)?;
+        let package = Self::get_package(&index, version, tags)?;
+        let checksum = get_checksum(&package)?;
         let options = DownloadOptions::default().checksum(Some(checksum));
-        _ = self.ctx.download_file(archive.url(), &options).await?;
+        _ = self.ctx.download_file(package.url(), &options).await?;
         Ok(())
     }
 
@@ -271,17 +270,17 @@ impl PackageManagerOps for PythonPackageManager {
         version: &Version,
         tags: &OptionalTags,
         dir: &Path,
-    ) -> Result<PackageInfo> {
+    ) -> Result<Package> {
         let version = downcast_version!(version);
         let index = self.get_index(false).await?;
-        let archive = Self::get_archive(&index, version, tags)?;
-        let archive_path = self.ctx.get_file(archive.url()).await?;
-        archive
+        let package = Self::get_package(&index, version, tags)?;
+        let package_path = self.ctx.get_file(package.url()).await?;
+        package
             .metadata()
             .archive_type()
-            .unpack(&archive_path, dir)
+            .unpack(&package_path, dir)
             .await?;
-        Ok(PackageInfo::new(archive))
+        Ok(Package::new(package))
     }
 
     async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()> {
