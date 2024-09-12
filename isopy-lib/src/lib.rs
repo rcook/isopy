@@ -34,17 +34,11 @@
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
 mod env_info;
-mod error;
-mod link_header;
 mod macros;
 mod shell;
-mod url;
 
 pub mod tng;
 
 pub use env_info::EnvInfo;
-pub use error::{other_error, IsopyLibError};
-pub use link_header::LinkHeader;
 pub use macros::TryToString;
 pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
-pub use url::{dir_url, file_url};
