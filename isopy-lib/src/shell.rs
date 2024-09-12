@@ -20,14 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::{bail, Result};
-use lazy_static::lazy_static;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
-
-lazy_static! {
-    static ref COLON_PATH_SEPARATOR: OsString = OsString::from(":");
-    static ref SEMICOLON_PATH_SEPARATOR: OsString = OsString::from(";");
-}
 
 #[derive(Clone, Copy, Debug)]
 pub enum Platform {
@@ -61,8 +55,8 @@ pub fn env_var_substitution(shell: Shell, env_var: &str) -> OsString {
 
 pub fn path_separator(shell: Shell) -> &'static OsStr {
     match shell {
-        Shell::Bash => &COLON_PATH_SEPARATOR,
-        Shell::Cmd => &SEMICOLON_PATH_SEPARATOR,
+        Shell::Bash => OsStr::new(":"),
+        Shell::Cmd => OsStr::new(";"),
     }
 }
 

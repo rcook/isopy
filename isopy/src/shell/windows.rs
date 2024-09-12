@@ -21,11 +21,21 @@
 //
 use crate::shell::proc::{get_parent_pid, get_pid, get_process_from_pid};
 use anyhow::{bail, Result};
-use lazy_static::lazy_static;
 use same_file::is_same_file;
 use std::env::var;
 use std::path::PathBuf;
+use std::sync::LazyLock;
 use sysinfo::System;
+
+const POWERSHELL_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+    PathBuf::from(var("WINDIR").expect("WINDIR must be defined"))
+        .join("System32")
+        .join("WindowsPowerShell")
+        .join("v1.0")
+        .join("powershell.exe")
+});
+const CMD_PATH: LazyLock<PathBuf> =
+    LazyLock::new(|| PathBuf::from(var("ComSpec").expect("ComSpec must be defined")));
 
 #[derive(Debug)]
 pub(crate) struct WindowsShellInfo {
@@ -37,17 +47,6 @@ pub(crate) struct WindowsShellInfo {
 pub(crate) enum WindowsShellKind {
     Cmd,
     PowerShell,
-}
-
-lazy_static! {
-    static ref POWERSHELL_PATH: PathBuf =
-        PathBuf::from(var("WINDIR").expect("lazy_static: WINDIR must be defined"))
-            .join("System32")
-            .join("WindowsPowerShell")
-            .join("v1.0")
-            .join("powershell.exe");
-    static ref CMD_PATH: PathBuf =
-        PathBuf::from(var("ComSpec").expect("lazy_static: ComSpec must be defined"));
 }
 
 pub(crate) fn get_windows_shell_info() -> Result<WindowsShellInfo> {
