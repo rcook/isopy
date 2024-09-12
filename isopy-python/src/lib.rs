@@ -34,6 +34,5 @@
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
 mod constants;
-mod error;
 
 pub mod tng;
