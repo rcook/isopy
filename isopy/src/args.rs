@@ -106,20 +106,84 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
+    #[command(name = "download", about = "Download package")]
+    Download {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+
+        #[arg(
+            help = "Optional tags",
+            short = 't',
+            long = "tags",
+            num_args = 0..,
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
+    },
+
     #[command(name = "env", about = "Environment commands")]
     Env {
         #[command(subcommand)]
         command: EnvCommand,
     },
 
-    #[command(name = "incubating", about = "Incubating features")]
-    Incubating {
-        #[command(subcommand)]
-        command: IncubatingCommand,
-    },
-
     #[command(name = "info", about = "Show information")]
     Info,
+
+    #[command(name = "install", about = "Install package")]
+    Install {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+
+        #[arg(
+            help = "Optional tags",
+            short = 't',
+            long = "tags",
+            num_args = 0..,
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
+
+        #[arg(help = "Installation directory")]
+        dir: PathBuf,
+    },
+
+    #[command(name = "packages", about = "List packages")]
+    Packages {
+        #[arg(help = "Package manager")]
+        moniker: Option<Moniker>,
+
+        #[arg(
+            help = "Subset of packages to list",
+            short = 'f',
+            long = "filter",
+            default_value_t = PackageFilter::Local,
+            value_enum
+        )]
+        filter: PackageFilter,
+
+        #[arg(
+            help = "Optional tags",
+            short = 't',
+            long = "tags",
+            num_args = 0..,
+            value_delimiter = ','
+        )]
+        tags: Option<Vec<String>>,
+
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
+        verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
+    },
 
     #[command(name = "project", about = "Project commands")]
     Project {
@@ -164,6 +228,18 @@ pub(crate) enum Command {
             overrides_with = "verbose"
         )]
         _no_verbose: bool,
+    },
+
+    #[command(name = "tags", about = "List tags")]
+    Tags {
+        #[arg(help = "Package manager")]
+        moniker: Option<Moniker>,
+    },
+
+    #[command(name = "update", about = "Update package indices")]
+    Update {
+        #[arg(help = "Package manager")]
+        moniker: Option<Moniker>,
     },
 
     #[command(
@@ -406,91 +482,6 @@ impl From<Shell> for IsopyLibShell {
             Shell::Cmd => Self::Cmd,
         }
     }
-}
-
-#[derive(Debug, Subcommand)]
-pub(crate) enum IncubatingCommand {
-    #[command(name = "download", about = "Download package")]
-    Download {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-
-        #[arg(
-            help = "Optional tags",
-            short = 't',
-            long = "tags",
-            num_args = 0..,
-            value_delimiter = ','
-        )]
-        tags: Option<Vec<String>>,
-    },
-
-    #[command(name = "install", about = "Install package")]
-    Install {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-
-        #[arg(
-            help = "Optional tags",
-            short = 't',
-            long = "tags",
-            num_args = 0..,
-            value_delimiter = ','
-        )]
-        tags: Option<Vec<String>>,
-
-        #[arg(help = "Installation directory")]
-        dir: PathBuf,
-    },
-
-    #[command(name = "packages", about = "List packages")]
-    Packages {
-        #[arg(help = "Package manager")]
-        moniker: Option<Moniker>,
-
-        #[arg(
-            help = "Subset of packages to list",
-            short = 'f',
-            long = "filter",
-            default_value_t = PackageFilter::Local,
-            value_enum
-        )]
-        filter: PackageFilter,
-
-        #[arg(
-            help = "Optional tags",
-            short = 't',
-            long = "tags",
-            num_args = 0..,
-            value_delimiter = ','
-        )]
-        tags: Option<Vec<String>>,
-
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
-    },
-
-    #[command(name = "tags", about = "List tags")]
-    Tags {
-        #[arg(help = "Package manager")]
-        moniker: Option<Moniker>,
-    },
-
-    #[command(name = "update", about = "Update package indices")]
-    Update {
-        #[arg(help = "Package manager")]
-        moniker: Option<Moniker>,
-    },
 }
 
 #[derive(Clone, Debug, ValueEnum)]

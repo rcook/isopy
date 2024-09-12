@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::{Args, Command, IncubatingCommand};
+use crate::args::{Args, Command};
 use crate::commands::env::{
     delete as env_delete, install as env_install, link as env_link, list as env_list,
 };
@@ -91,44 +91,34 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
     match command {
         Check { clean, .. } => check(&app, clean),
         Completions { shell } => Ok(completions(shell)),
+        Download { package_id, tags } => download(&app, &package_id, &tags).await,
         Env { command } => match command {
             EnvCommand::Delete { project_dir } => env_delete(&app, &project_dir).await,
             EnvCommand::Install { package_id } => env_install(&app, &package_id).await,
             EnvCommand::List { verbose, .. } => env_list(&app, verbose),
             EnvCommand::Link { dir_id } => env_link(&app, &dir_id),
         },
-        Incubating { command } => match command {
-            IncubatingCommand::Download { package_id, tags } => {
-                download(&app, &package_id, &tags).await
-            }
-            IncubatingCommand::Install {
-                package_id,
-                dir,
-                tags,
-            } => install(&app, &package_id, &dir, &tags).await,
-            IncubatingCommand::Packages {
-                moniker,
-                filter,
-                tags,
+        Install {
+            package_id,
+            dir,
+            tags,
+        } => install(&app, &package_id, &dir, &tags).await,
+        Packages {
+            moniker,
+            filter,
+            tags,
+            verbose,
+            ..
+        } => {
+            packages(
+                &app,
+                &moniker.map(Into::<Moniker>::into),
+                filter.into(),
+                &tags,
                 verbose,
-                ..
-            } => {
-                packages(
-                    &app,
-                    &moniker.map(Into::<Moniker>::into),
-                    filter.into(),
-                    &tags,
-                    verbose,
-                )
-                .await
-            }
-            IncubatingCommand::Tags { moniker } => {
-                tags(&app, &moniker.map(Into::<Moniker>::into)).await
-            }
-            IncubatingCommand::Update { moniker } => {
-                update(&app, &moniker.map(Into::<Moniker>::into)).await
-            }
-        },
+            )
+            .await
+        }
         Info => info(&app),
         Project { command } => match command {
             ProjectCommand::Add { package_id } => project_add(&app, &package_id),
@@ -138,6 +128,8 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
         Run { program, args } => run_command(app, &program, &args),
         Scratch => scratch(&app).await,
         Shell { verbose, .. } => shell(app, verbose),
+        Tags { moniker } => tags(&app, &moniker.map(Into::<Moniker>::into)).await,
+        Update { moniker } => update(&app, &moniker.map(Into::<Moniker>::into)).await,
         Wrap {
             wrapper_file_name,
             script_path,
