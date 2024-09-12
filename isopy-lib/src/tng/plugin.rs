@@ -24,7 +24,9 @@ use crate::tng::env_props::EnvProps;
 use crate::tng::package_manager::PackageManager;
 use crate::tng::package_manager_context::PackageManagerContext;
 use crate::tng::version::Version;
+use crate::{Platform, Shell};
 use anyhow::Result;
+use std::ffi::OsString;
 use std::path::Path;
 use url::Url;
 
@@ -37,6 +39,12 @@ pub trait PluginOps: Send + Sync {
         env_props: &EnvProps,
         base_dir: Option<&Path>,
     ) -> EnvInfo;
+    fn make_script_command(
+        &self,
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>>;
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
 

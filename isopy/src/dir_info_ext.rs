@@ -21,7 +21,6 @@
 //
 use crate::app::App;
 use crate::constants::ENV_CONFIG_FILE_NAME;
-use crate::registry::Registry;
 use crate::serialization::Env;
 use anyhow::Result;
 use isopy_lib::{EnvInfo, Platform, Shell};
@@ -36,6 +35,7 @@ pub(crate) trait DirInfoExt {
     fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
     fn make_script_command(
         &self,
+        app: &App,
         script_path: &Path,
         platform: Platform,
         shell: Shell,
@@ -57,11 +57,12 @@ impl DirInfoExt for DirInfo {
 
     fn make_script_command(
         &self,
+        app: &App,
         script_path: &Path,
         platform: Platform,
         shell: Shell,
     ) -> Result<Option<OsString>> {
-        make_script_command(self.data_dir(), script_path, platform, shell)
+        make_script_command(app, self.data_dir(), script_path, platform, shell)
     }
 }
 
@@ -80,11 +81,12 @@ impl DirInfoExt for Manifest {
 
     fn make_script_command(
         &self,
+        app: &App,
         script_path: &Path,
         platform: Platform,
         shell: Shell,
     ) -> Result<Option<OsString>> {
-        make_script_command(self.data_dir(), script_path, platform, shell)
+        make_script_command(app, self.data_dir(), script_path, platform, shell)
     }
 }
 
@@ -114,7 +116,7 @@ fn make_env_info(app: &App, data_dir: &Path, base_dir: Option<&Path>) -> Result<
     };
 
     for package in &env.packages {
-        let env_info = Registry::global().make_env_info(app, data_dir, package, base_dir)?;
+        let env_info = app.make_env_info(data_dir, package, base_dir)?;
         all_env_info.path_dirs.extend(env_info.path_dirs);
         all_env_info.vars.extend(env_info.vars);
     }
@@ -123,6 +125,7 @@ fn make_env_info(app: &App, data_dir: &Path, base_dir: Option<&Path>) -> Result<
 }
 
 fn make_script_command(
+    app: &App,
     data_dir: &Path,
     script_path: &Path,
     platform: Platform,
@@ -131,8 +134,7 @@ fn make_script_command(
     let env = read_env_config(data_dir)?;
 
     for package in &env.packages {
-        let result =
-            Registry::global().make_script_command(package, script_path, platform, shell)?;
+        let result = app.make_script_command(package, script_path, platform, shell)?;
         if result.is_some() {
             return Ok(result);
         }

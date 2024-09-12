@@ -19,12 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::tng::python_package_manager::PythonPackageManager;
 use anyhow::Result;
 use isopy_lib::tng::{
     EnvProps, PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
 };
-use isopy_lib::EnvInfo;
+use isopy_lib::{render_absolute_path, EnvInfo, Platform, Shell};
+use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use url::Url;
@@ -90,6 +92,39 @@ impl PluginOps for PythonPlugin {
         let vars = vec![];
 
         EnvInfo { path_dirs, vars }
+    }
+
+    fn make_script_command(
+        &self,
+        script_path: &Path,
+        _platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>> {
+        fn make_command(script_path: &Path, shell: Shell) -> Result<OsString> {
+            let delimiter: &str = match shell {
+                Shell::Bash => "'",
+                Shell::Cmd => "\"",
+            };
+
+            let mut s = OsString::new();
+            s.push(PYTHON_BIN_FILE_NAME.as_os_str());
+            s.push(" ");
+            s.push(delimiter);
+            s.push(render_absolute_path(shell, script_path)?);
+            s.push(delimiter);
+            Ok(s)
+        }
+
+        if script_path
+            .extension()
+            .map(OsStr::to_ascii_lowercase)
+            .as_ref()
+            == Some(&*PYTHON_SCRIPT_EXT)
+        {
+            Ok(Some(make_command(script_path, shell)?))
+        } else {
+            Ok(None)
+        }
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {

@@ -22,7 +22,6 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
-use crate::registry::Registry;
 use crate::serialization::Env;
 use crate::table::{table_columns, table_divider, table_line, table_title, Table, TableSettings};
 use anyhow::Result;
@@ -83,9 +82,7 @@ pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, e
         table_columns!(table, "Project directory", env.project_dir.display());
 
         for package in &env.packages {
-            if let Ok(env_info) =
-                Registry::global().make_env_info(app, dir_info.data_dir(), package, None)
-            {
+            if let Ok(env_info) = app.make_env_info(dir_info.data_dir(), package, None) {
                 table_columns!(table, "Package", &package.moniker);
 
                 table_line!(table, "dir: {}", package.dir.display());

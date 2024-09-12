@@ -26,10 +26,12 @@ use crate::serialization::{Env, Package, Project};
 use crate::shell::IsopyEnv;
 use crate::tng::{Moniker, PluginManager};
 use anyhow::{bail, Result};
-use isopy_lib::tng::Version;
+use isopy_lib::tng::{EnvProps, Version};
+use isopy_lib::{EnvInfo, Platform, Shell};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 pub(crate) struct App {
@@ -220,6 +222,33 @@ impl App {
 
     pub(crate) fn plugin_manager(&self) -> &PluginManager {
         &self.plugin_manager
+    }
+
+    pub(crate) fn make_env_info(
+        &self,
+        data_dir: &Path,
+        package: &Package,
+        base_dir: Option<&Path>,
+    ) -> Result<EnvInfo> {
+        let moniker = package.moniker.parse()?;
+        let plugin = self.plugin_manager.get_plugin(&moniker);
+        Ok(plugin.make_env_info(
+            data_dir,
+            &EnvProps::new(&package.dir, &package.url),
+            base_dir,
+        ))
+    }
+
+    pub(crate) fn make_script_command(
+        &self,
+        package: &Package,
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>> {
+        let moniker = package.moniker.parse()?;
+        let plugin = self.plugin_manager.get_plugin(&moniker);
+        Ok(plugin.make_script_command(script_path, platform, shell)?)
     }
 
     fn find_link_for_dir(&self, dir: &Path) -> Result<Option<Link>> {

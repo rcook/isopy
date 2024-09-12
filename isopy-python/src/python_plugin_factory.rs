@@ -19,15 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::serialization::ProjectConfig;
-use isopy_lib::{
-    other_error as isopy_lib_other_error, render_absolute_path, Descriptor, IsopyLibResult,
-    Platform, PluginFactory, Shell,
-};
+use isopy_lib::{other_error as isopy_lib_other_error, Descriptor, IsopyLibResult, PluginFactory};
 use serde_json::Value;
-use std::ffi::{OsStr, OsString};
-use std::path::Path;
 
 pub struct PythonPluginFactory;
 
@@ -42,38 +36,5 @@ impl PluginFactory for PythonPluginFactory {
         let project_config = serde_json::from_value::<ProjectConfig>(props.clone())
             .map_err(isopy_lib_other_error)?;
         Ok(Box::new(project_config.descriptor))
-    }
-
-    fn make_script_command(
-        &self,
-        script_path: &Path,
-        _platform: Platform,
-        shell: Shell,
-    ) -> IsopyLibResult<Option<OsString>> {
-        fn make_command(script_path: &Path, shell: Shell) -> IsopyLibResult<OsString> {
-            let delimiter: &str = match shell {
-                Shell::Bash => "'",
-                Shell::Cmd => "\"",
-            };
-
-            let mut s = OsString::new();
-            s.push(PYTHON_BIN_FILE_NAME.as_os_str());
-            s.push(" ");
-            s.push(delimiter);
-            s.push(render_absolute_path(shell, script_path)?);
-            s.push(delimiter);
-            Ok(s)
-        }
-
-        if script_path
-            .extension()
-            .map(OsStr::to_ascii_lowercase)
-            .as_ref()
-            == Some(&*PYTHON_SCRIPT_EXT)
-        {
-            Ok(Some(make_command(script_path, shell)?))
-        } else {
-            Ok(None)
-        }
     }
 }

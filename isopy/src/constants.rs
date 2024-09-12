@@ -29,7 +29,5 @@ lazy_static! {
     pub(crate) static ref PROJECT_CONFIG_FILE_NAME: OsString = OsString::from(".isopy.yaml");
 }
 
-pub(crate) const PYTHON_DESCRIPTOR_PREFIX: &str = "python";
-
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(crate) const EXECUTABLE_MASK: u32 = 0o100;

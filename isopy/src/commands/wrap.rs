@@ -94,7 +94,7 @@ pub(crate) fn wrap(
 
     let wrapper_path = make_wrapper_path(app.cache_dir(), wrapper_file_name);
 
-    let command = make_script_command(&dir_info, script_path, platform, shell)?;
+    let command = make_script_command(app, &dir_info, script_path, platform, shell)?;
 
     let s = template.render(
         "WRAPPER",
@@ -150,12 +150,13 @@ fn make_vars(vars: &[(String, String)]) -> String {
 }
 
 fn make_script_command(
+    app: &App,
     dir_info: &DirInfo,
     script_path: &Path,
     platform: Platform,
     shell: Shell,
 ) -> Result<String> {
-    if let Some(s) = dir_info.make_script_command(script_path, platform, shell)? {
+    if let Some(s) = dir_info.make_script_command(app, script_path, platform, shell)? {
         return Ok(String::from(
             s.to_str()
                 .ok_or_else(|| anyhow!("cannot convert OS string"))?,
