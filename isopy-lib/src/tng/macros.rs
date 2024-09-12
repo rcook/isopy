@@ -25,8 +25,8 @@ macro_rules! dyn_trait_struct {
         pub struct $name(Box<dyn $trait>);
 
         impl $name {
-            pub fn new(inner: Box<dyn $trait>) -> Self {
-                Self(inner)
+            pub fn new<T: $trait + 'static>(inner: T) -> Self {
+                Self(Box::new(inner))
             }
         }
     };

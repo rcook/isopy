@@ -43,9 +43,9 @@ pub(crate) struct PackageManagerHelper {
 
 impl PackageManagerHelper {
     pub(crate) fn new<P: Into<PathBuf>>(cache_dir: P) -> PackageManagerContext {
-        PackageManagerContext::new(Box::new(Self {
+        PackageManagerContext::new(Self {
             cache_dir: cache_dir.into(),
-        }))
+        })
     }
 
     async fn download_to_path(url: &Url, path: &Path, options: &DownloadOptions) -> Result<()> {

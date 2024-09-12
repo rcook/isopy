@@ -249,9 +249,7 @@ impl PackageManagerOps for PythonPackageManager {
                     kind,
                     archive.metadata().name(),
                     archive.url(),
-                    Version::new(Box::new(
-                        archive.metadata().full_version().version().clone(),
-                    )),
+                    Version::new(archive.metadata().full_version().version().clone()),
                     path,
                 )
             })
@@ -283,7 +281,7 @@ impl PackageManagerOps for PythonPackageManager {
             .archive_type()
             .unpack(&archive_path, dir)
             .await?;
-        Ok(PackageInfo::new(Box::new(archive)))
+        Ok(PackageInfo::new(archive))
     }
 
     async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()> {

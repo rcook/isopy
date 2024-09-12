@@ -39,9 +39,9 @@ pub(crate) struct PythonPlugin {
 
 impl PythonPlugin {
     pub(crate) fn new() -> Plugin {
-        Plugin::new(Box::new(Self {
+        Plugin::new(Self {
             url: INDEX_URL.clone(),
-        }))
+        })
     }
 }
 
@@ -51,10 +51,10 @@ impl PluginOps for PythonPlugin {
     }
 
     fn parse_version(&self, s: &str) -> Result<Version> {
-        Ok(Version::new(Box::new(s.parse::<VersionTriple>()?)))
+        Ok(Version::new(s.parse::<VersionTriple>()?))
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(Box::new(PythonPackageManager::new(ctx, &self.url)))
+        PackageManager::new(PythonPackageManager::new(ctx, &self.url))
     }
 }
