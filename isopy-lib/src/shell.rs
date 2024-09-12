@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Result};
+use anyhow::Result;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
 
@@ -83,6 +83,8 @@ pub fn render_absolute_path(_shell: Shell, path: &Path) -> Result<OsString> {
 
 #[cfg(target_os = "windows")]
 pub fn render_absolute_path(shell: Shell, path: &Path) -> Result<OsString> {
+    use anyhow::bail;
+
     if !path.is_absolute() {
         bail!("Path {} is not absolute", path.display())
     }
@@ -95,6 +97,7 @@ pub fn render_absolute_path(shell: Shell, path: &Path) -> Result<OsString> {
 
 #[cfg(target_os = "windows")]
 fn render_absolute_path_windows_bash(path: &Path) -> Result<OsString> {
+    use anyhow::bail;
     use std::path::{Component, Prefix};
 
     let mut iter = path.components();
