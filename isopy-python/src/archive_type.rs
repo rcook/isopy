@@ -46,8 +46,16 @@ impl ArchiveType {
             bail!("Output directory {} already exists", dir.display())
         }
 
-        let options = ExtractOptsBuilder::default().strip(1).build()?;
+        let options = ExtractOptsBuilder::default()
+            .strip(1)
+            .filter(|args| {
+                // TBD: Use progress UI instead eventually
+                println!("{}", args.rel_path());
+                true
+            })
+            .build()?;
         decompress(archive_path, dir, &options)?;
+        println!("Finished unpacking to {}", dir.display());
         Ok(())
     }
 }
