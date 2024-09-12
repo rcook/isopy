@@ -508,9 +508,9 @@ pub(crate) enum PackageFilter {
 impl From<PackageFilter> for isopy_lib::tng::PackageFilter {
     fn from(value: PackageFilter) -> Self {
         match value {
-            PackageFilter::All => isopy_lib::tng::PackageFilter::All,
-            PackageFilter::Local => isopy_lib::tng::PackageFilter::Local,
-            PackageFilter::Remote => isopy_lib::tng::PackageFilter::Remote,
+            PackageFilter::All => Self::All,
+            PackageFilter::Local => Self::Local,
+            PackageFilter::Remote => Self::Remote,
         }
     }
 }

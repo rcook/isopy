@@ -25,7 +25,7 @@ use crate::tng::PackageId;
 use anyhow::Result;
 
 pub(crate) async fn install(app: &App, package_id: &PackageId) -> Result<Status> {
-    app.install_package(&package_id.moniker(), &package_id.version())
+    app.install_package(package_id.moniker(), package_id.version())
         .await?;
     return_success!();
 }

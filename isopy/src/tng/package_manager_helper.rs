@@ -62,7 +62,7 @@ impl PackageManagerHelper {
             .header(USER_AGENT, ISOPY_USER_AGENT);
 
         if let Some(accept) = &options.accept {
-            request = request.header(ACCEPT, accept.as_str())
+            request = request.header(ACCEPT, accept.as_str());
         };
 
         let response = request.send().await?;
@@ -70,7 +70,7 @@ impl PackageManagerHelper {
         response.error_for_status_ref()?;
 
         let data = response.bytes().await?;
-        write(&path, data)?;
+        write(path, data)?;
 
         println!("Downloaded {url}");
 
@@ -179,7 +179,7 @@ impl PackageManagerHelper {
                 .to_str()
                 .expect("Must be valid string")
                 .to_string(),
-            downloaded_at: downloaded_at.clone(),
+            downloaded_at: *downloaded_at,
         };
 
         let mut cache = self.load_cache()?;
@@ -208,7 +208,7 @@ impl PackageManagerContextOps for PackageManagerHelper {
         let path = self.make_unique_path(url)?;
         let downloaded_at = Utc::now();
 
-        Self::download_to_path(url, &path, &options).await?;
+        Self::download_to_path(url, &path, options).await?;
         if let Some(checksum) = &options.checksum {
             if !checksum.validate_file(&path).await? {
                 remove_file(&path)?;

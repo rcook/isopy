@@ -93,7 +93,7 @@ impl App {
     pub(crate) async fn install_package(&self, moniker: &Moniker, version: &Version) -> Result<()> {
         let project_dir = &self.cwd;
 
-        let (dir_info, mut packages) = if let Some(dir_info) = self.repo.get(&project_dir)? {
+        let (dir_info, mut packages) = if let Some(dir_info) = self.repo.get(project_dir)? {
             let env = dir_info.read_env_config()?;
             if env.project_dir != *project_dir {
                 bail!(
@@ -105,7 +105,7 @@ impl App {
 
             (dir_info, env.packages)
         } else {
-            let Some(dir_info) = self.repo.init(&project_dir)? else {
+            let Some(dir_info) = self.repo.init(project_dir)? else {
                 bail!(
                     "Could not initialize environment for directory {}",
                     project_dir.display()
@@ -124,7 +124,7 @@ impl App {
 
         let package_manager = self
             .plugin_manager
-            .new_package_manager(&moniker, &self.config_dir);
+            .new_package_manager(moniker, &self.config_dir);
 
         let bin_subdir = Path::new(moniker.as_str());
 
@@ -134,7 +134,7 @@ impl App {
 
         let output_path = dir_info.data_dir().join(bin_subdir);
         let package_info = package_manager
-            .install_package(&version, &None, &output_path)
+            .install_package(version, &None, &output_path)
             .await?;
 
         package_manager
@@ -248,7 +248,7 @@ impl App {
     ) -> Result<Option<OsString>> {
         let moniker = package.moniker.parse()?;
         let plugin = self.plugin_manager.get_plugin(&moniker);
-        Ok(plugin.make_script_command(script_path, platform, shell)?)
+        plugin.make_script_command(script_path, platform, shell)
     }
 
     fn find_link_for_dir(&self, dir: &Path) -> Result<Option<Link>> {

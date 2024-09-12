@@ -34,7 +34,7 @@ pub(crate) async fn install(
 ) -> Result<Status> {
     app.plugin_manager()
         .new_package_manager(package_id.moniker(), app.config_dir())
-        .install_package(package_id.version(), &tags, dir)
+        .install_package(package_id.version(), tags, dir)
         .await?;
 
     info!(

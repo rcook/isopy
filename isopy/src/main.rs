@@ -33,6 +33,8 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
+#![allow(clippy::redundant_pub_crate)]
+
 mod app;
 mod args;
 mod bool_util;

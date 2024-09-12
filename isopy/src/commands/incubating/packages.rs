@@ -85,7 +85,7 @@ fn add_plugin_rows(
         format!(
             "{}:{}",
             moniker.as_str(),
-            package_summary.version().to_string()
+            **package_summary.version()
         )
     }
 
@@ -109,7 +109,7 @@ fn add_plugin_rows(
                             )
                         })?
                 };
-                let size = metadata(&p)?.len();
+                let size = metadata(p)?.len();
                 Ok(format!(
                     "{} ({})",
                     path.bright_white().bold(),

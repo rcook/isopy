@@ -38,21 +38,21 @@ pub(crate) async fn tags(app: &App, moniker: &Option<Moniker>) -> Result<Status>
         if !tags.tags().is_empty() {
             println!("  Tags:");
             for tag in tags.tags() {
-                println!("    {tag}")
+                println!("    {tag}");
             }
         }
 
         if !tags.default_tags().is_empty() {
             println!("  Default tags:");
             for tag in tags.default_tags() {
-                println!("    {tag}")
+                println!("    {tag}");
             }
         }
 
         if !tags.other_tags().is_empty() {
             println!("  Other tags:");
             for tag in tags.other_tags() {
-                println!("    {tag}")
+                println!("    {tag}");
             }
         }
 
