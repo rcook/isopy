@@ -21,38 +21,31 @@
 //
 use crate::app::App;
 use crate::fs::existing;
+use crate::package_id::PackageId;
+use crate::serialization::{Project, ProjectPackage};
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
+use log::info;
 
-pub(crate) async fn do_project_install(app: &App) -> Result<Status> {
-    if app.repo().get(app.cwd())?.is_some() {
+pub(crate) fn do_config(app: &App, package_id: &PackageId) -> Result<Status> {
+    let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
+
+    let moniker_str = package_id.moniker().as_str();
+    if packages.iter().any(|p| p.moniker == moniker_str) {
         return_user_error!(
-            "Project in directory {} already has an environment",
-            app.cwd().display()
+            "Environment already has a package from package manager \"{moniker_str}\""
         );
     }
 
-    let Some(project) = existing(app.read_project_config())? else {
-        return_user_error!(
-            "No project configuration file in directory {}",
-            app.cwd().display()
-        );
-    };
+    packages.push(ProjectPackage {
+        moniker: String::from(moniker_str),
+        version: package_id.version().to_string(),
+    });
 
-    let package_infos = project
-        .packages
-        .iter()
-        .map(|package| {
-            let moniker = package.moniker.parse()?;
-            let plugin = app.plugin_manager().get_plugin(&moniker);
-            let version = plugin.parse_version(&package.version)?;
-            Ok((moniker, version))
-        })
-        .collect::<Result<Vec<_>>>()?;
-
-    for (moniker, version) in package_infos {
-        app.install_package(&moniker, &version).await?;
-    }
-
+    app.write_project_config(&Project { packages }, true)?;
+    info!(
+        "Added package \"{moniker_str}\" to project at {}",
+        app.cwd().display()
+    );
     return_success!();
 }

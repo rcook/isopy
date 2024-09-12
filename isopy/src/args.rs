@@ -107,6 +107,12 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
+    #[command(name = "config", about = "Configure project")]
+    Config {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
     #[command(
         name = "delete",
         about = "Delete environment corresponding to project directory"
@@ -131,14 +137,45 @@ pub(crate) enum Command {
         tags: Option<Vec<String>>,
     },
 
-    #[command(name = "env", about = "Environment commands")]
-    Env {
-        #[command(subcommand)]
-        command: EnvCommand,
+    #[command(name = "env-init", about = "Install package into environment")]
+    EnvInit {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
+    },
+
+    #[command(name = "env-list", about = "List environments")]
+    EnvList {
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
+        verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
     },
 
     #[command(name = "info", about = "Show information")]
     Info,
+
+    #[command(
+        name = "init",
+        about = "Install configured project packages into environment"
+    )]
+    Init,
+
+    #[command(
+        name = "link",
+        about = "Use existing environment for current directory"
+    )]
+    Link {
+        #[arg(help = "Directory ID", value_parser = parse_meta_id)]
+        dir_id: MetaId,
+    },
 
     #[command(name = "packages", about = "List packages")]
     Packages {
@@ -175,12 +212,6 @@ pub(crate) enum Command {
 
         #[arg(help = "Show brief output", long = "no-verbose")]
         _no_verbose: bool,
-    },
-
-    #[command(name = "project", about = "Project commands")]
-    Project {
-        #[command(subcommand)]
-        command: ProjectCommand,
     },
 
     #[command(name = "prompt", about = "Show brief information in shell prompt")]
@@ -278,52 +309,6 @@ pub(crate) enum Command {
         #[arg(help = "Do not force overwrite of output file", long = "no-force")]
         _no_force: bool,
     },
-}
-
-#[derive(Debug, Subcommand)]
-pub(crate) enum EnvCommand {
-    #[command(name = "install", about = "Install package into environment")]
-    Install {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
-    #[command(
-        name = "link",
-        about = "Use existing environment for current directory"
-    )]
-    Link {
-        #[arg(help = "Directory ID", value_parser = parse_meta_id)]
-        dir_id: MetaId,
-    },
-
-    #[command(name = "list", about = "List environments")]
-    List {
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
-    },
-}
-
-#[derive(Debug, Subcommand)]
-pub(crate) enum ProjectCommand {
-    #[command(name = "add", about = "Add package to project")]
-    Add {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
-    #[command(name = "install", about = "Install project packages into environment")]
-    Install,
 }
 
 #[derive(ClapArgs, Debug)]

@@ -21,7 +21,6 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command};
-use crate::commands::*;
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
 use crate::moniker::Moniker;
@@ -74,24 +73,26 @@ pub(crate) async fn run() -> Result<Status> {
     };
 
     let app = App::new(cwd, &cache_dir, repo)?;
-    do_it(app, args.command).await
+    run_command(app, args.command).await
 }
 
-async fn do_it(app: App, command: Command) -> Result<Status> {
+async fn run_command(app: App, command: Command) -> Result<Status> {
     use crate::args::Command::*;
-    use crate::args::EnvCommand;
-    use crate::args::ProjectCommand;
+    use crate::commands::{
+        do_check, do_completions, do_config, do_delete, do_download, do_env_init, do_env_list,
+        do_info, do_init, do_link, do_packages, do_prompt, do_run, do_scratch, do_shell, do_tags,
+        do_update, do_wrap,
+    };
 
     match command {
         Check { clean, .. } => do_check(&app, clean),
         Completions { shell } => Ok(do_completions(shell)),
+        Config { package_id } => do_config(&app, &package_id),
         Delete { project_dir } => do_delete(&app, &project_dir).await,
         Download { package_id, tags } => do_download(&app, &package_id, &tags).await,
-        Env { command } => match command {
-            EnvCommand::Install { package_id } => do_env_install(&app, &package_id).await,
-            EnvCommand::List { verbose, .. } => do_env_list(&app, verbose),
-            EnvCommand::Link { dir_id } => do_env_link(&app, &dir_id),
-        },
+        EnvInit { package_id } => do_env_init(&app, &package_id).await,
+        EnvList { verbose, .. } => do_env_list(&app, verbose),
+        Link { dir_id } => do_link(&app, &dir_id),
         Packages {
             moniker,
             filter,
@@ -109,10 +110,7 @@ async fn do_it(app: App, command: Command) -> Result<Status> {
             .await
         }
         Info => do_info(&app),
-        Project { command } => match command {
-            ProjectCommand::Add { package_id } => do_project_add(&app, &package_id),
-            ProjectCommand::Install => do_project_install(&app).await,
-        },
+        Init => do_init(&app).await,
         Prompt(prompt_config) => do_prompt(&app, &prompt_config),
         Run { program, args } => do_run(app, &program, &args),
         Scratch => do_scratch(&app).await,

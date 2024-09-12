@@ -20,32 +20,24 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::existing;
-use crate::package_id::PackageId;
-use crate::serialization::{Project, ProjectPackage};
+use crate::print::make_prop_table;
+use crate::print::print_dir_info_and_env;
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
-use log::info;
+use joat_repo::MetaId;
 
-pub(crate) fn do_project_add(app: &App, package_id: &PackageId) -> Result<Status> {
-    let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
-
-    let moniker_str = package_id.moniker().as_str();
-    if packages.iter().any(|p| p.moniker == moniker_str) {
+pub(crate) fn do_link(app: &App, dir_id: &MetaId) -> Result<Status> {
+    let Some(dir_info) = app.repo().link(dir_id, app.cwd())? else {
         return_user_error!(
-            "Environment already has a package from package manager \"{moniker_str}\""
+            "directory {} is already linked to metadirectory with ID {}",
+            app.cwd().display(),
+            dir_id
         );
-    }
+    };
 
-    packages.push(ProjectPackage {
-        moniker: String::from(moniker_str),
-        version: package_id.version().to_string(),
-    });
+    let mut table = make_prop_table();
+    print_dir_info_and_env(app, &mut table, &dir_info)?;
+    table.print();
 
-    app.write_project_config(&Project { packages }, true)?;
-    info!(
-        "Added package \"{moniker_str}\" to project at {}",
-        app.cwd().display()
-    );
     return_success!();
 }

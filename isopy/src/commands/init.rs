@@ -20,24 +20,39 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::print::make_prop_table;
-use crate::print::print_dir_info_and_env;
+use crate::fs::existing;
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
-use joat_repo::MetaId;
 
-pub(crate) fn do_env_link(app: &App, dir_id: &MetaId) -> Result<Status> {
-    let Some(dir_info) = app.repo().link(dir_id, app.cwd())? else {
+pub(crate) async fn do_init(app: &App) -> Result<Status> {
+    if app.repo().get(app.cwd())?.is_some() {
         return_user_error!(
-            "directory {} is already linked to metadirectory with ID {}",
-            app.cwd().display(),
-            dir_id
+            "Project in directory {} already has an environment",
+            app.cwd().display()
+        );
+    }
+
+    let Some(project) = existing(app.read_project_config())? else {
+        return_user_error!(
+            "No project configuration file in directory {}",
+            app.cwd().display()
         );
     };
 
-    let mut table = make_prop_table();
-    print_dir_info_and_env(app, &mut table, &dir_info)?;
-    table.print();
+    let package_infos = project
+        .packages
+        .iter()
+        .map(|package| {
+            let moniker = package.moniker.parse()?;
+            let plugin = app.plugin_manager().get_plugin(&moniker);
+            let version = plugin.parse_version(&package.version)?;
+            Ok((moniker, version))
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    for (moniker, version) in package_infos {
+        app.install_package(&moniker, &version).await?;
+    }
 
     return_success!();
 }

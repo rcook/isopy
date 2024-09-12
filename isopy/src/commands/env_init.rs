@@ -24,7 +24,7 @@ use crate::package_id::PackageId;
 use crate::status::{return_success, Status};
 use anyhow::Result;
 
-pub(crate) async fn do_env_install(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) async fn do_env_init(app: &App, package_id: &PackageId) -> Result<Status> {
     app.install_package(package_id.moniker(), package_id.version())
         .await?;
     return_success!();
