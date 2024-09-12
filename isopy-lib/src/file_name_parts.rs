@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
+use crate::sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 use anyhow::{bail, Result};
 use url::Url;
 

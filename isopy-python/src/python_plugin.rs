@@ -22,10 +22,10 @@
 use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::python_package_manager::PythonPackageManager;
 use anyhow::Result;
-use isopy_lib::tng::{
+use isopy_lib::{render_absolute_path, EnvInfo, Platform, Shell};
+use isopy_lib::{
     EnvProps, PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
 };
-use isopy_lib::{render_absolute_path, EnvInfo, Platform, Shell};
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;

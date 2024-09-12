@@ -19,35 +19,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::package::Package;
-use crate::tng::package_summary::PackageSummary;
-use crate::tng::tags::Tags;
-use crate::tng::version::Version;
-use crate::tng::PackageFilter;
+use crate::env_info::EnvInfo;
+use crate::env_props::EnvProps;
+use crate::package_manager::PackageManager;
+use crate::package_manager_context::PackageManagerContext;
+use crate::shell::{Platform, Shell};
+use crate::version::Version;
 use anyhow::Result;
-use async_trait::async_trait;
+use std::ffi::OsString;
 use std::path::Path;
+use url::Url;
 
-pub type OptionalTags = Option<Vec<String>>;
-
-#[async_trait]
-pub trait PackageManagerOps: Send + Sync {
-    async fn update_index(&self) -> Result<()>;
-    async fn list_tags(&self) -> Result<Tags>;
-    async fn list_packages(
+pub trait PluginOps: Send + Sync {
+    fn url(&self) -> &Url;
+    fn parse_version(&self, s: &str) -> Result<Version>;
+    fn make_env_info(
         &self,
-        filter: PackageFilter,
-        tags: &OptionalTags,
-    ) -> Result<Vec<PackageSummary>>;
-    async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()>;
-    async fn install_package(
+        data_dir: &Path,
+        env_props: &EnvProps,
+        base_dir: Option<&Path>,
+    ) -> EnvInfo;
+    fn make_script_command(
         &self,
-        version: &Version,
-        tags: &OptionalTags,
-        dir: &Path,
-    ) -> Result<Package>;
-    async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()>;
-    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
+        script_path: &Path,
+        platform: Platform,
+        shell: Shell,
+    ) -> Result<Option<OsString>>;
+    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
 
-crate::macros::dyn_trait_struct!(PackageManager, PackageManagerOps);
+crate::macros::dyn_trait_struct!(Plugin, PluginOps);

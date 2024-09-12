@@ -19,16 +19,35 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::download_options::DownloadOptions;
+use crate::package::Package;
+use crate::package_summary::PackageSummary;
+use crate::tags::Tags;
+use crate::version::Version;
+use crate::PackageFilter;
 use anyhow::Result;
 use async_trait::async_trait;
-use std::path::PathBuf;
-use url::Url;
+use std::path::Path;
+
+pub type OptionalTags = Option<Vec<String>>;
 
 #[async_trait]
-pub trait PackageManagerContextOps: Send + Sync {
-    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
-    async fn get_file(&self, url: &Url) -> Result<PathBuf>;
+pub trait PackageManagerOps: Send + Sync {
+    async fn update_index(&self) -> Result<()>;
+    async fn list_tags(&self) -> Result<Tags>;
+    async fn list_packages(
+        &self,
+        filter: PackageFilter,
+        tags: &OptionalTags,
+    ) -> Result<Vec<PackageSummary>>;
+    async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()>;
+    async fn install_package(
+        &self,
+        version: &Version,
+        tags: &OptionalTags,
+        dir: &Path,
+    ) -> Result<Package>;
+    async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()>;
+    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
 
-crate::macros::dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);
+crate::macros::dyn_trait_struct!(PackageManager, PackageManagerOps);

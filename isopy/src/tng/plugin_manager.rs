@@ -22,7 +22,7 @@
 use crate::constants::CACHE_DIR_NAME;
 use crate::tng::package_manager_helper::PackageManagerHelper;
 use crate::tng::Moniker;
-use isopy_lib::tng::{PackageManager, Plugin};
+use isopy_lib::{PackageManager, Plugin};
 use std::path::Path;
 
 pub(crate) struct PluginManager {

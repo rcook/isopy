@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::metadata::Metadata;
-use isopy_lib::tng::{EnvProps, PackageOps};
+use isopy_lib::{EnvProps, PackageOps};
 use std::path::Path;
 use url::Url;
 

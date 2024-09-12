@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::accept::Accept;
-use crate::tng::checksum::Checksum;
+use crate::accept::Accept;
+use crate::checksum::Checksum;
 
 #[derive(Default)]
 pub struct DownloadOptions {

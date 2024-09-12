@@ -22,7 +22,7 @@
 use crate::python_package::PythonPackage;
 use anyhow::{anyhow, Result};
 use include_dir::{include_dir, Dir};
-use isopy_lib::tng::Checksum;
+use isopy_lib::Checksum;
 use std::collections::HashMap;
 
 const SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");

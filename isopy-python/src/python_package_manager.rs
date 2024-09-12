@@ -24,7 +24,7 @@ use crate::metadata::Metadata;
 use crate::python_package::PythonPackage;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
-use isopy_lib::tng::{
+use isopy_lib::{
     DownloadOptions, OptionalTags, Package, PackageFilter, PackageKind, PackageManagerContext,
     PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
 };

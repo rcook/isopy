@@ -19,36 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod accept;
-mod checksum;
-mod download_options;
-mod env_props;
-mod file_name_parts;
-mod package;
-mod package_filter;
-mod package_kind;
-mod package_manager;
-mod package_manager_context;
-mod package_summary;
-mod plugin;
-mod sanitize;
-mod tags;
-mod version;
-mod version_triple;
+use crate::env_props::EnvProps;
+use std::path::Path;
 
-pub use accept::Accept;
-pub use checksum::Checksum;
-pub use download_options::DownloadOptions;
-pub use env_props::EnvProps;
-pub use file_name_parts::FileNameParts;
-pub use package::{Package, PackageOps};
-pub use package_filter::PackageFilter;
-pub use package_kind::PackageKind;
-pub use package_manager::{OptionalTags, PackageManager, PackageManagerOps};
-pub use package_manager_context::{PackageManagerContext, PackageManagerContextOps};
-pub use package_summary::PackageSummary;
-pub use plugin::{Plugin, PluginOps};
-pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
-pub use tags::Tags;
-pub use version::Version;
-pub use version_triple::VersionTriple;
+pub trait PackageOps {
+    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
+}
+
+crate::macros::dyn_trait_struct!(Package, PackageOps);

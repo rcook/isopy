@@ -19,33 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env_info::EnvInfo;
-use crate::tng::env_props::EnvProps;
-use crate::tng::package_manager::PackageManager;
-use crate::tng::package_manager_context::PackageManagerContext;
-use crate::tng::version::Version;
-use crate::{Platform, Shell};
+use crate::download_options::DownloadOptions;
 use anyhow::Result;
-use std::ffi::OsString;
-use std::path::Path;
+use async_trait::async_trait;
+use std::path::PathBuf;
 use url::Url;
 
-pub trait PluginOps: Send + Sync {
-    fn url(&self) -> &Url;
-    fn parse_version(&self, s: &str) -> Result<Version>;
-    fn make_env_info(
-        &self,
-        data_dir: &Path,
-        env_props: &EnvProps,
-        base_dir: Option<&Path>,
-    ) -> EnvInfo;
-    fn make_script_command(
-        &self,
-        script_path: &Path,
-        platform: Platform,
-        shell: Shell,
-    ) -> Result<Option<OsString>>;
-    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
+#[async_trait]
+pub trait PackageManagerContextOps: Send + Sync {
+    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
+    async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 
-crate::macros::dyn_trait_struct!(Plugin, PluginOps);
+crate::macros::dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);

@@ -33,12 +33,42 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
+mod accept;
+mod checksum;
+mod download_options;
 mod env_info;
+mod env_props;
+mod file_name_parts;
 mod macros;
+mod package;
+mod package_filter;
+mod package_kind;
+mod package_manager;
+mod package_manager_context;
+mod package_summary;
+mod plugin;
+mod sanitize;
 mod shell;
+mod tags;
+mod version;
+mod version_triple;
 
-pub mod tng;
-
+pub use accept::Accept;
+pub use checksum::Checksum;
+pub use download_options::DownloadOptions;
 pub use env_info::EnvInfo;
+pub use env_props::EnvProps;
+pub use file_name_parts::FileNameParts;
 pub use macros::TryToString;
+pub use package::{Package, PackageOps};
+pub use package_filter::PackageFilter;
+pub use package_kind::PackageKind;
+pub use package_manager::{OptionalTags, PackageManager, PackageManagerOps};
+pub use package_manager_context::{PackageManagerContext, PackageManagerContextOps};
+pub use package_summary::PackageSummary;
+pub use plugin::{Plugin, PluginOps};
+pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
+pub use tags::Tags;
+pub use version::Version;
+pub use version_triple::VersionTriple;

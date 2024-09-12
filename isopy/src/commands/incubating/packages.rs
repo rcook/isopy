@@ -26,7 +26,7 @@ use crate::table::{table_columns, table_divider, table_headings, Table};
 use crate::tng::Moniker;
 use anyhow::{anyhow, Result};
 use colored::Colorize;
-use isopy_lib::tng::{PackageFilter, PackageSummary, Plugin};
+use isopy_lib::{PackageFilter, PackageSummary, Plugin};
 use std::fs::metadata;
 use strum::IntoEnumIterator;
 

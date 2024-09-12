@@ -22,7 +22,7 @@
 use crate::tng::moniker::Moniker;
 use crate::tng::plugin_manager::PluginManager;
 use anyhow::{bail, Error, Result};
-use isopy_lib::tng::Version;
+use isopy_lib::Version;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 

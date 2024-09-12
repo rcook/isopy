@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_plugin::PythonPlugin;
-use isopy_lib::tng::Plugin;
+use isopy_lib::Plugin;
 
 #[must_use]
 pub fn new_plugin() -> Plugin {

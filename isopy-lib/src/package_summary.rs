@@ -19,11 +19,57 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::env_props::EnvProps;
-use std::path::Path;
+use crate::package_kind::PackageKind;
+use crate::version::Version;
+use std::path::PathBuf;
+use url::Url;
 
-pub trait PackageOps {
-    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
+pub struct PackageSummary {
+    kind: PackageKind,
+    name: String,
+    url: Url,
+    version: Version,
+    path: Option<PathBuf>,
 }
 
-crate::macros::dyn_trait_struct!(Package, PackageOps);
+impl PackageSummary {
+    pub fn new<S: Into<String>, P: Into<PathBuf>>(
+        kind: PackageKind,
+        name: S,
+        url: &Url,
+        version: Version,
+        path: Option<P>,
+    ) -> Self {
+        Self {
+            kind,
+            name: name.into(),
+            url: url.clone(),
+            version,
+            path: path.map(std::convert::Into::into),
+        }
+    }
+    #[must_use]
+    pub const fn kind(&self) -> PackageKind {
+        self.kind
+    }
+
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    #[must_use]
+    pub const fn url(&self) -> &Url {
+        &self.url
+    }
+
+    #[must_use]
+    pub const fn version(&self) -> &Version {
+        &self.version
+    }
+
+    #[must_use]
+    pub const fn path(&self) -> &Option<PathBuf> {
+        &self.path
+    }
+}
