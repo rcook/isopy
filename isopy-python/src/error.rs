@@ -30,20 +30,8 @@ pub enum IsopyPythonError {
     #[error("Invalid repository name \"{0}\"")]
     InvalidRepositoryName(String),
 
-    #[error("Unsupported archive type \"{0}\"")]
-    UnsupportedArchiveType(String),
-
     #[error("Parse error \"{0}\"")]
     ParseError(String),
-
-    #[error("Invalid asset name \"{0}\"")]
-    InvalidAssetName(String),
-
-    #[error("Invalid token \"{1}\" in asset name \"{0}\"")]
-    InvalidAssetNameToken(String, String),
-
-    #[error("Token \"{1}\" missing from asset name \"{0}\"")]
-    MissingAssetNameToken(String, String),
 
     #[error(transparent)]
     Other(#[from] anyhow::Error),

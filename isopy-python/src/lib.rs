@@ -33,13 +33,10 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
-mod asset;
-mod asset_meta;
 mod constants;
 mod error;
 mod python_descriptor;
 mod python_plugin_factory;
-mod python_standalone_builds;
 mod python_version;
 mod repository_name;
 mod serialization;
