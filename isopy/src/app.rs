@@ -24,7 +24,7 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::fs::default_config_dir;
 use crate::moniker::Moniker;
 use crate::plugin_manager::PluginManager;
-use crate::serialization::{Env, Package, Project};
+use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{bail, Result};
 use isopy_lib::{EnvInfo, EnvProps, Platform, Shell, Version};
@@ -142,7 +142,7 @@ impl App {
             .await?;
 
         let env_props = package_info.get_env_props(bin_subdir);
-        packages.push(Package {
+        packages.push(EnvPackage {
             moniker: String::from(moniker.as_str()),
             dir: env_props.dir().to_path_buf(),
             url: env_props.url().clone(),
@@ -227,7 +227,7 @@ impl App {
     pub(crate) fn make_env_info(
         &self,
         data_dir: &Path,
-        package: &Package,
+        package: &EnvPackage,
         base_dir: Option<&Path>,
     ) -> Result<EnvInfo> {
         let moniker = package.moniker.parse()?;
@@ -241,7 +241,7 @@ impl App {
 
     pub(crate) fn make_script_command(
         &self,
-        package: &Package,
+        package: &EnvPackage,
         script_path: &Path,
         platform: Platform,
         shell: Shell,

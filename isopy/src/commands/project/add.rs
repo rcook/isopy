@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
-use crate::serialization::{Package2, Project};
+use crate::serialization::{Project, ProjectPackage};
 use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use log::info;
@@ -37,7 +37,7 @@ pub(crate) fn add(app: &App, package_id: &PackageId) -> Result<Status> {
         );
     }
 
-    packages.push(Package2 {
+    packages.push(ProjectPackage {
         moniker: String::from(moniker_str),
         version: package_id.version().to_string(),
     });

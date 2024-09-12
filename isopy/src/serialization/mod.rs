@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 mod env;
-mod package;
-mod package2;
+mod env_package;
 mod project;
+mod project_package;
 
 pub(crate) use env::Env;
-pub(crate) use package::Package;
-pub(crate) use package2::Package2;
+pub(crate) use env_package::EnvPackage;
 pub(crate) use project::Project;
+pub(crate) use project_package::ProjectPackage;
