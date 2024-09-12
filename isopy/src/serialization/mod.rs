@@ -19,10 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+mod download;
 mod env;
 mod env_package;
+mod file;
+mod manifest;
 mod project;
 
+pub(crate) use download::Download;
 pub(crate) use env::Env;
 pub(crate) use env_package::EnvPackage;
+pub(crate) use file::File;
+pub(crate) use manifest::Manifest;
 pub(crate) use project::Project;

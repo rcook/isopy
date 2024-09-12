@@ -25,7 +25,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct File {
+    #[serde(rename = "file_name")]
     pub(crate) file_name: String,
-    #[serde(with = "date_time_format")]
+
+    #[serde(rename = "downloaded_at", with = "date_time_format")]
     pub(crate) downloaded_at: DateTime<Utc>,
 }

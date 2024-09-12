@@ -21,8 +21,7 @@
 //
 use crate::cache_info::CacheInfo;
 use crate::constants::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
-use crate::download::Download;
-use crate::file::File;
+use crate::serialization::{Download, File};
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
