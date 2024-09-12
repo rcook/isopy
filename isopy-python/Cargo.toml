@@ -14,7 +14,7 @@ version = "0.3.25"
 [dependencies]
 anyhow = "1.0.86"
 async-trait = "0.1.82"
-decompress = { git = "https://github.com/rcook/decompress.git", rev = "899bfe1e83a5ece3128d3523f2488f802545ccd7" }
+decompress = { git = "https://github.com/rcook/decompress.git", rev = "c00c3b288e430eeffe78d3ba44952cf93697b1f0" }
 include_dir = "0.7.4"
 isopy-lib = { path = "../isopy-lib" }
 lazy_static = "1.5.0"

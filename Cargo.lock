@@ -492,7 +492,7 @@ dependencies = [
 [[package]]
 name = "decompress"
 version = "0.6.0"
-source = "git+https://github.com/rcook/decompress.git?rev=899bfe1e83a5ece3128d3523f2488f802545ccd7#899bfe1e83a5ece3128d3523f2488f802545ccd7"
+source = "git+https://github.com/rcook/decompress.git?rev=c00c3b288e430eeffe78d3ba44952cf93697b1f0#c00c3b288e430eeffe78d3ba44952cf93697b1f0"
 dependencies = [
  "ar",
  "bzip2",
@@ -500,6 +500,7 @@ dependencies = [
  "flate2",
  "infer",
  "lazy_static",
+ "path-absolutize",
  "regex",
  "tar",
  "thiserror",
