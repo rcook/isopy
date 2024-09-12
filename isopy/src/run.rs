@@ -23,7 +23,6 @@ use crate::app::App;
 use crate::args::{Args, Command};
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
-use crate::moniker::Moniker;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
@@ -99,24 +98,15 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
             tags,
             verbose,
             ..
-        } => {
-            do_packages(
-                &app,
-                &moniker.map(Into::<Moniker>::into),
-                filter.into(),
-                &tags,
-                verbose,
-            )
-            .await
-        }
+        } => do_packages(&app, &moniker, filter.into(), &tags, verbose).await,
         Info => do_info(&app),
         Init => do_init(&app).await,
         Prompt(prompt_config) => do_prompt(&app, &prompt_config),
         Run { program, args } => do_run(app, &program, &args),
         Scratch => do_scratch(&app).await,
         Shell { verbose, .. } => do_shell(app, verbose),
-        Tags { moniker } => do_tags(&app, &moniker.map(Into::<Moniker>::into)).await,
-        Update { moniker } => do_update(&app, &moniker.map(Into::<Moniker>::into)).await,
+        Tags { moniker } => do_tags(&app, &moniker).await,
+        Update { moniker } => do_update(&app, &moniker).await,
         Wrap {
             wrapper_file_name,
             script_path,
