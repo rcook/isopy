@@ -39,19 +39,9 @@ pub(crate) async fn do_init(app: &App) -> Result<Status> {
         );
     };
 
-    let package_infos = project
-        .packages
-        .iter()
-        .map(|package| {
-            let moniker = package.moniker.parse()?;
-            let plugin = app.plugin_manager().get_plugin(&moniker);
-            let version = plugin.parse_version(&package.version)?;
-            Ok((moniker, version))
-        })
-        .collect::<Result<Vec<_>>>()?;
-
-    for (moniker, version) in package_infos {
-        app.install_package(&moniker, &version).await?;
+    for package_id in project.package_ids {
+        app.install_package(&package_id.moniker(), &package_id.version())
+            .await?;
     }
 
     return_success!();

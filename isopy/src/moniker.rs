@@ -19,17 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error, Result};
+use anyhow::{bail, Error};
 use clap::ValueEnum;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 const PYTHON_STR: &str = "python";
 
-#[derive(Clone, Debug, EnumIter, ValueEnum)]
+#[derive(Clone, Debug, EnumIter, PartialEq, ValueEnum)]
 
 pub(crate) enum Moniker {
     #[clap(name = PYTHON_STR)]
@@ -57,7 +58,7 @@ impl Display for Moniker {
 impl FromStr for Moniker {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         for value in Self::iter() {
             if value.as_str() == s {
                 return Ok(value);

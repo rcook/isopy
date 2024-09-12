@@ -20,8 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::version::VersionOps;
-use anyhow::{bail, Error, Result};
+use anyhow::{bail, Error};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -40,7 +41,7 @@ impl Display for VersionTriple {
 impl FromStr for VersionTriple {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let parts = s.splitn(3, '.').collect::<Vec<_>>();
         if parts.len() != 3 {
             bail!("Invalid package version {s}")

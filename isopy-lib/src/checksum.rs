@@ -22,7 +22,9 @@
 use anyhow::{Error, Result};
 use hex::decode;
 use sha2::{Digest, Sha256};
-use std::{path::Path, str::FromStr};
+use std::path::Path;
+use std::result::Result as StdResult;
+use std::str::FromStr;
 use tokio::fs::read;
 
 #[derive(Debug)]
@@ -41,7 +43,7 @@ impl Checksum {
 impl FromStr for Checksum {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let value = decode(s)?;
         Ok(Self(value))
     }

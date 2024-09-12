@@ -19,11 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::ProjectPackage;
+use crate::package_id::PackageId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct Project {
-    #[serde(rename = "packages")]
-    pub(crate) packages: Vec<ProjectPackage>,
+    #[serde(rename = "package_ids")]
+    pub(crate) package_ids: Vec<PackageId>,
 }

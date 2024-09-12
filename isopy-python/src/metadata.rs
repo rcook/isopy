@@ -23,6 +23,7 @@ use crate::archive_type::ArchiveType;
 use crate::full_version::FullVersion;
 use anyhow::{bail, Error, Result};
 use std::collections::HashSet;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 
@@ -55,7 +56,7 @@ impl Metadata {
 impl FromStr for Metadata {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         fn parse_archive_type(s: &str) -> Result<(&str, ArchiveType)> {
             for archive_type in ArchiveType::iter() {
                 if let Some(prefix) = s.strip_suffix(archive_type.suffix()) {

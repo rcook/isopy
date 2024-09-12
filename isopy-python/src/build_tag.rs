@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{bail, Error, Result};
+use anyhow::{bail, Error};
 use regex::Regex;
 use std::cmp::Ordering;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::sync::LazyLock;
 
@@ -45,7 +46,7 @@ impl BuildTag {
 impl FromStr for BuildTag {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         if NEW_STYLE_BUILD_TAG_REGEX.is_match(s) {
             Ok(Self {
                 inner: Inner::NewStyle(String::from(s)),

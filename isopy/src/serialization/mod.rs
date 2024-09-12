@@ -22,9 +22,7 @@
 mod env;
 mod env_package;
 mod project;
-mod project_package;
 
 pub(crate) use env::Env;
 pub(crate) use env_package::EnvPackage;
 pub(crate) use project::Project;
-pub(crate) use project_package::ProjectPackage;

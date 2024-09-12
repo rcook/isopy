@@ -21,9 +21,11 @@
 //
 use crate::moniker::Moniker;
 use crate::plugin_manager::PluginManager;
-use anyhow::{bail, Error, Result};
+use anyhow::{bail, Error};
 use isopy_lib::Version;
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug)]
@@ -45,7 +47,7 @@ impl PackageId {
 impl FromStr for PackageId {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let Some((moniker_str, version_str)) = s.split_once(':') else {
             bail!("Invalid package ID {s}")
         };
@@ -65,5 +67,24 @@ impl FromStr for PackageId {
 impl Display for PackageId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}:{}", self.moniker, *self.version)
+    }
+}
+
+impl Serialize for PackageId {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: ::serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+impl<'de> Deserialize<'de> for PackageId {
+    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {
+        <Self as FromStr>::from_str(&String::deserialize(deserializer)?)
+            .map_err(serde::de::Error::custom)
     }
 }
