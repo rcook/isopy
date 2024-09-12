@@ -22,8 +22,10 @@
 use crate::tng::python_package_manager::PythonPackageManager;
 use anyhow::Result;
 use isopy_lib::tng::{
-    PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
+    EnvProps, PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,
 };
+use isopy_lib::EnvInfo;
+use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use url::Url;
 
@@ -52,6 +54,42 @@ impl PluginOps for PythonPlugin {
 
     fn parse_version(&self, s: &str) -> Result<Version> {
         Ok(Version::new(s.parse::<VersionTriple>()?))
+    }
+
+    fn make_env_info(
+        &self,
+        data_dir: &Path,
+        env_props: &EnvProps,
+        _base_dir: Option<&Path>,
+    ) -> EnvInfo {
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_props.dir()).join("bin")]
+        }
+
+        #[cfg(target_os = "windows")]
+        fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
+            let d = data_dir.join(&env_props.dir());
+            vec![d.clone(), d.join("Scripts")]
+        }
+
+        let path_dirs = make_path_dirs(data_dir, &env_props);
+        /*
+        let vars = if let Some(d) = base_dir {
+            vec![(
+                String::from("PYTHONPATH"),
+                String::from(
+                    d.to_str()
+                        .ok_or_else(|| anyhow!("could not convert directory"))?,
+                ),
+            )]
+        } else {
+            vec![]
+        };
+        */
+        let vars = vec![];
+
+        EnvInfo { path_dirs, vars }
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {

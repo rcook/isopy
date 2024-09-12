@@ -36,7 +36,7 @@ pub(crate) fn info(app: &App) -> Result<Status> {
     table_columns!(table, "Working directory", app.cwd().display());
 
     if let Some(dir_info) = app.find_dir_info(None)? {
-        print_dir_info_and_env(&mut table, &dir_info)?;
+        print_dir_info_and_env(app, &mut table, &dir_info)?;
     }
 
     table_title!(table, "Repository information");

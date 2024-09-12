@@ -50,7 +50,7 @@ pub(crate) fn shell(app: App, verbose: bool) -> Result<Status> {
         );
     };
 
-    let Some(env_info) = dir_info.make_env_info(None)? else {
+    let Some(env_info) = dir_info.make_env_info(&app, None)? else {
         return_user_error!("could not get environment info");
     };
 

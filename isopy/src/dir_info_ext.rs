@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::registry::Registry;
 use crate::serialization::Env;
@@ -32,7 +33,7 @@ use std::path::{Path, PathBuf};
 pub(crate) trait DirInfoExt {
     fn read_env_config(&self) -> Result<Env>;
     fn write_env_config(&self, env: &Env, overwrite: bool) -> Result<()>;
-    fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
+    fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
     fn make_script_command(
         &self,
         script_path: &Path,
@@ -50,8 +51,8 @@ impl DirInfoExt for DirInfo {
         write_env_config(self.data_dir(), env, overwrite)
     }
 
-    fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-        make_env_info(self.data_dir(), base_dir)
+    fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+        make_env_info(app, self.data_dir(), base_dir)
     }
 
     fn make_script_command(
@@ -73,8 +74,8 @@ impl DirInfoExt for Manifest {
         write_env_config(self.data_dir(), env, overwrite)
     }
 
-    fn make_env_info(&self, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-        make_env_info(self.data_dir(), base_dir)
+    fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+        make_env_info(app, self.data_dir(), base_dir)
     }
 
     fn make_script_command(
@@ -104,7 +105,7 @@ fn write_env_config(data_dir: &Path, env: &Env, overwrite: bool) -> Result<()> {
     Ok(())
 }
 
-fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+fn make_env_info(app: &App, data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
     let env = read_env_config(data_dir)?;
 
     let mut all_env_info = EnvInfo {
@@ -113,10 +114,7 @@ fn make_env_info(data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvI
     };
 
     for package in &env.packages {
-        let Some(env_info) = Registry::global().make_env_info(data_dir, package, base_dir)? else {
-            return Ok(None);
-        };
-
+        let env_info = Registry::global().make_env_info(app, data_dir, package, base_dir)?;
         all_env_info.path_dirs.extend(env_info.path_dirs);
         all_env_info.vars.extend(env_info.vars);
     }

@@ -71,7 +71,7 @@ pub(crate) fn wrap(
         );
     };
 
-    let Some(env_info) = dir_info.make_env_info(Some(base_dir))? else {
+    let Some(env_info) = dir_info.make_env_info(app, Some(base_dir))? else {
         return_user_error!("could not get environment info");
     };
 

@@ -19,15 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::env_info::EnvInfo;
+use crate::tng::env_props::EnvProps;
 use crate::tng::package_manager::PackageManager;
 use crate::tng::package_manager_context::PackageManagerContext;
 use crate::tng::version::Version;
 use anyhow::Result;
+use std::path::Path;
 use url::Url;
 
 pub trait PluginOps: Send + Sync {
     fn url(&self) -> &Url;
     fn parse_version(&self, s: &str) -> Result<Version>;
+    fn make_env_info(
+        &self,
+        data_dir: &Path,
+        env_props: &EnvProps,
+        base_dir: Option<&Path>,
+    ) -> EnvInfo;
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
 

@@ -39,7 +39,7 @@ pub(crate) fn run(app: App, program: &str, args: &[String]) -> Result<Status> {
         );
     };
 
-    let Some(env_info) = dir_info.make_env_info(None)? else {
+    let Some(env_info) = dir_info.make_env_info(&app, None)? else {
         return_user_error!("could not get environment info");
     };
 

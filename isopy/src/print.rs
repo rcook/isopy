@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::registry::Registry;
@@ -77,13 +78,13 @@ pub(crate) fn print_metadir(
     table_columns!(table, "Created at", manifest.created_at());
 }
 
-pub(crate) fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {
+pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {
     if let Some(env) = env {
         table_columns!(table, "Project directory", env.project_dir.display());
 
         for package in &env.packages {
-            if let Ok(Some(env_info)) =
-                Registry::global().make_env_info(dir_info.data_dir(), package, None)
+            if let Ok(env_info) =
+                Registry::global().make_env_info(app, dir_info.data_dir(), package, None)
             {
                 table_columns!(table, "Package", &package.moniker);
 
@@ -116,10 +117,14 @@ pub(crate) fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option
     table_columns!(table, "Project directory", dir_info.project_dir().display());
 }
 
-pub(crate) fn print_dir_info_and_env(table: &mut Table, dir_info: &DirInfo) -> Result<()> {
+pub(crate) fn print_dir_info_and_env(
+    app: &App,
+    table: &mut Table,
+    dir_info: &DirInfo,
+) -> Result<()> {
     table_title!(table, "Environment info");
     let env = existing(dir_info.read_env_config())?;
-    print_dir_info(table, dir_info, &env);
+    print_dir_info(app, table, dir_info, &env);
     Ok(())
 }
 

@@ -19,20 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::EnvProps;
-use crate::{Descriptor, EnvInfo, IsopyLibResult, Platform, Shell};
+use crate::{Descriptor, IsopyLibResult, Platform, Shell};
 use serde_json::Value;
 use std::ffi::OsString;
 use std::path::Path;
 
 pub trait PluginFactory: Send + Sync {
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>>;
-    fn make_env_info(
-        &self,
-        data_dir: &Path,
-        env_props: &EnvProps,
-        base_dir: Option<&Path>,
-    ) -> IsopyLibResult<EnvInfo>;
     fn make_script_command(
         &self,
         script_path: &Path,

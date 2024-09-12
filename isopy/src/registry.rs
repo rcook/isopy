@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::app::App;
 use crate::constants::PYTHON_DESCRIPTOR_PREFIX;
 use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::Package;
@@ -55,23 +56,18 @@ impl Registry {
 
     pub(crate) fn make_env_info(
         &self,
+        app: &App,
         data_dir: &Path,
         package: &Package,
         base_dir: Option<&Path>,
-    ) -> Result<Option<EnvInfo>> {
-        let Some(plugin_host) = self
-            .plugin_hosts
-            .iter()
-            .find(|p| p.prefix() == package.moniker)
-        else {
-            return Ok(None);
-        };
-
-        Ok(Some(plugin_host.make_env_info(
+    ) -> Result<EnvInfo> {
+        let moniker = package.moniker.parse()?;
+        let plugin = app.plugin_manager().get_plugin(&moniker);
+        Ok(plugin.make_env_info(
             data_dir,
             &EnvProps::new(&package.dir, &package.url),
             base_dir,
-        )?))
+        ))
     }
 
     pub(crate) fn make_script_command(

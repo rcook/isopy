@@ -36,7 +36,7 @@ pub(crate) fn link(app: &App, dir_id: &MetaId) -> Result<Status> {
     };
 
     let mut table = make_prop_table();
-    print_dir_info_and_env(&mut table, &dir_info)?;
+    print_dir_info_and_env(app, &mut table, &dir_info)?;
     table.print();
 
     return_success!();
