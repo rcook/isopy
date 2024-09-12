@@ -19,20 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use std::ffi::OsString;
-use std::path::PathBuf;
-use std::sync::LazyLock;
-
-pub(crate) static CACHE_DIR: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from(".isopy"));
-pub(crate) static ENV_CONFIG_FILE_NAME: LazyLock<OsString> =
-    LazyLock::new(|| OsString::from("env.yaml"));
-pub(crate) static PROJECT_CONFIG_FILE_NAME: LazyLock<OsString> =
-    LazyLock::new(|| OsString::from(".isopy.yaml"));
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-pub(crate) const EXECUTABLE_MASK: u32 = 0o100;
-
+pub(crate) const ENV_CONFIG_FILE_NAME: &str = "env.yaml";
+pub(crate) const PROJECT_CONFIG_FILE_NAME: &str = ".isopy.yaml";
 pub(crate) const CACHE_DIR_NAME: &str = "cache";
 pub(crate) const CACHE_FILE_NAME: &str = "cache.json";
 pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
 pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub(crate) const EXECUTABLE_MASK: u32 = 0o100;

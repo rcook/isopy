@@ -92,7 +92,7 @@ pub(crate) fn do_wrap(
 
     let vars = make_vars(&env_info.vars);
 
-    let wrapper_path = make_wrapper_path(app.cache_dir(), wrapper_file_name);
+    let wrapper_path = make_wrapper_path(app.config_dir(), wrapper_file_name);
 
     let command = make_script_command(app, &dir_info, script_path, platform, shell)?;
 
@@ -177,8 +177,8 @@ fn make_script_command(
     ))
 }
 
-fn make_wrapper_path(cache_dir: &Path, wrapper_file_name: &WrapperFileName) -> PathBuf {
-    let mut path = cache_dir.join("bin");
+fn make_wrapper_path(config_dir: &Path, wrapper_file_name: &WrapperFileName) -> PathBuf {
+    let mut path = config_dir.join("bin");
     path.push(wrapper_file_name.as_os_str());
 
     #[cfg(target_os = "windows")]

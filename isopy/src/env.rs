@@ -25,7 +25,7 @@ use std::env::{remove_var, set_var, var, VarError};
 use std::sync::LazyLock;
 
 pub(crate) const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
-pub(crate) const ISOPY_CACHE_DIR_ENV_NAME: &str = "ISOPY_CACHE_DIR";
+pub(crate) const ISOPY_CONFIG_DIR_ENV_NAME: &str = "ISOPY_CONFIG_DIR";
 pub(crate) const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
 pub(crate) const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
@@ -40,7 +40,7 @@ enum EnvType {
 static ENVS: LazyLock<Vec<(&'static str, EnvType)>> = LazyLock::new(|| {
     vec![
         (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
-        (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),
+        (ISOPY_CONFIG_DIR_ENV_NAME, EnvType::Ignore),
         (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
     ]
 });

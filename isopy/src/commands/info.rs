@@ -42,6 +42,9 @@ pub(crate) fn do_info(app: &App) -> Result<Status> {
     table_title!(table, "Repository information");
     print_repo(&mut table, app.repo());
 
+    table_title!(table, "Cache information");
+    table_columns!(table, "Configuration directory", app.config_dir().display());
+
     table_title!(table, "Environment variables");
     let mut keys = get_env_keys();
     keys.sort();

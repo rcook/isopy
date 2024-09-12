@@ -19,10 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CONFIG_DIR_NAME;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use joatmon::{FileReadError, HasOtherError, YamlError};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub(crate) fn existing<T>(result: Result<T>) -> Result<Option<T>> {
     match result {
@@ -82,21 +81,4 @@ pub(crate) fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     }
 
     inner(path)
-}
-
-pub(crate) fn default_config_dir() -> Result<PathBuf> {
-    #[cfg(any(target_os = "linux", target_os = "windows"))]
-    {
-        Ok(dirs::config_dir()
-            .ok_or_else(|| anyhow!("Could not determine configuration directory"))?
-            .join(CONFIG_DIR_NAME))
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        Ok(dirs::home_dir()
-            .ok_or_else(|| anyhow!("Could not determine home directory"))?
-            .join(".config")
-            .join(CONFIG_DIR_NAME))
-    }
 }

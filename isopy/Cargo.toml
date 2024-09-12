@@ -20,7 +20,6 @@ chrono = "0.4.38"
 colored = "2.1.0"
 ctrlc = "3.4.5"
 dirs = "5.0.1"
-home = "0.5.9"
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
 joat-logger = "0.0.5"

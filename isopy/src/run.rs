@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command};
-use crate::constants::CACHE_DIR;
+use crate::constants::CONFIG_DIR_NAME;
 use crate::env::set_up_env;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
@@ -41,10 +41,16 @@ fn set_up() -> Result<()> {
     Ok(())
 }
 
-fn default_cache_dir() -> Option<PathBuf> {
-    let home_dir = home::home_dir()?;
-    let isopy_dir = home_dir.join(&*CACHE_DIR);
-    Some(isopy_dir)
+fn default_config_dir() -> Option<PathBuf> {
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
+    {
+        Some(dirs::config_dir()?.join(CONFIG_DIR_NAME))
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        Some(dirs::home_dir()?.join(".config").join(CONFIG_DIR_NAME))
+    }
 }
 
 pub(crate) async fn run() -> Result<Status> {
@@ -54,11 +60,11 @@ pub(crate) async fn run() -> Result<Status> {
 
     set_max_level(args.log_level.into());
 
-    let Some(cache_dir) = args.cache_dir.or_else(default_cache_dir) else {
+    let Some(config_dir) = args.config_dir.or_else(default_config_dir) else {
         bail!("Could not infer isopy cache directory location: please specify using --dir option")
     };
 
-    let repo = match RepoConfig::default(&cache_dir, None).repo() {
+    let repo = match RepoConfig::default(&config_dir, None).repo() {
         Ok(Some(r)) => r,
         Ok(None) => {
             bail!("Could not acquire lock on repository: is another instance of isopy running?")
@@ -71,7 +77,7 @@ pub(crate) async fn run() -> Result<Status> {
         None => current_dir()?,
     };
 
-    let app = App::new(cwd, &cache_dir, repo)?;
+    let app = App::new(cwd, &config_dir, repo)?;
     run_command(app, args.command).await
 }
 

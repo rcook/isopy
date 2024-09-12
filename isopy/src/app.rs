@@ -21,7 +21,6 @@
 //
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::default_config_dir;
 use crate::moniker::Moniker;
 use crate::plugin_manager::PluginManager;
 use crate::serialization::{Env, EnvPackage, Project};
@@ -37,20 +36,18 @@ use std::path::{Path, PathBuf};
 pub(crate) struct App {
     config_dir: PathBuf,
     cwd: PathBuf,
-    cache_dir: PathBuf,
     repo: Repo,
     project_config_path: PathBuf,
     plugin_manager: PluginManager,
 }
 
 impl App {
-    pub(crate) fn new(cwd: PathBuf, cache_dir: &Path, repo: Repo) -> Result<Self> {
+    pub(crate) fn new(cwd: PathBuf, config_dir: &Path, repo: Repo) -> Result<Self> {
         let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
         let plugin_manager = PluginManager::new();
         Ok(Self {
-            config_dir: default_config_dir()?,
+            config_dir: config_dir.to_path_buf(),
             cwd,
-            cache_dir: cache_dir.to_path_buf(),
             repo,
             project_config_path,
             plugin_manager,
@@ -63,10 +60,6 @@ impl App {
 
     pub(crate) fn cwd(&self) -> &Path {
         &self.cwd
-    }
-
-    pub(crate) fn cache_dir(&self) -> &Path {
-        &self.cache_dir
     }
 
     pub(crate) const fn repo(&self) -> &Repo {

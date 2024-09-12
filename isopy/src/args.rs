@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME};
+use crate::env::{ISOPY_CONFIG_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME};
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
@@ -48,13 +48,13 @@ const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_
 pub(crate) struct Args {
     #[arg(
         global = true,
-        help = "Path to isopy cache directory",
+        help = "Path to isopy configuration directory",
         short = 'd',
-        long = "cache-dir",
+        long = "config-dir",
         value_parser = parse_absolute_path,
-        env = ISOPY_CACHE_DIR_ENV_NAME
+        env = ISOPY_CONFIG_DIR_ENV_NAME
     )]
-    pub(crate) cache_dir: Option<PathBuf>,
+    pub(crate) config_dir: Option<PathBuf>,
 
     #[arg(
         global = true,

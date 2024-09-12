@@ -119,7 +119,7 @@ pub(crate) fn print_dir_info_and_env(
     table: &mut Table,
     dir_info: &DirInfo,
 ) -> Result<()> {
-    table_title!(table, "Environment info");
+    table_title!(table, "Environment information");
     let env = existing(dir_info.read_env_config())?;
     print_dir_info(app, table, dir_info, &env);
     Ok(())
