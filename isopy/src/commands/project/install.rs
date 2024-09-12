@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::fs::existing;
 use crate::status::{return_success, return_user_error, Status};
-use anyhow::{bail, Result};
+use anyhow::Result;
 
 pub(crate) async fn install(app: &App) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
@@ -43,18 +43,9 @@ pub(crate) async fn install(app: &App) -> Result<Status> {
         .packages
         .iter()
         .map(|package| {
-            // TBD: Hack. Rename "descriptor" to "version" etc.
-            let Some(version_value) = package.props.get("descriptor") else {
-                bail!("Missing descriptor")
-            };
-
-            let Some(version_str) = version_value.as_str() else {
-                bail!("Invalid descriptor")
-            };
-
             let moniker = package.moniker.parse()?;
             let plugin = app.plugin_manager().get_plugin(&moniker);
-            let version = plugin.parse_version(version_str)?;
+            let version = plugin.parse_version(&package.version)?;
             Ok((moniker, version))
         })
         .collect::<Result<Vec<_>>>()?;

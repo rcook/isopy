@@ -21,28 +21,30 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::package_id::PackageId;
-use crate::serialization::{Package, Project};
+use crate::serialization::{Package2, Project};
 use crate::status::{return_success, return_user_error, Status};
+use crate::tng::PackageId;
 use anyhow::Result;
 use log::info;
 
 pub(crate) fn add(app: &App, package_id: &PackageId) -> Result<Status> {
     let mut packages = existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.packages);
 
-    let id = package_id.plugin_host().prefix();
-    if packages.iter().any(|p| p.moniker == id) {
-        return_user_error!("environment already has a package with ID \"{id}\" configured");
+    let moniker_str = package_id.moniker().as_str();
+    if packages.iter().any(|p| p.moniker == moniker_str) {
+        return_user_error!(
+            "Environment already has a package from package manager \"{moniker_str}\""
+        );
     }
 
-    packages.push(Package {
-        moniker: String::from(id),
-        props: package_id.descriptor().get_project_props()?,
+    packages.push(Package2 {
+        moniker: String::from(moniker_str),
+        version: package_id.version().to_string(),
     });
 
     app.write_project_config(&Project { packages }, true)?;
     info!(
-        "added package \"{id}\" to project at {}",
+        "Added package \"{moniker_str}\" to project at {}",
         app.cwd().display()
     );
     return_success!();

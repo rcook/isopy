@@ -20,14 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
-use url::Url;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct EnvConfig {
-    #[serde(rename = "dir")]
-    pub dir: PathBuf,
+pub(crate) struct Package2 {
+    #[serde(rename = "moniker")]
+    pub(crate) moniker: String,
 
-    #[serde(rename = "url")]
-    pub url: Url,
+    #[serde(rename = "version")]
+    pub(crate) version: String,
 }

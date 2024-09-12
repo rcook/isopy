@@ -21,8 +21,10 @@
 //
 mod env;
 mod package;
+mod package2;
 mod project;
 
 pub(crate) use env::Env;
 pub(crate) use package::Package;
+pub(crate) use package2::Package2;
 pub(crate) use project::Project;

@@ -19,32 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::descriptor_info::DescriptorInfo;
-use crate::plugin_host::PluginHost;
-use crate::registry::Registry;
-use isopy_lib::Descriptor;
-use std::str::FromStr;
+use std::path::{Path, PathBuf};
+use url::Url;
 
-#[derive(Clone, Debug)]
-pub(crate) struct PackageId {
-    descriptor_info: DescriptorInfo,
+pub struct EnvProps {
+    dir: PathBuf,
+    url: Url,
 }
 
-impl PackageId {
-    pub(crate) fn plugin_host(&self) -> &PluginHost {
-        &self.descriptor_info.plugin_host
+impl EnvProps {
+    pub fn new(dir: &Path, url: &Url) -> Self {
+        Self {
+            dir: dir.to_path_buf(),
+            url: url.clone(),
+        }
     }
 
-    pub(crate) fn descriptor(&self) -> &dyn Descriptor {
-        self.descriptor_info.descriptor.as_ref().as_ref()
+    pub fn dir(&self) -> &Path {
+        &self.dir
     }
-}
 
-impl FromStr for PackageId {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let descriptor_info = Registry::global().parse_descriptor(s)?;
-        Ok(Self { descriptor_info })
+    pub fn url(&self) -> &Url {
+        &self.url
     }
 }

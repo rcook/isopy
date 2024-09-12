@@ -20,10 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::PYTHON_DESCRIPTOR_PREFIX;
-use crate::descriptor_info::DescriptorInfo;
 use crate::plugin_host::{PluginHost, PluginHostRef};
 use crate::serialization::Package;
-use anyhow::{bail, Result};
+use anyhow::Result;
+use isopy_lib::tng::EnvProps;
 use isopy_lib::{EnvInfo, Platform, PluginFactory, Shell};
 use isopy_python::PythonPluginFactory;
 use lazy_static::lazy_static;
@@ -53,19 +53,6 @@ impl Registry {
         }
     }
 
-    pub(crate) fn parse_descriptor(&self, s: &str) -> Result<DescriptorInfo> {
-        let Some((plugin_host, tail)) = self.find_plugin_host(s) else {
-            bail!("unsupported descriptor format {s}");
-        };
-
-        let descriptor = Arc::new(plugin_host.parse_descriptor(tail)?);
-
-        Ok(DescriptorInfo {
-            plugin_host: Arc::clone(plugin_host),
-            descriptor,
-        })
-    }
-
     pub(crate) fn make_env_info(
         &self,
         data_dir: &Path,
@@ -82,7 +69,7 @@ impl Registry {
 
         Ok(Some(plugin_host.make_env_info(
             data_dir,
-            &package.props,
+            &EnvProps::new(&package.dir, &package.url),
             base_dir,
         )?))
     }
@@ -103,16 +90,6 @@ impl Registry {
         };
 
         Ok(plugin_host.make_script_command(script_path, platform, shell)?)
-    }
-
-    fn find_plugin_host<'a>(&self, s: &'a str) -> Option<(&PluginHostRef, &'a str)> {
-        if let Some((prefix, tail)) = s.split_once(':') {
-            if let Some(plugin_host) = self.plugin_hosts.iter().find(|p| p.prefix() == prefix) {
-                return Some((plugin_host, tail));
-            }
-        }
-
-        self.plugin_hosts.first().map(|p| (p, s))
     }
 }
 

@@ -19,12 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
-use serde_json::Value;
+use crate::tng::env_props::EnvProps;
 use std::path::Path;
 
 pub trait PackageInfoOps {
-    fn get_env_props(&self, bin_subdir: &Path) -> Result<Value>;
+    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
 }
 
 crate::tng::macros::dyn_trait_struct!(PackageInfo, PackageInfoOps);

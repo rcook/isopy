@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::tng::EnvProps;
 use crate::{Descriptor, EnvInfo, IsopyLibResult, Platform, Shell};
 use reqwest::Url;
 use serde_json::Value;
@@ -33,7 +34,7 @@ pub trait PluginFactory: Send + Sync {
     fn make_env_info(
         &self,
         data_dir: &Path,
-        props: &Value,
+        env_props: &EnvProps,
         base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo>;
     fn make_script_command(

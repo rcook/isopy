@@ -20,13 +20,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use std::path::PathBuf;
+use url::Url;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct Package {
-    #[serde(rename = "id")] // TBD: Rename to "moniker"
+    #[serde(rename = "moniker")]
     pub(crate) moniker: String,
 
-    #[serde(flatten)]
-    pub(crate) props: Value,
+    #[serde(rename = "dir")]
+    pub(crate) dir: PathBuf,
+
+    #[serde(rename = "url")]
+    pub(crate) url: Url,
 }

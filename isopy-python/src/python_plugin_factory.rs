@@ -21,7 +21,8 @@
 //
 use crate::constants::{PLUGIN_NAME, PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT, RELEASES_URL};
 use crate::python_descriptor::PythonDescriptor;
-use crate::serialization::{EnvConfig, ProjectConfig};
+use crate::serialization::ProjectConfig;
+use isopy_lib::tng::EnvProps;
 use isopy_lib::{
     other_error as isopy_lib_other_error, render_absolute_path, Descriptor, EnvInfo,
     IsopyLibResult, Platform, PluginFactory, Shell,
@@ -64,26 +65,21 @@ impl PluginFactory for PythonPluginFactory {
     fn make_env_info(
         &self,
         data_dir: &Path,
-        props: &Value,
+        env_props: &EnvProps,
         _base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo> {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
-        fn make_path_dirs(data_dir: &Path, env_config: &EnvConfig) -> Vec<PathBuf> {
-            vec![data_dir.join(&env_config.dir).join("bin")]
+        fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
+            vec![data_dir.join(&env_props.dir()).join("bin")]
         }
 
         #[cfg(target_os = "windows")]
-        fn make_path_dirs(data_dir: &Path, env_config: &EnvConfig) -> Vec<PathBuf> {
-            vec![
-                data_dir.join(&env_config.dir),
-                data_dir.join(&env_config.dir).join("Scripts"),
-            ]
+        fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
+            let d = data_dir.join(&env_props.dir());
+            vec![d.clone(), d.join("Scripts")]
         }
 
-        let env_config =
-            serde_json::from_value::<EnvConfig>(props.clone()).map_err(isopy_lib_other_error)?;
-
-        let path_dirs = make_path_dirs(data_dir, &env_config);
+        let path_dirs = make_path_dirs(data_dir, &env_props);
         /*
         let vars = if let Some(d) = base_dir {
             vec![(

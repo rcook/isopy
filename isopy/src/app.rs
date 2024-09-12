@@ -139,9 +139,11 @@ impl App {
             .on_after_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
+        let env_props = package_info.get_env_props(bin_subdir);
         packages.push(Package {
             moniker: String::from(moniker.as_str()),
-            props: package_info.get_env_props(bin_subdir)?,
+            dir: env_props.dir().to_path_buf(),
+            url: env_props.url().clone(),
         });
 
         dir_info.write_env_config(

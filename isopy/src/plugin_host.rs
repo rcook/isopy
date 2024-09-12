@@ -1,3 +1,4 @@
+use isopy_lib::tng::EnvProps;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -66,10 +67,11 @@ impl PluginFactory for PluginHost {
     fn make_env_info(
         &self,
         data_dir: &Path,
-        props: &Value,
+        env_props: &EnvProps,
         base_dir: Option<&Path>,
     ) -> IsopyLibResult<EnvInfo> {
-        self.plugin_factory.make_env_info(data_dir, props, base_dir)
+        self.plugin_factory
+            .make_env_info(data_dir, env_props, base_dir)
     }
 
     fn make_script_command(

@@ -19,10 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::{serialization::EnvConfig, tng::archive_metadata::ArchiveMetadata};
-use anyhow::Result;
-use isopy_lib::tng::PackageInfoOps;
-use serde_json::Value;
+use crate::tng::archive_metadata::ArchiveMetadata;
+use isopy_lib::tng::{EnvProps, PackageInfoOps};
 use std::path::Path;
 use url::Url;
 
@@ -50,10 +48,7 @@ impl ArchiveInfo {
 }
 
 impl PackageInfoOps for ArchiveInfo {
-    fn get_env_props(&self, bin_subdir: &Path) -> Result<Value> {
-        Ok(serde_json::to_value(EnvConfig {
-            dir: bin_subdir.to_path_buf(),
-            url: self.url.clone(),
-        })?)
+    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps {
+        EnvProps::new(bin_subdir, &self.url)
     }
 }

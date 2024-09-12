@@ -20,8 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME};
-use crate::package_id::PackageId;
-use crate::tng::{Moniker, PackageId as NewPackageId};
+use crate::tng::{Moniker, PackageId};
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell as ClapCompleteShell;
@@ -227,7 +226,7 @@ pub(crate) enum EnvCommand {
     #[command(name = "install", about = "Install package into environment")]
     Install {
         #[arg(help = "Package ID")]
-        package_id: NewPackageId,
+        package_id: PackageId,
     },
 
     #[command(
@@ -414,7 +413,7 @@ pub(crate) enum IncubatingCommand {
     #[command(name = "download", about = "Download package")]
     Download {
         #[arg(help = "Package ID")]
-        package_id: NewPackageId,
+        package_id: PackageId,
 
         #[arg(
             help = "Optional tags",
@@ -429,7 +428,7 @@ pub(crate) enum IncubatingCommand {
     #[command(name = "install", about = "Install package")]
     Install {
         #[arg(help = "Package ID")]
-        package_id: NewPackageId,
+        package_id: PackageId,
 
         #[arg(
             help = "Optional tags",

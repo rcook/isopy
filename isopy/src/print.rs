@@ -27,7 +27,6 @@ use crate::table::{table_columns, table_divider, table_line, table_title, Table,
 use anyhow::Result;
 use colored::Color;
 use joat_repo::{DirInfo, Link, Manifest, Repo};
-use serde_json::Value;
 
 pub(crate) fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
@@ -62,12 +61,8 @@ pub(crate) fn print_metadir(
 
         for package in &env.packages {
             table_columns!(table, "Package", &package.moniker);
-
-            if let Some(obj) = package.props.as_object() {
-                for (k, v) in obj {
-                    table_line!(table, "{k}: {}", prettify_value(v));
-                }
-            }
+            table_line!(table, "dir: {}", package.dir.display());
+            table_line!(table, "url: {}", package.url);
         }
     } else {
         table_columns!(
@@ -92,11 +87,8 @@ pub(crate) fn print_dir_info(table: &mut Table, dir_info: &DirInfo, env: &Option
             {
                 table_columns!(table, "Package", &package.moniker);
 
-                if let Some(obj) = package.props.as_object() {
-                    for (k, v) in obj {
-                        table_line!(table, "{k}: {}", prettify_value(v));
-                    }
-                }
+                table_line!(table, "dir: {}", package.dir.display());
+                table_line!(table, "url: {}", package.url);
 
                 for p in env_info.path_dirs {
                     table_line!(table, "{}", p.display());
@@ -154,14 +146,6 @@ pub(crate) fn make_prop_table() -> Table {
         ..Default::default()
     }
     .build()
-}
-
-pub(crate) fn prettify_value(value: &Value) -> String {
-    if let Some(s) = value.as_str() {
-        String::from(s)
-    } else {
-        value.to_string()
-    }
 }
 
 #[allow(clippy::cast_precision_loss)]

@@ -22,6 +22,7 @@
 mod accept;
 mod checksum;
 mod download_options;
+mod env_props;
 mod file_name_parts;
 mod macros;
 mod package_filter;
@@ -39,6 +40,7 @@ mod version_triple;
 pub use accept::Accept;
 pub use checksum::Checksum;
 pub use download_options::DownloadOptions;
+pub use env_props::EnvProps;
 pub use file_name_parts::FileNameParts;
 pub use package_filter::PackageFilter;
 pub use package_info::{PackageInfo, PackageInfoOps};
