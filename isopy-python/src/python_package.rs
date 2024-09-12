@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::metadata::Metadata;
-use isopy_lib::{EnvProps, PackageOps};
+use isopy_lib::{EnvProps, PackageOps, Version};
 use std::path::Path;
 use url::Url;
 
@@ -28,13 +28,16 @@ use url::Url;
 pub(crate) struct PythonPackage {
     url: Url,
     metadata: Metadata,
+    version: Version,
 }
 
 impl PythonPackage {
     pub(crate) fn new(url: &Url, metadata: Metadata) -> Self {
+        let version = Version::new(metadata.full_version().version().clone());
         Self {
             url: url.clone(),
             metadata,
+            version,
         }
     }
 
@@ -48,6 +51,10 @@ impl PythonPackage {
 }
 
 impl PackageOps for PythonPackage {
+    fn version(&self) -> &Version {
+        &self.version
+    }
+
     fn get_env_props(&self, bin_subdir: &Path) -> EnvProps {
         EnvProps::new(bin_subdir, &self.url)
     }

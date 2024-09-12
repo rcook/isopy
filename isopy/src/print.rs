@@ -60,7 +60,7 @@ pub(crate) fn print_metadir(
         table_columns!(table, "Project directory", env.project_dir.display());
 
         for package in &env.packages {
-            table_columns!(table, "Package", &package.moniker);
+            table_columns!(table, "Package", &package.package_id);
             table_line!(table, "dir: {}", package.dir.display());
             table_line!(table, "url: {}", package.url);
         }
@@ -82,20 +82,19 @@ pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, e
         table_columns!(table, "Project directory", env.project_dir.display());
 
         for package in &env.packages {
-            if let Ok(env_info) = app.make_env_info(dir_info.data_dir(), package, None) {
-                table_columns!(table, "Package", &package.moniker);
+            let env_info = app.make_env_info(dir_info.data_dir(), package, None);
 
-                table_line!(table, "dir: {}", package.dir.display());
-                table_line!(table, "url: {}", package.url);
+            table_columns!(table, "Package", &package.package_id);
+            table_line!(table, "dir: {}", package.dir.display());
+            table_line!(table, "url: {}", package.url);
 
-                for p in env_info.path_dirs {
-                    table_line!(table, "{}", p.display());
-                }
+            for p in env_info.path_dirs {
+                table_line!(table, "{}", p.display());
+            }
 
-                for (k, v) in env_info.vars {
-                    table_line!(table, "{k} = {v}");
-                }
-            };
+            for (k, v) in env_info.vars {
+                table_line!(table, "{k} = {v}");
+            }
         }
     }
 

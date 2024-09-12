@@ -116,7 +116,7 @@ fn make_env_info(app: &App, data_dir: &Path, base_dir: Option<&Path>) -> Result<
     };
 
     for package in &env.packages {
-        let env_info = app.make_env_info(data_dir, package, base_dir)?;
+        let env_info = app.make_env_info(data_dir, package, base_dir);
         all_env_info.path_dirs.extend(env_info.path_dirs);
         all_env_info.vars.extend(env_info.vars);
     }

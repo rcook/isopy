@@ -35,6 +35,13 @@ pub(crate) struct PackageId {
 }
 
 impl PackageId {
+    pub(crate) fn new(moniker: &Moniker, version: &Version) -> Self {
+        Self {
+            moniker: moniker.clone(),
+            version: version.clone(),
+        }
+    }
+
     pub(crate) const fn moniker(&self) -> &Moniker {
         &self.moniker
     }

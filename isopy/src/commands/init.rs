@@ -40,7 +40,7 @@ pub(crate) async fn do_init(app: &App) -> Result<Status> {
     };
 
     for package_id in project.package_ids {
-        app.install_package(&package_id.moniker(), &package_id.version())
+        app.install_package(package_id.moniker(), package_id.version())
             .await?;
     }
 

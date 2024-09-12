@@ -22,6 +22,7 @@
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::moniker::Moniker;
+use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
@@ -106,11 +107,8 @@ impl App {
             (dir_info, Vec::new())
         };
 
-        if packages.iter().any(|p| p.moniker == moniker.as_str()) {
-            bail!(
-                "Environment already has a package with ID {} configured",
-                moniker.as_str()
-            );
+        if packages.iter().any(|p| p.package_id.moniker() == moniker) {
+            bail!("Environment already has a package for package manager {moniker} configured",);
         }
 
         let package_manager = self
@@ -124,7 +122,7 @@ impl App {
             .await?;
 
         let output_path = dir_info.data_dir().join(bin_subdir);
-        let package_info = package_manager
+        let package = package_manager
             .install_package(version, &None, &output_path)
             .await?;
 
@@ -132,9 +130,9 @@ impl App {
             .on_after_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
-        let env_props = package_info.get_env_props(bin_subdir);
+        let env_props = package.get_env_props(bin_subdir);
         packages.push(EnvPackage {
-            moniker: String::from(moniker.as_str()),
+            package_id: PackageId::new(moniker, package.version()),
             dir: env_props.dir().to_path_buf(),
             url: env_props.url().clone(),
         });
@@ -220,14 +218,14 @@ impl App {
         data_dir: &Path,
         package: &EnvPackage,
         base_dir: Option<&Path>,
-    ) -> Result<EnvInfo> {
-        let moniker = package.moniker.parse()?;
-        let plugin = self.plugin_manager.get_plugin(&moniker);
-        Ok(plugin.make_env_info(
-            data_dir,
-            &EnvProps::new(&package.dir, &package.url),
-            base_dir,
-        ))
+    ) -> EnvInfo {
+        self.plugin_manager
+            .get_plugin(package.package_id.moniker())
+            .make_env_info(
+                data_dir,
+                &EnvProps::new(&package.dir, &package.url),
+                base_dir,
+            )
     }
 
     pub(crate) fn make_script_command(
@@ -237,8 +235,7 @@ impl App {
         platform: Platform,
         shell: Shell,
     ) -> Result<Option<OsString>> {
-        let moniker = package.moniker.parse()?;
-        let plugin = self.plugin_manager.get_plugin(&moniker);
+        let plugin = self.plugin_manager.get_plugin(package.package_id.moniker());
         plugin.make_script_command(script_path, platform, shell)
     }
 

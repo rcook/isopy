@@ -19,14 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::package_id::PackageId;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use url::Url;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct EnvPackage {
-    #[serde(rename = "moniker")]
-    pub(crate) moniker: String,
+    #[serde(rename = "package_id")]
+    pub(crate) package_id: PackageId,
 
     #[serde(rename = "dir")]
     pub(crate) dir: PathBuf,
