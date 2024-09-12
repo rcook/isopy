@@ -36,7 +36,7 @@ impl PluginManager {
         }
     }
 
-    pub(crate) fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
+    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
         match moniker {
             Moniker::Python => &self.python_plugin,
         }

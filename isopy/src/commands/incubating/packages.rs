@@ -82,11 +82,7 @@ fn add_plugin_rows(
     verbose: bool,
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package_summary: &PackageSummary) -> String {
-        format!(
-            "{}:{}",
-            moniker.as_str(),
-            **package_summary.version()
-        )
+        format!("{}:{}", moniker.as_str(), **package_summary.version())
     }
 
     fn make_package_info(package_summary: &PackageSummary, verbose: bool) -> Result<String> {

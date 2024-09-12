@@ -37,7 +37,7 @@ pub(crate) enum Moniker {
 }
 
 impl Moniker {
-    pub(crate) fn as_str(&self) -> &str {
+    pub(crate) const fn as_str(&self) -> &str {
         match self {
             Self::Python => PYTHON_STR,
         }

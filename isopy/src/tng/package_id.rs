@@ -33,11 +33,11 @@ pub(crate) struct PackageId {
 }
 
 impl PackageId {
-    pub(crate) fn moniker(&self) -> &Moniker {
+    pub(crate) const fn moniker(&self) -> &Moniker {
         &self.moniker
     }
 
-    pub(crate) fn version(&self) -> &Version {
+    pub(crate) const fn version(&self) -> &Version {
         &self.version
     }
 }
