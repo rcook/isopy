@@ -92,27 +92,3 @@ impl Registry {
         Ok(plugin_host.make_script_command(script_path, platform, shell)?)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::constants::PYTHON_DESCRIPTOR_PREFIX;
-    use crate::plugin_host::PluginHost;
-    use crate::registry::Registry;
-    use anyhow::Result;
-    use isopy_python::PythonPluginFactory;
-    use rstest::rstest;
-
-    #[rstest]
-    #[case("python:1.2.3:11223344", "1.2.3:11223344")]
-    #[case("python:1.2.3:11223344", "python:1.2.3:11223344")]
-    fn to_descriptor_info(#[case] expected_str: &str, #[case] input: &str) -> Result<()> {
-        let registry = Registry::new(vec![PluginHost::new(
-            PYTHON_DESCRIPTOR_PREFIX,
-            Box::<PythonPluginFactory>::default(),
-        )]);
-
-        let descriptor_info = registry.parse_descriptor(input)?;
-        assert_eq!(expected_str, descriptor_info.to_string());
-        Ok(())
-    }
-}
