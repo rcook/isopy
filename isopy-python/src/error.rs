@@ -19,14 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use std::error::Error as StdError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum IsopyPythonError {
-    #[error("Invalid version \"{0}\"")]
-    InvalidVersion(String),
-
     #[error("Parse error \"{0}\"")]
     ParseError(String),
 
@@ -38,11 +34,4 @@ impl From<strum::ParseError> for IsopyPythonError {
     fn from(value: strum::ParseError) -> Self {
         Self::ParseError(value.to_string())
     }
-}
-
-pub fn other_error<E>(error: E) -> IsopyPythonError
-where
-    E: StdError + Send + Sync + 'static,
-{
-    IsopyPythonError::Other(anyhow::Error::new(error))
 }

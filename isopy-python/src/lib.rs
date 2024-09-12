@@ -35,12 +35,5 @@
 #![allow(clippy::option_if_let_else)]
 mod constants;
 mod error;
-mod python_descriptor;
-mod python_plugin_factory;
-mod python_version;
-mod serialization;
-mod tag;
 
 pub mod tng;
-
-pub use python_plugin_factory::PythonPluginFactory;
