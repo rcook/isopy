@@ -19,10 +19,35 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::download::Download;
-use serde::{Deserialize, Serialize};
+use crate::manifest::Manifest;
+use anyhow::Result;
+use std::fs::File;
+use std::path::PathBuf;
 
-#[derive(Debug, Default, Deserialize, Serialize)]
-pub(crate) struct Manifest {
-    pub(crate) downloads: Vec<Download>,
+#[derive(Debug)]
+pub(crate) struct CacheInfo {
+    pub(crate) path: PathBuf,
+    pub(crate) manifest: Manifest,
+}
+
+impl CacheInfo {
+    pub(crate) fn load<P>(path: P) -> Result<Self>
+    where
+        P: Into<PathBuf>,
+    {
+        let path = path.into();
+        let manifest = if path.is_file() {
+            let f = File::open(&path)?;
+            serde_json::from_reader(f)?
+        } else {
+            Manifest::default()
+        };
+        Ok(Self { path, manifest })
+    }
+
+    pub(crate) fn save(&self) -> Result<()> {
+        let f = File::create(&self.path)?;
+        serde_json::to_writer_pretty(&f, &self.manifest)?;
+        Ok(())
+    }
 }

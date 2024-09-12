@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::moniker::Moniker;
 use crate::status::{return_success, Status};
-use crate::tng::Moniker;
 use anyhow::Result;
 use log::info;
 use strum::IntoEnumIterator;

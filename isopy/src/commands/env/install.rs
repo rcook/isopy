@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::package_id::PackageId;
 use crate::status::{return_success, Status};
-use crate::tng::PackageId;
 use anyhow::Result;
 
 pub(crate) async fn install(app: &App, package_id: &PackageId) -> Result<Status> {

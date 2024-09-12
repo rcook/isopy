@@ -20,7 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env::{ISOPY_CACHE_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME};
-use crate::tng::{Moniker, PackageId};
+use crate::moniker::Moniker;
+use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell as ClapCompleteShell;

@@ -19,16 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod cache_info;
-mod date_time_format;
-mod download;
-mod file;
-mod manifest;
-mod moniker;
-mod package_id;
-mod package_manager_helper;
-mod plugin_manager;
+use crate::download::Download;
+use serde::{Deserialize, Serialize};
 
-pub(crate) use moniker::Moniker;
-pub(crate) use package_id::PackageId;
-pub(crate) use plugin_manager::PluginManager;
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub(crate) struct Manifest {
+    pub(crate) downloads: Vec<Download>,
+}

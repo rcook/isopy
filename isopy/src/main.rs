@@ -39,11 +39,20 @@
 mod app;
 mod args;
 mod bool_util;
+mod cache_info;
 mod commands;
 mod constants;
+mod date_time_format;
 mod dir_info_ext;
+mod download;
 mod env;
+mod file;
 mod fs;
+mod manifest;
+mod moniker;
+mod package_id;
+mod package_manager_helper;
+mod plugin_manager;
 mod print;
 mod run;
 mod serialization;
@@ -51,7 +60,6 @@ mod shell;
 mod status;
 mod table;
 mod terminal;
-mod tng;
 mod wrapper_file_name;
 
 #[tokio::main]

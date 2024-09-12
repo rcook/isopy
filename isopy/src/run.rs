@@ -32,9 +32,9 @@ use crate::commands::{
 };
 use crate::constants::CACHE_DIR;
 use crate::env::set_up_env;
+use crate::moniker::Moniker;
 use crate::status::Status;
 use crate::terminal::reset_terminal;
-use crate::tng::Moniker;
 use anyhow::{bail, Result};
 use clap::Parser;
 use joat_logger::init_ui;

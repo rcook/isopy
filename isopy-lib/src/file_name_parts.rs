@@ -105,7 +105,7 @@ impl FileNameParts {
 
 #[cfg(test)]
 mod tests {
-    use crate::tng::file_name_parts::{FileNamePartRefs, FileNameParts};
+    use crate::file_name_parts::{FileNamePartRefs, FileNameParts};
     use anyhow::Result;
     use rstest::rstest;
 

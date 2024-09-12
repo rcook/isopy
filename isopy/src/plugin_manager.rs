@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::CACHE_DIR_NAME;
-use crate::tng::package_manager_helper::PackageManagerHelper;
-use crate::tng::Moniker;
+use crate::moniker::Moniker;
+use crate::package_manager_helper::PackageManagerHelper;
 use isopy_lib::{PackageManager, Plugin};
 use std::path::Path;
 

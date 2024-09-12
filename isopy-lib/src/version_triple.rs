@@ -70,7 +70,7 @@ impl VersionOps for VersionTriple {
 
 #[cfg(test)]
 mod tests {
-    use crate::tng::version_triple::VersionTriple;
+    use crate::version_triple::VersionTriple;
     use anyhow::Result;
     use rstest::rstest;
 

@@ -20,10 +20,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::moniker::Moniker;
 use crate::print::{humanize_size_base_2, make_list_table};
 use crate::status::{return_success, Status};
 use crate::table::{table_columns, table_divider, table_headings, Table};
-use crate::tng::Moniker;
 use anyhow::{anyhow, Result};
 use colored::Colorize;
 use isopy_lib::{PackageFilter, PackageSummary, Plugin};

@@ -22,9 +22,10 @@
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::default_config_dir;
+use crate::moniker::Moniker;
+use crate::plugin_manager::PluginManager;
 use crate::serialization::{Env, Package, Project};
 use crate::shell::IsopyEnv;
-use crate::tng::{Moniker, PluginManager};
 use anyhow::{bail, Result};
 use isopy_lib::{EnvInfo, EnvProps, Platform, Shell, Version};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};

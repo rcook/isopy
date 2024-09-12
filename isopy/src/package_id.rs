@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::moniker::Moniker;
-use crate::tng::plugin_manager::PluginManager;
+use crate::moniker::Moniker;
+use crate::plugin_manager::PluginManager;
 use anyhow::{bail, Error, Result};
 use isopy_lib::Version;
 use std::fmt::{Display, Formatter, Result as FmtResult};
