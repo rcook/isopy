@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::result::IsopyLibResult;
+use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
@@ -83,19 +83,14 @@ where
 }
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-pub fn render_absolute_path(_shell: Shell, path: &Path) -> IsopyLibResult<OsString> {
+pub fn render_absolute_path(_shell: Shell, path: &Path) -> Result<OsString> {
     Ok(OsString::from(path))
 }
 
 #[cfg(target_os = "windows")]
-pub fn render_absolute_path(shell: Shell, path: &Path) -> IsopyLibResult<OsString> {
-    use crate::error::{IsopyLibError, RenderPathFailedReason};
-
+pub fn render_absolute_path(shell: Shell, path: &Path) -> Result<OsString> {
     if !path.is_absolute() {
-        return Err(IsopyLibError::RenderPathFailed(
-            path.to_path_buf(),
-            RenderPathFailedReason::IsNotAbsolute,
-        ));
+        bail!("Path {} is not absolute", path.display())
     }
 
     match shell {
@@ -105,24 +100,17 @@ pub fn render_absolute_path(shell: Shell, path: &Path) -> IsopyLibResult<OsStrin
 }
 
 #[cfg(target_os = "windows")]
-fn render_absolute_path_windows_bash(path: &Path) -> IsopyLibResult<OsString> {
-    use crate::error::{IsopyLibError, RenderPathFailedReason};
+fn render_absolute_path_windows_bash(path: &Path) -> Result<OsString> {
     use std::path::{Component, Prefix};
 
     let mut iter = path.components();
 
     let Some(Component::Prefix(prefix)) = iter.next() else {
-        return Err(IsopyLibError::RenderPathFailed(
-            path.to_path_buf(),
-            RenderPathFailedReason::PrefixMissing,
-        ));
+        bail!("Path {} does not have a prefix component", path.display())
     };
 
     let Prefix::Disk(raw) = prefix.kind() else {
-        return Err(IsopyLibError::RenderPathFailed(
-            path.to_path_buf(),
-            RenderPathFailedReason::DriveMissing,
-        ));
+        bail!("Path {} does not have a disc component", path.display())
     };
 
     let mut s = OsString::new();
@@ -131,10 +119,10 @@ fn render_absolute_path_windows_bash(path: &Path) -> IsopyLibResult<OsString> {
     s.push(temp);
 
     let Some(Component::RootDir) = iter.next() else {
-        return Err(IsopyLibError::RenderPathFailed(
-            path.to_path_buf(),
-            RenderPathFailedReason::IsNotAbsolute,
-        ));
+        bail!(
+            "Path {} does not have root directory component",
+            path.display()
+        )
     };
 
     for component in iter {

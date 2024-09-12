@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::{IsopyLibError, IsopyLibResult};
-use anyhow::anyhow;
+use crate::IsopyLibError;
+use anyhow::{anyhow, Result};
 use reqwest::{Response, Url};
 use std::collections::HashMap;
 use std::result::Result as StdResult;
@@ -34,7 +34,7 @@ pub struct LinkHeader {
 }
 
 impl LinkHeader {
-    pub fn from_response(response: &Response) -> IsopyLibResult<Option<Self>> {
+    pub fn from_response(response: &Response) -> Result<Option<Self>> {
         let Some(link_header) = response.headers().get("link") else {
             return Ok(None);
         };
@@ -66,14 +66,12 @@ impl LinkHeader {
             .collect::<HashMap<_, _>>()
     }
 
-    fn get_link_url(links: &HashMap<String, String>, k: &str) -> IsopyLibResult<Option<Url>> {
+    fn get_link_url(links: &HashMap<String, String>, k: &str) -> Result<Option<Url>> {
         let Some(s) = links.get(k) else {
             return Ok(None);
         };
 
-        Ok(Some(s.parse::<Url>().map_err(|e| {
-            IsopyLibError::InvalidUrl(s.clone(), anyhow!(e))
-        })?))
+        Ok(Some(s.parse::<Url>()?))
     }
 }
 

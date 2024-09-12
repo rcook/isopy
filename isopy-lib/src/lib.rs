@@ -33,32 +33,18 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
-mod checksum;
-mod descriptor;
-mod download;
 mod env_info;
 mod error;
-mod last_modified;
 mod link_header;
 mod macros;
-mod reqwest_response;
-mod response;
-mod result;
 mod shell;
 mod url;
 
 pub mod tng;
 
-pub use checksum::verify_sha256_file_checksum;
-pub use descriptor::{Descriptor, DescriptorRef};
-pub use download::download_stream;
 pub use env_info::EnvInfo;
 pub use error::{other_error, IsopyLibError};
-pub use last_modified::LastModified;
 pub use link_header::LinkHeader;
 pub use macros::TryToString;
-pub use reqwest_response::ReqwestResponse;
-pub use response::{ContentLength, Response, Stream};
-pub use result::IsopyLibResult;
 pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
 pub use url::{dir_url, file_url};
