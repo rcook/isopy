@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::archive_info::ArchiveInfo;
+use crate::archive_info::ArchiveInfo;
 use anyhow::{anyhow, Result};
 use include_dir::{include_dir, Dir};
 use isopy_lib::tng::Checksum;

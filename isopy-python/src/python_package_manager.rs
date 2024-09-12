@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::archive_info::ArchiveInfo;
-use crate::tng::archive_metadata::ArchiveMetadata;
-use crate::tng::checksum::get_checksum;
+use crate::archive_info::ArchiveInfo;
+use crate::archive_metadata::ArchiveMetadata;
+use crate::checksum::get_checksum;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::tng::{

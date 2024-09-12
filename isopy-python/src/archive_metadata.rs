@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::archive_full_version::ArchiveFullVersion;
-use crate::tng::archive_type::ArchiveType;
+use crate::archive_full_version::ArchiveFullVersion;
+use crate::archive_type::ArchiveType;
 use anyhow::{bail, Error, Result};
 use std::collections::HashSet;
 use std::str::FromStr;

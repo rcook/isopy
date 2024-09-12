@@ -19,9 +19,36 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::tng::python_plugin::PythonPlugin;
-use isopy_lib::tng::Plugin;
+use crate::archive_metadata::ArchiveMetadata;
+use isopy_lib::tng::{EnvProps, PackageInfoOps};
+use std::path::Path;
+use url::Url;
 
-pub fn new_plugin() -> Plugin {
-    PythonPlugin::new()
+#[derive(Clone, Debug)]
+pub(crate) struct ArchiveInfo {
+    url: Url,
+    metadata: ArchiveMetadata,
+}
+
+impl ArchiveInfo {
+    pub(crate) fn new(url: &Url, metadata: ArchiveMetadata) -> Self {
+        Self {
+            url: url.clone(),
+            metadata,
+        }
+    }
+
+    pub(crate) fn url(&self) -> &Url {
+        &self.url
+    }
+
+    pub(crate) fn metadata(&self) -> &ArchiveMetadata {
+        &self.metadata
+    }
+}
+
+impl PackageInfoOps for ArchiveInfo {
+    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps {
+        EnvProps::new(bin_subdir, &self.url)
+    }
 }

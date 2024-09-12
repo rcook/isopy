@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
-use crate::tng::python_package_manager::PythonPackageManager;
+use crate::python_package_manager::PythonPackageManager;
 use anyhow::Result;
 use isopy_lib::tng::{
     EnvProps, PackageManager, PackageManagerContext, Plugin, PluginOps, Version, VersionTriple,

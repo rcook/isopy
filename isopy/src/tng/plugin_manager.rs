@@ -32,7 +32,7 @@ pub(crate) struct PluginManager {
 impl PluginManager {
     pub(crate) fn new() -> Self {
         Self {
-            python_plugin: isopy_python::tng::new_plugin(),
+            python_plugin: isopy_python::new_plugin(),
         }
     }
 
