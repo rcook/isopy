@@ -37,7 +37,7 @@ enum EnvType {
     Bool,
 }
 
-const ENVS: LazyLock<Vec<(&'static str, EnvType)>> = LazyLock::new(|| {
+static ENVS: LazyLock<Vec<(&'static str, EnvType)>> = LazyLock::new(|| {
     vec![
         (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
         (ISOPY_CACHE_DIR_ENV_NAME, EnvType::Ignore),

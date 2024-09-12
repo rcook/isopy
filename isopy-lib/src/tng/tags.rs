@@ -37,17 +37,17 @@ impl Tags {
     }
 
     #[must_use]
-    pub fn tags(&self) -> &Vec<String> {
+    pub const fn tags(&self) -> &Vec<String> {
         &self.tags
     }
 
     #[must_use]
-    pub fn default_tags(&self) -> &Vec<String> {
+    pub const fn default_tags(&self) -> &Vec<String> {
         &self.default_tags
     }
 
     #[must_use]
-    pub fn other_tags(&self) -> &Vec<String> {
+    pub const fn other_tags(&self) -> &Vec<String> {
         &self.other_tags
     }
 }

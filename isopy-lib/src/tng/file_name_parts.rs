@@ -70,6 +70,7 @@ impl FileNameParts {
         }
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn from_url_safe(url: &Url) -> Result<Self> {
         if !Self::can_be_sanitized(url) {
             bail!("Url {url} cannot be sanitized")
@@ -114,7 +115,7 @@ mod tests {
     #[case("other.file.tar.gz", ("other.file", ".tar.gz"))]
     #[case("file.txt", ("file", ".txt"))]
     #[case("other.file.other.gz", ("other.file.other", ".gz"))]
-    fn split(#[case] input: &str, #[case] expected: (&str, &str)) -> Result<()> {
+    fn split(#[case] input: &str, #[case] expected: (&str, &str)) {
         assert_eq!(
             FileNamePartRefs {
                 prefix: expected.0,
@@ -122,14 +123,13 @@ mod tests {
             },
             FileNamePartRefs::split(input)
         );
-        Ok(())
     }
 
     #[rstest]
     #[case("file", ("file", ""))]
     #[case("file&name.t&ar.g&z", ("file_name_t_ar", ".g_z"))]
     #[case("file&&name.tar.zst", ("file_name", ".tar.zst"))]
-    fn from_str_safe(#[case] input: &str, #[case] expected: (&str, &str)) -> Result<()> {
+    fn from_str_safe(#[case] input: &str, #[case] expected: (&str, &str)) {
         assert_eq!(
             FileNameParts {
                 prefix: String::from(expected.0),
@@ -137,7 +137,6 @@ mod tests {
             },
             FileNameParts::from_str_safe(input)
         );
-        Ok(())
     }
 
     #[rstest]

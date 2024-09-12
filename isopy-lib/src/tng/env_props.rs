@@ -42,7 +42,7 @@ impl EnvProps {
     }
 
     #[must_use]
-    pub fn url(&self) -> &Url {
+    pub const fn url(&self) -> &Url {
         &self.url
     }
 }

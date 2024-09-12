@@ -32,7 +32,10 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::new_ret_no_self)]
 #![allow(clippy::option_if_let_else)]
+#![allow(clippy::redundant_pub_crate)]
+
 mod archive_type;
 mod build_tag;
 mod checksum;

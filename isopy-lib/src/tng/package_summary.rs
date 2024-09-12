@@ -50,7 +50,7 @@ impl PackageSummary {
         }
     }
     #[must_use]
-    pub fn kind(&self) -> PackageKind {
+    pub const fn kind(&self) -> PackageKind {
         self.kind
     }
 
@@ -60,17 +60,17 @@ impl PackageSummary {
     }
 
     #[must_use]
-    pub fn url(&self) -> &Url {
+    pub const fn url(&self) -> &Url {
         &self.url
     }
 
     #[must_use]
-    pub fn version(&self) -> &Version {
+    pub const fn version(&self) -> &Version {
         &self.version
     }
 
     #[must_use]
-    pub fn path(&self) -> &Option<PathBuf> {
+    pub const fn path(&self) -> &Option<PathBuf> {
         &self.path
     }
 }

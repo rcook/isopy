@@ -39,15 +39,15 @@ impl Metadata {
         &self.name
     }
 
-    pub(crate) fn archive_type(&self) -> &ArchiveType {
+    pub(crate) const fn archive_type(&self) -> &ArchiveType {
         &self.archive_type
     }
 
-    pub(crate) fn full_version(&self) -> &FullVersion {
+    pub(crate) const fn full_version(&self) -> &FullVersion {
         &self.full_version
     }
 
-    pub(crate) fn tags(&self) -> &HashSet<String> {
+    pub(crate) const fn tags(&self) -> &HashSet<String> {
         &self.tags
     }
 }
@@ -74,7 +74,7 @@ impl FromStr for Metadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let full_version = FullVersion::from_tags(&mut tags)?;
+        let full_version = FullVersion::from_tags(&mut tags);
 
         Ok(Self {
             name,

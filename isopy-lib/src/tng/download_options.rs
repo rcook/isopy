@@ -36,13 +36,13 @@ impl DownloadOptions {
     }
 
     #[must_use]
-    pub fn accept(mut self, value: Option<Accept>) -> Self {
+    pub const fn accept(mut self, value: Option<Accept>) -> Self {
         self.accept = value;
         self
     }
 
     #[must_use]
-    pub fn update(mut self, value: bool) -> Self {
+    pub const fn update(mut self, value: bool) -> Self {
         self.update = value;
         self
     }

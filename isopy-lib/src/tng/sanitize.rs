@@ -26,7 +26,7 @@ pub struct SanitizeOptions {
 
 impl SanitizeOptions {
     #[must_use]
-    pub fn retain_dots(mut self, value: bool) -> Self {
+    pub const fn retain_dots(mut self, value: bool) -> Self {
         self.retain_dots = value;
         self
     }
@@ -56,7 +56,6 @@ pub fn sanitize(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::tng::sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
-    use anyhow::Result;
     use rstest::rstest;
 
     #[rstest]
@@ -66,10 +65,9 @@ mod tests {
     #[case("www__foo__com", "www_foo_com")]
     #[case("www___foo___com", "www_foo_com")]
     #[case("www__.foo__.com", "www_.foo_.com")]
-    fn test_sanitize_with_options(#[case] input: &str, #[case] expected: &str) -> Result<()> {
+    fn test_sanitize_with_options(#[case] input: &str, #[case] expected: &str) {
         let options = SanitizeOptions::default().retain_dots(true);
         assert_eq!(expected, sanitize_with_options(input, &options));
-        Ok(())
     }
 
     #[rstest]
@@ -79,8 +77,7 @@ mod tests {
     #[case("www__foo__com", "www_foo_com")]
     #[case("www___foo___com", "www_foo_com")]
     #[case("www__.foo__.com", "www_foo_com")]
-    fn test_sanitize(#[case] input: &str, #[case] expected: &str) -> Result<()> {
+    fn test_sanitize(#[case] input: &str, #[case] expected: &str) {
         assert_eq!(expected, sanitize(input));
-        Ok(())
     }
 }

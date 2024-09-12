@@ -22,6 +22,7 @@
 use crate::python_plugin::PythonPlugin;
 use isopy_lib::tng::Plugin;
 
+#[must_use]
 pub fn new_plugin() -> Plugin {
     PythonPlugin::new()
 }

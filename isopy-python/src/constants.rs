@@ -23,11 +23,11 @@ use std::ffi::OsString;
 use std::sync::LazyLock;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-pub(crate) const PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
+pub(crate) static PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
     LazyLock::new(|| OsString::from("python3"));
 
 #[cfg(target_os = "windows")]
-pub(crate) const PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
+pub(crate) static PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
     LazyLock::new(|| OsString::from("python.exe"));
 
-pub(crate) const PYTHON_SCRIPT_EXT: LazyLock<OsString> = LazyLock::new(|| OsString::from("py"));
+pub(crate) static PYTHON_SCRIPT_EXT: LazyLock<OsString> = LazyLock::new(|| OsString::from("py"));

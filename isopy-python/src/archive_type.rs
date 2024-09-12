@@ -32,7 +32,7 @@ pub(crate) enum ArchiveType {
 }
 
 impl ArchiveType {
-    pub(crate) fn suffix(&self) -> &str {
+    pub(crate) const fn suffix(&self) -> &str {
         match self {
             Self::TarGz => ".tar.gz",
             Self::TarZst => ".tar.zst",
@@ -40,6 +40,7 @@ impl ArchiveType {
         }
     }
 
+    #[allow(clippy::unused_async)]
     pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
         if dir.exists() {
             bail!("Output directory {} already exists", dir.display())

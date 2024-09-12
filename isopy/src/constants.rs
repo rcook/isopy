@@ -23,10 +23,10 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
-pub(crate) const CACHE_DIR: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from(".isopy"));
-pub(crate) const ENV_CONFIG_FILE_NAME: LazyLock<OsString> =
+pub(crate) static CACHE_DIR: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from(".isopy"));
+pub(crate) static ENV_CONFIG_FILE_NAME: LazyLock<OsString> =
     LazyLock::new(|| OsString::from("env.yaml"));
-pub(crate) const PROJECT_CONFIG_FILE_NAME: LazyLock<OsString> =
+pub(crate) static PROJECT_CONFIG_FILE_NAME: LazyLock<OsString> =
     LazyLock::new(|| OsString::from(".isopy.yaml"));
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]

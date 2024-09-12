@@ -53,6 +53,21 @@ macro_rules! downcast_version {
     };
 }
 
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+const DEFAULT_TAGS: [&str; 5] = ["aarch64", "unknown", "linux", "gnu", "install_only"];
+
+#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+const DEFAULT_TAGS: [&str; 5] = ["x86_64", "unknown", "linux", "gnu", "install_only"];
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+const DEFAULT_TAGS: [&str; 4] = ["aarch64", "apple", "darwin", "install_only"];
+
+#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+const DEFAULT_TAGS: [&str; 4] = ["x86_64", "apple", "darwin", "install_only"];
+
+#[cfg(target_os = "windows")]
+const DEFAULT_TAGS: [&str; 6] = ["x86_64", "pc", "windows", "msvc", "shared", "install_only"];
+
 pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
     url: Url,
@@ -72,7 +87,7 @@ impl PythonPackageManager {
         }
 
         let assets = g!(g!(item.get("assets")).as_array())
-            .into_iter()
+            .iter()
             .map(|asset| {
                 let url = g!(g!(asset.get("browser_download_url")).as_str()).parse::<Url>()?;
                 let name = g!(g!(asset.get("name")).as_str());
@@ -81,7 +96,7 @@ impl PythonPackageManager {
             .collect::<Result<Vec<_>>>()?;
         let packages = assets
             .into_iter()
-            .filter(|(_, name)| filter_fn(*name))
+            .filter(|(_, name)| filter_fn(name))
             .map(|(url, name)| {
                 let metadata = name.parse::<Metadata>()?;
                 let archive_info = PythonPackage::new(&url, metadata);
@@ -91,35 +106,12 @@ impl PythonPackageManager {
         Ok(packages)
     }
 
-    #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
-    fn get_default_tags() -> HashSet<&'static str> {
-        HashSet::from(["aarch64", "unknown", "linux", "gnu", "install_only"])
-    }
-
-    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-    fn get_default_tags() -> HashSet<&'static str> {
-        HashSet::from(["x86_64", "unknown", "linux", "gnu", "install_only"])
-    }
-
-    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-    fn get_default_tags() -> HashSet<&'static str> {
-        HashSet::from(["aarch64", "apple", "darwin", "install_only"])
-    }
-
-    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-    fn get_default_tags() -> HashSet<&'static str> {
-        HashSet::from(["x86_64", "apple", "darwin", "install_only"])
-    }
-
-    #[cfg(target_os = "windows")]
-    fn get_default_tags() -> HashSet<&'static str> {
-        HashSet::from(["x86_64", "pc", "windows", "msvc", "shared", "install_only"])
-    }
-
     fn get_tags(tags: &OptionalTags) -> HashSet<&str> {
-        tags.as_ref()
-            .map(|t| t.iter().map(|item| item.as_str()).collect::<HashSet<_>>())
-            .unwrap_or_else(|| Self::get_default_tags())
+        tags.as_ref().map_or(DEFAULT_TAGS.into(), |t| {
+            t.iter()
+                .map(std::string::String::as_str)
+                .collect::<HashSet<_>>()
+        })
     }
 
     fn get_package(
@@ -152,7 +144,7 @@ impl PythonPackageManager {
         metadata
             .tags()
             .iter()
-            .map(|t| t.as_str())
+            .map(String::as_str)
             .chain(once(metadata.full_version().build_tag().as_str()))
             .collect::<HashSet<_>>()
             .is_superset(tags)
@@ -187,17 +179,17 @@ impl PackageManagerOps for PythonPackageManager {
             }
         }
 
-        let mut tags = Vec::from_iter(tags.into_iter());
+        let mut tags = tags.into_iter().collect::<Vec<_>>();
         tags.sort();
         let tags = tags;
 
-        let mut other_tags = Vec::from_iter(other_tags.into_iter());
+        let mut other_tags = other_tags.into_iter().collect::<Vec<_>>();
         other_tags.sort();
         let other_tags = other_tags;
 
-        let mut default_tags = Self::get_default_tags()
+        let mut default_tags = DEFAULT_TAGS
             .into_iter()
-            .map(|t| String::from(t))
+            .map(String::from)
             .collect::<Vec<_>>();
         default_tags.sort();
         let default_tags = default_tags;

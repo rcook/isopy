@@ -38,11 +38,11 @@ impl PythonPackage {
         }
     }
 
-    pub(crate) fn url(&self) -> &Url {
+    pub(crate) const fn url(&self) -> &Url {
         &self.url
     }
 
-    pub(crate) fn metadata(&self) -> &Metadata {
+    pub(crate) const fn metadata(&self) -> &Metadata {
         &self.metadata
     }
 }

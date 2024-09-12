@@ -31,7 +31,7 @@ use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use url::Url;
 
-const INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
+static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
     "https://api.github.com/repos/indygreg/python-build-standalone/releases"
         .parse()
         .expect("Invalid index URL")
@@ -66,16 +66,16 @@ impl PluginOps for PythonPlugin {
     ) -> EnvInfo {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
-            vec![data_dir.join(&env_props.dir()).join("bin")]
+            vec![data_dir.join(env_props.dir()).join("bin")]
         }
 
         #[cfg(target_os = "windows")]
         fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
-            let d = data_dir.join(&env_props.dir());
+            let d = data_dir.join(env_props.dir());
             vec![d.clone(), d.join("Scripts")]
         }
 
-        let path_dirs = make_path_dirs(data_dir, &env_props);
+        let path_dirs = make_path_dirs(data_dir, env_props);
         /*
         let vars = if let Some(d) = base_dir {
             vec![(

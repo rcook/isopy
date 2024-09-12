@@ -69,8 +69,7 @@ enum Inner {
 impl Inner {
     fn as_str(&self) -> &str {
         match self {
-            Self::OldStyle(s) => &s,
-            Self::NewStyle(s) => &s,
+            Self::OldStyle(s) | Self::NewStyle(s) => s,
         }
     }
 }
@@ -78,8 +77,9 @@ impl Inner {
 impl Ord for Inner {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Self::OldStyle(a), Self::OldStyle(b)) => a.cmp(b),
-            (Self::NewStyle(a), Self::NewStyle(b)) => a.cmp(b),
+            (Self::OldStyle(a), Self::OldStyle(b)) | (Self::NewStyle(a), Self::NewStyle(b)) => {
+                a.cmp(b)
+            }
             (Self::NewStyle(_), Self::OldStyle(_)) => Ordering::Greater,
             (Self::OldStyle(_), Self::NewStyle(_)) => Ordering::Less,
         }

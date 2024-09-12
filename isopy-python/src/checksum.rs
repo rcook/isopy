@@ -28,7 +28,7 @@ use std::collections::HashMap;
 const SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
 
 pub(crate) fn get_checksum(package: &PythonPackage) -> Result<Checksum> {
-    fn parse_checksums<'a>(content: &'a str) -> HashMap<&'a str, &'a str> {
+    fn parse_checksums(content: &str) -> HashMap<&str, &str> {
         content
             .lines()
             .map(|line| {

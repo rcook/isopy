@@ -220,7 +220,7 @@ impl App {
         Ok(dir_info)
     }
 
-    pub(crate) fn plugin_manager(&self) -> &PluginManager {
+    pub(crate) const fn plugin_manager(&self) -> &PluginManager {
         &self.plugin_manager
     }
 
