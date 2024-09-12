@@ -91,7 +91,7 @@ impl DirInfoExt for Manifest {
 }
 
 fn make_env_config_path(data_dir: &Path) -> PathBuf {
-    data_dir.join(&*ENV_CONFIG_FILE_NAME)
+    data_dir.join(ENV_CONFIG_FILE_NAME)
 }
 
 fn read_env_config(data_dir: &Path) -> Result<Env> {

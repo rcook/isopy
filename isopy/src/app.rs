@@ -42,16 +42,14 @@ pub(crate) struct App {
 }
 
 impl App {
-    pub(crate) fn new(cwd: PathBuf, config_dir: &Path, repo: Repo) -> Result<Self> {
-        let project_config_path = cwd.join(&*PROJECT_CONFIG_FILE_NAME);
-        let plugin_manager = PluginManager::new();
-        Ok(Self {
+    pub(crate) fn new(cwd: &Path, config_dir: &Path, repo: Repo) -> Self {
+        Self {
             config_dir: config_dir.to_path_buf(),
-            cwd,
+            cwd: cwd.to_path_buf(),
             repo,
-            project_config_path,
-            plugin_manager,
-        })
+            project_config_path: cwd.join(PROJECT_CONFIG_FILE_NAME),
+            plugin_manager: PluginManager::new(),
+        }
     }
 
     pub(crate) fn config_dir(&self) -> &Path {
