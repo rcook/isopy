@@ -27,8 +27,6 @@ lazy_static! {
     pub(crate) static ref PYTHON_SCRIPT_EXT: OsString = OsString::from("py");
 }
 
-pub(crate) const PLUGIN_NAME: &str = "Python";
-
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 fn python_bin_file_name() -> OsString {
     OsString::from("python3")

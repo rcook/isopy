@@ -26,7 +26,6 @@ use std::ffi::OsString;
 use std::path::Path;
 
 pub trait PluginFactory: Send + Sync {
-    fn name(&self) -> &str;
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>>;
     fn make_env_info(
         &self,

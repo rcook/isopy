@@ -47,10 +47,6 @@ impl PluginHost {
 }
 
 impl PluginFactory for PluginHost {
-    fn name(&self) -> &str {
-        self.plugin_factory.name()
-    }
-
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
         self.plugin_factory.read_project_config(props)
     }

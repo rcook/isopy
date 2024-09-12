@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PLUGIN_NAME, PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
+use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::serialization::ProjectConfig;
 use isopy_lib::tng::EnvProps;
 use isopy_lib::{
@@ -39,10 +39,6 @@ impl Default for PythonPluginFactory {
 }
 
 impl PluginFactory for PythonPluginFactory {
-    fn name(&self) -> &str {
-        PLUGIN_NAME
-    }
-
     fn read_project_config(&self, props: &Value) -> IsopyLibResult<Box<dyn Descriptor>> {
         let project_config = serde_json::from_value::<ProjectConfig>(props.clone())
             .map_err(isopy_lib_other_error)?;
