@@ -28,7 +28,7 @@ use std::path::Path;
 pub(crate) async fn delete(app: &App, project_dir: &Path) -> Result<Status> {
     let Some(_) = app.get_dir_info(project_dir)? else {
         return_user_error!(
-            "no environment exists for project directory {}",
+            "No environment exists for project directory {}",
             project_dir.display()
         )
     };
@@ -36,7 +36,7 @@ pub(crate) async fn delete(app: &App, project_dir: &Path) -> Result<Status> {
     app.remove_project_env(project_dir)?;
 
     return_success!(
-        "environment for project directory {} successfully removed",
+        "Environment for project directory {} successfully removed",
         project_dir.display()
     );
 }
