@@ -20,11 +20,9 @@ isopy-lib = { path = "../isopy-lib" }
 lazy_static = "1.5.0"
 log = "0.4.22"
 regex = "1.10.6"
-serde = "1.0.209"
 serde_json = "1.0.128"
 strum = "0.26.3"
 strum_macros = "0.26.4"
-thiserror = "1.0.63"
 tokio = { version = "1.40.0", features = ["full"] }
 url = { version = "2.5.2", features = ["serde"] }
 

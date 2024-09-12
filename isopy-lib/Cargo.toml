@@ -14,17 +14,11 @@ version = "0.3.25"
 [dependencies]
 anyhow = "1.0.86"
 async-trait = "0.1.82"
-bytes = "1.7.1"
 derive_more = { version = "1.0.0", features = ["deref"] }
-futures-util = "0.3.30"
 hex = "0.4.3"
-joat-logger = "0.0.5"
-joatmon = "0.0.34"
 lazy_static = "1.5.0"
-log = "0.4.22"
 reqwest = { version = "0.12.7", features = ["stream"] }
 serde = "1.0.209"
-serde_json = "1.0.128"
 sha2 = "0.10.8"
 thiserror = "1.0.63"
 tokio = { version = "1.40.0", features = ["full"] }
