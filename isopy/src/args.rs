@@ -107,12 +107,6 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
-    #[command(name = "config", about = "Configure project")]
-    Config {
-        #[arg(help = "Package ID")]
-        package_id: PackageId,
-    },
-
     #[command(
         name = "delete",
         about = "Delete environment corresponding to project directory"
@@ -212,6 +206,12 @@ pub(crate) enum Command {
 
         #[arg(help = "Show brief output", long = "no-verbose")]
         _no_verbose: bool,
+    },
+
+    #[command(name = "project", about = "Configure project")]
+    Project {
+        #[arg(help = "Package ID")]
+        package_id: PackageId,
     },
 
     #[command(name = "prompt", about = "Show brief information in shell prompt")]

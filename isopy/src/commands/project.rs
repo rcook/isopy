@@ -27,7 +27,7 @@ use crate::status::{return_success, return_user_error, Status};
 use anyhow::Result;
 use log::info;
 
-pub(crate) fn do_config(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) fn do_project(app: &App, package_id: &PackageId) -> Result<Status> {
     let mut package_ids =
         existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.package_ids);
 
