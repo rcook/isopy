@@ -24,11 +24,13 @@ use crate::moniker::Moniker;
 use crate::print::{humanize_size_base_2, make_list_table};
 use crate::status::{return_success, Status};
 use crate::table::{table_columns, table_divider, table_headings, Table};
+use anyhow::bail;
 use anyhow::Result;
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 use isopy_lib::{PackageFilter, PackageSummary, Plugin};
 use std::fs::metadata;
 use strum::IntoEnumIterator;
+use url::{Host, Url};
 
 pub(crate) async fn do_packages(
     app: &App,
@@ -88,6 +90,19 @@ fn add_plugin_rows(
     }
 
     fn make_package_info(package_summary: &PackageSummary) -> Result<String> {
+        fn format_url(url: &Url) -> Result<ColoredString> {
+            let scheme = url.scheme();
+            let Some(Host::Domain(domain)) = url.host() else {
+                bail!("Unsupport URL type {url}")
+            };
+
+            let path = url.path();
+            Ok(match path.rfind('/') {
+                Some(i) => format!("{scheme}://{domain}/{}{}", "...".cyan(), &path[i..]).white(),
+                None => format!("{scheme}://{domain}{path}").white(),
+            })
+        }
+
         match package_summary.path() {
             Some(p) => {
                 let size = metadata(p)?.len();
@@ -97,7 +112,7 @@ fn add_plugin_rows(
                     humanize_size_base_2(size).cyan()
                 ))
             }
-            None => Ok(format!("{}", package_summary.url().as_str().white())),
+            None => Ok(format!("{}", format_url(package_summary.url())?.white())),
         }
     }
 
