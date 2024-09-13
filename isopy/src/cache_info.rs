@@ -38,7 +38,7 @@ impl CacheInfo {
         let path = path.into();
         let manifest = if path.is_file() {
             let f = File::open(&path)?;
-            serde_json::from_reader(f)?
+            serde_yaml::from_reader(f)?
         } else {
             Manifest::default()
         };
@@ -47,7 +47,7 @@ impl CacheInfo {
 
     pub(crate) fn save(&self) -> Result<()> {
         let f = File::create(&self.path)?;
-        serde_json::to_writer_pretty(&f, &self.manifest)?;
+        serde_yaml::to_writer(f, &self.manifest)?;
         Ok(())
     }
 }

@@ -1176,7 +1176,6 @@ dependencies = [
  "rstest",
  "same-file",
  "serde",
- "serde_json",
  "serde_yaml",
  "strum",
  "strum_macros",
