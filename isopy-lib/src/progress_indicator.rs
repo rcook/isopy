@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::progress_indicator_options::ProgressIndicatorOptions;
+use crate::Extent;
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
@@ -29,31 +31,25 @@ pub struct ProgressIndicator(Option<Arc<ProgressBar>>);
 
 impl ProgressIndicator {
     #[allow(unused)]
-    pub fn new(show_progress: bool, len: Option<u64>) -> Result<Self> {
-        let (progress_bar, template) = match len {
-            Some(len) => (
-                if show_progress {
-                    Some(Arc::new(ProgressBar::new(len)))
-                } else {
-                    None
-                },
-                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
+    pub fn new(options: &ProgressIndicatorOptions) -> Result<Self> {
+        if !options.enabled {
+            return Ok(Self(None));
+        }
+
+        let (progress_bar, template) = match &options.extent {
+            Extent::Unknown => (
+                ProgressBar::new_spinner(),
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {wide_msg:.yellow}",
             ),
-            None => (
-                if show_progress {
-                    Some(Arc::new(ProgressBar::new_spinner()))
-                } else {
-                    None
-                },
-                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
+            Extent::Bytes(len) => (
+                ProgressBar::new(*len),
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  [{eta_precise:.yellow} remaining]  {bar}  {decimal_bytes} of {decimal_total_bytes}  {wide_msg:.yellow}"
             ),
         };
 
-        if let Some(ref progress_bar) = progress_bar {
-            progress_bar.set_style(ProgressStyle::with_template(template)?);
-        }
+        progress_bar.set_style(ProgressStyle::with_template(template)?);
 
-        Ok(Self(progress_bar))
+        Ok(Self(Some(Arc::new(progress_bar))))
     }
 
     pub fn set_progress(&self, pos: u64) {

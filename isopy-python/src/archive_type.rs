@@ -21,7 +21,7 @@
 //
 use anyhow::{bail, Result};
 use decompress::{decompress, ExtractOptsBuilder};
-use isopy_lib::{InstallPackageOptions, ProgressIndicator};
+use isopy_lib::{Extent, InstallPackageOptions, ProgressIndicator, ProgressIndicatorOptions};
 use log::info;
 use std::path::Path;
 use strum_macros::EnumIter;
@@ -53,7 +53,11 @@ impl ArchiveType {
             bail!("Output directory {} already exists", dir.display())
         }
 
-        let progress_indicator = ProgressIndicator::new(options.show_progress, None)?;
+        let progress_indicator = ProgressIndicator::new(
+            &ProgressIndicatorOptions::default()
+                .enabled(options.show_progress)
+                .extent(Extent::Unknown),
+        )?;
 
         {
             let progress_indicator = progress_indicator.clone();
