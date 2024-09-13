@@ -27,24 +27,40 @@ use std::collections::HashSet;
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct FullVersion {
     version: VersionTriple,
+    version_ex: Option<String>,
     build_tag: BuildTag,
 }
 
 impl FullVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
+        fn get_version_and_version_ex(prefix: &str) -> (&str, Option<String>) {
+            prefix.find("rc").map_or_else(
+                || (prefix, None),
+                |i| (&prefix[0..i], Some(String::from(&prefix[i..]))),
+            )
+        }
+
         let mut full_version = None;
         let mut version = None;
+        let mut version_ex = None;
         let mut build_tag = None;
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
-                if let Ok(temp_version) = prefix.parse() {
+                let (version_str, temp_version_ex) = get_version_and_version_ex(prefix);
+                if let Ok(temp_version) = version_str.parse() {
                     if let Ok(temp_build_tag) = suffix.parse() {
-                        assert!(full_version.is_none() && version.is_none() && build_tag.is_none());
+                        assert!(
+                            full_version.is_none()
+                                && version.is_none()
+                                && version_ex.is_none()
+                                && build_tag.is_none()
+                        );
                         tags_to_remove.push(tag.clone());
                         full_version = Some(Self {
                             version: temp_version,
+                            version_ex: temp_version_ex,
                             build_tag: temp_build_tag,
                         });
                         break;
@@ -52,10 +68,12 @@ impl FullVersion {
                 }
             }
 
-            if let Ok(temp_version) = tag.parse() {
-                assert!(full_version.is_none() && version.is_none());
+            let (version_str, temp_version_ex) = get_version_and_version_ex(tag);
+            if let Ok(temp_version) = version_str.parse() {
+                assert!(full_version.is_none() && version.is_none() && version_ex.is_none());
                 tags_to_remove.push(tag.clone());
                 version = Some(temp_version);
+                version_ex = temp_version_ex;
                 if build_tag.is_some() {
                     break;
                 }
@@ -88,7 +106,11 @@ impl FullVersion {
             bail!("Could not determine package build tag from tags {tags:?}")
         };
 
-        Ok(Self { version, build_tag })
+        Ok(Self {
+            version,
+            version_ex: None,
+            build_tag,
+        })
     }
 
     pub(crate) const fn version(&self) -> &VersionTriple {
