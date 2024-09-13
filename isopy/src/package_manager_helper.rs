@@ -25,16 +25,20 @@ use crate::serialization::{Download, File};
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use futures_util::StreamExt;
 use isopy_lib::{
     DownloadOptions, FileNameParts, PackageManagerContext, PackageManagerContextOps,
     ProgressIndicator,
 };
+use log::info;
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
-use std::fs::{create_dir_all, remove_file, write};
+use std::fs::{create_dir_all, remove_file};
 use std::path::{Path, PathBuf};
+use tokio::fs::File as FSFile;
+use tokio::io::AsyncWriteExt;
 use url::Url;
 
 pub(crate) struct PackageManagerHelper {
@@ -55,7 +59,7 @@ impl PackageManagerHelper {
             })?,
         )?;
 
-        println!("Downloading {url}");
+        info!("Downloading {url}");
 
         let mut request = Client::new()
             .get(ReqwestUrl::parse(url.as_str())?)
@@ -69,14 +73,22 @@ impl PackageManagerHelper {
         Self::error_for_github_rate_limit(&response)?;
         response.error_for_status_ref()?;
 
-        let progress_indicator = ProgressIndicator::new(options.show_progress)?;
+        let progress_indicator =
+            ProgressIndicator::new(options.show_progress, response.content_length())?;
 
-        let data = response.bytes().await?;
-        write(path, data)?;
+        let mut stream = response.bytes_stream();
+        let mut f = FSFile::create_new(path).await?;
+        let mut downloaded = 0;
+        while let Some(chunk) = stream.next().await {
+            let chunk = chunk?;
+            downloaded += chunk.len() as u64;
+            f.write_all(&chunk).await?;
+            progress_indicator.set_progress(downloaded);
+        }
 
-        progress_indicator.finish();
+        progress_indicator.finish_and_clear();
 
-        println!("Downloaded {url}");
+        info!("Downloaded {url}");
 
         Ok(())
     }

@@ -54,7 +54,7 @@ impl DownloadOptions {
     }
 
     #[must_use]
-    pub fn show_progress(mut self, value: bool) -> Self {
+    pub const fn show_progress(mut self, value: bool) -> Self {
         self.show_progress = value;
         self
     }

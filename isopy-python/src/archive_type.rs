@@ -53,7 +53,7 @@ impl ArchiveType {
             bail!("Output directory {} already exists", dir.display())
         }
 
-        let progress_indicator = ProgressIndicator::new_spinner(options.show_progress)?;
+        let progress_indicator = ProgressIndicator::new(options.show_progress, None)?;
 
         {
             let progress_indicator = progress_indicator.clone();
@@ -67,7 +67,7 @@ impl ArchiveType {
             decompress(archive_path, dir, &options)?;
         }
 
-        progress_indicator.finish();
+        progress_indicator.finish_and_clear();
 
         info!("Unpacked package to {}", dir.display());
         Ok(())

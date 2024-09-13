@@ -22,49 +22,63 @@
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct ProgressIndicator(Option<Rc<ProgressBar>>);
+pub struct ProgressIndicator(Option<Arc<ProgressBar>>);
 
 impl ProgressIndicator {
     #[allow(unused)]
-    pub fn new(show_progress: bool) -> Result<Self> {
-        let progress_bar = ProgressBar::new_spinner();
-        progress_bar.set_style(ProgressStyle::with_template(
-            "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
-        )?);
+    pub fn new(show_progress: bool, len: Option<u64>) -> Result<Self> {
+        let (progress_bar, template) = match len {
+            Some(len) => (
+                if show_progress {
+                    Some(Arc::new(ProgressBar::new(len)))
+                } else {
+                    None
+                },
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
+            ),
+            None => (
+                if show_progress {
+                    Some(Arc::new(ProgressBar::new_spinner()))
+                } else {
+                    None
+                },
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
+            ),
+        };
 
-        Ok(if show_progress {
-            Self(Some(Rc::new(progress_bar)))
-        } else {
-            Self(None)
-        })
+        if let Some(ref progress_bar) = progress_bar {
+            progress_bar.set_style(ProgressStyle::with_template(template)?);
+        }
+
+        Ok(Self(progress_bar))
     }
 
-    #[allow(unused)]
-    pub fn new_spinner(show_progress: bool) -> Result<Self> {
-        let progress_bar = ProgressBar::new_spinner();
-        progress_bar.set_style(ProgressStyle::with_template(
-            "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
-        )?);
-
-        Ok(if show_progress {
-            Self(Some(Rc::new(progress_bar)))
-        } else {
-            Self(None)
-        })
+    pub fn set_progress(&self, pos: u64) {
+        if let Some(ref inner) = self.0 {
+            inner.set_position(pos);
+        }
     }
 
     pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
-        if let Some(inner) = &self.0 {
+        if let Some(ref inner) = self.0 {
             inner.set_message(msg);
         }
     }
 
-    pub fn finish(&self) {
-        if let Some(inner) = &self.0 {
+    pub fn println<I: AsRef<str>>(&self, msg: I) {
+        if let Some(ref inner) = self.0 {
+            inner.println(msg);
+        }
+    }
+
+    pub fn finish_and_clear(&self) {
+        if let Some(ref inner) = self.0 {
             inner.finish_and_clear();
         }
     }
 }
+
+unsafe impl Send for ProgressIndicator {}

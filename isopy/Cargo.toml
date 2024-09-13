@@ -20,6 +20,7 @@ chrono = "0.4.38"
 colored = "2.1.0"
 ctrlc = "3.4.5"
 dirs = "5.0.1"
+futures-util = "0.3.30"
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
 joat-logger = "0.0.5"
@@ -27,7 +28,7 @@ joat-repo = "0.0.12"
 joatmon = "0.0.34"
 log = { version = "0.4.22", features = ["std"] }
 path-absolutize = "3.1.1"
-reqwest = { version = "0.12.7" }
+reqwest = { version = "0.12.7", features = ["stream"] }
 serde = { version = "1.0.209", features = ["derive"] }
 serde_yaml = "0.9.34"
 tinytemplate = "1.2.1"
