@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::build_tag::BuildTag;
+use anyhow::{bail, Result};
 use isopy_lib::VersionTriple;
 use std::collections::HashSet;
 
@@ -30,7 +31,7 @@ pub(crate) struct FullVersion {
 }
 
 impl FullVersion {
-    pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Self {
+    pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut full_version = None;
         let mut version = None;
         let mut build_tag = None;
@@ -76,12 +77,18 @@ impl FullVersion {
 
         if let Some(result) = full_version {
             assert!(version.is_none() && build_tag.is_none());
-            return result;
+            return Ok(result);
         }
 
-        let version = version.expect("Version must be found");
-        let build_tag = build_tag.expect("Group must be found");
-        Self { version, build_tag }
+        let Some(version) = version else {
+            bail!("Could not determine package version from tags {tags:?}")
+        };
+
+        let Some(build_tag) = build_tag else {
+            bail!("Could not determine package build tag from tags {tags:?}")
+        };
+
+        Ok(Self { version, build_tag })
     }
 
     pub(crate) const fn version(&self) -> &VersionTriple {

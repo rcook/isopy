@@ -75,7 +75,7 @@ impl FromStr for Metadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let full_version = FullVersion::from_tags(&mut tags);
+        let full_version = FullVersion::from_tags(&mut tags)?;
 
         Ok(Self {
             name,
