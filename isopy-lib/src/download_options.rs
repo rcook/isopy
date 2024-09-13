@@ -22,11 +22,11 @@
 use crate::accept::Accept;
 use crate::checksum::Checksum;
 
-#[derive(Default)]
 pub struct DownloadOptions {
     pub accept: Option<Accept>,
     pub update: bool,
     pub checksum: Option<Checksum>,
+    pub show_progress: bool,
 }
 
 impl DownloadOptions {
@@ -51,5 +51,22 @@ impl DownloadOptions {
     pub fn checksum(mut self, value: Option<Checksum>) -> Self {
         self.checksum = value;
         self
+    }
+
+    #[must_use]
+    pub fn show_progress(mut self, value: bool) -> Self {
+        self.show_progress = value;
+        self
+    }
+}
+
+impl Default for DownloadOptions {
+    fn default() -> Self {
+        Self {
+            accept: None,
+            update: false,
+            checksum: None,
+            show_progress: true,
+        }
     }
 }

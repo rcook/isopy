@@ -25,7 +25,10 @@ use crate::serialization::{Download, File};
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use isopy_lib::{DownloadOptions, FileNameParts, PackageManagerContext, PackageManagerContextOps};
+use isopy_lib::{
+    DownloadOptions, FileNameParts, PackageManagerContext, PackageManagerContextOps,
+    ProgressIndicator,
+};
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use reqwest::{Response, Url as ReqwestUrl};
@@ -66,8 +69,12 @@ impl PackageManagerHelper {
         Self::error_for_github_rate_limit(&response)?;
         response.error_for_status_ref()?;
 
+        let progress_indicator = ProgressIndicator::new(options.show_progress)?;
+
         let data = response.bytes().await?;
         write(path, data)?;
+
+        progress_indicator.finish();
 
         println!("Downloaded {url}");
 
