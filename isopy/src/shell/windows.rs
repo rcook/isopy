@@ -27,14 +27,14 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 use sysinfo::System;
 
-const POWERSHELL_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
+static POWERSHELL_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     PathBuf::from(var("WINDIR").expect("WINDIR must be defined"))
         .join("System32")
         .join("WindowsPowerShell")
         .join("v1.0")
         .join("powershell.exe")
 });
-const CMD_PATH: LazyLock<PathBuf> =
+static CMD_PATH: LazyLock<PathBuf> =
     LazyLock::new(|| PathBuf::from(var("ComSpec").expect("ComSpec must be defined")));
 
 #[derive(Debug)]
