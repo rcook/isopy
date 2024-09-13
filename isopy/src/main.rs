@@ -39,7 +39,7 @@
 mod app;
 mod args;
 mod bool_util;
-mod cache_info;
+mod cache;
 mod commands;
 mod constants;
 mod date_time_format;

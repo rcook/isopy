@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::cache_info::CacheInfo;
+use crate::cache::Cache;
 use crate::constants::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::serialization::{Download, File};
 use anyhow::{anyhow, bail, Result};
@@ -144,8 +144,8 @@ impl PackageManagerHelper {
         )
     }
 
-    fn load_cache(&self) -> Result<CacheInfo> {
-        CacheInfo::load(self.cache_dir.join(CACHE_FILE_NAME))
+    fn load_cache(&self) -> Result<Cache> {
+        Cache::load(self.cache_dir.join(CACHE_FILE_NAME))
     }
 
     fn check_cache(&self, url: &Url) -> Result<Option<PathBuf>> {

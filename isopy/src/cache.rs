@@ -25,12 +25,12 @@ use std::fs::File;
 use std::path::PathBuf;
 
 #[derive(Debug)]
-pub(crate) struct CacheInfo {
+pub(crate) struct Cache {
     pub(crate) path: PathBuf,
     pub(crate) manifest: Manifest,
 }
 
-impl CacheInfo {
+impl Cache {
     pub(crate) fn load<P>(path: P) -> Result<Self>
     where
         P: Into<PathBuf>,
