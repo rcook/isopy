@@ -29,15 +29,17 @@ pub struct PackageSummary {
     name: String,
     url: Url,
     version: Version,
+    label: String,
     path: Option<PathBuf>,
 }
 
 impl PackageSummary {
-    pub fn new<S: Into<String>, P: Into<PathBuf>>(
+    pub fn new<S1: Into<String>, S2: Into<String>, P: Into<PathBuf>>(
         kind: PackageKind,
-        name: S,
+        name: S1,
         url: &Url,
         version: Version,
+        label: S2,
         path: Option<P>,
     ) -> Self {
         Self {
@@ -45,6 +47,7 @@ impl PackageSummary {
             name: name.into(),
             url: url.clone(),
             version,
+            label: label.into(),
             path: path.map(std::convert::Into::into),
         }
     }
@@ -66,6 +69,11 @@ impl PackageSummary {
     #[must_use]
     pub const fn version(&self) -> &Version {
         &self.version
+    }
+
+    #[must_use]
+    pub fn label(&self) -> &str {
+        &self.label
     }
 
     #[must_use]

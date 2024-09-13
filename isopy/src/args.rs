@@ -193,19 +193,6 @@ pub(crate) enum Command {
             value_delimiter = ','
         )]
         tags: Option<Vec<String>>,
-
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
     },
 
     #[command(name = "project", about = "Configure project")]

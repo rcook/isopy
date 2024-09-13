@@ -103,9 +103,7 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
             moniker,
             filter,
             tags,
-            verbose,
-            ..
-        } => do_packages(&app, &moniker, filter.into(), &tags, verbose).await,
+        } => do_packages(&app, &moniker, filter.into(), &tags).await,
         Project { package_id } => do_project(&app, &package_id),
         Prompt(prompt_config) => do_prompt(&app, &prompt_config),
         Run { program, args } => do_run(app, &program, &args),

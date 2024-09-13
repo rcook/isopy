@@ -241,6 +241,7 @@ impl PackageManagerOps for PythonPackageManager {
                     archive.metadata().name(),
                     archive.url(),
                     Version::new(archive.metadata().full_version().version().clone()),
+                    String::from(archive.metadata().full_version().build_tag().as_str()),
                     path,
                 )
             })
