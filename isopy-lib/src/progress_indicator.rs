@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use indicatif::ProgressBar;
+use anyhow::Result;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
 use std::rc::Rc;
 
@@ -27,13 +28,32 @@ use std::rc::Rc;
 pub struct ProgressIndicator(Option<Rc<ProgressBar>>);
 
 impl ProgressIndicator {
-    #[must_use]
-    pub fn new_spinner(show_progress: bool) -> Self {
-        if show_progress {
-            Self(Some(Rc::new(ProgressBar::new_spinner())))
+    #[allow(unused)]
+    pub fn new(show_progress: bool) -> Result<Self> {
+        let progress_bar = ProgressBar::new_spinner();
+        progress_bar.set_style(ProgressStyle::with_template(
+            "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
+        )?);
+
+        Ok(if show_progress {
+            Self(Some(Rc::new(progress_bar)))
         } else {
             Self(None)
-        }
+        })
+    }
+
+    #[allow(unused)]
+    pub fn new_spinner(show_progress: bool) -> Result<Self> {
+        let progress_bar = ProgressBar::new_spinner();
+        progress_bar.set_style(ProgressStyle::with_template(
+            "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
+        )?);
+
+        Ok(if show_progress {
+            Self(Some(Rc::new(progress_bar)))
+        } else {
+            Self(None)
+        })
     }
 
     pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {

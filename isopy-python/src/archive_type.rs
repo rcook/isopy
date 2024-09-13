@@ -53,7 +53,7 @@ impl ArchiveType {
             bail!("Output directory {} already exists", dir.display())
         }
 
-        let progress_indicator = ProgressIndicator::new_spinner(options.show_progress);
+        let progress_indicator = ProgressIndicator::new_spinner(options.show_progress)?;
 
         {
             let progress_indicator = progress_indicator.clone();
