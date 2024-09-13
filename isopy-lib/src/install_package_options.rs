@@ -19,35 +19,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::fs::existing;
-use crate::status::{return_success, return_user_error, Status};
-use anyhow::Result;
-use isopy_lib::InstallPackageOptions;
+pub struct InstallPackageOptions {
+    pub show_progress: bool,
+}
 
-pub(crate) async fn do_init(app: &App) -> Result<Status> {
-    if app.repo().get(app.cwd())?.is_some() {
-        return_user_error!(
-            "Project in directory {} already has an environment",
-            app.cwd().display()
-        );
+impl InstallPackageOptions {
+    #[must_use]
+    pub const fn show_progress(mut self, value: bool) -> Self {
+        self.show_progress = value;
+        self
     }
+}
 
-    let Some(project) = existing(app.read_project_config())? else {
-        return_user_error!(
-            "No project configuration file in directory {}",
-            app.cwd().display()
-        );
-    };
-
-    for package_id in project.package_ids {
-        app.install_package(
-            package_id.moniker(),
-            package_id.version(),
-            &InstallPackageOptions::default(),
-        )
-        .await?;
+impl Default for InstallPackageOptions {
+    fn default() -> Self {
+        Self {
+            show_progress: true,
+        }
     }
-
-    return_success!();
 }

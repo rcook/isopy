@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::install_package_options::InstallPackageOptions;
 use crate::package::Package;
 use crate::package_summary::PackageSummary;
 use crate::tags::Tags;
@@ -45,6 +46,7 @@ pub trait PackageManagerOps: Send + Sync {
         version: &Version,
         tags: &OptionalTags,
         dir: &Path,
+        options: &InstallPackageOptions,
     ) -> Result<Package>;
     async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()>;
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;

@@ -27,7 +27,7 @@ use crate::plugin_manager::PluginManager;
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{bail, Result};
-use isopy_lib::{EnvInfo, EnvProps, Platform, Shell, Version};
+use isopy_lib::{EnvInfo, EnvProps, InstallPackageOptions, Platform, Shell, Version};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
@@ -82,7 +82,12 @@ impl App {
         Ok(())
     }
 
-    pub(crate) async fn install_package(&self, moniker: &Moniker, version: &Version) -> Result<()> {
+    pub(crate) async fn install_package(
+        &self,
+        moniker: &Moniker,
+        version: &Version,
+        options: &InstallPackageOptions,
+    ) -> Result<()> {
         let project_dir = &self.cwd;
 
         let (dir_info, mut packages) = if let Some(dir_info) = self.repo.get(project_dir)? {
@@ -123,7 +128,7 @@ impl App {
 
         let output_path = dir_info.data_dir().join(bin_subdir);
         let package = package_manager
-            .install_package(version, &None, &output_path)
+            .install_package(version, &None, &output_path, options)
             .await?;
 
         package_manager

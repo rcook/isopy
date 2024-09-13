@@ -25,8 +25,8 @@ use crate::python_package::PythonPackage;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadOptions, OptionalTags, Package, PackageFilter, PackageKind, PackageManagerContext,
-    PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
+    DownloadOptions, InstallPackageOptions, OptionalTags, Package, PackageFilter, PackageKind,
+    PackageManagerContext, PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -262,6 +262,7 @@ impl PackageManagerOps for PythonPackageManager {
         version: &Version,
         tags: &OptionalTags,
         dir: &Path,
+        options: &InstallPackageOptions,
     ) -> Result<Package> {
         let version = downcast_version!(version);
         let index = self.get_index(false).await?;
@@ -270,7 +271,7 @@ impl PackageManagerOps for PythonPackageManager {
         package
             .metadata()
             .archive_type()
-            .unpack(&package_path, dir)
+            .unpack(&package_path, dir, options)
             .await?;
         Ok(Package::new(package))
     }

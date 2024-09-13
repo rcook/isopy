@@ -1193,6 +1193,7 @@ dependencies = [
  "async-trait",
  "derive_more",
  "hex",
+ "indicatif",
  "rstest",
  "serde",
  "sha2",

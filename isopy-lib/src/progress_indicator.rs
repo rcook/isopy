@@ -19,35 +19,32 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::fs::existing;
-use crate::status::{return_success, return_user_error, Status};
-use anyhow::Result;
-use isopy_lib::InstallPackageOptions;
+use indicatif::ProgressBar;
+use std::borrow::Cow;
+use std::rc::Rc;
 
-pub(crate) async fn do_init(app: &App) -> Result<Status> {
-    if app.repo().get(app.cwd())?.is_some() {
-        return_user_error!(
-            "Project in directory {} already has an environment",
-            app.cwd().display()
-        );
+#[derive(Clone)]
+pub struct ProgressIndicator(Option<Rc<ProgressBar>>);
+
+impl ProgressIndicator {
+    #[must_use]
+    pub fn new_spinner(show_progress: bool) -> Self {
+        if show_progress {
+            Self(Some(Rc::new(ProgressBar::new_spinner())))
+        } else {
+            Self(None)
+        }
     }
 
-    let Some(project) = existing(app.read_project_config())? else {
-        return_user_error!(
-            "No project configuration file in directory {}",
-            app.cwd().display()
-        );
-    };
-
-    for package_id in project.package_ids {
-        app.install_package(
-            package_id.moniker(),
-            package_id.version(),
-            &InstallPackageOptions::default(),
-        )
-        .await?;
+    pub fn set_message(&self, msg: impl Into<Cow<'static, str>>) {
+        if let Some(inner) = &self.0 {
+            inner.set_message(msg);
+        }
     }
 
-    return_success!();
+    pub fn finish(&self) {
+        if let Some(inner) = &self.0 {
+            inner.finish_and_clear();
+        }
+    }
 }

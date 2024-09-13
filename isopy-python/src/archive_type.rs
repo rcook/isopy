@@ -21,6 +21,8 @@
 //
 use anyhow::{bail, Result};
 use decompress::{decompress, ExtractOptsBuilder};
+use isopy_lib::{InstallPackageOptions, ProgressIndicator};
+use log::info;
 use std::path::Path;
 use strum_macros::EnumIter;
 
@@ -41,21 +43,33 @@ impl ArchiveType {
     }
 
     #[allow(clippy::unused_async)]
-    pub(crate) async fn unpack(&self, archive_path: &Path, dir: &Path) -> Result<()> {
+    pub(crate) async fn unpack(
+        &self,
+        archive_path: &Path,
+        dir: &Path,
+        options: &InstallPackageOptions,
+    ) -> Result<()> {
         if dir.exists() {
             bail!("Output directory {} already exists", dir.display())
         }
 
-        let options = ExtractOptsBuilder::default()
-            .strip(1)
-            .filter(|args| {
-                // TBD: Use progress UI instead eventually
-                println!("{}", args.rel_path());
-                true
-            })
-            .build()?;
-        decompress(archive_path, dir, &options)?;
-        println!("Finished unpacking to {}", dir.display());
+        let progress_indicator = ProgressIndicator::new_spinner(options.show_progress);
+
+        {
+            let progress_indicator = progress_indicator.clone();
+            let options = ExtractOptsBuilder::default()
+                .strip(1)
+                .filter(move |args| {
+                    progress_indicator.set_message(format!("Unpacking {}", args.rel_path()));
+                    true
+                })
+                .build()?;
+            decompress(archive_path, dir, &options)?;
+        }
+
+        progress_indicator.finish();
+
+        info!("Unpacked package to {}", dir.display());
         Ok(())
     }
 }

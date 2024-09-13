@@ -23,9 +23,14 @@ use crate::app::App;
 use crate::package_id::PackageId;
 use crate::status::{return_success, Status};
 use anyhow::Result;
+use isopy_lib::InstallPackageOptions;
 
 pub(crate) async fn do_env_init(app: &App, package_id: &PackageId) -> Result<Status> {
-    app.install_package(package_id.moniker(), package_id.version())
-        .await?;
+    app.install_package(
+        package_id.moniker(),
+        package_id.version(),
+        &InstallPackageOptions::default(),
+    )
+    .await?;
     return_success!();
 }
