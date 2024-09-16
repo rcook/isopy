@@ -26,32 +26,32 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::sync::LazyLock;
 
-static NEW_STYLE_BUILD_TAG_REGEX: LazyLock<Regex> =
+static NEW_STYLE_RELEASE_GROUP_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}$").expect("Invalid regex"));
 
-static OLD_STYLE_BUILD_TAG_REGEX: LazyLock<Regex> =
+static OLD_STYLE_RELEASE_GROUP_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}T\\d{4}$").expect("Invalid regex"));
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub(crate) struct BuildTag {
+pub(crate) struct ReleaseGroup {
     inner: Inner,
 }
 
-impl BuildTag {
+impl ReleaseGroup {
     pub(crate) fn as_str(&self) -> &str {
         self.inner.as_str()
     }
 }
 
-impl FromStr for BuildTag {
+impl FromStr for ReleaseGroup {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        if NEW_STYLE_BUILD_TAG_REGEX.is_match(s) {
+        if NEW_STYLE_RELEASE_GROUP_REGEX.is_match(s) {
             Ok(Self {
                 inner: Inner::NewStyle(String::from(s)),
             })
-        } else if OLD_STYLE_BUILD_TAG_REGEX.is_match(s) {
+        } else if OLD_STYLE_RELEASE_GROUP_REGEX.is_match(s) {
             Ok(Self {
                 inner: Inner::OldStyle(String::from(s)),
             })

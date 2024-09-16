@@ -19,70 +19,64 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::build_tag::BuildTag;
+use crate::release_group::ReleaseGroup;
+use crate::{discriminator::Discriminator, python_version::PythonVersion};
 use anyhow::{bail, Result};
 use isopy_lib::VersionTriple;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct FullVersion {
+pub(crate) struct PythonIndexVersion {
     version: VersionTriple,
-    version_ex: Option<String>,
-    build_tag: BuildTag,
+    discriminator: Discriminator,
+    release_group: ReleaseGroup,
 }
 
-impl FullVersion {
+impl PythonIndexVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
-        fn get_version_and_version_ex(prefix: &str) -> (&str, Option<String>) {
-            prefix.find("rc").map_or_else(
-                || (prefix, None),
-                |i| (&prefix[0..i], Some(String::from(&prefix[i..]))),
-            )
-        }
-
-        let mut full_version = None;
+        let mut result = None;
         let mut version = None;
-        let mut version_ex = None;
-        let mut build_tag = None;
+        let mut discriminator = None;
+        let mut release_group = None;
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
-                let (version_str, temp_version_ex) = get_version_and_version_ex(prefix);
+                let (temp_discriminator, version_str) = Discriminator::parse(prefix);
                 if let Ok(temp_version) = version_str.parse() {
-                    if let Ok(temp_build_tag) = suffix.parse() {
+                    if let Ok(temp_release_group) = suffix.parse() {
                         assert!(
-                            full_version.is_none()
+                            result.is_none()
                                 && version.is_none()
-                                && version_ex.is_none()
-                                && build_tag.is_none()
+                                && discriminator.is_none()
+                                && release_group.is_none()
                         );
                         tags_to_remove.push(tag.clone());
-                        full_version = Some(Self {
+                        result = Some(Self {
                             version: temp_version,
-                            version_ex: temp_version_ex,
-                            build_tag: temp_build_tag,
+                            discriminator: temp_discriminator,
+                            release_group: temp_release_group,
                         });
                         break;
                     }
                 }
             }
 
-            let (version_str, temp_version_ex) = get_version_and_version_ex(tag);
+            let (temp_discriminator, version_str) = Discriminator::parse(tag);
             if let Ok(temp_version) = version_str.parse() {
-                assert!(full_version.is_none() && version.is_none() && version_ex.is_none());
+                assert!(result.is_none() && version.is_none() && discriminator.is_none());
                 tags_to_remove.push(tag.clone());
                 version = Some(temp_version);
-                version_ex = temp_version_ex;
-                if build_tag.is_some() {
+                discriminator = Some(temp_discriminator);
+                if release_group.is_some() {
                     break;
                 }
             }
 
-            if let Ok(temp_build_tag) = tag.parse() {
-                assert!(full_version.is_none() && build_tag.is_none());
+            if let Ok(temp_release_group) = tag.parse() {
+                assert!(result.is_none() && release_group.is_none());
                 tags_to_remove.push(tag.clone());
-                build_tag = Some(temp_build_tag);
+                release_group = Some(temp_release_group);
                 if version.is_some() {
                     break;
                 }
@@ -93,8 +87,8 @@ impl FullVersion {
             assert!(tags.remove(&tag));
         }
 
-        if let Some(result) = full_version {
-            assert!(version.is_none() && build_tag.is_none());
+        if let Some(result) = result {
+            assert!(version.is_none() && release_group.is_none());
             return Ok(result);
         }
 
@@ -102,14 +96,14 @@ impl FullVersion {
             bail!("Could not determine package version from tags {tags:?}")
         };
 
-        let Some(build_tag) = build_tag else {
-            bail!("Could not determine package build tag from tags {tags:?}")
+        let Some(release_group) = release_group else {
+            bail!("Could not determine package release group from tags {tags:?}")
         };
 
         Ok(Self {
             version,
-            version_ex: None,
-            build_tag,
+            discriminator: Discriminator::None,
+            release_group,
         })
     }
 
@@ -117,7 +111,30 @@ impl FullVersion {
         &self.version
     }
 
-    pub(crate) const fn build_tag(&self) -> &BuildTag {
-        &self.build_tag
+    #[allow(unused)]
+    pub(crate) const fn discriminator(&self) -> &Discriminator {
+        &self.discriminator
+    }
+
+    pub(crate) const fn release_group(&self) -> &ReleaseGroup {
+        &self.release_group
+    }
+
+    pub(crate) fn matches(&self, other: &PythonVersion) -> bool {
+        if self.version != *other.version() {
+            return false;
+        }
+
+        if self.discriminator != *other.discriminator() {
+            return false;
+        }
+
+        if let Some(other_release_group) = other.release_group() {
+            if self.release_group != *other_release_group {
+                return false;
+            }
+        }
+
+        true
     }
 }

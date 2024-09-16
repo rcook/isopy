@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::archive_type::ArchiveType;
-use crate::full_version::FullVersion;
+use crate::python_index_version::PythonIndexVersion;
 use anyhow::{bail, Error, Result};
 use std::collections::HashSet;
 use std::result::Result as StdResult;
@@ -31,7 +31,7 @@ use strum::IntoEnumIterator;
 pub(crate) struct Metadata {
     name: String,
     archive_type: ArchiveType,
-    full_version: FullVersion,
+    index_version: PythonIndexVersion,
     tags: HashSet<String>,
 }
 
@@ -44,8 +44,8 @@ impl Metadata {
         &self.archive_type
     }
 
-    pub(crate) const fn full_version(&self) -> &FullVersion {
-        &self.full_version
+    pub(crate) const fn index_version(&self) -> &PythonIndexVersion {
+        &self.index_version
     }
 
     pub(crate) const fn tags(&self) -> &HashSet<String> {
@@ -75,12 +75,11 @@ impl FromStr for Metadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let full_version = FullVersion::from_tags(&mut tags)?;
-
+        let index_version = PythonIndexVersion::from_tags(&mut tags)?;
         Ok(Self {
             name,
             archive_type,
-            full_version,
+            index_version,
             tags,
         })
     }

@@ -22,12 +22,13 @@
 use crate::checksum::get_checksum;
 use crate::metadata::Metadata;
 use crate::python_package::PythonPackage;
+use crate::python_version::PythonVersion;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
     OptionalTags, Package, PackageFilter, PackageKind, PackageManagerContext, PackageManagerOps,
-    PackageSummary, Tags, Version, VersionTriple,
+    PackageSummary, Tags, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -50,7 +51,7 @@ macro_rules! downcast_version {
     ($version : expr) => {
         $version
             .as_any()
-            .downcast_ref::<VersionTriple>()
+            .downcast_ref::<PythonVersion>()
             .ok_or_else(|| anyhow!("Invalid version type"))?
     };
 }
@@ -118,7 +119,7 @@ impl PythonPackageManager {
 
     fn get_package(
         index: &Value,
-        version: &VersionTriple,
+        version: &PythonVersion,
         tags: &OptionalTags,
     ) -> Result<PythonPackage> {
         let tags = Self::get_tags(tags);
@@ -126,7 +127,7 @@ impl PythonPackageManager {
         for item in g!(index.as_array()) {
             packages.extend(Self::get_packages(item)?.into_iter().filter(|archive| {
                 let m = archive.metadata();
-                Self::metadata_has_tags(m, &tags) && m.full_version().version() == version
+                Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
             }));
         }
 
@@ -134,7 +135,7 @@ impl PythonPackageManager {
             bail!("No matching archives found")
         }
 
-        packages.sort_by_cached_key(|archive| archive.metadata().full_version().clone());
+        packages.sort_by_cached_key(|archive| archive.metadata().index_version().clone());
         packages.reverse();
         Ok(packages
             .into_iter()
@@ -147,7 +148,7 @@ impl PythonPackageManager {
             .tags()
             .iter()
             .map(String::as_str)
-            .chain(once(metadata.full_version().build_tag().as_str()))
+            .chain(once(metadata.index_version().release_group().as_str()))
             .collect::<HashSet<_>>()
             .is_superset(tags)
     }
@@ -178,7 +179,7 @@ impl PackageManagerOps for PythonPackageManager {
             for archive in Self::get_packages(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
                 other_tags.insert(String::from(
-                    archive.metadata().full_version().build_tag().as_str(),
+                    archive.metadata().index_version().release_group().as_str(),
                 ));
             }
         }
@@ -230,8 +231,8 @@ impl PackageManagerOps for PythonPackageManager {
         records.sort_by(|a, b| {
             if a.0 == b.0 {
                 b.1.metadata()
-                    .full_version()
-                    .cmp(a.1.metadata().full_version())
+                    .index_version()
+                    .cmp(a.1.metadata().index_version())
             } else {
                 b.0.cmp(&a.0)
             }
@@ -244,8 +245,8 @@ impl PackageManagerOps for PythonPackageManager {
                     kind,
                     archive.metadata().name(),
                     archive.url(),
-                    Version::new(archive.metadata().full_version().version().clone()),
-                    String::from(archive.metadata().full_version().build_tag().as_str()),
+                    Version::new(archive.metadata().index_version().version().clone()),
+                    String::from(archive.metadata().index_version().release_group().as_str()),
                     path,
                 )
             })
@@ -279,8 +280,17 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> StdResult<Package, InstallPackageError> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let package = Self::get_package(&index, version, tags)
-            .map_err(|_| InstallPackageError::VersionNotFound)?;
+
+        let Ok(package) = Self::get_package(&index, version, tags) else {
+            match tags {
+                Some(tags) => {
+                    log::error!("Package version {} not found (tags {:?})", version, tags);
+                }
+                None => log::error!("Package version {} not found", version),
+            }
+            return Err(InstallPackageError::VersionNotFound);
+        };
+
         let package_path = self
             .ctx
             .get_file(package.url())

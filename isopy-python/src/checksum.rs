@@ -40,8 +40,8 @@ pub(crate) fn get_checksum(package: &PythonPackage) -> Result<Checksum> {
             .collect::<HashMap<_, _>>()
     }
 
-    let build_tag_str = package.metadata().full_version().build_tag().as_str();
-    let file_name = format!("{build_tag_str}.sha256sums");
+    let release_group_str = package.metadata().index_version().release_group().as_str();
+    let file_name = format!("{release_group_str}.sha256sums");
     let file = SHA256SUMS_DIR
         .get_file(&file_name)
         .ok_or_else(|| anyhow!("Resource file {} not found", file_name))?;

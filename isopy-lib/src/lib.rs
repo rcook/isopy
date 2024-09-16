@@ -82,5 +82,5 @@ pub use progress_indicator_options::ProgressIndicatorOptions;
 pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
 pub use tags::Tags;
-pub use version::Version;
+pub use version::{Version, VersionOps};
 pub use version_triple::VersionTriple;

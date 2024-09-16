@@ -37,14 +37,16 @@
 #![allow(clippy::redundant_pub_crate)]
 
 mod archive_type;
-mod build_tag;
 mod checksum;
 mod constants;
+mod discriminator;
 mod entrypoint;
-mod full_version;
 mod metadata;
+mod python_index_version;
 mod python_package;
 mod python_package_manager;
 mod python_plugin;
+mod python_version;
+mod release_group;
 
 pub use entrypoint::new_plugin;

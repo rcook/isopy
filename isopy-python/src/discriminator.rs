@@ -19,43 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::metadata::Metadata;
-use isopy_lib::{EnvProps, PackageOps, Version};
-use std::path::Path;
-use url::Url;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[derive(Clone, Debug)]
-pub(crate) struct PythonPackage {
-    url: Url,
-    metadata: Metadata,
-    version: Version,
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub(crate) enum Discriminator {
+    String(String),
+    None,
 }
 
-impl PythonPackage {
-    pub(crate) fn new(url: &Url, metadata: Metadata) -> Self {
-        let version = Version::new(metadata.index_version().version().clone());
-        Self {
-            url: url.clone(),
-            metadata,
-            version,
+impl Discriminator {
+    pub(crate) fn parse(s: &str) -> (Self, &str) {
+        s.find("rc").map_or_else(
+            || (Self::None, s),
+            |i| (Self::String(String::from(&s[i..])), &s[0..i]),
+        )
+    }
+}
+
+impl Display for Discriminator {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Self::String(value) => write!(f, "{value}")?,
+            Self::None => {}
         }
-    }
-
-    pub(crate) const fn url(&self) -> &Url {
-        &self.url
-    }
-
-    pub(crate) const fn metadata(&self) -> &Metadata {
-        &self.metadata
-    }
-}
-
-impl PackageOps for PythonPackage {
-    fn version(&self) -> &Version {
-        &self.version
-    }
-
-    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps {
-        EnvProps::new(bin_subdir, &self.url)
+        Ok(())
     }
 }
