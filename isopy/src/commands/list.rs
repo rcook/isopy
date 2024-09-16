@@ -28,7 +28,7 @@ use crate::table::{table_divider, table_title};
 use anyhow::Result;
 use log::info;
 
-pub(crate) fn do_env_list(app: &App, verbose: bool) -> Result<Status> {
+pub(crate) fn do_list(app: &App, verbose: bool) -> Result<Status> {
     if verbose {
         list_verbose(app)?;
     } else {

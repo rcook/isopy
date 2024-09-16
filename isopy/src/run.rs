@@ -84,9 +84,9 @@ pub(crate) async fn run() -> Result<Status> {
 async fn run_command(app: App, command: Command) -> Result<Status> {
     use crate::args::Command::*;
     use crate::commands::{
-        do_check, do_completions, do_delete, do_download, do_env_init, do_env_list, do_info,
-        do_init, do_link, do_packages, do_project, do_prompt, do_run, do_scratch, do_shell,
-        do_tags, do_update, do_wrap,
+        do_check, do_completions, do_delete, do_download, do_env, do_info, do_init, do_link,
+        do_list, do_packages, do_project, do_prompt, do_run, do_scratch, do_shell, do_tags,
+        do_update, do_wrap,
     };
 
     match command {
@@ -94,15 +94,15 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
         Completions { shell } => Ok(do_completions(shell)),
         Delete { project_dir } => do_delete(&app, &project_dir).await,
         Download { package_id, tags } => do_download(&app, &package_id, &tags).await,
-        EnvInit {
+        Env {
             package_id,
             download,
             ..
-        } => do_env_init(&app, &package_id, download).await,
-        EnvList { verbose, .. } => do_env_list(&app, verbose),
-        Link { dir_id } => do_link(&app, &dir_id),
+        } => do_env(&app, &package_id, download).await,
         Info => do_info(&app),
         Init { download, .. } => do_init(&app, download).await,
+        Link { dir_id } => do_link(&app, &dir_id),
+        List { verbose, .. } => do_list(&app, verbose),
         Packages {
             moniker,
             filter,

@@ -25,11 +25,7 @@ use crate::status::{report_install_package_error, return_success, Status};
 use anyhow::Result;
 use isopy_lib::{DownloadPackageOptions, InstallPackageOptions};
 
-pub(crate) async fn do_env_init(
-    app: &App,
-    package_id: &PackageId,
-    download: bool,
-) -> Result<Status> {
+pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> Result<Status> {
     let download_package_options = DownloadPackageOptions::default().show_progress(true);
     let install_package_options = InstallPackageOptions::default().show_progress(true);
 

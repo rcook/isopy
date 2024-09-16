@@ -131,8 +131,8 @@ pub(crate) enum Command {
         tags: Option<Vec<String>>,
     },
 
-    #[command(name = "env-init", about = "Install package into environment")]
-    EnvInit {
+    #[command(name = "env", about = "Install package into environment")]
+    Env {
         #[arg(help = "Package ID")]
         package_id: PackageId,
 
@@ -148,22 +148,6 @@ pub(crate) enum Command {
 
         #[arg(help = "Do not download package if missing", long = "no-download")]
         _no_download: bool,
-    },
-
-    #[command(name = "env-list", about = "List environments")]
-    EnvList {
-        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
-        #[arg(
-            help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
-        )]
-        verbose: bool,
-
-        #[arg(help = "Show brief output", long = "no-verbose")]
-        _no_verbose: bool,
     },
 
     #[command(name = "info", about = "Show information")]
@@ -195,6 +179,22 @@ pub(crate) enum Command {
     Link {
         #[arg(help = "Directory ID", value_parser = parse_meta_id)]
         dir_id: MetaId,
+    },
+
+    #[command(name = "list", about = "List environments")]
+    List {
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --verbose/--no-verbose with default of "false"
+        #[arg(
+            help = "Show detailed output",
+            long = "verbose",
+            overrides_with = "_no_verbose",
+            default_value_t = false
+        )]
+        verbose: bool,
+
+        #[arg(help = "Show brief output", long = "no-verbose")]
+        _no_verbose: bool,
     },
 
     #[command(name = "packages", about = "List packages")]
