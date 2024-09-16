@@ -107,16 +107,13 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
-    #[command(
-        name = "delete",
-        about = "Delete environment corresponding to project directory"
-    )]
+    #[command(name = "delete", about = "Delete project or non-project environment")]
     Delete {
         #[arg(help = "Project directory", value_parser = parse_absolute_path)]
         project_dir: PathBuf,
     },
 
-    #[command(name = "download", about = "Download package")]
+    #[command(name = "download", about = "Download package into local cache")]
     Download {
         #[arg(help = "Package ID")]
         package_id: PackageId,
@@ -131,7 +128,7 @@ pub(crate) enum Command {
         tags: Option<Vec<String>>,
     },
 
-    #[command(name = "env", about = "Install package into environment")]
+    #[command(name = "env", about = "Install package into non-project environment")]
     Env {
         #[arg(help = "Package ID")]
         package_id: PackageId,
@@ -150,7 +147,7 @@ pub(crate) enum Command {
         _no_download: bool,
     },
 
-    #[command(name = "info", about = "Show information")]
+    #[command(name = "info", about = "Show information about current environment")]
     Info,
 
     #[command(
@@ -201,7 +198,7 @@ pub(crate) enum Command {
         _no_verbose: bool,
     },
 
-    #[command(name = "packages", about = "List packages")]
+    #[command(name = "packages", about = "List local and/or remote packages")]
     Packages {
         #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
@@ -225,7 +222,10 @@ pub(crate) enum Command {
         tags: Option<Vec<String>>,
     },
 
-    #[command(name = "project", about = "Configure project")]
+    #[command(
+        name = "project",
+        about = "Generate project configuration file for current directory"
+    )]
     Project {
         #[arg(help = "Package ID")]
         package_id: PackageId,
@@ -270,7 +270,7 @@ pub(crate) enum Command {
         _no_verbose: bool,
     },
 
-    #[command(name = "tags", about = "List tags")]
+    #[command(name = "tags", about = "List package tags")]
     Tags {
         #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
@@ -284,7 +284,7 @@ pub(crate) enum Command {
 
     #[command(
         name = "wrap",
-        about = "Generate environment wrapper script in bin directory for script"
+        about = "Generate environment wrapper in bin directory for script"
     )]
     Wrap {
         #[arg(help = "Wrapper file name")]
