@@ -23,6 +23,7 @@ use crate::app::App;
 use crate::moniker::Moniker;
 use crate::status::{return_success, Status};
 use anyhow::Result;
+use colored::Colorize;
 use strum::IntoEnumIterator;
 
 pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
@@ -33,26 +34,26 @@ pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Stat
             .list_tags()
             .await?;
 
-        println!("Package manager: {moniker}");
+        println!("Package manager: {}", moniker.as_str().bright_magenta());
 
         if !tags.tags().is_empty() {
             println!("  Tags:");
             for tag in tags.tags() {
-                println!("    {tag}");
+                println!("    {}", tag.cyan());
             }
         }
 
         if !tags.default_tags().is_empty() {
             println!("  Default tags:");
             for tag in tags.default_tags() {
-                println!("    {tag}");
+                println!("    {}", tag.cyan());
             }
         }
 
         if !tags.other_tags().is_empty() {
             println!("  Other tags:");
             for tag in tags.other_tags() {
-                println!("    {tag}");
+                println!("    {}", tag.cyan());
             }
         }
 
