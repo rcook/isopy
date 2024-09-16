@@ -22,27 +22,28 @@
 use crate::env::{read_env_bool, ISOPY_BACKTRACE_ENV_NAME};
 use colored::Colorize;
 
+#[derive(Debug)]
 pub(crate) enum Status {
     Success,
     UserError,
 }
 
 macro_rules! return_success_quiet {
-    () => {{
-        return Ok(Status::Success);
-    }};
+    () => {
+        return Ok($crate::status::Status::Success);
+    };
 }
 pub(crate) use return_success_quiet;
 
 macro_rules! return_success {
     () => {{
         log::info!("isopy completed successfully");
-        return Ok(Status::Success);
+        return Ok($crate::status::Status::Success);
     }};
 
     ($($arg: tt)*) => {{
         log::info!($($arg)*);
-        return Ok(Status::Success);
+        return Ok($crate::status::Status::Success);
     }};
 }
 pub(crate) use return_success;
@@ -50,10 +51,22 @@ pub(crate) use return_success;
 macro_rules! return_user_error {
     ($($arg: tt)*) => {{
         log::error!($($arg)*);
-        return Ok(Status::UserError);
+        return Ok($crate::status::Status::UserError);
     }};
 }
 pub(crate) use return_user_error;
+
+macro_rules! report_install_package_error {
+    ($result: expr) => {
+        match $result {
+            Ok(value) => value,
+            Err(isopy_lib::InstallPackageError::VersionNotFound) => $crate::status::return_user_error!("Specified version of one or more packages was not found in index"),
+            Err(isopy_lib::InstallPackageError::PackageNotDownloaded) => $crate::status::return_user_error!("One or more specified packages has not been downloaded: run \"download\" command or run this command with \"--download\" option"),
+            Err(isopy_lib::InstallPackageError::Other(e)) => return Err(e),
+        }
+    };
+}
+pub(crate) use report_install_package_error;
 
 pub(crate) fn show_error(error: &anyhow::Error) {
     eprintln!("{}", format!("{error}").bright_red());

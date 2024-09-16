@@ -135,6 +135,19 @@ pub(crate) enum Command {
     EnvInit {
         #[arg(help = "Package ID")]
         package_id: PackageId,
+
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --download/--no-download with default of "false"
+        #[arg(
+            help = "Download package if required",
+            long = "download",
+            overrides_with = "_no_download",
+            default_value_t = false
+        )]
+        download: bool,
+
+        #[arg(help = "Do not download package if missing", long = "no-download")]
+        _no_download: bool,
     },
 
     #[command(name = "env-list", about = "List environments")]
@@ -160,7 +173,20 @@ pub(crate) enum Command {
         name = "init",
         about = "Install configured project packages into environment"
     )]
-    Init,
+    Init {
+        // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+        // --download/--no-download with default of "false"
+        #[arg(
+            help = "Download package if required",
+            long = "download",
+            overrides_with = "_no_download",
+            default_value_t = false
+        )]
+        download: bool,
+
+        #[arg(help = "Do not download package if missing", long = "no-download")]
+        _no_download: bool,
+    },
 
     #[command(
         name = "link",

@@ -25,6 +25,7 @@ use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
 use std::sync::Arc;
+use std::time::Duration;
 
 #[derive(Clone)]
 pub struct ProgressIndicator(Option<Arc<ProgressBar>>);
@@ -38,7 +39,11 @@ impl ProgressIndicator {
 
         let (progress_bar, template) = match &options.extent {
             Extent::Unknown => (
-                ProgressBar::new_spinner(),
+                {
+                    let progress_bar = ProgressBar::new_spinner();
+                    progress_bar.enable_steady_tick(Duration::from_millis(100));
+                    progress_bar
+                },
                 "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {wide_msg:.yellow}",
             ),
             Extent::Bytes(len) => (

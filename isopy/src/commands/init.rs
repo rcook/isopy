@@ -21,11 +21,11 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::status::{return_success, return_user_error, Status};
+use crate::status::{report_install_package_error, return_success, return_user_error, Status};
 use anyhow::Result;
-use isopy_lib::InstallPackageOptions;
+use isopy_lib::{DownloadPackageOptions, InstallPackageOptions};
 
-pub(crate) async fn do_init(app: &App) -> Result<Status> {
+pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
         return_user_error!(
             "Project in directory {} already has an environment",
@@ -40,13 +40,25 @@ pub(crate) async fn do_init(app: &App) -> Result<Status> {
         );
     };
 
+    let download_package_options = DownloadPackageOptions::default().show_progress(true);
+    let install_package_options = InstallPackageOptions::default().show_progress(true);
+
     for package_id in project.package_ids {
-        app.install_package(
-            package_id.moniker(),
-            package_id.version(),
-            &InstallPackageOptions::default(),
-        )
-        .await?;
+        if download {
+            app.plugin_manager()
+                .new_package_manager(package_id.moniker(), app.config_dir())
+                .download_package(package_id.version(), &None, &download_package_options)
+                .await?;
+        }
+
+        report_install_package_error!(
+            app.install_package(
+                package_id.moniker(),
+                package_id.version(),
+                &install_package_options,
+            )
+            .await
+        );
     }
 
     return_success!();

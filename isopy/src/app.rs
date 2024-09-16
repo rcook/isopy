@@ -27,12 +27,16 @@ use crate::plugin_manager::PluginManager;
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{bail, Result};
-use isopy_lib::{EnvInfo, EnvProps, InstallPackageOptions, Platform, Shell, Version};
+use isopy_lib::{
+    install_package_bail, install_package_error, EnvInfo, EnvProps, InstallPackageError,
+    InstallPackageOptions, Platform, Shell, Version,
+};
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+use std::result::Result as StdResult;
 
 pub(crate) struct App {
     config_dir: PathBuf,
@@ -87,13 +91,17 @@ impl App {
         moniker: &Moniker,
         version: &Version,
         options: &InstallPackageOptions,
-    ) -> Result<()> {
+    ) -> StdResult<(), InstallPackageError> {
         let project_dir = &self.cwd;
 
-        let (dir_info, mut packages) = if let Some(dir_info) = self.repo.get(project_dir)? {
+        let (dir_info, mut packages) = if let Some(dir_info) = self
+            .repo
+            .get(project_dir)
+            .map_err(|e| install_package_error!(e))?
+        {
             let env = dir_info.read_env_config()?;
             if env.project_dir != *project_dir {
-                bail!(
+                install_package_bail!(
                     "Environment directory {} does not correspond to project directory {}",
                     dir_info.data_dir().display(),
                     project_dir.display()
@@ -102,18 +110,24 @@ impl App {
 
             (dir_info, env.packages)
         } else {
-            let Some(dir_info) = self.repo.init(project_dir)? else {
-                bail!(
+            let Some(dir_info) = self
+                .repo
+                .init(project_dir)
+                .map_err(|e| install_package_error!(e))?
+            else {
+                install_package_bail!(
                     "Could not initialize environment for directory {}",
                     project_dir.display()
-                )
+                );
             };
 
             (dir_info, Vec::new())
         };
 
         if packages.iter().any(|p| p.package_id.moniker() == moniker) {
-            bail!("Environment already has a package for package manager {moniker} configured",);
+            install_package_bail!(
+                "Environment already has a package for package manager {moniker} configured"
+            );
         }
 
         let package_manager = self

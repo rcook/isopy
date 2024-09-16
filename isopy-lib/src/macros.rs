@@ -66,7 +66,7 @@ macro_rules! serializable_newtype {
 }
 
 macro_rules! dyn_trait_struct {
-    ($name : ident, $trait: ident) => {
+    ($name: ident, $trait: ident) => {
         #[derive(derive_more::Deref)]
         pub struct $name(Box<dyn $trait>);
 

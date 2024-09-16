@@ -21,16 +21,33 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{return_success, Status};
+use crate::status::{report_install_package_error, return_success, Status};
 use anyhow::Result;
-use isopy_lib::InstallPackageOptions;
+use isopy_lib::{DownloadPackageOptions, InstallPackageOptions};
 
-pub(crate) async fn do_env_init(app: &App, package_id: &PackageId) -> Result<Status> {
-    app.install_package(
-        package_id.moniker(),
-        package_id.version(),
-        &InstallPackageOptions::default(),
-    )
-    .await?;
-    return_success!();
+pub(crate) async fn do_env_init(
+    app: &App,
+    package_id: &PackageId,
+    download: bool,
+) -> Result<Status> {
+    let download_package_options = DownloadPackageOptions::default().show_progress(true);
+    let install_package_options = InstallPackageOptions::default().show_progress(true);
+
+    if download {
+        app.plugin_manager()
+            .new_package_manager(package_id.moniker(), app.config_dir())
+            .download_package(package_id.version(), &None, &download_package_options)
+            .await?;
+    }
+
+    report_install_package_error!(
+        app.install_package(
+            package_id.moniker(),
+            package_id.version(),
+            &install_package_options
+        )
+        .await
+    );
+
+    return_success!()
 }

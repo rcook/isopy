@@ -27,7 +27,7 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
 use isopy_lib::{
-    DownloadOptions, Extent, FileNameParts, PackageManagerContext, PackageManagerContextOps,
+    DownloadFileOptions, Extent, FileNameParts, PackageManagerContext, PackageManagerContextOps,
     ProgressIndicator, ProgressIndicatorOptions,
 };
 use log::info;
@@ -52,7 +52,7 @@ impl PackageManagerHelper {
         })
     }
 
-    async fn download_to_path(url: &Url, path: &Path, options: &DownloadOptions) -> Result<()> {
+    async fn download_to_path(url: &Url, path: &Path, options: &DownloadFileOptions) -> Result<()> {
         create_dir_all(
             path.parent().ok_or_else(|| {
                 anyhow!("Cannot get parent directory from path {}", path.display())
@@ -221,7 +221,7 @@ impl PackageManagerHelper {
 
 #[async_trait]
 impl PackageManagerContextOps for PackageManagerHelper {
-    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf> {
+    async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache(url)? {
                 return Ok(path);

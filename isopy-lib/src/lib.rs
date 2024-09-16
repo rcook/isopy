@@ -35,9 +35,11 @@
 #![allow(clippy::option_if_let_else)]
 mod accept;
 mod checksum;
-mod download_options;
+mod download_file_options;
+mod download_package_options;
 mod env_info;
 mod env_props;
+mod error;
 mod extent;
 mod file_name_parts;
 mod install_package_options;
@@ -59,9 +61,11 @@ mod version_triple;
 
 pub use accept::Accept;
 pub use checksum::Checksum;
-pub use download_options::DownloadOptions;
+pub use download_file_options::DownloadFileOptions;
+pub use download_package_options::DownloadPackageOptions;
 pub use env_info::EnvInfo;
 pub use env_props::EnvProps;
+pub use error::InstallPackageError;
 pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
 pub use install_package_options::InstallPackageOptions;

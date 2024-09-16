@@ -19,54 +19,36 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::accept::Accept;
-use crate::checksum::Checksum;
+use thiserror::Error;
 
-pub struct DownloadOptions {
-    pub accept: Option<Accept>,
-    pub update: bool,
-    pub checksum: Option<Checksum>,
-    pub show_progress: bool,
+#[derive(Debug, Error)]
+pub enum InstallPackageError {
+    #[error("Version not found")]
+    VersionNotFound,
+
+    #[error("Package not downloaded")]
+    PackageNotDownloaded,
+
+    #[error("Other")]
+    Other(#[from] anyhow::Error),
 }
 
-impl DownloadOptions {
-    #[must_use]
-    pub fn json() -> Self {
-        Self::default().accept(Some(Accept::ApplicationJson))
-    }
-
-    #[must_use]
-    pub const fn accept(mut self, value: Option<Accept>) -> Self {
-        self.accept = value;
-        self
-    }
-
-    #[must_use]
-    pub const fn update(mut self, value: bool) -> Self {
-        self.update = value;
-        self
-    }
-
-    #[must_use]
-    pub fn checksum(mut self, value: Option<Checksum>) -> Self {
-        self.checksum = value;
-        self
-    }
-
-    #[must_use]
-    pub const fn show_progress(mut self, value: bool) -> Self {
-        self.show_progress = value;
-        self
-    }
+#[macro_export]
+macro_rules! install_package_bail {
+    ($msg: literal $(,)?) => {
+        return std::result::Result::Err($crate::InstallPackageError::Other(anyhow::anyhow!($msg)))
+    };
+    ($err: expr $(,)?) => {
+        return std::result::Result::Err($crate::InstallPackageError::Other(anyhow::anyhow!($err)));
+    };
+    ($fmt: expr, $($arg: tt)*) => {
+        return std::result::Result::Err($crate::InstallPackageError::Other(anyhow::anyhow!($fmt, $($arg)*)));
+    };
 }
 
-impl Default for DownloadOptions {
-    fn default() -> Self {
-        Self {
-            accept: None,
-            update: false,
-            checksum: None,
-            show_progress: true,
-        }
-    }
+#[macro_export]
+macro_rules! install_package_error {
+    ($err: expr) => {
+        InstallPackageError::Other(anyhow::anyhow!($err))
+    };
 }

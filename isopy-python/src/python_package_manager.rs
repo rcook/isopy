@@ -25,13 +25,15 @@ use crate::python_package::PythonPackage;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadOptions, InstallPackageOptions, OptionalTags, Package, PackageFilter, PackageKind,
-    PackageManagerContext, PackageManagerOps, PackageSummary, Tags, Version, VersionTriple,
+    DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
+    OptionalTags, Package, PackageFilter, PackageKind, PackageManagerContext, PackageManagerOps,
+    PackageSummary, Tags, Version, VersionTriple,
 };
 use serde_json::Value;
 use std::collections::HashSet;
 use std::iter::once;
 use std::path::Path;
+use std::result::Result as StdResult;
 use tokio::fs::read_to_string;
 use url::Url;
 
@@ -150,8 +152,10 @@ impl PythonPackageManager {
             .is_superset(tags)
     }
 
-    async fn get_index(&self, update: bool) -> Result<Value> {
-        let options = DownloadOptions::json().update(update);
+    async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
+        let options = DownloadFileOptions::json()
+            .update(update)
+            .show_progress(show_progress);
         let path = self.ctx.download_file(&self.url, &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
@@ -162,14 +166,14 @@ impl PythonPackageManager {
 #[async_trait]
 impl PackageManagerOps for PythonPackageManager {
     async fn update_index(&self) -> Result<()> {
-        self.get_index(true).await?;
+        self.get_index(true, true).await?; // TBD: Pass show_progress via UpdateIndexOptions etc.
         Ok(())
     }
 
     async fn list_tags(&self) -> Result<Tags> {
         let mut tags = HashSet::new();
         let mut other_tags = HashSet::new();
-        let index = self.get_index(false).await?;
+        let index = self.get_index(false, true).await?; // TBD: Pass show_progress via ListTagsOptions etc.
         for item in g!(index.as_array()) {
             for archive in Self::get_packages(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
@@ -204,7 +208,7 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<Vec<PackageSummary>> {
         let tags = Self::get_tags(tags);
         let mut records = Vec::new();
-        let index = self.get_index(false).await?;
+        let index = self.get_index(false, true).await?; // TBD: Pass show_progress via ListPackagesOptions etc.
         for item in g!(index.as_array()) {
             for package in Self::get_packages(item)? {
                 if Self::metadata_has_tags(package.metadata(), &tags) {
@@ -248,12 +252,20 @@ impl PackageManagerOps for PythonPackageManager {
             .collect())
     }
 
-    async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()> {
+    async fn download_package(
+        &self,
+        version: &Version,
+        tags: &OptionalTags,
+        options: &DownloadPackageOptions,
+    ) -> Result<()> {
         let version = downcast_version!(version);
-        let index = self.get_index(false).await?;
+        let index = self.get_index(false, options.show_progress).await?;
         let package = Self::get_package(&index, version, tags)?;
         let checksum = get_checksum(&package)?;
-        let options = DownloadOptions::default().checksum(Some(checksum));
+        let options = DownloadFileOptions::default()
+            .update(false)
+            .checksum(Some(checksum))
+            .show_progress(options.show_progress);
         _ = self.ctx.download_file(package.url(), &options).await?;
         Ok(())
     }
@@ -264,11 +276,16 @@ impl PackageManagerOps for PythonPackageManager {
         tags: &OptionalTags,
         dir: &Path,
         options: &InstallPackageOptions,
-    ) -> Result<Package> {
+    ) -> StdResult<Package, InstallPackageError> {
         let version = downcast_version!(version);
-        let index = self.get_index(false).await?;
-        let package = Self::get_package(&index, version, tags)?;
-        let package_path = self.ctx.get_file(package.url()).await?;
+        let index = self.get_index(false, options.show_progress).await?;
+        let package = Self::get_package(&index, version, tags)
+            .map_err(|_| InstallPackageError::VersionNotFound)?;
+        let package_path = self
+            .ctx
+            .get_file(package.url())
+            .await
+            .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
         package
             .metadata()
             .archive_type()

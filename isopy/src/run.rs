@@ -94,11 +94,15 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
         Completions { shell } => Ok(do_completions(shell)),
         Delete { project_dir } => do_delete(&app, &project_dir).await,
         Download { package_id, tags } => do_download(&app, &package_id, &tags).await,
-        EnvInit { package_id } => do_env_init(&app, &package_id).await,
+        EnvInit {
+            package_id,
+            download,
+            ..
+        } => do_env_init(&app, &package_id, download).await,
         EnvList { verbose, .. } => do_env_list(&app, verbose),
         Link { dir_id } => do_link(&app, &dir_id),
         Info => do_info(&app),
-        Init => do_init(&app).await,
+        Init { download, .. } => do_init(&app, download).await,
         Packages {
             moniker,
             filter,

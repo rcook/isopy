@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 #[derive(Default)]
-pub struct InstallPackageOptions {
+pub struct DownloadPackageOptions {
     pub show_progress: bool,
 }
 
-impl InstallPackageOptions {
+impl DownloadPackageOptions {
     #[must_use]
     pub const fn show_progress(mut self, value: bool) -> Self {
         self.show_progress = value;

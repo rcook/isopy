@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::download_options::DownloadOptions;
+use crate::download_file_options::DownloadFileOptions;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::path::PathBuf;
@@ -27,7 +27,7 @@ use url::Url;
 
 #[async_trait]
 pub trait PackageManagerContextOps: Send + Sync {
-    async fn download_file(&self, url: &Url, options: &DownloadOptions) -> Result<PathBuf>;
+    async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf>;
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
 

@@ -19,6 +19,7 @@ hex = "0.4.3"
 indicatif = "0.17.8"
 serde = "1.0.209"
 sha2 = "0.10.8"
+thiserror = "1.0.63"
 tokio = { version = "1.40.0", features = ["full"] }
 url = "2.5.2"
 

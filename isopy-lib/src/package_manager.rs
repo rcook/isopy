@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::download_package_options::DownloadPackageOptions;
+use crate::error::InstallPackageError;
 use crate::install_package_options::InstallPackageOptions;
 use crate::package::Package;
 use crate::package_summary::PackageSummary;
@@ -28,6 +30,7 @@ use crate::PackageFilter;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::path::Path;
+use std::result::Result as StdResult;
 
 pub type OptionalTags = Option<Vec<String>>;
 
@@ -40,14 +43,19 @@ pub trait PackageManagerOps: Send + Sync {
         filter: PackageFilter,
         tags: &OptionalTags,
     ) -> Result<Vec<PackageSummary>>;
-    async fn download_package(&self, version: &Version, tags: &OptionalTags) -> Result<()>;
+    async fn download_package(
+        &self,
+        version: &Version,
+        tags: &OptionalTags,
+        options: &DownloadPackageOptions,
+    ) -> Result<()>;
     async fn install_package(
         &self,
         version: &Version,
         tags: &OptionalTags,
         dir: &Path,
         options: &InstallPackageOptions,
-    ) -> Result<Package>;
+    ) -> StdResult<Package, InstallPackageError>;
     async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()>;
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
