@@ -12,7 +12,7 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.4.0"
 
 [dependencies]
-anyhow = { version = "1.0.86", features = ["backtrace"] }
+anyhow = { version = "1.0.89", features = ["backtrace"] }
 async-trait = "0.1.82"
 clap = { version = "4.5.17", features = ["derive", "env"] }
 clap_complete = "4.5.26"
@@ -29,7 +29,7 @@ joatmon = "0.0.34"
 log = { version = "0.4.22", features = ["std"] }
 path-absolutize = "3.1.1"
 reqwest = { version = "0.12.7", features = ["stream"] }
-serde = { version = "1.0.209", features = ["derive"] }
+serde = { version = "1.0.210", features = ["derive"] }
 serde_yaml = "0.9.34"
 tinytemplate = "1.2.1"
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
