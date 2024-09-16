@@ -26,6 +26,7 @@ use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::{return_success, Status};
 use crate::table::{table_divider, table_title};
 use anyhow::Result;
+use colored::Colorize;
 use log::info;
 
 pub(crate) fn do_list(app: &App, verbose: bool) -> Result<Status> {
@@ -43,9 +44,14 @@ fn list_verbose(app: &App) -> Result<()> {
 
     let manifests = app.repo().list_manifests()?;
     if !manifests.is_empty() {
-        table_title!(table, "Metadirectories");
+        table_title!(table, "Package directories");
         for (idx, manifest) in manifests.iter().enumerate() {
-            table_divider!(table, "({}) {}", idx + 1, manifest.meta_id());
+            table_divider!(
+                table,
+                "({}) {}",
+                idx + 1,
+                manifest.meta_id().to_string().bright_magenta()
+            );
             let env = existing(manifest.read_env_config())?;
             print_metadir(&mut table, manifest, &env, None);
         }
@@ -60,8 +66,8 @@ fn list_verbose(app: &App) -> Result<()> {
                 table,
                 "({}) {} -> {}",
                 idx + 1,
-                link.link_id(),
-                link.meta_id()
+                link.link_id().to_string().bright_cyan(),
+                link.meta_id().to_string().bright_magenta()
             );
 
             print_link(&mut table, link, None);

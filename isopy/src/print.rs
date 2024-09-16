@@ -33,8 +33,8 @@ pub(crate) fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
         table_divider!(table, "({i})");
     }
 
-    table_columns!(table, "Project directory", link.project_dir().display());
     table_columns!(table, "Link path", link.link_path().display());
+    table_columns!(table, "Project directory", link.project_dir().display());
     table_columns!(table, "Created at", link.created_at());
 }
 
@@ -56,6 +56,10 @@ pub(crate) fn print_metadir(
         table_divider!(table, "({i})");
     }
 
+    table_columns!(table, "Data directory", manifest.data_dir().display());
+    table_columns!(table, "Manifest path", manifest.manifest_path().display());
+    table_columns!(table, "Created at", manifest.created_at());
+
     if let Some(env) = env {
         table_columns!(table, "Project directory", env.project_dir.display());
 
@@ -71,10 +75,6 @@ pub(crate) fn print_metadir(
             manifest.original_project_dir().display()
         );
     }
-
-    table_columns!(table, "Data directory", manifest.data_dir().display());
-    table_columns!(table, "Manifest path", manifest.manifest_path().display());
-    table_columns!(table, "Created at", manifest.created_at());
 }
 
 pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {

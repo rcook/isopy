@@ -184,16 +184,20 @@ pub(crate) enum Command {
     #[command(name = "list", about = "List environments")]
     List {
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
-        // --verbose/--no-verbose with default of "false"
+        // --verbose/--no-verbose with default of "true"
         #[arg(
             help = "Show detailed output",
-            long = "verbose",
-            overrides_with = "_no_verbose",
-            default_value_t = false
+            long = "no-verbose",
+            default_value_t = true,
+            action = ArgAction::SetFalse
         )]
         verbose: bool,
 
-        #[arg(help = "Show brief output", long = "no-verbose")]
+        #[arg(
+            help = "Show brief output",
+            long = "verbose",
+            overrides_with = "verbose"
+        )]
         _no_verbose: bool,
     },
 
