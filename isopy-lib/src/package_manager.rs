@@ -22,6 +22,7 @@
 use crate::download_package_options::DownloadPackageOptions;
 use crate::error::InstallPackageError;
 use crate::install_package_options::InstallPackageOptions;
+use crate::macros::dyn_trait_struct;
 use crate::package::Package;
 use crate::package_summary::PackageSummary;
 use crate::tags::Tags;
@@ -59,5 +60,4 @@ pub trait PackageManagerOps: Send + Sync {
     async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()>;
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
-
-crate::macros::dyn_trait_struct!(PackageManager, PackageManagerOps);
+dyn_trait_struct!(PackageManager, PackageManagerOps);

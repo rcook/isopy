@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::macros::dyn_trait_struct;
 use std::any::Any;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 
@@ -26,8 +27,7 @@ pub trait VersionOps: Debug + Display + Send + Sync {
     fn box_clone(&self) -> Box<dyn VersionOps>;
     fn as_any(&self) -> &dyn Any;
 }
-
-crate::macros::dyn_trait_struct!(Version, VersionOps);
+dyn_trait_struct!(Version, VersionOps);
 
 impl Clone for Version {
     fn clone(&self) -> Self {

@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env_props::EnvProps;
+use crate::macros::dyn_trait_struct;
 use crate::version::Version;
 use std::path::Path;
 
@@ -27,5 +28,4 @@ pub trait PackageOps {
     fn version(&self) -> &Version;
     fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
 }
-
-crate::macros::dyn_trait_struct!(Package, PackageOps);
+dyn_trait_struct!(Package, PackageOps);

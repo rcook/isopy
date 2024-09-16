@@ -21,6 +21,7 @@
 //
 use crate::env_info::EnvInfo;
 use crate::env_props::EnvProps;
+use crate::macros::dyn_trait_struct;
 use crate::package_manager::PackageManager;
 use crate::package_manager_context::PackageManagerContext;
 use crate::shell::{Platform, Shell};
@@ -47,5 +48,4 @@ pub trait PluginOps: Send + Sync {
     ) -> Result<Option<OsString>>;
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager;
 }
-
-crate::macros::dyn_trait_struct!(Plugin, PluginOps);
+dyn_trait_struct!(Plugin, PluginOps);

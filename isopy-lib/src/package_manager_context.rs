@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::download_file_options::DownloadFileOptions;
+use crate::macros::dyn_trait_struct;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::path::PathBuf;
@@ -30,5 +31,4 @@ pub trait PackageManagerContextOps: Send + Sync {
     async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf>;
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
 }
-
-crate::macros::dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);
+dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);

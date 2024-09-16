@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env::{read_env_bool, ISOPY_BACKTRACE_ENV_NAME};
+use anyhow::Error;
 use colored::Colorize;
 
 #[derive(Debug)]
@@ -28,47 +29,50 @@ pub(crate) enum Status {
     UserError,
 }
 
+#[macro_export]
 macro_rules! return_success_quiet {
     () => {
-        return Ok($crate::status::Status::Success);
+        return ::std::result::Result::Ok($crate::status::Status::Success);
     };
 }
 pub(crate) use return_success_quiet;
 
+#[macro_export]
 macro_rules! return_success {
     () => {{
-        log::info!("isopy completed successfully");
-        return Ok($crate::status::Status::Success);
+        ::log::info!("isopy completed successfully");
+        return ::std::result::Result::Ok($crate::status::Status::Success);
     }};
 
     ($($arg: tt)*) => {{
-        log::info!($($arg)*);
-        return Ok($crate::status::Status::Success);
+        ::log::info!($($arg)*);
+        return ::std::result::Result::Ok($crate::status::Status::Success);
     }};
 }
 pub(crate) use return_success;
 
 macro_rules! return_user_error {
     ($($arg: tt)*) => {{
-        log::error!($($arg)*);
-        return Ok($crate::status::Status::UserError);
+        ::log::error!($($arg)*);
+        return ::std::result::Result::Ok($crate::status::Status::UserError);
     }};
 }
 pub(crate) use return_user_error;
 
+#[macro_export]
 macro_rules! report_install_package_error {
     ($result: expr) => {
         match $result {
-            Ok(value) => value,
-            Err(isopy_lib::InstallPackageError::VersionNotFound) => $crate::status::return_user_error!("Specified version of one or more packages was not found in index"),
-            Err(isopy_lib::InstallPackageError::PackageNotDownloaded) => $crate::status::return_user_error!("One or more specified packages has not been downloaded: run \"download\" command or run this command with \"--download\" option"),
-            Err(isopy_lib::InstallPackageError::Other(e)) => return Err(e),
+            ::std::result::Result::Ok(value) => value,
+            ::std::result::Result::Err(::isopy_lib::InstallPackageError::VersionNotFound) => $crate::status::return_user_error!("Specified version of one or more packages was not found in index"),
+            ::std::result::Result::Err(::isopy_lib::InstallPackageError::PackageNotDownloaded) => $crate::status::return_user_error!("One or more specified packages has not been downloaded: run \"download\" command or run this command with \"--download\" option"),
+            ::std::result::Result::Err(::isopy_lib::InstallPackageError::Other(e)) => return ::std::result::Result::Err(e),
         }
     };
 }
 pub(crate) use report_install_package_error;
 
-pub(crate) fn show_error(error: &anyhow::Error) {
+pub(crate) fn show_error(error: &Error) {
     eprintln!("{}", format!("{error}").bright_red());
     if read_env_bool(ISOPY_BACKTRACE_ENV_NAME) {
         eprintln!("stack backtrace:\n{}", error.backtrace());

@@ -36,19 +36,19 @@ pub enum InstallPackageError {
 #[macro_export]
 macro_rules! install_package_bail {
     ($msg: literal $(,)?) => {
-        return std::result::Result::Err($crate::InstallPackageError::Other(anyhow::anyhow!($msg)))
+        return ::std::result::Result::Err($crate::InstallPackageError::Other(::anyhow::anyhow!($msg)))
     };
     ($err: expr $(,)?) => {
-        return std::result::Result::Err($crate::InstallPackageError::Other(anyhow::anyhow!($err)));
+        return ::std::result::Result::Err($crate::InstallPackageError::Other(::anyhow::anyhow!($err)));
     };
     ($fmt: expr, $($arg: tt)*) => {
-        return std::result::Result::Err($crate::InstallPackageError::Other(anyhow::anyhow!($fmt, $($arg)*)));
+        return ::std::result::Result::Err($crate::InstallPackageError::Other(::anyhow::anyhow!($fmt, $($arg)*)));
     };
 }
 
 #[macro_export]
 macro_rules! install_package_error {
     ($err: expr) => {
-        InstallPackageError::Other(anyhow::anyhow!($err))
+        $crate::InstallPackageError::Other(::anyhow::anyhow!($err))
     };
 }
