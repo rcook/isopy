@@ -50,7 +50,7 @@ fn list_verbose(app: &App) -> Result<()> {
                 table,
                 "({}) {}",
                 idx + 1,
-                manifest.meta_id().to_string().bright_magenta()
+                manifest.meta_id().to_string().bright_cyan()
             );
             let env = existing(manifest.read_env_config())?;
             print_metadir(&mut table, manifest, &env, None);
@@ -66,8 +66,8 @@ fn list_verbose(app: &App) -> Result<()> {
                 table,
                 "({}) {} -> {}",
                 idx + 1,
-                link.link_id().to_string().bright_cyan(),
-                link.meta_id().to_string().bright_magenta()
+                link.link_id().to_string().bright_magenta(),
+                link.meta_id().to_string().bright_cyan()
             );
 
             print_link(&mut table, link, None);
