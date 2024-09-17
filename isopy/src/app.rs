@@ -146,17 +146,9 @@ impl App {
 
         let bin_subdir = Path::new(moniker.as_str());
 
-        package_manager
-            .on_before_install(dir_info.data_dir(), bin_subdir)
-            .await?;
-
         let output_path = dir_info.data_dir().join(bin_subdir);
         let package = package_manager
             .install_package(version, &None, &output_path, options)
-            .await?;
-
-        package_manager
-            .on_after_install(dir_info.data_dir(), bin_subdir)
             .await?;
 
         let env_props = package.get_env_props(bin_subdir);

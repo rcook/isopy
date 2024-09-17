@@ -153,6 +153,41 @@ impl PythonPackageManager {
             .is_superset(tags)
     }
 
+    async fn on_before_install(_dir: &Path) -> Result<()> {
+        Ok(())
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    async fn on_after_install(dir: &Path) -> Result<()> {
+        use log::trace;
+        use std::os::unix::fs::symlink;
+
+        let bin_dir = dir.join("bin");
+        let link = bin_dir.join("python");
+        if !link.exists() {
+            let original = bin_dir.join("python3");
+            trace!("Creating link {} to {}", link.display(), original.display());
+            symlink(&original, &link)?;
+            trace!("Created link {} to {}", link.display(), original.display());
+        }
+        Ok(())
+    }
+
+    #[cfg(target_os = "windows")]
+    async fn on_after_install(dir: &Path) -> Result<()> {
+        use log::trace;
+        use std::fs::write;
+
+        let cmd_path = dir.join("python3.cmd");
+        if !cmd_path.exists() {
+            const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
+            trace!("Creating wrapper script {}", cmd_path.display());
+            write(&cmd_path, WRAPPER)?;
+            trace!("Created wrapper script {}", cmd_path.display());
+        }
+        Ok(())
+    }
+
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
         let options = DownloadFileOptions::json()
             .update(update)
@@ -280,6 +315,7 @@ impl PackageManagerOps for PythonPackageManager {
         options: &InstallPackageOptions,
     ) -> StdResult<Package, InstallPackageError> {
         let version = downcast_version!(version);
+
         let index = self.get_index(false, options.show_progress).await?;
 
         let Ok(package) = Self::get_package(&index, version, tags) else {
@@ -297,46 +333,17 @@ impl PackageManagerOps for PythonPackageManager {
             .get_file(package.url())
             .await
             .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
+
+        Self::on_before_install(dir).await?;
+
         package
             .metadata()
             .archive_type()
             .unpack(&package_path, dir, options)
             .await?;
+
+        Self::on_after_install(dir).await?;
+
         Ok(Package::new(package))
-    }
-
-    async fn on_before_install(&self, _output_dir: &Path, _bin_subdir: &Path) -> Result<()> {
-        Ok(())
-    }
-
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()> {
-        use log::trace;
-        use std::os::unix::fs::symlink;
-
-        let bin_dir = output_dir.join(bin_subdir).join("bin");
-        let link = bin_dir.join("python");
-        if !link.exists() {
-            let original = bin_dir.join("python3");
-            trace!("Creating link {} to {}", link.display(), original.display());
-            symlink(&original, &link)?;
-            trace!("Created link {} to {}", link.display(), original.display());
-        }
-        Ok(())
-    }
-
-    #[cfg(target_os = "windows")]
-    async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()> {
-        use log::trace;
-        use std::fs::write;
-
-        let cmd_path = output_dir.join(bin_subdir).join("python3.cmd");
-        if !cmd_path.exists() {
-            const WRAPPER: &str = "@echo off\n\"%~dp0python.exe\" %*\n";
-            trace!("Creating wrapper script {}", cmd_path.display());
-            write(&cmd_path, WRAPPER)?;
-            trace!("Created wrapper script {}", cmd_path.display());
-        }
-        Ok(())
     }
 }
