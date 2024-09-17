@@ -29,6 +29,7 @@ use isopy_lib::{env_var_substitution, join_paths, render_absolute_path, Platform
 use joat_repo::DirInfo;
 use joatmon::safe_write_file;
 use log::info;
+use path_absolutize::Absolutize;
 use serde::Serialize;
 use std::ffi::OsString;
 use std::fmt::Write;
@@ -91,7 +92,7 @@ pub(crate) fn do_wrap(
 
     let vars = make_vars(&env_info.vars);
 
-    let wrapper_path = make_wrapper_path(app.config_dir(), wrapper_file_name);
+    let wrapper_path = make_wrapper_path(app, wrapper_file_name)?;
 
     let command = make_script_command(app, &dir_info, script_path, platform, shell)?;
 
@@ -176,16 +177,40 @@ fn make_script_command(
     ))
 }
 
-fn make_wrapper_path(config_dir: &Path, wrapper_file_name: &WrapperFileName) -> PathBuf {
-    let mut path = config_dir.join("bin");
-    path.push(wrapper_file_name.as_os_str());
-
-    #[cfg(target_os = "windows")]
-    if path.extension().map_or(true, |ext| {
-        !ext.eq_ignore_ascii_case("bat") && !ext.eq_ignore_ascii_case("cmd")
-    }) {
-        _ = path.set_extension("cmd");
+fn make_wrapper_path(app: &App, wrapper_file_name: &WrapperFileName) -> Result<PathBuf> {
+    fn make_path(app: &App, wrapper_file_name: &WrapperFileName) -> Result<PathBuf> {
+        Ok(match wrapper_file_name {
+            WrapperFileName::FileNameOnly(c) => app.config_dir().join("bin").join(c),
+            WrapperFileName::Path(p) => p.absolutize_from(app.cwd())?.to_path_buf(),
+        })
     }
 
-    path
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    fn inner(app: &App, wrapper_file_name: &WrapperFileName) -> Result<PathBuf> {
+        make_path(app, wrapper_file_name)
+    }
+
+    #[cfg(target_os = "windows")]
+    fn inner(app: &App, wrapper_file_name: &WrapperFileName) -> Result<PathBuf> {
+        let mut path = make_path(app, wrapper_file_name)?;
+
+        match path.extension() {
+            Some(ext) => {
+                if !ext.eq_ignore_ascii_case("bat") && !ext.eq_ignore_ascii_case("cmd") {
+                    _ = path.set_extension(format!(
+                        "{}.cmd",
+                        ext.to_str().ok_or_else(|| anyhow!(
+                            "Cannot get extension from path {}",
+                            path.display()
+                        ))?
+                    ))
+                }
+            }
+            None => _ = path.set_extension("cmd"),
+        }
+
+        Ok(path)
+    }
+
+    inner(app, wrapper_file_name)
 }

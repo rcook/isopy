@@ -19,51 +19,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::{serializable_newtype, TryToString};
-use std::ffi::{OsStr, OsString};
+use anyhow::Error;
+use std::ffi::OsString;
+use std::path::{Component, Path, PathBuf};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
-serializable_newtype!(WrapperFileName, OsString);
-
-impl WrapperFileName {
-    pub(crate) fn as_os_str(&self) -> &OsStr {
-        self.0.as_os_str()
-    }
+#[derive(Clone, Debug)]
+pub(crate) enum WrapperFileName {
+    FileNameOnly(OsString),
+    Path(PathBuf),
 }
 
 impl FromStr for WrapperFileName {
-    type Err = anyhow::Error;
+    type Err = Error;
 
-    //#[cfg(any(target_os = "linux", target_os = "macos"))]
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self(OsString::from_str(s)?))
-    }
+        let path = Path::new(s);
 
-    // TBD: Defer this check until time of creation of the file
-    /*
-    #[cfg(target_os = "windows")]
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        use anyhow::bail;
-
-        let temp = s.to_lowercase();
-
-        #[allow(clippy::case_sensitive_file_extension_comparisons)]
-        if !temp.ends_with(".bat") && !temp.ends_with(".cmd") {
-            bail!("wrapper file name must have .bat or .cmd extension");
+        let components = path.components().collect::<Vec<_>>();
+        if components.len() == 1 {
+            if let Some(Component::Normal(c)) = components.first() {
+                return Ok(Self::FileNameOnly(c.to_os_string()));
+            }
         }
 
-        Ok(Self(OsString::from_str(s)?))
-    }
-    */
-}
-
-impl TryToString for WrapperFileName {
-    fn to_string_lossy(&self) -> String {
-        self.0.to_string_lossy().to_string()
-    }
-
-    fn try_to_string(&self) -> Option<String> {
-        self.0.to_str().map(String::from)
+        Ok(Self::Path(path.to_path_buf()))
     }
 }

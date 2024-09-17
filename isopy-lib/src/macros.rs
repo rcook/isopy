@@ -19,52 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub trait TryToString: Sized {
-    fn to_string_lossy(&self) -> String;
-    fn try_to_string(&self) -> Option<String>;
-}
-
-#[macro_export]
-macro_rules! serializable_newtype {
-    ($name: ident, $inner_type: ty) => {
-        #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-        pub struct $name($inner_type);
-
-        impl ::std::fmt::Display for $name {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                write!(
-                    f,
-                    "{}",
-                    <Self as $crate::TryToString>::to_string_lossy(&self)
-                )
-            }
-        }
-
-        impl ::serde::Serialize for $name {
-            fn serialize<S>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error>
-            where
-                S: ::serde::Serializer,
-            {
-                serializer.serialize_str(
-                    &<Self as $crate::TryToString>::try_to_string(&self).ok_or_else(|| {
-                        ::serde::ser::Error::custom("failed to serialize as string")
-                    })?,
-                )
-            }
-        }
-
-        impl<'de> ::serde::Deserialize<'de> for $name {
-            fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
-            where
-                D: ::serde::Deserializer<'de>,
-            {
-                <Self as ::std::str::FromStr>::from_str(&String::deserialize(deserializer)?)
-                    .map_err(::serde::de::Error::custom)
-            }
-        }
-    };
-}
-
 #[macro_export]
 macro_rules! dyn_trait_struct {
     ($name: ident, $trait: ident) => {

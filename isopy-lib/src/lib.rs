@@ -64,7 +64,6 @@ pub use env_info::EnvInfo;
 pub use error::InstallPackageError;
 pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
-pub use macros::TryToString;
 pub use package::{Package, PackageOps};
 pub use package_kind::PackageKind;
 pub use package_manager::{
