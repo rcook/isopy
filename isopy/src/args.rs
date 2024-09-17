@@ -76,6 +76,23 @@ pub(crate) struct Args {
     )]
     pub(crate) log_level: LogLevel,
 
+    // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
+    // --show-progress/--no-show-progress with default of "true"
+    #[arg(
+        help = "Show progress indicator",
+        long = "no-show-progress",
+        default_value_t = true,
+        action = ArgAction::SetFalse
+    )]
+    pub(crate) show_progress: bool,
+
+    #[arg(
+        help = "Do not show progress indicator",
+        long = "show-progress",
+        overrides_with = "show_progress"
+    )]
+    _no_show_progress: bool,
+
     #[command(subcommand)]
     pub(crate) command: Command,
 }

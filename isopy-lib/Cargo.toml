@@ -14,6 +14,7 @@ version = "0.4.0"
 [dependencies]
 anyhow = "1.0.89"
 async-trait = "0.1.82"
+derive_builder = "0.20.1"
 derive_more = { version = "1.0.0", features = ["deref"] }
 hex = "0.4.3"
 indicatif = "0.17.8"

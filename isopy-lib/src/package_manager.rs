@@ -19,9 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::download_package_options::DownloadPackageOptions;
 use crate::error::InstallPackageError;
-use crate::install_package_options::InstallPackageOptions;
 use crate::macros::dyn_trait_struct;
 use crate::package::Package;
 use crate::package_summary::PackageSummary;
@@ -30,19 +28,51 @@ use crate::version::Version;
 use crate::PackageFilter;
 use anyhow::Result;
 use async_trait::async_trait;
+use derive_builder::Builder;
 use std::path::Path;
 use std::result::Result as StdResult;
 
 pub type OptionalTags = Option<Vec<String>>;
 
+#[derive(Builder, Default)]
+#[builder(default)]
+pub struct DownloadPackageOptions {
+    pub show_progress: bool,
+}
+
+#[derive(Builder, Default)]
+#[builder(default)]
+pub struct InstallPackageOptions {
+    pub show_progress: bool,
+}
+
+#[derive(Builder, Default)]
+#[builder(default)]
+pub struct ListPackagesOptions {
+    pub show_progress: bool,
+}
+
+#[derive(Builder, Default)]
+#[builder(default)]
+pub struct ListTagsOptions {
+    pub show_progress: bool,
+}
+
+#[derive(Builder, Default)]
+#[builder(default)]
+pub struct UpdateIndexOptions {
+    pub show_progress: bool,
+}
+
 #[async_trait]
 pub trait PackageManagerOps: Send + Sync {
-    async fn update_index(&self) -> Result<()>;
-    async fn list_tags(&self) -> Result<Tags>;
+    async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()>;
+    async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags>;
     async fn list_packages(
         &self,
         filter: PackageFilter,
         tags: &OptionalTags,
+        options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>>;
     async fn download_package(
         &self,
@@ -61,3 +91,25 @@ pub trait PackageManagerOps: Send + Sync {
     async fn on_after_install(&self, output_dir: &Path, bin_subdir: &Path) -> Result<()>;
 }
 dyn_trait_struct!(PackageManager, PackageManagerOps);
+
+#[cfg(test)]
+mod tests {
+    use super::ListPackagesOptionsBuilder;
+
+    #[test]
+    fn basics() {
+        assert!(
+            !ListPackagesOptionsBuilder::default()
+                .build()
+                .expect("Must succeed")
+                .show_progress
+        );
+        assert!(
+            ListPackagesOptionsBuilder::default()
+                .show_progress(true)
+                .build()
+                .expect("Must succeed")
+                .show_progress
+        );
+    }
+}

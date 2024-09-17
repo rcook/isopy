@@ -23,11 +23,15 @@ use crate::app::App;
 use crate::package_id::PackageId;
 use crate::status::{report_install_package_error, return_success, Status};
 use anyhow::Result;
-use isopy_lib::{DownloadPackageOptions, InstallPackageOptions};
+use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder};
 
 pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> Result<Status> {
-    let download_package_options = DownloadPackageOptions::default().show_progress(true);
-    let install_package_options = InstallPackageOptions::default().show_progress(true);
+    let download_package_options = DownloadPackageOptionsBuilder::default()
+        .show_progress(app.show_progress())
+        .build()?;
+    let install_package_options = InstallPackageOptionsBuilder::default()
+        .show_progress(app.show_progress())
+        .build()?;
 
     if download {
         app.plugin_manager()

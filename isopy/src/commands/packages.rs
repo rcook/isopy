@@ -27,7 +27,10 @@ use crate::table::{table_columns, table_divider, table_headings, Table};
 use anyhow::bail;
 use anyhow::Result;
 use colored::{ColoredString, Colorize};
-use isopy_lib::{PackageFilter, PackageSummary, Plugin};
+use isopy_lib::{
+    ListPackagesOptions, ListPackagesOptionsBuilder, OptionalTags, PackageFilter, PackageSummary,
+    Plugin,
+};
 use std::fs::metadata;
 use strum::IntoEnumIterator;
 use url::{Host, Url};
@@ -36,34 +39,38 @@ pub(crate) async fn do_packages(
     app: &App,
     moniker: &Option<Moniker>,
     filter: PackageFilter,
-    tags: &Option<Vec<String>>,
+    tags: &OptionalTags,
 ) -> Result<Status> {
-    async fn list_plugin_packages(
+    async fn list_packages(
         table: &mut Table,
         app: &App,
         moniker: &Moniker,
         filter: PackageFilter,
-        tags: &Option<Vec<String>>,
+        tags: &OptionalTags,
+        options: &ListPackagesOptions,
     ) -> Result<()> {
         let plugin = app.plugin_manager().get_plugin(moniker);
         let package_summaries = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
-            .list_packages(filter, tags)
+            .list_packages(filter, tags, options)
             .await?;
         add_plugin_rows(table, moniker, plugin, &package_summaries, filter)?;
         Ok(())
     }
 
     let mut table = make_list_table();
+    let options = ListPackagesOptionsBuilder::default()
+        .show_progress(app.show_progress())
+        .build()?;
 
     match moniker {
         Some(moniker) => {
-            list_plugin_packages(&mut table, app, moniker, filter, tags).await?;
+            list_packages(&mut table, app, moniker, filter, tags, &options).await?;
         }
         None => {
             for moniker in Moniker::iter() {
-                list_plugin_packages(&mut table, app, &moniker, filter, tags).await?;
+                list_packages(&mut table, app, &moniker, filter, tags, &options).await?;
             }
         }
     }

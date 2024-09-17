@@ -77,7 +77,7 @@ pub(crate) async fn run() -> Result<Status> {
         None => current_dir()?,
     };
 
-    let app = App::new(&cwd, &config_dir, repo);
+    let app = App::new(&cwd, &config_dir, repo, args.show_progress);
     run_command(app, args.command).await
 }
 

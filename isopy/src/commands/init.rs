@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::status::{report_install_package_error, return_success, return_user_error, Status};
 use anyhow::Result;
-use isopy_lib::{DownloadPackageOptions, InstallPackageOptions};
+use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder};
 
 pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
@@ -40,8 +40,12 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
         );
     };
 
-    let download_package_options = DownloadPackageOptions::default().show_progress(true);
-    let install_package_options = InstallPackageOptions::default().show_progress(true);
+    let download_package_options = DownloadPackageOptionsBuilder::default()
+        .show_progress(app.show_progress())
+        .build()?;
+    let install_package_options = InstallPackageOptionsBuilder::default()
+        .show_progress(app.show_progress())
+        .build()?;
 
     for package_id in project.package_ids {
         if download {

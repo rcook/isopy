@@ -23,26 +23,35 @@ use crate::app::App;
 use crate::moniker::Moniker;
 use crate::status::{return_success, Status};
 use anyhow::Result;
+use isopy_lib::{UpdateIndexOptions, UpdateIndexOptionsBuilder};
 use log::info;
 use strum::IntoEnumIterator;
 
 pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
-    async fn update_index(app: &App, moniker: &Moniker) -> Result<()> {
+    async fn update_index(
+        app: &App,
+        moniker: &Moniker,
+        options: &UpdateIndexOptions,
+    ) -> Result<()> {
         app.plugin_manager()
             .new_package_manager(moniker, app.config_dir())
-            .update_index()
+            .update_index(options)
             .await?;
         info!("Updated index for package manager {moniker}");
         Ok(())
     }
 
+    let options = UpdateIndexOptionsBuilder::default()
+        .show_progress(app.show_progress())
+        .build()?;
+
     match moniker {
         Some(moniker) => {
-            update_index(app, moniker).await?;
+            update_index(app, moniker, &options).await?;
         }
         None => {
             for moniker in Moniker::iter() {
-                update_index(app, &moniker).await?;
+                update_index(app, &moniker, &options).await?;
             }
         }
     }

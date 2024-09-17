@@ -36,13 +36,11 @@
 mod accept;
 mod checksum;
 mod download_file_options;
-mod download_package_options;
 mod env_info;
 mod env_props;
 mod error;
 mod extent;
 mod file_name_parts;
-mod install_package_options;
 mod macros;
 mod package;
 mod package_filter;
@@ -62,18 +60,21 @@ mod version_triple;
 pub use accept::Accept;
 pub use checksum::Checksum;
 pub use download_file_options::DownloadFileOptions;
-pub use download_package_options::DownloadPackageOptions;
 pub use env_info::EnvInfo;
 pub use env_props::EnvProps;
 pub use error::InstallPackageError;
 pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
-pub use install_package_options::InstallPackageOptions;
 pub use macros::TryToString;
 pub use package::{Package, PackageOps};
 pub use package_filter::PackageFilter;
 pub use package_kind::PackageKind;
-pub use package_manager::{OptionalTags, PackageManager, PackageManagerOps};
+pub use package_manager::{
+    DownloadPackageOptions, DownloadPackageOptionsBuilder, InstallPackageOptions,
+    InstallPackageOptionsBuilder, ListPackagesOptions, ListPackagesOptionsBuilder, ListTagsOptions,
+    ListTagsOptionsBuilder, OptionalTags, PackageManager, PackageManagerOps, UpdateIndexOptions,
+    UpdateIndexOptionsBuilder,
+};
 pub use package_manager_context::{PackageManagerContext, PackageManagerContextOps};
 pub use package_summary::PackageSummary;
 pub use plugin::{Plugin, PluginOps};

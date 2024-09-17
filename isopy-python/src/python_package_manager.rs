@@ -27,8 +27,8 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
-    OptionalTags, Package, PackageFilter, PackageKind, PackageManagerContext, PackageManagerOps,
-    PackageSummary, Tags, Version,
+    ListPackagesOptions, ListTagsOptions, OptionalTags, Package, PackageFilter, PackageKind,
+    PackageManagerContext, PackageManagerOps, PackageSummary, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -166,15 +166,15 @@ impl PythonPackageManager {
 
 #[async_trait]
 impl PackageManagerOps for PythonPackageManager {
-    async fn update_index(&self) -> Result<()> {
-        self.get_index(true, true).await?; // TBD: Pass show_progress via UpdateIndexOptions etc.
+    async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()> {
+        self.get_index(true, options.show_progress).await?;
         Ok(())
     }
 
-    async fn list_tags(&self) -> Result<Tags> {
+    async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags> {
         let mut tags = HashSet::new();
         let mut other_tags = HashSet::new();
-        let index = self.get_index(false, true).await?; // TBD: Pass show_progress via ListTagsOptions etc.
+        let index = self.get_index(false, options.show_progress).await?;
         for item in g!(index.as_array()) {
             for archive in Self::get_packages(item)? {
                 tags.extend(archive.metadata().tags().to_owned());
@@ -206,10 +206,11 @@ impl PackageManagerOps for PythonPackageManager {
         &self,
         filter: PackageFilter,
         tags: &OptionalTags,
+        options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
         let tags = Self::get_tags(tags);
         let mut records = Vec::new();
-        let index = self.get_index(false, true).await?; // TBD: Pass show_progress via ListPackagesOptions etc.
+        let index = self.get_index(false, options.show_progress).await?;
         for item in g!(index.as_array()) {
             for package in Self::get_packages(item)? {
                 if Self::metadata_has_tags(package.metadata(), &tags) {

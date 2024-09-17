@@ -44,16 +44,18 @@ pub(crate) struct App {
     repo: Repo,
     project_config_path: PathBuf,
     plugin_manager: PluginManager,
+    show_progress: bool,
 }
 
 impl App {
-    pub(crate) fn new(cwd: &Path, config_dir: &Path, repo: Repo) -> Self {
+    pub(crate) fn new(cwd: &Path, config_dir: &Path, repo: Repo, show_progress: bool) -> Self {
         Self {
             config_dir: config_dir.to_path_buf(),
             cwd: cwd.to_path_buf(),
             repo,
             project_config_path: cwd.join(PROJECT_CONFIG_FILE_NAME),
             plugin_manager: PluginManager::new(),
+            show_progress,
         }
     }
 
@@ -67,6 +69,14 @@ impl App {
 
     pub(crate) const fn repo(&self) -> &Repo {
         &self.repo
+    }
+
+    pub(crate) const fn plugin_manager(&self) -> &PluginManager {
+        &self.plugin_manager
+    }
+
+    pub(crate) const fn show_progress(&self) -> bool {
+        self.show_progress
     }
 
     pub(crate) fn has_project_config_file(&self) -> bool {
@@ -226,10 +236,6 @@ impl App {
         };
 
         Ok(dir_info)
-    }
-
-    pub(crate) const fn plugin_manager(&self) -> &PluginManager {
-        &self.plugin_manager
     }
 
     pub(crate) fn make_env_info(
