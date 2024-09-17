@@ -65,7 +65,7 @@ impl PluginOps for PythonPlugin {
 
         #[cfg(target_os = "windows")]
         fn make_path_dirs(dir: &Path) -> Vec<PathBuf> {
-            vec![dir.clone(), dir.join("Scripts")]
+            vec![dir.to_path_buf(), dir.join("Scripts")]
         }
 
         let path_dirs = make_path_dirs(dir);
