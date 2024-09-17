@@ -203,7 +203,7 @@ fn make_wrapper_path(app: &App, wrapper_file_name: &WrapperFileName) -> Result<P
                             "Cannot get extension from path {}",
                             path.display()
                         ))?
-                    ))
+                    ));
                 }
             }
             None => _ = path.set_extension("cmd"),
