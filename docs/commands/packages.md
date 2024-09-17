@@ -1,8 +1,8 @@
-## `package available` command
+## `packages` command
 
-_List packages available for download_
+_List local and/or remote packages_
 
-Lists packages available for download from sources such as
+Lists locally cached packages or packages available for download from sources such as
 [Python Standalone Builds][python-build-standalone-releases] or
 [Adoptium][adoptium] filtered down to the operating system and architecture of
 the local machine.

@@ -1,6 +1,6 @@
-## `package download` command
+## `download` command
 
-_Downloads packages_
+_Download package into local cache_
 
 Downloads package from sources such as [Python Standalone Builds][python-build-standalone-releases]
 or [Adoptium][adoptium].

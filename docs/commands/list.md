@@ -1,3 +1,3 @@
-## `env list` command
+## `list` command
 
 _Lists environments_
