@@ -19,13 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env_props::EnvProps;
 use crate::macros::dyn_trait_struct;
 use crate::version::Version;
-use std::path::Path;
+use url::Url;
 
 pub trait PackageOps {
     fn version(&self) -> &Version;
-    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps;
+    fn url(&self) -> &Url;
 }
 dyn_trait_struct!(Package, PackageOps);

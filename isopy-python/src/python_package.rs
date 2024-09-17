@@ -20,8 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::metadata::Metadata;
-use isopy_lib::{EnvProps, PackageOps, Version};
-use std::path::Path;
+use isopy_lib::{PackageOps, Version};
 use url::Url;
 
 #[derive(Clone, Debug)]
@@ -55,7 +54,7 @@ impl PackageOps for PythonPackage {
         &self.version
     }
 
-    fn get_env_props(&self, bin_subdir: &Path) -> EnvProps {
-        EnvProps::new(bin_subdir, &self.url)
+    fn url(&self) -> &Url {
+        self.url()
     }
 }

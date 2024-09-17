@@ -32,7 +32,7 @@ use std::path::{Path, PathBuf};
 pub(crate) trait DirInfoExt {
     fn read_env_config(&self) -> Result<Env>;
     fn write_env_config(&self, env: &Env, overwrite: bool) -> Result<()>;
-    fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>>;
+    fn make_env_info(&self, app: &App) -> Result<Option<EnvInfo>>;
     fn make_script_command(
         &self,
         app: &App,
@@ -51,8 +51,8 @@ impl DirInfoExt for DirInfo {
         write_env_config(self.data_dir(), env, overwrite)
     }
 
-    fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-        make_env_info(app, self.data_dir(), base_dir)
+    fn make_env_info(&self, app: &App) -> Result<Option<EnvInfo>> {
+        make_env_info(app, self.data_dir())
     }
 
     fn make_script_command(
@@ -75,8 +75,8 @@ impl DirInfoExt for Manifest {
         write_env_config(self.data_dir(), env, overwrite)
     }
 
-    fn make_env_info(&self, app: &App, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
-        make_env_info(app, self.data_dir(), base_dir)
+    fn make_env_info(&self, app: &App) -> Result<Option<EnvInfo>> {
+        make_env_info(app, self.data_dir())
     }
 
     fn make_script_command(
@@ -107,7 +107,7 @@ fn write_env_config(data_dir: &Path, env: &Env, overwrite: bool) -> Result<()> {
     Ok(())
 }
 
-fn make_env_info(app: &App, data_dir: &Path, base_dir: Option<&Path>) -> Result<Option<EnvInfo>> {
+fn make_env_info(app: &App, data_dir: &Path) -> Result<Option<EnvInfo>> {
     let env = read_env_config(data_dir)?;
 
     let mut all_env_info = EnvInfo {
@@ -116,7 +116,7 @@ fn make_env_info(app: &App, data_dir: &Path, base_dir: Option<&Path>) -> Result<
     };
 
     for package in &env.packages {
-        let env_info = app.make_env_info(data_dir, package, base_dir);
+        let env_info = app.make_env_info(data_dir, package);
         all_env_info.path_dirs.extend(env_info.path_dirs);
         all_env_info.vars.extend(env_info.vars);
     }

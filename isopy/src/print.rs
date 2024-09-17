@@ -82,7 +82,7 @@ pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, e
         table_columns!(table, "Project directory", env.project_dir.display());
 
         for package in &env.packages {
-            let env_info = app.make_env_info(dir_info.data_dir(), package, None);
+            let env_info = app.make_env_info(dir_info.data_dir(), package);
 
             table_columns!(table, "Package", &package.package_id);
             table_line!(table, "dir: {}", package.dir.display());

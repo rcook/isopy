@@ -59,7 +59,6 @@ pub(crate) fn do_wrap(
     app: &App,
     wrapper_file_name: &WrapperFileName,
     script_path: &Path,
-    base_dir: &Path,
     platform: Platform,
     shell: Shell,
     force: bool,
@@ -71,7 +70,7 @@ pub(crate) fn do_wrap(
         );
     };
 
-    let Some(env_info) = dir_info.make_env_info(app, Some(base_dir))? else {
+    let Some(env_info) = dir_info.make_env_info(app)? else {
         return_user_error!("could not get environment info");
     };
 

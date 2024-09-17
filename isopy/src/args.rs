@@ -310,9 +310,6 @@ pub(crate) enum Command {
         #[arg(help = "Script path", value_parser = parse_absolute_path)]
         script_path: PathBuf,
 
-        #[arg(help = "Base directory", value_parser = parse_absolute_path)]
-        base_dir: PathBuf,
-
         #[arg(
             help = "Platform",
             short = 'p',

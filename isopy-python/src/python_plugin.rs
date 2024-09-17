@@ -24,7 +24,7 @@ use crate::python_package_manager::PythonPackageManager;
 use crate::python_version::PythonVersion;
 use anyhow::Result;
 use isopy_lib::{render_absolute_path, EnvInfo, Platform, Shell};
-use isopy_lib::{EnvProps, PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
+use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
@@ -57,39 +57,19 @@ impl PluginOps for PythonPlugin {
         Ok(Version::new(s.parse::<PythonVersion>()?))
     }
 
-    fn make_env_info(
-        &self,
-        data_dir: &Path,
-        env_props: &EnvProps,
-        _base_dir: Option<&Path>,
-    ) -> EnvInfo {
+    fn make_env_info(&self, dir: &Path) -> EnvInfo {
         #[cfg(any(target_os = "linux", target_os = "macos"))]
-        fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
-            vec![data_dir.join(env_props.dir()).join("bin")]
+        fn make_path_dirs(dir: &Path) -> Vec<PathBuf> {
+            vec![dir.join("bin")]
         }
 
         #[cfg(target_os = "windows")]
-        fn make_path_dirs(data_dir: &Path, env_props: &EnvProps) -> Vec<PathBuf> {
-            let d = data_dir.join(env_props.dir());
-            vec![d.clone(), d.join("Scripts")]
+        fn make_path_dirs(dir: &Path) -> Vec<PathBuf> {
+            vec![dir.clone(), dir.join("Scripts")]
         }
 
-        let path_dirs = make_path_dirs(data_dir, env_props);
-        /*
-        let vars = if let Some(d) = base_dir {
-            vec![(
-                String::from("PYTHONPATH"),
-                String::from(
-                    d.to_str()
-                        .ok_or_else(|| anyhow!("could not convert directory"))?,
-                ),
-            )]
-        } else {
-            vec![]
-        };
-        */
+        let path_dirs = make_path_dirs(dir);
         let vars = vec![];
-
         EnvInfo { path_dirs, vars }
     }
 

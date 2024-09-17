@@ -118,7 +118,6 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
         Wrap {
             wrapper_file_name,
             script_path,
-            base_dir,
             platform,
             shell,
             force,
@@ -127,7 +126,6 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
             &app,
             &wrapper_file_name,
             &script_path,
-            &base_dir,
             platform.into(),
             shell.into(),
             force,

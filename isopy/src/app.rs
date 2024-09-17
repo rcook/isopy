@@ -28,7 +28,7 @@ use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{bail, Result};
 use isopy_lib::{
-    install_package_bail, install_package_error, EnvInfo, EnvProps, InstallPackageError,
+    install_package_bail, install_package_error, EnvInfo, InstallPackageError,
     InstallPackageOptions, Platform, Shell, Version,
 };
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
@@ -144,18 +144,16 @@ impl App {
             .plugin_manager
             .new_package_manager(moniker, &self.config_dir);
 
-        let bin_subdir = Path::new(moniker.as_str());
-
-        let output_path = dir_info.data_dir().join(bin_subdir);
+        let dir_name = Path::new(moniker.as_str());
+        let output_path = dir_info.data_dir().join(dir_name);
         let package = package_manager
             .install_package(version, &None, &output_path, options)
             .await?;
 
-        let env_props = package.get_env_props(bin_subdir);
         packages.push(EnvPackage {
             package_id: PackageId::new(moniker, package.version()),
-            dir: env_props.dir().to_path_buf(),
-            url: env_props.url().clone(),
+            dir: dir_name.to_path_buf(),
+            url: package.url().clone(),
         });
 
         dir_info.write_env_config(
@@ -230,19 +228,10 @@ impl App {
         Ok(dir_info)
     }
 
-    pub(crate) fn make_env_info(
-        &self,
-        data_dir: &Path,
-        package: &EnvPackage,
-        base_dir: Option<&Path>,
-    ) -> EnvInfo {
+    pub(crate) fn make_env_info(&self, data_dir: &Path, package: &EnvPackage) -> EnvInfo {
         self.plugin_manager
             .get_plugin(package.package_id.moniker())
-            .make_env_info(
-                data_dir,
-                &EnvProps::new(&package.dir, &package.url),
-                base_dir,
-            )
+            .make_env_info(&data_dir.join(&package.dir))
     }
 
     pub(crate) fn make_script_command(

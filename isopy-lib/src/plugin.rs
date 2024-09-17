@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env_info::EnvInfo;
-use crate::env_props::EnvProps;
 use crate::macros::dyn_trait_struct;
 use crate::package_manager::PackageManager;
 use crate::package_manager_context::PackageManagerContext;
@@ -34,12 +33,7 @@ use url::Url;
 pub trait PluginOps: Send + Sync {
     fn url(&self) -> &Url;
     fn parse_version(&self, s: &str) -> Result<Version>;
-    fn make_env_info(
-        &self,
-        data_dir: &Path,
-        env_props: &EnvProps,
-        base_dir: Option<&Path>,
-    ) -> EnvInfo;
+    fn make_env_info(&self, dir: &Path) -> EnvInfo;
     fn make_script_command(
         &self,
         script_path: &Path,

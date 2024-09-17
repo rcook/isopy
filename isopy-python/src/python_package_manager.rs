@@ -153,12 +153,8 @@ impl PythonPackageManager {
             .is_superset(tags)
     }
 
-    async fn on_before_install(_dir: &Path) -> Result<()> {
-        Ok(())
-    }
-
     #[cfg(any(target_os = "linux", target_os = "macos"))]
-    async fn on_after_install(dir: &Path) -> Result<()> {
+    fn on_after_install(dir: &Path) -> Result<()> {
         use log::trace;
         use std::os::unix::fs::symlink;
 
@@ -174,7 +170,7 @@ impl PythonPackageManager {
     }
 
     #[cfg(target_os = "windows")]
-    async fn on_after_install(dir: &Path) -> Result<()> {
+    fn on_after_install(dir: &Path) -> Result<()> {
         use log::trace;
         use std::fs::write;
 
@@ -334,15 +330,13 @@ impl PackageManagerOps for PythonPackageManager {
             .await
             .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
 
-        Self::on_before_install(dir).await?;
-
         package
             .metadata()
             .archive_type()
             .unpack(&package_path, dir, options)
             .await?;
 
-        Self::on_after_install(dir).await?;
+        Self::on_after_install(dir)?;
 
         Ok(Package::new(package))
     }
