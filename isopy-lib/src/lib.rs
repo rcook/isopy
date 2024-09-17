@@ -43,7 +43,6 @@ mod extent;
 mod file_name_parts;
 mod macros;
 mod package;
-mod package_filter;
 mod package_kind;
 mod package_manager;
 mod package_manager_context;
@@ -53,6 +52,8 @@ mod progress_indicator;
 mod progress_indicator_options;
 mod sanitize;
 mod shell;
+mod source_filter;
+mod tag_filter;
 mod tags;
 mod version;
 mod version_triple;
@@ -67,12 +68,11 @@ pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
 pub use macros::TryToString;
 pub use package::{Package, PackageOps};
-pub use package_filter::PackageFilter;
 pub use package_kind::PackageKind;
 pub use package_manager::{
     DownloadPackageOptions, DownloadPackageOptionsBuilder, InstallPackageOptions,
     InstallPackageOptionsBuilder, ListPackagesOptions, ListPackagesOptionsBuilder, ListTagsOptions,
-    ListTagsOptionsBuilder, OptionalTags, PackageManager, PackageManagerOps, UpdateIndexOptions,
+    ListTagsOptionsBuilder, PackageManager, PackageManagerOps, UpdateIndexOptions,
     UpdateIndexOptionsBuilder,
 };
 pub use package_manager_context::{PackageManagerContext, PackageManagerContextOps};
@@ -82,6 +82,8 @@ pub use progress_indicator::ProgressIndicator;
 pub use progress_indicator_options::ProgressIndicatorOptions;
 pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
+pub use source_filter::SourceFilter;
+pub use tag_filter::TagFilter;
 pub use tags::Tags;
 pub use version::{Version, VersionOps};
 pub use version_triple::VersionTriple;

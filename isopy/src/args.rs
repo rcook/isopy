@@ -498,7 +498,7 @@ pub(crate) enum PackageFilter {
     Remote,
 }
 
-impl From<PackageFilter> for isopy_lib::PackageFilter {
+impl From<PackageFilter> for isopy_lib::SourceFilter {
     fn from(value: PackageFilter) -> Self {
         match value {
             PackageFilter::All => Self::All,

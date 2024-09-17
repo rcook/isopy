@@ -28,8 +28,8 @@ use anyhow::bail;
 use anyhow::Result;
 use colored::{ColoredString, Colorize};
 use isopy_lib::{
-    ListPackagesOptions, ListPackagesOptionsBuilder, OptionalTags, PackageFilter, PackageSummary,
-    Plugin,
+    ListPackagesOptions, ListPackagesOptionsBuilder, PackageSummary, Plugin, SourceFilter,
+    TagFilter,
 };
 use std::fs::metadata;
 use strum::IntoEnumIterator;
@@ -38,15 +38,15 @@ use url::{Host, Url};
 pub(crate) async fn do_packages(
     app: &App,
     moniker: &Option<Moniker>,
-    filter: PackageFilter,
-    tags: &OptionalTags,
+    filter: SourceFilter,
+    tags: &TagFilter,
 ) -> Result<Status> {
     async fn list_packages(
         table: &mut Table,
         app: &App,
         moniker: &Moniker,
-        filter: PackageFilter,
-        tags: &OptionalTags,
+        filter: SourceFilter,
+        tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<()> {
         let plugin = app.plugin_manager().get_plugin(moniker);
@@ -85,7 +85,7 @@ fn add_plugin_rows(
     moniker: &Moniker,
     plugin: &Plugin,
     package_summaries: &Vec<PackageSummary>,
-    filter: PackageFilter,
+    filter: SourceFilter,
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package_summary: &PackageSummary) -> String {
         format!(
@@ -125,19 +125,19 @@ fn add_plugin_rows(
 
     if package_summaries.is_empty() {
         match filter {
-            PackageFilter::Local => table_divider!(
+            SourceFilter::Local => table_divider!(
                 table,
                 "No local packages found for {} ({})",
                 moniker.as_str().cyan(),
                 plugin.url().as_str().bright_magenta()
             ),
-            PackageFilter::All => table_divider!(
+            SourceFilter::All => table_divider!(
                 table,
                 "No packages (local or remote) found for {} ({})",
                 moniker.as_str().cyan(),
                 plugin.url().as_str().bright_magenta()
             ),
-            PackageFilter::Remote => todo!(),
+            SourceFilter::Remote => todo!(),
         }
     } else {
         table_divider!(

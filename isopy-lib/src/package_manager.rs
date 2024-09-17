@@ -23,16 +23,15 @@ use crate::error::InstallPackageError;
 use crate::macros::dyn_trait_struct;
 use crate::package::Package;
 use crate::package_summary::PackageSummary;
+use crate::tag_filter::TagFilter;
 use crate::tags::Tags;
 use crate::version::Version;
-use crate::PackageFilter;
+use crate::SourceFilter;
 use anyhow::Result;
 use async_trait::async_trait;
 use derive_builder::Builder;
 use std::path::Path;
 use std::result::Result as StdResult;
-
-pub type OptionalTags = Option<Vec<String>>;
 
 #[derive(Builder, Default)]
 #[builder(default)]
@@ -70,20 +69,20 @@ pub trait PackageManagerOps: Send + Sync {
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags>;
     async fn list_packages(
         &self,
-        filter: PackageFilter,
-        tags: &OptionalTags,
+        sources: SourceFilter,
+        tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>>;
     async fn download_package(
         &self,
         version: &Version,
-        tags: &OptionalTags,
+        tags: &TagFilter,
         options: &DownloadPackageOptions,
     ) -> Result<()>;
     async fn install_package(
         &self,
         version: &Version,
-        tags: &OptionalTags,
+        tags: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
     ) -> StdResult<Package, InstallPackageError>;

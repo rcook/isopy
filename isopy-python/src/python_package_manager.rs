@@ -27,8 +27,8 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, OptionalTags, Package, PackageFilter, PackageKind,
-    PackageManagerContext, PackageManagerOps, PackageSummary, Tags, UpdateIndexOptions, Version,
+    ListPackagesOptions, ListTagsOptions, Package, PackageKind, PackageManagerContext,
+    PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -109,7 +109,7 @@ impl PythonPackageManager {
         Ok(packages)
     }
 
-    fn get_tags(tags: &OptionalTags) -> HashSet<&str> {
+    fn get_tags(tags: &TagFilter) -> HashSet<&str> {
         tags.as_ref().map_or(DEFAULT_TAGS.into(), |t| {
             t.iter()
                 .map(std::string::String::as_str)
@@ -120,7 +120,7 @@ impl PythonPackageManager {
     fn get_package(
         index: &Value,
         version: &PythonVersion,
-        tags: &OptionalTags,
+        tags: &TagFilter,
     ) -> Result<PythonPackage> {
         let tags = Self::get_tags(tags);
         let mut packages = Vec::new();
@@ -204,8 +204,8 @@ impl PackageManagerOps for PythonPackageManager {
 
     async fn list_packages(
         &self,
-        filter: PackageFilter,
-        tags: &OptionalTags,
+        sources: SourceFilter,
+        tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
         let tags = Self::get_tags(tags);
@@ -219,10 +219,10 @@ impl PackageManagerOps for PythonPackageManager {
                         _ => (PackageKind::Remote, None),
                     };
                     let is_local = kind == PackageKind::Local;
-                    match filter {
-                        PackageFilter::All => records.push((kind, package, path)),
-                        PackageFilter::Local if is_local => records.push((kind, package, path)),
-                        PackageFilter::Remote if !is_local => records.push((kind, package, path)),
+                    match sources {
+                        SourceFilter::All => records.push((kind, package, path)),
+                        SourceFilter::Local if is_local => records.push((kind, package, path)),
+                        SourceFilter::Remote if !is_local => records.push((kind, package, path)),
                         _ => {}
                     }
                 }
@@ -257,7 +257,7 @@ impl PackageManagerOps for PythonPackageManager {
     async fn download_package(
         &self,
         version: &Version,
-        tags: &OptionalTags,
+        tags: &TagFilter,
         options: &DownloadPackageOptions,
     ) -> Result<()> {
         let version = downcast_version!(version);
@@ -275,7 +275,7 @@ impl PackageManagerOps for PythonPackageManager {
     async fn install_package(
         &self,
         version: &Version,
-        tags: &OptionalTags,
+        tags: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
     ) -> StdResult<Package, InstallPackageError> {
