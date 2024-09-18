@@ -35,24 +35,28 @@ pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Stat
             .list_tags(options)
             .await?;
 
-        println!("Package manager: {}", moniker.as_str().bright_magenta());
+        println!(
+            "{}: {}",
+            "Package manager".bright_green(),
+            moniker.as_str().bright_magenta()
+        );
 
         if !tags.tags().is_empty() {
-            println!("  Tags:");
+            println!("  {}:", "Tags".bright_yellow());
             for tag in tags.tags() {
                 println!("    {}", tag.cyan());
             }
         }
 
         if !tags.default_tags().is_empty() {
-            println!("  Default tags:");
+            println!("  {}:", "Default tags".bright_yellow());
             for tag in tags.default_tags() {
                 println!("    {}", tag.cyan());
             }
         }
 
         if !tags.other_tags().is_empty() {
-            println!("  Other tags:");
+            println!("  {}:", "Other tags".bright_yellow());
             for tag in tags.other_tags() {
                 println!("    {}", tag.cyan());
             }
