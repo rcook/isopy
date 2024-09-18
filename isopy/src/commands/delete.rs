@@ -20,13 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::status::{return_success, return_user_error, Status};
+use crate::status::{success, user_error, Status};
 use anyhow::Result;
 use std::path::Path;
 
 pub(crate) async fn do_delete(app: &App, project_dir: &Path) -> Result<Status> {
     if app.get_dir_info(project_dir)?.is_none() {
-        return_user_error!(
+        user_error!(
             "No environment exists for project directory {}",
             project_dir.display()
         )
@@ -34,7 +34,7 @@ pub(crate) async fn do_delete(app: &App, project_dir: &Path) -> Result<Status> {
 
     app.remove_project_env(project_dir)?;
 
-    return_success!(
+    success!(
         "Environment for project directory {} successfully removed",
         project_dir.display()
     );

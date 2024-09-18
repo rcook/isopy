@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{return_success, Status};
+use crate::status::{success, Status};
 use anyhow::Result;
 use isopy_lib::DownloadPackageOptionsBuilder;
 use log::info;
@@ -41,5 +41,5 @@ pub(crate) async fn do_download(
 
     info!("Package {} is now available locally", package_id);
 
-    return_success!();
+    success!();
 }

@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{report_install_package_error, return_success, Status};
+use crate::status::{report_install_package_error, success, Status};
 use anyhow::Result;
 use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder};
 
@@ -49,5 +49,5 @@ pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) ->
         .await
     );
 
-    return_success!()
+    success!()
 }

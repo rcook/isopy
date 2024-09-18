@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::print::{make_prop_table, print_link, print_metadir};
-use crate::status::{return_success, Status};
+use crate::status::{success, Status};
 use crate::table::{table_divider, table_title};
 use anyhow::Result;
 use colored::Colorize;
@@ -36,7 +36,7 @@ pub(crate) fn do_list(app: &App, verbose: bool) -> Result<Status> {
         list_brief(app)?;
     }
 
-    return_success!();
+    success!();
 }
 
 fn list_verbose(app: &App) -> Result<()> {

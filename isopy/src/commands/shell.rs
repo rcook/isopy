@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::{Command, IsopyEnv};
-use crate::status::{return_success, return_user_error, Status};
+use crate::status::{success, user_error, Status};
 use anyhow::Result;
 use colored::Colorize;
 use ctrlc::set_handler;
@@ -31,27 +31,27 @@ use log::info;
 pub(crate) fn do_shell(app: App, verbose: bool) -> Result<Status> {
     if let Some(isopy_env) = IsopyEnv::get_vars()? {
         if let Some(link) = app.find_link(isopy_env.link_id())? {
-            return_user_error!(
+            user_error!(
                 "you are already in the isopy shell for project {}",
                 link.project_dir().display()
             );
         }
 
-        return_user_error!(
+        user_error!(
             "you are already in an isopy shell (metadirectory ID {}",
             isopy_env.meta_id()
         );
     };
 
     let Some(dir_info) = app.find_dir_info(None)? else {
-        return_user_error!(
+        user_error!(
             "could not find environment for directory {}",
             app.cwd().display()
         );
     };
 
     let Some(env_info) = dir_info.make_env_info(&app)? else {
-        return_user_error!("could not get environment info");
+        user_error!("could not get environment info");
     };
 
     if verbose {
@@ -81,5 +81,5 @@ pub(crate) fn do_shell(app: App, verbose: bool) -> Result<Status> {
     set_handler(move || {})?;
 
     Command::new_shell().exec(&isopy_env, &env_info)?;
-    return_success!();
+    success!();
 }

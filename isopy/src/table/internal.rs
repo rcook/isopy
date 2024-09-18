@@ -25,14 +25,14 @@ use colored::{Color, Colorize};
 
 macro_rules! table_title {
     ($table: expr, $($arg: tt)*) => {{
-        $table.add_title(&std::fmt::format(format_args!($($arg)*)));
+        $table.add_title(&::std::fmt::format(format_args!($($arg)*)));
     }}
 }
 pub(crate) use table_title;
 
 macro_rules! table_divider {
     ($table: expr, $($arg: tt)*) => {{
-        $table.add_divider(&std::fmt::format(format_args!($($arg)*)));
+        $table.add_divider(&::std::fmt::format(format_args!($($arg)*)));
     }}
 }
 pub(crate) use table_divider;
@@ -61,19 +61,19 @@ pub(crate) use table_headings;
 
 macro_rules! table_line {
     ($table: expr, $($arg: tt)*) => {{
-        $table.add_line(&std::fmt::format(format_args!($($arg)*)));
+        $table.add_line(&::std::fmt::format(format_args!($($arg)*)));
     }}
 }
 pub(crate) use table_line;
 
-pub struct Table {
+pub(crate) struct Table {
     settings: TableSettings,
     widths: Vec<usize>,
     rows: Vec<Row>,
 }
 
 impl Table {
-    pub fn new(settings: &TableSettings) -> Self {
+    pub(crate) fn new(settings: &TableSettings) -> Self {
         Self {
             settings: settings.clone(),
             widths: vec![],
@@ -81,29 +81,29 @@ impl Table {
         }
     }
 
-    pub fn add_title(&mut self, s: &str) {
+    pub(crate) fn add_title(&mut self, s: &str) {
         self.rows.push(Row::Title(String::from(s)));
     }
 
-    pub fn add_divider(&mut self, s: &str) {
+    pub(crate) fn add_divider(&mut self, s: &str) {
         self.rows.push(Row::Divider(String::from(s)));
     }
 
-    pub fn add_columns(&mut self, values: &[&str]) {
+    pub(crate) fn add_columns(&mut self, values: &[&str]) {
         let columns = self.make_column_vec(values);
         self.rows.push(Row::Columns(columns));
     }
 
-    pub fn add_headings(&mut self, values: &[&str]) {
+    pub(crate) fn add_headings(&mut self, values: &[&str]) {
         let columns = self.make_column_vec(values);
         self.rows.push(Row::Headings(columns));
     }
 
-    pub fn add_line(&mut self, s: &str) {
+    pub(crate) fn add_line(&mut self, s: &str) {
         self.rows.push(Row::Line(String::from(s)));
     }
 
-    pub fn print(&self) {
+    pub(crate) fn print(&self) {
         for row in &self.rows {
             match row {
                 Row::Title(s) => println!(

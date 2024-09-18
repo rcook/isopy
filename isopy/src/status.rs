@@ -30,15 +30,15 @@ pub(crate) enum Status {
 }
 
 #[macro_export]
-macro_rules! return_success_quiet {
+macro_rules! success_quiet {
     () => {
         return ::std::result::Result::Ok($crate::status::Status::Success);
     };
 }
-pub(crate) use return_success_quiet;
+pub(crate) use success_quiet;
 
 #[macro_export]
-macro_rules! return_success {
+macro_rules! success {
     () => {{
         ::log::info!("isopy completed successfully");
         return ::std::result::Result::Ok($crate::status::Status::Success);
@@ -49,23 +49,23 @@ macro_rules! return_success {
         return ::std::result::Result::Ok($crate::status::Status::Success);
     }};
 }
-pub(crate) use return_success;
+pub(crate) use success;
 
-macro_rules! return_user_error {
+macro_rules! user_error {
     ($($arg: tt)*) => {{
         ::log::error!($($arg)*);
         return ::std::result::Result::Ok($crate::status::Status::UserError);
     }};
 }
-pub(crate) use return_user_error;
+pub(crate) use user_error;
 
 #[macro_export]
 macro_rules! report_install_package_error {
     ($result: expr) => {
         match $result {
             ::std::result::Result::Ok(value) => value,
-            ::std::result::Result::Err(::isopy_lib::InstallPackageError::VersionNotFound) => $crate::status::return_user_error!("Specified version of one or more packages was not found in index"),
-            ::std::result::Result::Err(::isopy_lib::InstallPackageError::PackageNotDownloaded) => $crate::status::return_user_error!("One or more specified packages has not been downloaded: run \"download\" command or run this command with \"--download\" option"),
+            ::std::result::Result::Err(::isopy_lib::InstallPackageError::VersionNotFound) => $crate::status::user_error!("Specified version of one or more packages was not found in index"),
+            ::std::result::Result::Err(::isopy_lib::InstallPackageError::PackageNotDownloaded) => $crate::status::user_error!("One or more specified packages has not been downloaded: run \"download\" command or run this command with \"--download\" option"),
             ::std::result::Result::Err(::isopy_lib::InstallPackageError::Other(e)) => return ::std::result::Result::Err(e),
         }
     };

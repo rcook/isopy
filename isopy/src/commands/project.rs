@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
-use crate::status::{return_success, return_user_error, Status};
+use crate::status::{success, user_error, Status};
 use anyhow::Result;
 use log::info;
 
@@ -35,7 +35,7 @@ pub(crate) fn do_project(app: &App, package_id: &PackageId) -> Result<Status> {
         .iter()
         .any(|p| p.moniker() == package_id.moniker())
     {
-        return_user_error!(
+        user_error!(
             "Environment already has a package from package manager \"{}\"",
             package_id.moniker().as_str()
         );
@@ -49,5 +49,5 @@ pub(crate) fn do_project(app: &App, package_id: &PackageId) -> Result<Status> {
         package_id,
         app.cwd().display()
     );
-    return_success!();
+    success!();
 }

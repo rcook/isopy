@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::print::{make_prop_table, print_link, print_metadir};
-use crate::status::{return_success, Status};
+use crate::status::{success, Status};
 use crate::table::table_divider;
 use anyhow::Result;
 use joat_repo::Trash;
@@ -30,7 +30,7 @@ pub(crate) fn do_check(app: &App, clean: bool) -> Result<Status> {
     let mut trash = Trash::compute(app.repo())?;
 
     if trash.is_empty() {
-        return_success!("no clean-up required");
+        success!("no clean-up required");
     }
 
     let mut table = make_prop_table();
@@ -72,5 +72,5 @@ pub(crate) fn do_check(app: &App, clean: bool) -> Result<Status> {
         trash.empty()?;
     }
 
-    return_success!();
+    success!();
 }

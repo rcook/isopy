@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::env::{get_env_keys, read_env};
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
-use crate::status::{return_success, Status};
+use crate::status::{success, Status};
 use crate::table::{table_columns, table_title};
 use anyhow::Result;
 
@@ -56,5 +56,5 @@ pub(crate) fn do_info(app: &App) -> Result<Status> {
 
     table.print();
 
-    return_success!();
+    success!();
 }

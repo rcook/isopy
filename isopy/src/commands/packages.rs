@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::moniker::Moniker;
 use crate::print::{humanize_size_base_2, make_list_table};
-use crate::status::{return_success, Status};
+use crate::status::{success, Status};
 use crate::table::{table_columns, table_divider, table_headings, Table};
 use anyhow::bail;
 use anyhow::Result;
@@ -77,7 +77,7 @@ pub(crate) async fn do_packages(
 
     table.print();
 
-    return_success!();
+    success!();
 }
 
 fn add_plugin_rows(

@@ -21,20 +21,20 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::status::{report_install_package_error, return_success, return_user_error, Status};
+use crate::status::{report_install_package_error, success, user_error, Status};
 use anyhow::Result;
 use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder};
 
 pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
-        return_user_error!(
+        user_error!(
             "Project in directory {} already has an environment",
             app.cwd().display()
         );
     }
 
     let Some(project) = existing(app.read_project_config())? else {
-        return_user_error!(
+        user_error!(
             "No project configuration file in directory {}",
             app.cwd().display()
         );
@@ -65,5 +65,5 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
         );
     }
 
-    return_success!();
+    success!();
 }

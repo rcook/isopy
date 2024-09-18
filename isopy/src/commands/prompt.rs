@@ -24,7 +24,7 @@ use crate::args::PromptConfig;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::shell::IsopyEnv;
-use crate::status::{return_success_quiet, Status};
+use crate::status::{success_quiet, Status};
 use anyhow::Result;
 
 pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
@@ -58,5 +58,5 @@ pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> Result<Statu
         );
     }
 
-    return_success_quiet!();
+    success_quiet!();
 }
