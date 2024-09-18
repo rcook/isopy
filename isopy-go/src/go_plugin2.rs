@@ -19,40 +19,51 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
+use anyhow::Result;
+use isopy_lib::{
+    EnvInfo, PackageManager, PackageManagerContext, Platform, Plugin, PluginOps, Shell, Version,
+};
+use std::ffi::OsString;
 use std::path::Path;
+use std::sync::LazyLock;
+use url::Url;
 
-pub(crate) struct PluginManager {
-    go_plugin: Plugin,
-    python_plugin: Plugin,
+use crate::go_package_manager::GoPackageManager;
+
+static INDEX_URL: LazyLock<Url> =
+    LazyLock::new(|| "https://go.dev/dl/".parse().expect("Invalid index URL"));
+
+pub(crate) struct GoPlugin2;
+
+impl GoPlugin2 {
+    pub(crate) fn new() -> Plugin {
+        Plugin::new(Self)
+    }
 }
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go_plugin: isopy_go::new_plugin(),
-            python_plugin: isopy_python::new_plugin(),
-        }
+impl PluginOps for GoPlugin2 {
+    fn url(&self) -> &Url {
+        &INDEX_URL
     }
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go_plugin,
-            Moniker::Python => &self.python_plugin,
-        }
+    fn parse_version(&self, _s: &str) -> Result<Version> {
+        todo!()
     }
 
-    pub(crate) fn new_package_manager(
+    fn make_env_info(&self, _dir: &Path) -> EnvInfo {
+        todo!()
+    }
+
+    fn make_script_command(
         &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
+        _script_path: &Path,
+        _platform: Platform,
+        _shell: Shell,
+    ) -> Result<Option<OsString>> {
+        todo!()
+    }
+
+    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
+        PackageManager::new(GoPackageManager::new(ctx, &INDEX_URL))
     }
 }

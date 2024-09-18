@@ -19,40 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use super::file::File;
+use serde::Deserialize;
 
-pub(crate) struct PluginManager {
-    go_plugin: Plugin,
-    python_plugin: Plugin,
-}
+#[derive(Debug, Deserialize)]
+pub struct Version {
+    #[serde(rename = "version")]
+    #[allow(clippy::struct_field_names)]
+    pub version: String,
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go_plugin: isopy_go::new_plugin(),
-            python_plugin: isopy_python::new_plugin(),
-        }
-    }
+    #[serde(rename = "stable")]
+    pub stable: bool,
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go_plugin,
-            Moniker::Python => &self.python_plugin,
-        }
-    }
-
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
-    }
+    #[serde(rename = "files")]
+    pub files: Vec<File>,
 }

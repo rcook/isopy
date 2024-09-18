@@ -19,40 +19,43 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use serde::Deserialize;
 
-pub(crate) struct PluginManager {
-    go_plugin: Plugin,
-    python_plugin: Plugin,
-}
+#[derive(Debug, Deserialize, PartialEq)]
+pub enum Os {
+    #[serde(rename = "aix")]
+    Aix,
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go_plugin: isopy_go::new_plugin(),
-            python_plugin: isopy_python::new_plugin(),
-        }
-    }
+    #[serde(rename = "darwin")]
+    Darwin,
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go_plugin,
-            Moniker::Python => &self.python_plugin,
-        }
-    }
+    #[serde(rename = "dragonfly")]
+    Dragonfly,
 
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
-    }
+    #[serde(rename = "4")]
+    Four,
+
+    #[serde(rename = "freebsd")]
+    FreeBsd,
+
+    #[serde(rename = "illumos")]
+    Illumos,
+
+    #[serde(rename = "linux")]
+    Linux,
+
+    #[serde(rename = "netbsd")]
+    NetBsd,
+
+    #[serde(rename = "openbsd")]
+    OpenBsd,
+
+    #[serde(rename = "plan9")]
+    Plan9,
+
+    #[serde(rename = "solaris")]
+    Solaris,
+
+    #[serde(rename = "windows")]
+    Windows,
 }

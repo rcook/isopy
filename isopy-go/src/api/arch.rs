@@ -19,40 +19,52 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use serde::Deserialize;
 
-pub(crate) struct PluginManager {
-    go_plugin: Plugin,
-    python_plugin: Plugin,
-}
+#[derive(Debug, Deserialize, PartialEq)]
+pub enum Arch {
+    #[serde(rename = "amd64")]
+    Amd64,
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go_plugin: isopy_go::new_plugin(),
-            python_plugin: isopy_python::new_plugin(),
-        }
-    }
+    #[serde(rename = "arm6")]
+    Arm6,
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go_plugin,
-            Moniker::Python => &self.python_plugin,
-        }
-    }
+    #[serde(rename = "arm64")]
+    Arm64,
 
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
-    }
+    #[serde(rename = "armv6l")]
+    Armv6l,
+
+    #[serde(rename = "bootstrap")]
+    Bootstrap,
+
+    #[serde(rename = "386")]
+    I386,
+
+    #[serde(rename = "loong64")]
+    Loong64,
+
+    #[serde(rename = "mips")]
+    Mips,
+
+    #[serde(rename = "mipsle")]
+    Mipsle,
+
+    #[serde(rename = "mips64")]
+    Mips64,
+
+    #[serde(rename = "mips64le")]
+    Mips64le,
+
+    #[serde(rename = "ppc64")]
+    Ppc64,
+
+    #[serde(rename = "ppc64le")]
+    Ppc64le,
+
+    #[serde(rename = "riscv64")]
+    Riscv64,
+
+    #[serde(rename = "s390x")]
+    S390x,
 }

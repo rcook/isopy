@@ -19,40 +19,39 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use crate::api::{Arch, Kind, Os};
 
-pub(crate) struct PluginManager {
-    go_plugin: Plugin,
-    python_plugin: Plugin,
+pub struct Filter {
+    pub os: Os,
+    pub arch: Arch,
+    pub kind: Kind,
 }
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
+impl Default for Filter {
+    #[cfg(target_os = "linux")]
+    fn default() -> Self {
         Self {
-            go_plugin: isopy_go::new_plugin(),
-            python_plugin: isopy_python::new_plugin(),
+            os: Os::Linux,
+            arch: Arch::Amd64,
+            kind: Kind::Archive,
         }
     }
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go_plugin,
-            Moniker::Python => &self.python_plugin,
+    #[cfg(target_os = "macos")]
+    fn default() -> Self {
+        Self {
+            os: Os::Darwin,
+            arch: Arch::Amd64,
+            kind: Kind::Archive,
         }
     }
 
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
+    #[cfg(target_os = "windows")]
+    fn default() -> Self {
+        Self {
+            os: Os::Windows,
+            arch: Arch::Amd64,
+            kind: Kind::Archive,
+        }
     }
 }

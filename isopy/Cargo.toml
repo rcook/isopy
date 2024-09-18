@@ -21,6 +21,7 @@ colored = "2.1.0"
 ctrlc = "3.4.5"
 dirs = "5.0.1"
 futures-util = "0.3.30"
+isopy-go = { path = "../isopy-go" }
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
 joat-logger = "0.0.5"

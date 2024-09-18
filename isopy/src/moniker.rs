@@ -28,11 +28,15 @@ use std::str::FromStr;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+const GO_STR: &str = "go";
 const PYTHON_STR: &str = "python";
 
 #[derive(Clone, Debug, EnumIter, PartialEq, ValueEnum)]
 
 pub(crate) enum Moniker {
+    #[clap(name = GO_STR)]
+    Go,
+
     #[clap(name = PYTHON_STR)]
     Python,
 }
@@ -40,6 +44,7 @@ pub(crate) enum Moniker {
 impl Moniker {
     pub(crate) const fn as_str(&self) -> &str {
         match self {
+            Self::Go => GO_STR,
             Self::Python => PYTHON_STR,
         }
     }
