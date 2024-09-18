@@ -28,6 +28,7 @@ pub struct DownloadFileOptions {
     pub update: bool,
     pub checksum: Option<Checksum>,
     pub show_progress: bool,
+    pub query: Vec<(String, String)>,
 }
 
 impl DownloadFileOptions {
@@ -57,6 +58,15 @@ impl DownloadFileOptions {
     #[must_use]
     pub const fn show_progress(mut self, value: bool) -> Self {
         self.show_progress = value;
+        self
+    }
+
+    #[must_use]
+    pub fn query(mut self, value: &[(&str, &str)]) -> Self {
+        self.query = value
+            .iter()
+            .map(|(k, v)| (String::from(*k), String::from(*v)))
+            .collect();
         self
     }
 }

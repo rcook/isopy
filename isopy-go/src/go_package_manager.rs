@@ -22,32 +22,47 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageManagerContext, PackageManagerOps, PackageSummary,
-    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
+    ListPackagesOptions, ListTagsOptions, Package, PackageManagerContext, PackageManagerOps,
+    PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
+use serde_json::Value;
 use std::path::Path;
 use std::result::Result as StdResult;
+use tokio::fs::read_to_string;
 use url::Url;
 
 pub(crate) struct GoPackageManager {
-    _ctx: PackageManagerContext,
-    _url: Url,
+    ctx: PackageManagerContext,
+    url: Url,
 }
 
 impl GoPackageManager {
     pub(crate) fn new(ctx: PackageManagerContext, url: &Url) -> Self {
         Self {
-            _ctx: ctx,
-            _url: url.clone(),
+            ctx,
+            url: url.clone(),
         }
+    }
+
+    async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
+        let options = DownloadFileOptions::json()
+            .update(update)
+            .show_progress(show_progress)
+            .query(&[("include", "all"), ("mode", "json")]);
+        //TBD: let url = dir_url(&self.url);
+        let path = self.ctx.download_file(&self.url, &options).await?;
+        let s = read_to_string(path).await?;
+        let index = serde_json::from_str(&s)?;
+        Ok(index)
     }
 }
 
 #[async_trait]
 impl PackageManagerOps for GoPackageManager {
-    async fn update_index(&self, _options: &UpdateIndexOptions) -> Result<()> {
-        todo!()
+    async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()> {
+        self.get_index(true, options.show_progress).await?;
+        Ok(())
     }
 
     async fn list_tags(&self, _options: &ListTagsOptions) -> Result<Tags> {

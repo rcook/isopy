@@ -69,6 +69,8 @@ impl PackageManagerHelper {
             request = request.header(ACCEPT, accept.as_str());
         };
 
+        request = request.query(&options.query);
+
         let response = request.send().await?;
         Self::error_for_github_rate_limit(&response)?;
         response.error_for_status_ref()?;
