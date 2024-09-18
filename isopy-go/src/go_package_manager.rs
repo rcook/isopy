@@ -22,9 +22,9 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, Package, PackageManagerContext, PackageManagerOps,
-    PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    dir_url, DownloadFileOptions, DownloadPackageOptions, InstallPackageError,
+    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageManagerContext,
+    PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::path::Path;
@@ -50,8 +50,8 @@ impl GoPackageManager {
             .update(update)
             .show_progress(show_progress)
             .query(&[("include", "all"), ("mode", "json")]);
-        //TBD: let url = dir_url(&self.url);
-        let path = self.ctx.download_file(&self.url, &options).await?;
+        let url = dir_url(&self.url);
+        let path = self.ctx.download_file(&url, &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)
