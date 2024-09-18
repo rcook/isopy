@@ -88,12 +88,15 @@ fn add_plugin_rows(
     filter: SourceFilter,
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package_summary: &PackageSummary) -> String {
-        format!(
-            "{}:{}:{}",
-            moniker.as_str(),
-            **package_summary.version(),
-            package_summary.label()
-        )
+        match package_summary.label() {
+            Some(label) => format!(
+                "{}:{}:{}",
+                moniker.as_str(),
+                **package_summary.version(),
+                label
+            ),
+            None => format!("{}:{}", moniker.as_str(), **package_summary.version()),
+        }
     }
 
     fn make_package_info(package_summary: &PackageSummary) -> Result<String> {

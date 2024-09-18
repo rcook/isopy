@@ -37,18 +37,18 @@
 #![allow(clippy::redundant_pub_crate)]
 
 mod entrypoint;
+mod extra;
 mod go_package_manager;
 mod go_plugin2;
+mod go_version;
 
 //mod api;
 //mod constants;
 //mod download;
 //mod error;
-//mod extra;
 //mod filter;
 //mod go_plugin;
 //mod go_plugin_factory;
-//mod go_version;
 //mod helper;
 //mod result;
 //mod serialization;

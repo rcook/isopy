@@ -21,8 +21,8 @@
 //
 use std::cmp::Ordering;
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum Extra {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum Extra {
     Stable,
     ReleaseCandidate(u32),
     Beta(u32),

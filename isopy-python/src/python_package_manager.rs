@@ -278,7 +278,9 @@ impl PackageManagerOps for PythonPackageManager {
                     archive.metadata().name(),
                     archive.url(),
                     Version::new(archive.metadata().index_version().version().clone()),
-                    String::from(archive.metadata().index_version().release_group().as_str()),
+                    Some(String::from(
+                        archive.metadata().index_version().release_group().as_str(),
+                    )),
                     path,
                 )
             })

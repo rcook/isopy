@@ -29,7 +29,7 @@ pub struct PackageSummary {
     name: String,
     url: Url,
     version: Version,
-    label: String,
+    label: Option<String>,
     path: Option<PathBuf>,
 }
 
@@ -39,7 +39,7 @@ impl PackageSummary {
         name: S1,
         url: &Url,
         version: Version,
-        label: S2,
+        label: Option<S2>,
         path: Option<P>,
     ) -> Self {
         Self {
@@ -47,8 +47,8 @@ impl PackageSummary {
             name: name.into(),
             url: url.clone(),
             version,
-            label: label.into(),
-            path: path.map(std::convert::Into::into),
+            label: label.map(Into::into),
+            path: path.map(Into::into),
         }
     }
     #[must_use]
@@ -72,7 +72,7 @@ impl PackageSummary {
     }
 
     #[must_use]
-    pub fn label(&self) -> &str {
+    pub const fn label(&self) -> &Option<String> {
         &self.label
     }
 
