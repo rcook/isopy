@@ -19,43 +19,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use std::cmp::Ordering;
 
-pub(crate) struct PluginManager {
-    go: Plugin,
-    java: Plugin,
-    python: Plugin,
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum Extra {
+    Stable,
+    ReleaseCandidate(u32),
+    Beta(u32),
 }
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go: isopy_go::new_plugin(),
-            java: isopy_java::new_plugin(),
-            python: isopy_python::new_plugin(),
-        }
+impl PartialOrd for Extra {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
+}
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go,
-            Moniker::Java => &self.java,
-            Moniker::Python => &self.python,
+impl Ord for Extra {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self {
+            Self::Stable => match other {
+                Self::Stable => Ordering::Equal,
+                _ => Ordering::Greater,
+            },
+            Self::ReleaseCandidate(this) => match other {
+                Self::Stable => Ordering::Less,
+                Self::ReleaseCandidate(that) => this.cmp(that),
+                Self::Beta(_) => Ordering::Greater,
+            },
+            Self::Beta(this) => match other {
+                Self::Beta(that) => this.cmp(that),
+                _ => Ordering::Less,
+            },
         }
-    }
-
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
     }
 }

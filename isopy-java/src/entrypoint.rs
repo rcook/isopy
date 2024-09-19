@@ -19,43 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use crate::go_plugin::GoPlugin;
+use isopy_lib::Plugin;
 
-pub(crate) struct PluginManager {
-    go: Plugin,
-    java: Plugin,
-    python: Plugin,
-}
-
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go: isopy_go::new_plugin(),
-            java: isopy_java::new_plugin(),
-            python: isopy_python::new_plugin(),
-        }
-    }
-
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go,
-            Moniker::Java => &self.java,
-            Moniker::Python => &self.python,
-        }
-    }
-
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
-    }
+#[must_use]
+pub fn new_plugin() -> Plugin {
+    GoPlugin::new()
 }

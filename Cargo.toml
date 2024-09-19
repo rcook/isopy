@@ -8,6 +8,7 @@ strip = true
 members = [
   "isopy",
   "isopy-go",
+  "isopy-java",
   "isopy-lib",
   "isopy-python",
 ]

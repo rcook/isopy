@@ -19,43 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+#![warn(clippy::all)]
+//#![warn(clippy::cargo)]
+//#![warn(clippy::expect_used)]
+#![warn(clippy::nursery)]
+//#![warn(clippy::panic_in_result_fn)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::derive_partial_eq_without_eq)]
+#![allow(clippy::enum_glob_use)]
+#![allow(clippy::future_not_send)]
+#![allow(clippy::match_wildcard_for_single_variants)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::new_ret_no_self)]
+#![allow(clippy::option_if_let_else)]
+#![allow(clippy::redundant_pub_crate)]
 
-pub(crate) struct PluginManager {
-    go: Plugin,
-    java: Plugin,
-    python: Plugin,
-}
+mod api;
+mod entrypoint;
+mod extra;
+mod go_package;
+mod go_package_manager;
+mod go_plugin;
+mod go_version;
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go: isopy_go::new_plugin(),
-            java: isopy_java::new_plugin(),
-            python: isopy_python::new_plugin(),
-        }
-    }
-
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go,
-            Moniker::Java => &self.java,
-            Moniker::Python => &self.python,
-        }
-    }
-
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
-    }
-}
+pub use entrypoint::new_plugin;

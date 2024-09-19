@@ -19,43 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use std::path::Path;
+use serde::{Deserialize, Serialize};
 
-pub(crate) struct PluginManager {
-    go: Plugin,
-    java: Plugin,
-    python: Plugin,
-}
+#[derive(Debug, Deserialize, Serialize)]
+pub(crate) struct File {
+    #[serde(rename = "arch")]
+    pub(crate) arch: String,
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go: isopy_go::new_plugin(),
-            java: isopy_java::new_plugin(),
-            python: isopy_python::new_plugin(),
-        }
-    }
+    #[allow(clippy::struct_field_names)]
+    #[serde(rename = "filename")]
+    pub(crate) file_name: String,
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go,
-            Moniker::Java => &self.java,
-            Moniker::Python => &self.python,
-        }
-    }
+    #[serde(rename = "kind")]
+    pub(crate) kind: String,
 
-    pub(crate) fn new_package_manager(
-        &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
-    }
+    #[serde(rename = "os")]
+    pub(crate) os: String,
+
+    #[serde(rename = "sha256")]
+    pub(crate) sha256: String,
+
+    #[serde(rename = "size")]
+    pub(crate) size: u64,
+
+    #[serde(rename = "version")]
+    pub(crate) version: String,
 }

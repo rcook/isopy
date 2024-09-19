@@ -19,43 +19,55 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::CACHE_DIR_NAME;
-use crate::moniker::Moniker;
-use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
+use anyhow::Result;
+use isopy_lib::{
+    EnvInfo, PackageManager, PackageManagerContext, Platform, Plugin, PluginOps, Shell, Version,
+};
+use std::ffi::OsString;
 use std::path::Path;
+use std::sync::LazyLock;
+use url::Url;
 
-pub(crate) struct PluginManager {
-    go: Plugin,
-    java: Plugin,
-    python: Plugin,
+use crate::go_package_manager::GoPackageManager;
+use crate::go_version::GoVersion;
+
+static INDEX_URL: LazyLock<Url> =
+    LazyLock::new(|| "https://go.dev/dl/".parse().expect("Invalid index URL"));
+
+pub(crate) struct GoPlugin;
+
+impl GoPlugin {
+    pub(crate) fn new() -> Plugin {
+        Plugin::new(Self)
+    }
 }
 
-impl PluginManager {
-    pub(crate) fn new() -> Self {
-        Self {
-            go: isopy_go::new_plugin(),
-            java: isopy_java::new_plugin(),
-            python: isopy_python::new_plugin(),
+impl PluginOps for GoPlugin {
+    fn url(&self) -> &Url {
+        &INDEX_URL
+    }
+
+    fn parse_version(&self, s: &str) -> Result<Version> {
+        Ok(Version::new(s.parse::<GoVersion>()?))
+    }
+
+    fn make_env_info(&self, dir: &Path) -> EnvInfo {
+        EnvInfo {
+            path_dirs: vec![dir.join("bin")],
+            vars: vec![],
         }
     }
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
-        match moniker {
-            Moniker::Go => &self.go,
-            Moniker::Java => &self.java,
-            Moniker::Python => &self.python,
-        }
-    }
-
-    pub(crate) fn new_package_manager(
+    fn make_script_command(
         &self,
-        moniker: &Moniker,
-        config_dir: &Path,
-    ) -> PackageManager {
-        let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
-        let plugin = self.get_plugin(moniker);
-        plugin.new_package_manager(ctx)
+        _script_path: &Path,
+        _platform: Platform,
+        _shell: Shell,
+    ) -> Result<Option<OsString>> {
+        todo!()
+    }
+
+    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
+        PackageManager::new(GoPackageManager::new(ctx, &INDEX_URL))
     }
 }

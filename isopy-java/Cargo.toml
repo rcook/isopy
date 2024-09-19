@@ -1,26 +1,25 @@
 [package]
 authors = ["Richard Cook"]
 categories = ["development-tools"]
-description = "Isolated Python Tool - Python Support"
+description = "Isolated Python Tool - Java Support"
 edition = "2021"
 homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
-name = "isopy-python"
+name = "isopy-java"
 readme = "../README.md"
 repository = "https://github.com/rcook/isopy.git"
 version = "0.4.0"
 
 [dependencies]
-anyhow = "1.0.89"
-async-trait = "0.1.82"
-include_dir = "0.7.4"
+anyhow = "1.0.82"
+async-trait = "0.1.80"
 isopy-lib = { path = "../isopy-lib" }
-log = "0.4.22"
-regex = "1.10.6"
-serde_json = "1.0.128"
+log = "0.4.21"
+serde = "1.0.200"
+serde_json = "1.0.116"
 tokio = { version = "1.40.0", features = ["full"] }
-url = { version = "2.5.2", features = ["serde"] }
+url = { version = "2.5.0", features = ["serde"] }
 
 [dev-dependencies]
-rstest = "0.22.0"
+rstest = "0.19.0"

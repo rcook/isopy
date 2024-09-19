@@ -1226,6 +1226,7 @@ dependencies = [
  "exec",
  "futures-util",
  "isopy-go",
+ "isopy-java",
  "isopy-lib",
  "isopy-python",
  "joat-logger",
@@ -1253,18 +1254,26 @@ version = "0.4.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "chrono",
  "isopy-lib",
- "joatmon",
- "lazy_static",
  "log",
- "percent-encoding",
- "reqwest",
  "rstest 0.19.0",
  "serde",
  "serde_json",
- "serde_yaml",
- "thiserror",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "isopy-java"
+version = "0.4.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "isopy-lib",
+ "log",
+ "rstest 0.19.0",
+ "serde",
+ "serde_json",
  "tokio",
  "url",
 ]
@@ -1282,7 +1291,6 @@ dependencies = [
  "indicatif",
  "log",
  "rstest 0.22.0",
- "serde",
  "sha2",
  "strum",
  "strum_macros",
@@ -1303,8 +1311,6 @@ dependencies = [
  "regex",
  "rstest 0.22.0",
  "serde_json",
- "strum",
- "strum_macros",
  "tokio",
  "url",
 ]
