@@ -20,7 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::go_version::GoVersion;
-use anyhow::{bail, Result};
+use crate::serialization::Release;
+use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, DownloadFileOptions, DownloadPackageOptions, InstallPackageError,
@@ -29,19 +30,17 @@ use isopy_lib::{
     UpdateIndexOptions, Version,
 };
 use serde_json::Value;
-use std::path::{Path, PathBuf};
+use std::collections::HashSet;
+use std::path::Path;
 use std::result::Result as StdResult;
 use tokio::fs::read_to_string;
 use url::Url;
 
-macro_rules! g {
-    ($e : expr) => {
-        match $e {
-            Some(value) => value,
-            None => bail!("Invalid index"),
-        }
-    };
-}
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+const DEFAULT_TAGS: [&str; 2] = ["arm64", "darwin"];
+
+#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+const DEFAULT_TAGS: [&str; 2] = ["amd64", "darwin"];
 
 #[allow(unused)]
 macro_rules! downcast_version {
@@ -97,30 +96,57 @@ impl PackageManagerOps for GoPackageManager {
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
         let index = self.get_index(false, options.show_progress).await?;
-        let mut versions = Vec::new();
-        for item in g!(index.as_array()) {
-            match sources {
-                SourceFilter::All | SourceFilter::Remote => {
-                    let version = g!(g!(item.get("version")).as_str()).parse::<GoVersion>()?;
-                    versions.push(version);
-                }
-                SourceFilter::Local => {}
+        let mut file_infos = Vec::new();
+        let releases = serde_json::from_value::<Vec<Release>>(index)?;
+        let filter_tags = HashSet::from(DEFAULT_TAGS);
+        for release in releases {
+            for file in release.files {
+                match file.kind.as_str() {
+                    "archive" => {
+                        let tags = [file.arch.as_str(), file.os.as_str()]
+                            .into_iter()
+                            .collect::<HashSet<_>>();
+                        if tags.is_superset(&filter_tags) {
+                            let version = file.version.parse::<GoVersion>()?;
+                            let url = self.url.join(&file.file_name)?;
+                            let (kind, path) = match self.ctx.get_file(&url).await {
+                                Ok(p) => (PackageKind::Local, Some(p)),
+                                _ => (PackageKind::Remote, None),
+                            };
+                            let is_local = kind == PackageKind::Local;
+                            match sources {
+                                SourceFilter::All => {
+                                    file_infos.push((file.file_name, version, url, path))
+                                }
+                                SourceFilter::Local if is_local => {
+                                    file_infos.push((file.file_name, version, url, path))
+                                }
+                                SourceFilter::Remote if !is_local => {
+                                    file_infos.push((file.file_name, version, url, path))
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                    "installer" | "source" => {}
+                    _ => todo!("Unimplemented file kind {}", file.kind),
+                };
             }
         }
 
-        versions.sort();
-        versions.reverse();
+        file_infos.sort_by(|a, b| a.1.cmp(&b.1));
+        file_infos.reverse();
 
-        let package_summaries = versions
+        let package_summaries = file_infos
             .into_iter()
-            .map(|version| {
+            .map(|i| {
                 PackageSummary::new(
                     PackageKind::Remote,
-                    "HELLO",
-                    &Url::parse("https://httpbin.org").unwrap(),
-                    Version::new(version),
+                    i.0,
+                    &i.2,
+                    Version::new(i.1),
                     None::<String>,
-                    None::<PathBuf>,
+                    i.3,
                 )
             })
             .collect::<Vec<_>>();

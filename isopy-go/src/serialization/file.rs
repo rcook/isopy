@@ -19,26 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct VersionRec {
-    #[serde(rename = "version")]
-    pub version: String,
+pub(crate) struct File {
+    #[serde(rename = "arch")]
+    pub(crate) arch: String,
 
-    #[serde(rename = "stable")]
-    pub stable: bool,
+    #[allow(clippy::struct_field_names)]
+    #[serde(rename = "filename")]
+    pub(crate) file_name: String,
 
-    #[serde(rename = "file_name")]
-    pub file_name: String,
+    #[serde(rename = "kind")]
+    pub(crate) kind: String,
 
-    #[serde(rename = "url")]
-    pub url: Url,
+    #[serde(rename = "os")]
+    pub(crate) os: String,
+
+    #[serde(rename = "sha256")]
+    pub(crate) sha256: String,
 
     #[serde(rename = "size")]
-    pub size: u64,
+    pub(crate) size: u64,
 
-    #[serde(rename = "checksum")]
-    pub checksum: String,
+    #[serde(rename = "version")]
+    pub(crate) version: String,
 }

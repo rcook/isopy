@@ -41,6 +41,7 @@ mod extra;
 mod go_package_manager;
 mod go_plugin2;
 mod go_version;
+mod serialization;
 
 //mod api;
 //mod constants;
@@ -51,7 +52,6 @@ mod go_version;
 //mod go_plugin_factory;
 //mod helper;
 //mod result;
-//mod serialization;
 
 //pub use self::go_plugin_factory::GoPluginFactory;
 

@@ -19,15 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::version_rec::VersionRec;
-use chrono::{DateTime, Utc};
+use crate::serialization::file::File;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct IndexRec {
-    #[serde(rename = "last_updated_at")]
-    pub last_updated_at: DateTime<Utc>,
+pub(crate) struct Release {
+    #[serde(rename = "stable")]
+    pub(crate) stable: bool,
 
-    #[serde(rename = "versions")]
-    pub versions: Vec<VersionRec>,
+    #[serde(rename = "version")]
+    pub(crate) version: String,
+
+    #[serde(rename = "files")]
+    pub(crate) files: Vec<File>,
 }
