@@ -88,59 +88,6 @@ impl GoPackageManager {
         let index = self.get_index(update, show_progress).await?;
         let mut packages = Vec::new();
         for release in serde_json::from_value::<Vec<Release>>(index)? {
-            /*
-
-            let packages = self.get_packages(false, options.show_progress).await?;
-            let mut file_infos = Vec::new();
-            for package in packages {
-                let file = &package.file;
-                match file.kind.as_str() {
-                    "archive" => {
-                        let tags = [file.arch.as_str(), file.os.as_str()]
-                            .into_iter()
-                            .collect::<HashSet<_>>();
-                        if tags.is_superset(&filter_tags) {
-                            let version = file.version.parse::<GoVersion>()?;
-                            let (kind, path) = match self.ctx.get_file(package.url()).await {
-                                Ok(p) => (PackageKind::Local, Some(p)),
-                                _ => (PackageKind::Remote, None),
-                            };
-                            let is_local = kind == PackageKind::Local;
-                            match sources {
-                                SourceFilter::All => {
-                                    file_infos.push((
-                                        file.file_name.clone(),
-                                        version,
-                                        package.url().clone(),
-                                        path,
-                                    ));
-                                }
-                                SourceFilter::Local if is_local => {
-                                    file_infos.push((
-                                        file.file_name.clone(),
-                                        version,
-                                        package.url().clone(),
-                                        path,
-                                    ));
-                                }
-                                SourceFilter::Remote if !is_local => {
-                                    file_infos.push((
-                                        file.file_name.clone(),
-                                        version,
-                                        package.url().clone(),
-                                        path,
-                                    ));
-                                }
-                                _ => {}
-                            }
-                        }
-                    }
-                    "installer" | "source" => {}
-                    _ => todo!("Unimplemented file kind {}", file.kind),
-                };
-            }
-
-                 */
             let filter_tags = HashSet::from(DEFAULT_TAGS);
             for file in release.files {
                 match file.kind.as_str() {
@@ -233,15 +180,10 @@ impl PackageManagerOps for GoPackageManager {
         let mut packages = Vec::new();
         for package in self.get_packages(false, options.show_progress).await? {
             if package.tags().is_superset(&filter_tags) {
-                let is_local = *package.kind() == PackageKind::Local;
-                match sources {
-                    SourceFilter::All => {
-                        packages.push(package);
-                    }
-                    SourceFilter::Local if is_local => {
-                        packages.push(package);
-                    }
-                    SourceFilter::Remote if !is_local => {
+                match (sources, package.kind()) {
+                    (SourceFilter::All, _)
+                    | (SourceFilter::Local, PackageKind::Local)
+                    | (SourceFilter::Remote, PackageKind::Remote) => {
                         packages.push(package);
                     }
                     _ => {}
