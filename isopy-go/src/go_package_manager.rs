@@ -22,10 +22,10 @@
 use crate::go_package::GoPackage;
 use crate::go_version::GoVersion;
 use crate::serialization::Release;
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, DownloadFileOptions, DownloadPackageOptions, InstallPackageError,
+    dir_url, ArchiveType, DownloadFileOptions, DownloadPackageOptions, InstallPackageError,
     InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageKind,
     PackageManagerContext, PackageManagerOps, PackageOps, PackageSummary, SourceFilter, TagFilter,
     Tags, UpdateIndexOptions, Version,
@@ -149,11 +149,19 @@ impl GoPackageManager {
                                 Ok(p) => (PackageKind::Local, Some(p)),
                                 _ => (PackageKind::Remote, None),
                             };
+                            let (archive_type, _) = ArchiveType::strip_suffix(&file.file_name)
+                                .ok_or_else(|| {
+                                    anyhow!(
+                                        "Cannot determine archive type of file name {}",
+                                        file.file_name
+                                    )
+                                })?;
                             let checksum = file.sha256.parse()?;
                             let tags = vec![file.arch, file.os];
                             packages.push(GoPackage::new(
                                 &file.file_name,
                                 kind,
+                                archive_type,
                                 &url,
                                 &version,
                                 &path,
@@ -276,7 +284,7 @@ impl PackageManagerOps for GoPackageManager {
         &self,
         version: &Version,
         tags: &TagFilter,
-        _dir: &Path,
+        dir: &Path,
         options: &InstallPackageOptions,
     ) -> StdResult<Package, InstallPackageError> {
         let version = downcast_version!(version);
@@ -299,15 +307,11 @@ impl PackageManagerOps for GoPackageManager {
             .await
             .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
 
-        todo!("package_path={package_path:?}");
-        /*
-        release
-            .metadata()
+        package
             .archive_type()
             .unpack(&package_path, dir, options)
             .await?;
-        */
-        //Self::on_after_install(dir)?;
-        //Ok(Package::new(package))
+
+        Ok(Package::new(package))
     }
 }

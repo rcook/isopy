@@ -20,12 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_index_version::PythonIndexVersion;
-use anyhow::{bail, Error, Result};
+use anyhow::{anyhow, bail, Error};
 use isopy_lib::ArchiveType;
 use std::collections::HashSet;
 use std::result::Result as StdResult;
 use std::str::FromStr;
-use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Metadata {
@@ -57,18 +56,10 @@ impl FromStr for Metadata {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        fn parse_archive_type(s: &str) -> Result<(&str, ArchiveType)> {
-            for archive_type in ArchiveType::iter() {
-                if let Some(prefix) = s.strip_suffix(archive_type.suffix()) {
-                    return Ok((prefix, archive_type));
-                }
-            }
-            bail!("Archive {s} is not a valid Python archive")
-        }
-
         let name = String::from(s);
 
-        let (prefix, archive_type) = parse_archive_type(s)?;
+        let (archive_type, prefix) = ArchiveType::strip_suffix(s)
+            .ok_or_else(|| anyhow!("Cannot determine archive type of file name {s}"))?;
 
         let mut tags = prefix.split('-').map(str::to_owned).collect::<HashSet<_>>();
         if !tags.remove("cpython") {

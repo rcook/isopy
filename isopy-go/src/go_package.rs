@@ -20,13 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::go_version::GoVersion;
-use isopy_lib::{Checksum, PackageKind, PackageOps, Version};
+use isopy_lib::{ArchiveType, Checksum, PackageKind, PackageOps, Version};
 use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
 pub(crate) struct GoPackage {
     name: String,
     kind: PackageKind,
+    archive_type: ArchiveType,
     url: Url,
     version: GoVersion,
     other_version: Version,
@@ -36,9 +37,11 @@ pub(crate) struct GoPackage {
 }
 
 impl GoPackage {
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         name: &str,
         kind: PackageKind,
+        archive_type: ArchiveType,
         url: &Url,
         version: &GoVersion,
         path: &Option<PathBuf>,
@@ -51,6 +54,7 @@ impl GoPackage {
         Self {
             name: String::from(name),
             kind,
+            archive_type,
             url: url.clone(),
             version,
             other_version,
@@ -66,6 +70,10 @@ impl GoPackage {
 
     pub(crate) const fn kind(&self) -> &PackageKind {
         &self.kind
+    }
+
+    pub(crate) const fn archive_type(&self) -> &ArchiveType {
+        &self.archive_type
     }
 
     pub(crate) const fn url(&self) -> &Url {

@@ -27,6 +27,7 @@ use anyhow::{bail, Result};
 use decompress::{decompress, ExtractOptsBuilder};
 use log::info;
 use std::path::Path;
+use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 #[derive(Clone, Copy, Debug, EnumIter)]
@@ -37,6 +38,15 @@ pub enum ArchiveType {
 }
 
 impl ArchiveType {
+    #[must_use] pub fn strip_suffix(s: &str) -> Option<(Self, &str)> {
+        for value in Self::iter() {
+            if let Some(prefix) = s.strip_suffix(value.suffix()) {
+                return Some((value, prefix));
+            }
+        }
+        None
+    }
+
     #[must_use]
     pub const fn suffix(&self) -> &str {
         match self {
