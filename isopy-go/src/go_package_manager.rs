@@ -43,6 +43,12 @@ const DEFAULT_TAGS: [&str; 2] = ["arm64", "darwin"];
 #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
 const DEFAULT_TAGS: [&str; 2] = ["amd64", "darwin"];
 
+#[cfg(all(target_os = "windows", target_arch = "aarch64"))]
+const DEFAULT_TAGS: [&str; 2] = ["arm64", "windows"];
+
+#[cfg(all(target_os = "windows", target_arch = "x86_64"))]
+const DEFAULT_TAGS: [&str; 2] = ["amd64", "windows"];
+
 #[allow(unused)]
 macro_rules! downcast_version {
     ($version : expr) => {
