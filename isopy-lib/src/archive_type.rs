@@ -38,7 +38,8 @@ pub enum ArchiveType {
 }
 
 impl ArchiveType {
-    #[must_use] pub fn strip_suffix(s: &str) -> Option<(Self, &str)> {
+    #[must_use]
+    pub fn strip_suffix(s: &str) -> Option<(Self, &str)> {
         for value in Self::iter() {
             if let Some(prefix) = s.strip_suffix(value.suffix()) {
                 return Some((value, prefix));
