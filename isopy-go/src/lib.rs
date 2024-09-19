@@ -36,24 +36,20 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
+mod api;
 mod entrypoint;
 mod extra;
 mod go_package;
 mod go_package_manager;
 mod go_plugin;
 mod go_version;
-mod serialization;
 
-//mod api;
 //mod constants;
 //mod download;
 //mod error;
 //mod filter;
-//mod go_plugin;
 //mod go_plugin_factory;
 //mod helper;
 //mod result;
-
-//pub use self::go_plugin_factory::GoPluginFactory;
 
 pub use entrypoint::new_plugin;
