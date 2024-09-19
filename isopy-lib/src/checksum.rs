@@ -27,7 +27,7 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 use tokio::fs::read;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Checksum(Vec<u8>);
 
 impl Checksum {

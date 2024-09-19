@@ -25,9 +25,9 @@ use crate::serialization::Release;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, install_package_error, DownloadFileOptions, DownloadPackageOptions,
-    InstallPackageError, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
-    PackageKind, PackageManagerContext, PackageManagerOps, PackageSummary, SourceFilter, TagFilter,
+    dir_url, DownloadFileOptions, DownloadPackageOptions, InstallPackageError,
+    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageKind,
+    PackageManagerContext, PackageManagerOps, PackageOps, PackageSummary, SourceFilter, TagFilter,
     Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
@@ -82,13 +82,90 @@ impl GoPackageManager {
         let index = self.get_index(update, show_progress).await?;
         let mut packages = Vec::new();
         for release in serde_json::from_value::<Vec<Release>>(index)? {
-            packages.extend(
-                release
-                    .files
-                    .into_iter()
-                    .map(GoPackage::from_file)
-                    .collect::<Result<Vec<_>>>()?,
-            );
+            /*
+
+            let packages = self.get_packages(false, options.show_progress).await?;
+            let mut file_infos = Vec::new();
+            for package in packages {
+                let file = &package.file;
+                match file.kind.as_str() {
+                    "archive" => {
+                        let tags = [file.arch.as_str(), file.os.as_str()]
+                            .into_iter()
+                            .collect::<HashSet<_>>();
+                        if tags.is_superset(&filter_tags) {
+                            let version = file.version.parse::<GoVersion>()?;
+                            let (kind, path) = match self.ctx.get_file(package.url()).await {
+                                Ok(p) => (PackageKind::Local, Some(p)),
+                                _ => (PackageKind::Remote, None),
+                            };
+                            let is_local = kind == PackageKind::Local;
+                            match sources {
+                                SourceFilter::All => {
+                                    file_infos.push((
+                                        file.file_name.clone(),
+                                        version,
+                                        package.url().clone(),
+                                        path,
+                                    ));
+                                }
+                                SourceFilter::Local if is_local => {
+                                    file_infos.push((
+                                        file.file_name.clone(),
+                                        version,
+                                        package.url().clone(),
+                                        path,
+                                    ));
+                                }
+                                SourceFilter::Remote if !is_local => {
+                                    file_infos.push((
+                                        file.file_name.clone(),
+                                        version,
+                                        package.url().clone(),
+                                        path,
+                                    ));
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                    "installer" | "source" => {}
+                    _ => todo!("Unimplemented file kind {}", file.kind),
+                };
+            }
+
+                 */
+            let filter_tags = HashSet::from(DEFAULT_TAGS);
+            for file in release.files {
+                match file.kind.as_str() {
+                    "archive" => {
+                        let tags = [file.arch.as_str(), file.os.as_str()]
+                            .into_iter()
+                            .collect::<HashSet<_>>();
+                        if tags.is_superset(&filter_tags) {
+                            let version = file.version.parse::<GoVersion>()?;
+                            let url = self.url.join(&file.file_name)?;
+                            let (kind, path) = match self.ctx.get_file(&url).await {
+                                Ok(p) => (PackageKind::Local, Some(p)),
+                                _ => (PackageKind::Remote, None),
+                            };
+                            let checksum = file.sha256.parse()?;
+                            let tags = vec![file.arch, file.os];
+                            packages.push(GoPackage::new(
+                                &file.file_name,
+                                kind,
+                                &url,
+                                &version,
+                                &path,
+                                checksum,
+                                tags,
+                            ));
+                        }
+                    }
+                    "installer" | "source" => {}
+                    _ => todo!("Unimplemented file kind {}", file.kind),
+                }
+            }
         }
         Ok(packages)
     }
@@ -103,13 +180,13 @@ impl GoPackageManager {
         let packages = self.get_packages(update, show_progress).await?;
         let mut packages = packages
             .into_iter()
-            .filter(|p| p.go_version() == version)
+            .filter(|p| p.version() == version)
             .collect::<Vec<_>>();
         if packages.is_empty() {
             bail!("No matching packages found")
         }
 
-        packages.sort_by_cached_key(|p| p.go_version().clone());
+        packages.sort_by_cached_key(|p| p.version().clone());
         packages.reverse();
         Ok(packages
             .into_iter()
@@ -135,56 +212,42 @@ impl PackageManagerOps for GoPackageManager {
         _tags: &TagFilter, // TBD
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
-        let filter_tags = HashSet::from(DEFAULT_TAGS);
-        let packages = self.get_packages(false, options.show_progress).await?;
-        let mut file_infos = Vec::new();
-        for package in packages {
-            let file = package.file;
-            match file.kind.as_str() {
-                "archive" => {
-                    let tags = [file.arch.as_str(), file.os.as_str()]
-                        .into_iter()
-                        .collect::<HashSet<_>>();
-                    if tags.is_superset(&filter_tags) {
-                        let version = file.version.parse::<GoVersion>()?;
-                        let url = self.url.join(&file.file_name)?;
-                        let (kind, path) = match self.ctx.get_file(&url).await {
-                            Ok(p) => (PackageKind::Local, Some(p)),
-                            _ => (PackageKind::Remote, None),
-                        };
-                        let is_local = kind == PackageKind::Local;
-                        match sources {
-                            SourceFilter::All => {
-                                file_infos.push((file.file_name, version, url, path));
-                            }
-                            SourceFilter::Local if is_local => {
-                                file_infos.push((file.file_name, version, url, path));
-                            }
-                            SourceFilter::Remote if !is_local => {
-                                file_infos.push((file.file_name, version, url, path));
-                            }
-                            _ => {}
-                        }
+        let filter_tags = DEFAULT_TAGS
+            .into_iter()
+            .map(String::from)
+            .collect::<HashSet<_>>();
+        let mut packages = Vec::new();
+        for package in self.get_packages(false, options.show_progress).await? {
+            if package.tags().is_superset(&filter_tags) {
+                let is_local = *package.kind() == PackageKind::Local;
+                match sources {
+                    SourceFilter::All => {
+                        packages.push(package);
                     }
+                    SourceFilter::Local if is_local => {
+                        packages.push(package);
+                    }
+                    SourceFilter::Remote if !is_local => {
+                        packages.push(package);
+                    }
+                    _ => {}
                 }
-                "installer" | "source" => {}
-                _ => todo!("Unimplemented file kind {}", file.kind),
-            };
+            }
         }
 
-        file_infos.sort_by(|a, b| a.1.cmp(&b.1));
-        file_infos.reverse();
+        packages.sort_by(|a, b| a.version().cmp(b.version()));
+        packages.reverse();
 
-        let package_summaries = file_infos
+        let package_summaries = packages
             .into_iter()
-            .map(|i| {
+            .map(|p| {
                 PackageSummary::new(
                     PackageKind::Remote,
-                    i.0,
-                    &i.2,
-                    Version::new(i.1),
+                    p.name(),
+                    p.url(),
+                    PackageOps::version(&p).clone(),
                     None::<String>,
-                    i.3,
+                    p.path().clone(),
                 )
             })
             .collect::<Vec<_>>();
@@ -193,11 +256,20 @@ impl PackageManagerOps for GoPackageManager {
 
     async fn download_package(
         &self,
-        _version: &Version,
-        _tags: &TagFilter,
-        _options: &DownloadPackageOptions,
+        version: &Version,
+        tags: &TagFilter,
+        options: &DownloadPackageOptions,
     ) -> Result<()> {
-        todo!()
+        let version = downcast_version!(version);
+        let package = self
+            .get_package(false, options.show_progress, version, tags)
+            .await?;
+        let options = DownloadFileOptions::default()
+            .update(false)
+            .checksum(Some(package.checksum().clone()))
+            .show_progress(options.show_progress);
+        _ = self.ctx.download_file(package.url(), &options).await?;
+        Ok(())
     }
 
     async fn install_package(
@@ -223,12 +295,7 @@ impl PackageManagerOps for GoPackageManager {
 
         let package_path = self
             .ctx
-            .get_file(
-                &self
-                    .url
-                    .join(&package.file.file_name)
-                    .map_err(|e| install_package_error!(e))?,
-            )
+            .get_file(package.url())
             .await
             .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
 

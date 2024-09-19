@@ -20,39 +20,81 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::go_version::GoVersion;
-use crate::serialization::File;
-use anyhow::Result;
-use isopy_lib::{PackageOps, Version};
+use isopy_lib::{Checksum, PackageKind, PackageOps, Version};
+use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
 pub(crate) struct GoPackage {
-    pub(crate) file: File,
-    go_version: GoVersion,
-    version: Version,
+    name: String,
+    kind: PackageKind,
+    url: Url,
+    version: GoVersion,
+    other_version: Version,
+    path: Option<PathBuf>,
+    checksum: Checksum,
+    tags: HashSet<String>,
 }
 
 impl GoPackage {
-    pub(crate) fn from_file(file: File) -> Result<Self> {
-        let go_version = file.version.parse::<GoVersion>()?;
-        let version = Version::new(go_version.clone());
-        Ok(Self {
-            file,
-            go_version,
+    pub(crate) fn new(
+        name: &str,
+        kind: PackageKind,
+        url: &Url,
+        version: &GoVersion,
+        path: &Option<PathBuf>,
+        checksum: Checksum,
+        tags: Vec<String>,
+    ) -> Self {
+        let version = version.clone();
+        let other_version = Version::new(version.clone());
+        let tags = tags.into_iter().collect::<HashSet<_>>();
+        Self {
+            name: String::from(name),
+            kind,
+            url: url.clone(),
             version,
-        })
+            other_version,
+            path: path.clone(),
+            checksum,
+            tags,
+        }
     }
 
-    pub(crate) const fn go_version(&self) -> &GoVersion {
-        &self.go_version
+    pub(crate) fn name(&self) -> &str {
+        self.name.as_str()
+    }
+
+    pub(crate) const fn kind(&self) -> &PackageKind {
+        &self.kind
+    }
+
+    pub(crate) const fn url(&self) -> &Url {
+        &self.url
+    }
+
+    pub(crate) const fn version(&self) -> &GoVersion {
+        &self.version
+    }
+
+    pub(crate) const fn path(&self) -> &Option<PathBuf> {
+        &self.path
+    }
+
+    pub(crate) const fn checksum(&self) -> &Checksum {
+        &self.checksum
+    }
+
+    pub(crate) const fn tags(&self) -> &HashSet<String> {
+        &self.tags
     }
 }
 
 impl PackageOps for GoPackage {
     fn version(&self) -> &Version {
-        &self.version
+        &self.other_version
     }
 
     fn url(&self) -> &Url {
-        todo!()
+        &self.url
     }
 }
