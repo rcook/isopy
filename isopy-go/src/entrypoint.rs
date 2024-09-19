@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::go_plugin2::GoPlugin2;
+use crate::go_plugin::GoPlugin;
 use isopy_lib::Plugin;
 
 #[must_use]
 pub fn new_plugin() -> Plugin {
-    GoPlugin2::new()
+    GoPlugin::new()
 }

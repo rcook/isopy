@@ -40,7 +40,7 @@ mod entrypoint;
 mod extra;
 mod go_package;
 mod go_package_manager;
-mod go_plugin2;
+mod go_plugin;
 mod go_version;
 mod serialization;
 
