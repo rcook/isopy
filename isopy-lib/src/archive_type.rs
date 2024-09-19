@@ -19,22 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::extent::Extent;
+use crate::package_manager::InstallPackageOptions;
+use crate::progress_indicator::ProgressIndicator;
+use crate::progress_indicator_options::ProgressIndicatorOptions;
 use anyhow::{bail, Result};
 use decompress::{decompress, ExtractOptsBuilder};
-use isopy_lib::{Extent, InstallPackageOptions, ProgressIndicator, ProgressIndicatorOptions};
 use log::info;
 use std::path::Path;
 use strum_macros::EnumIter;
 
 #[derive(Clone, Copy, Debug, EnumIter)]
-pub(crate) enum ArchiveType {
+pub enum ArchiveType {
     TarGz,
     TarZst,
     Zip,
 }
 
 impl ArchiveType {
-    pub(crate) const fn suffix(&self) -> &str {
+    #[must_use]
+    pub const fn suffix(&self) -> &str {
         match self {
             Self::TarGz => ".tar.gz",
             Self::TarZst => ".tar.zst",
@@ -43,7 +47,7 @@ impl ArchiveType {
     }
 
     #[allow(clippy::unused_async)]
-    pub(crate) async fn unpack(
+    pub async fn unpack(
         &self,
         archive_path: &Path,
         dir: &Path,

@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::archive_type::ArchiveType;
 use crate::python_index_version::PythonIndexVersion;
 use anyhow::{bail, Error, Result};
+use isopy_lib::ArchiveType;
 use std::collections::HashSet;
 use std::result::Result as StdResult;
 use std::str::FromStr;

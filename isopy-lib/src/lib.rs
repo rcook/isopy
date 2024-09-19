@@ -34,6 +34,7 @@
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
 mod accept;
+mod archive_type;
 mod checksum;
 mod download_file_options;
 mod env_info;
@@ -59,6 +60,7 @@ mod version;
 mod version_triple;
 
 pub use accept::Accept;
+pub use archive_type::ArchiveType;
 pub use checksum::Checksum;
 pub use download_file_options::DownloadFileOptions;
 pub use env_info::EnvInfo;

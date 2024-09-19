@@ -36,7 +36,6 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
-mod archive_type;
 mod checksum;
 mod constants;
 mod discriminator;
