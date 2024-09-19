@@ -241,7 +241,7 @@ pub(crate) enum Command {
 
     #[command(
         name = "project",
-        about = "Generate project configuration file for current directory"
+        about = "Generate or update project configuration file for current directory"
     )]
     Project {
         #[arg(help = "Package ID")]

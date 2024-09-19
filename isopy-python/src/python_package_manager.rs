@@ -23,7 +23,7 @@ use crate::checksum::get_checksum;
 use crate::metadata::Metadata;
 use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
@@ -51,8 +51,8 @@ macro_rules! downcast_version {
     ($version : expr) => {
         $version
             .as_any()
-            .downcast_ref::<PythonVersion>()
-            .ok_or_else(|| anyhow!("Invalid version type"))?
+            .downcast_ref::<$crate::python_version::PythonVersion>()
+            .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
     };
 }
 

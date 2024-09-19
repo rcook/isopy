@@ -19,52 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::go_version::GoVersion;
+use crate::serialization::File;
 use anyhow::Result;
-use isopy_lib::{
-    EnvInfo, PackageManager, PackageManagerContext, Platform, Plugin, PluginOps, Shell, Version,
-};
-use std::ffi::OsString;
-use std::path::Path;
-use std::sync::LazyLock;
+use isopy_lib::{PackageOps, Version};
 use url::Url;
 
-use crate::go_package_manager::GoPackageManager;
-use crate::go_version::GoVersion;
+pub(crate) struct GoPackage {
+    pub(crate) file: File,
+    go_version: GoVersion,
+    version: Version,
+}
 
-static INDEX_URL: LazyLock<Url> =
-    LazyLock::new(|| "https://go.dev/dl/".parse().expect("Invalid index URL"));
+impl GoPackage {
+    pub(crate) fn from_file(file: File) -> Result<Self> {
+        let go_version = file.version.parse::<GoVersion>()?;
+        let version = Version::new(go_version.clone());
+        Ok(Self {
+            file,
+            go_version,
+            version,
+        })
+    }
 
-pub(crate) struct GoPlugin2;
-
-impl GoPlugin2 {
-    pub(crate) fn new() -> Plugin {
-        Plugin::new(Self)
+    pub(crate) const fn go_version(&self) -> &GoVersion {
+        &self.go_version
     }
 }
 
-impl PluginOps for GoPlugin2 {
+impl PackageOps for GoPackage {
+    fn version(&self) -> &Version {
+        &self.version
+    }
+
     fn url(&self) -> &Url {
-        &INDEX_URL
-    }
-
-    fn parse_version(&self, s: &str) -> Result<Version> {
-        Ok(Version::new(s.parse::<GoVersion>()?))
-    }
-
-    fn make_env_info(&self, _dir: &Path) -> EnvInfo {
         todo!()
-    }
-
-    fn make_script_command(
-        &self,
-        _script_path: &Path,
-        _platform: Platform,
-        _shell: Shell,
-    ) -> Result<Option<OsString>> {
-        todo!()
-    }
-
-    fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(GoPackageManager::new(ctx, &INDEX_URL))
     }
 }
