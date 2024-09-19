@@ -44,12 +44,4 @@ mod go_package_manager;
 mod go_plugin;
 mod go_version;
 
-//mod constants;
-//mod download;
-//mod error;
-//mod filter;
-//mod go_plugin_factory;
-//mod helper;
-//mod result;
-
 pub use entrypoint::new_plugin;
