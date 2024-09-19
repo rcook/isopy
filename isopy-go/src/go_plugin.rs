@@ -51,8 +51,11 @@ impl PluginOps for GoPlugin {
         Ok(Version::new(s.parse::<GoVersion>()?))
     }
 
-    fn make_env_info(&self, _dir: &Path) -> EnvInfo {
-        todo!()
+    fn make_env_info(&self, dir: &Path) -> EnvInfo {
+        EnvInfo {
+            path_dirs: vec![dir.join("bin")],
+            vars: vec![],
+        }
     }
 
     fn make_script_command(
