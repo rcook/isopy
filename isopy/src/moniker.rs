@@ -56,8 +56,7 @@ impl Moniker {
     pub(crate) fn iter_enabled() -> impl Iterator<Item = Self> {
         let java_enabled = read_env_bool(ISOPY_JAVA_ENV_NAME);
         Self::iter().filter(move |member| match member {
-            Self::Java if java_enabled => true,
-            Self::Java if !java_enabled => false,
+            Self::Java => java_enabled,
             _ => true,
         })
     }
