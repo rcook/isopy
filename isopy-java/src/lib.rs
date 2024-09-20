@@ -36,7 +36,7 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
-mod api;
+mod adoptium;
 mod entrypoint;
 mod extra;
 mod java_package;

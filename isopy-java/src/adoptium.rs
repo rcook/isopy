@@ -19,9 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod file;
-mod release;
+use anyhow::Result;
+use reqwest::Client;
+use url::Url;
 
-#[allow(unused)]
-pub(crate) use self::file::File;
-pub(crate) use self::release::Release;
+pub(crate) struct Adoptium {
+    server_url: Url,
+    client: Client,
+}
+
+impl Adoptium {
+    #[must_use]
+    pub(crate) fn new(server_url: &Url) -> Self {
+        Self {
+            server_url: server_url.clone(),
+            client: Client::new(),
+        }
+    }
+
+    pub(crate) async fn demo(&self) -> Result<()> {
+        let request_builder = self
+            .client
+            .get(self.server_url.join("/v3/info/release_versions")?);
+        let response = request_builder.send().await?;
+        todo!("response={response:?}");
+    }
+}

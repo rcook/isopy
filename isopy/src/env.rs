@@ -27,6 +27,7 @@ use std::sync::LazyLock;
 pub(crate) const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
 pub(crate) const ISOPY_CONFIG_DIR_ENV_NAME: &str = "ISOPY_CONFIG_DIR";
 pub(crate) const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
+pub(crate) const ISOPY_JAVA_ENV_NAME: &str = "ISOPY_JAVA";
 pub(crate) const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
 pub(crate) const BOOL_TRUE_VALUE: &str = "true";
@@ -42,6 +43,7 @@ static ENVS: LazyLock<Vec<(&'static str, EnvType)>> = LazyLock::new(|| {
         (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
         (ISOPY_CONFIG_DIR_ENV_NAME, EnvType::Ignore),
         (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
+        (ISOPY_JAVA_ENV_NAME, EnvType::Bool),
     ]
 });
 

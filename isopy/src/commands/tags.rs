@@ -25,7 +25,6 @@ use crate::status::{success, Status};
 use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{ListTagsOptions, ListTagsOptionsBuilder};
-use strum::IntoEnumIterator;
 
 pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn list_tags(app: &App, moniker: &Moniker, options: &ListTagsOptions) -> Result<()> {
@@ -74,7 +73,7 @@ pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Stat
             list_tags(app, moniker, &options).await?;
         }
         None => {
-            for moniker in Moniker::iter() {
+            for moniker in Moniker::iter_enabled() {
                 list_tags(app, &moniker, &options).await?;
             }
         }

@@ -17,6 +17,7 @@ async-trait = "0.1.80"
 isopy-lib = { path = "../isopy-lib" }
 log = "0.4.21"
 percent-encoding = "2.3.1"
+reqwest = { version = "0.12.7", features = ["stream"] }
 serde = "1.0.200"
 serde_json = "1.0.116"
 tokio = { version = "1.40.0", features = ["full"] }

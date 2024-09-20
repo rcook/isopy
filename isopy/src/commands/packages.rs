@@ -32,7 +32,6 @@ use isopy_lib::{
     TagFilter,
 };
 use std::fs::metadata;
-use strum::IntoEnumIterator;
 use url::{Host, Url};
 
 pub(crate) async fn do_packages(
@@ -69,7 +68,7 @@ pub(crate) async fn do_packages(
             list_packages(&mut table, app, moniker, filter, tags, &options).await?;
         }
         None => {
-            for moniker in Moniker::iter() {
+            for moniker in Moniker::iter_enabled() {
                 list_packages(&mut table, app, &moniker, filter, tags, &options).await?;
             }
         }

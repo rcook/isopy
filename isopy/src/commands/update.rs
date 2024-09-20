@@ -25,7 +25,6 @@ use crate::status::{success, Status};
 use anyhow::Result;
 use isopy_lib::{UpdateIndexOptions, UpdateIndexOptionsBuilder};
 use log::info;
-use strum::IntoEnumIterator;
 
 pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
     async fn update_index(
@@ -50,7 +49,7 @@ pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> Result<St
             update_index(app, moniker, &options).await?;
         }
         None => {
-            for moniker in Moniker::iter() {
+            for moniker in Moniker::iter_enabled() {
                 update_index(app, &moniker, &options).await?;
             }
         }

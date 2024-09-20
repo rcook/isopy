@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::env::{read_env_bool, ISOPY_JAVA_ENV_NAME};
 use anyhow::{bail, Error};
-use clap::ValueEnum;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
 use std::result::Result as StdResult;
@@ -29,19 +29,14 @@ use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 const GO: &str = "go";
-//const JAVA: &str = "java";
+const JAVA: &str = "java";
 const PYTHON: &str = "python";
 
-#[derive(Clone, Debug, EnumIter, PartialEq, ValueEnum)]
+#[derive(Clone, Debug, EnumIter, PartialEq)]
 
 pub(crate) enum Moniker {
-    #[clap(name = GO)]
     Go,
-
-    //#[clap(name = JAVA)]
-    //Java,
-    //
-    #[clap(name = PYTHON)]
+    Java,
     Python,
 }
 
@@ -49,13 +44,22 @@ impl Moniker {
     pub(crate) const fn as_str(&self) -> &str {
         match self {
             Self::Go => GO,
-            //Self::Java => JAVA,
+            Self::Java => JAVA,
             Self::Python => PYTHON,
         }
     }
 
     pub(crate) fn dir(&self) -> &Path {
         Path::new(self.as_str())
+    }
+
+    pub(crate) fn iter_enabled() -> impl Iterator<Item = Self> {
+        let java_enabled = read_env_bool(ISOPY_JAVA_ENV_NAME);
+        Self::iter().filter(move |member| match member {
+            Self::Java if java_enabled => true,
+            Self::Java if !java_enabled => false,
+            _ => true,
+        })
     }
 }
 
@@ -69,9 +73,9 @@ impl FromStr for Moniker {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        for value in Self::iter() {
-            if value.as_str() == s {
-                return Ok(value);
+        for member in Self::iter_enabled() {
+            if member.as_str().eq_ignore_ascii_case(s) {
+                return Ok(member);
             }
         }
         bail!("Invalid package manager moniker {s}")

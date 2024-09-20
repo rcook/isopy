@@ -1272,6 +1272,7 @@ dependencies = [
  "isopy-lib",
  "log",
  "percent-encoding",
+ "reqwest",
  "rstest 0.19.0",
  "serde",
  "serde_json",

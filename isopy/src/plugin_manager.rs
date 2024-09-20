@@ -27,7 +27,7 @@ use std::path::Path;
 
 pub(crate) struct PluginManager {
     go: Plugin,
-    //java: Plugin,
+    java: Plugin,
     python: Plugin,
 }
 
@@ -35,7 +35,7 @@ impl PluginManager {
     pub(crate) fn new() -> Self {
         Self {
             go: isopy_go::new_plugin(),
-            //java: isopy_java::new_plugin(),
+            java: isopy_java::new_plugin(),
             python: isopy_python::new_plugin(),
         }
     }
@@ -43,7 +43,7 @@ impl PluginManager {
     pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
         match moniker {
             Moniker::Go => &self.go,
-            //Moniker::Java => &self.java,
+            Moniker::Java => &self.java,
             Moniker::Python => &self.python,
         }
     }
