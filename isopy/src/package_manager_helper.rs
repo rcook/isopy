@@ -41,14 +41,92 @@ use tokio::fs::{create_dir_all, File as FSFile};
 use tokio::io::AsyncWriteExt;
 use url::Url;
 
-pub(crate) struct PackageManagerHelper {
-    cache_dir: PathBuf,
+trait CacheItem {
+    fn url(&self) -> &Url;
+    fn make_download(&self) -> Download;
+    fn add_to_downloads(&self, download: &mut Download);
 }
 
-#[derive(Clone, Copy)]
-enum CacheItemType {
-    File,
-    Directory,
+struct FileCacheItem {
+    url: Url,
+    path: PathBuf,
+    downloaded_at: DateTime<Utc>,
+}
+
+impl FileCacheItem {
+    fn make_file(&self) -> File {
+        File {
+            file_name: self
+                .path
+                .file_name()
+                .expect("Must have file name")
+                .to_str()
+                .expect("Must be valid string")
+                .to_string(),
+            downloaded_at: self.downloaded_at,
+        }
+    }
+}
+
+impl CacheItem for FileCacheItem {
+    fn url(&self) -> &Url {
+        &self.url
+    }
+
+    fn make_download(&self) -> Download {
+        Download {
+            url: self.url.clone(),
+            files: vec![self.make_file()],
+            directories: vec![],
+        }
+    }
+
+    fn add_to_downloads(&self, download: &mut Download) {
+        download.files.push(self.make_file());
+    }
+}
+
+struct DirectoryCacheItem {
+    url: Url,
+    path: PathBuf,
+    created_at: DateTime<Utc>,
+}
+
+impl DirectoryCacheItem {
+    fn make_directory(&self) -> Directory {
+        Directory {
+            dir_name: self
+                .path
+                .file_name()
+                .expect("Must have directory name")
+                .to_str()
+                .expect("Must be valid string")
+                .to_string(),
+            created_at: self.created_at,
+        }
+    }
+}
+
+impl CacheItem for DirectoryCacheItem {
+    fn url(&self) -> &Url {
+        &self.url
+    }
+
+    fn make_download(&self) -> Download {
+        Download {
+            url: self.url.clone(),
+            files: vec![],
+            directories: vec![self.make_directory()],
+        }
+    }
+
+    fn add_to_downloads(&self, download: &mut Download) {
+        download.directories.push(self.make_directory());
+    }
+}
+
+pub(crate) struct PackageManagerHelper {
+    cache_dir: PathBuf,
 }
 
 impl PackageManagerHelper {
@@ -209,7 +287,7 @@ impl PackageManagerHelper {
         Ok(None)
     }
 
-    fn make_unique_path(&self, url: &Url, cache_item_type: CacheItemType) -> Result<PathBuf> {
+    fn make_unique_path(&self, url: &Url) -> Result<PathBuf> {
         let file_name_parts = FileNameParts::from_url_safe(url)?;
         for i in 0.. {
             let file_name = if i == 0 {
@@ -221,77 +299,24 @@ impl PackageManagerHelper {
                 )
             };
             let p = self.cache_dir.join(file_name);
-            match cache_item_type {
-                CacheItemType::File => {
-                    if !p.is_file() {
-                        return Ok(p);
-                    }
-                }
-                CacheItemType::Directory => {
-                    if !p.is_dir() {
-                        return Ok(p);
-                    }
-                }
+            if !p.exists() {
+                return Ok(p);
             }
         }
         unreachable!();
     }
 
-    fn add_file_to_cache_manifest(
-        &self,
-        url: &Url,
-        path: &Path,
-        downloaded_at: &DateTime<Utc>,
-    ) -> Result<()> {
-        let file = File {
-            file_name: path
-                .file_name()
-                .expect("Must have file name")
-                .to_str()
-                .expect("Must be valid string")
-                .to_string(),
-            downloaded_at: *downloaded_at,
-        };
-
+    fn add_to_cache_manifest<C: CacheItem>(&self, cache_item: &C) -> Result<()> {
         let mut cache = self.load_cache()?;
-        if let Some(d) = cache.manifest.downloads.iter_mut().find(|d| d.url == *url) {
-            d.files.push(file);
+        if let Some(d) = cache
+            .manifest
+            .downloads
+            .iter_mut()
+            .find(|d| d.url == *cache_item.url())
+        {
+            cache_item.add_to_downloads(d);
         } else {
-            cache.manifest.downloads.push(Download {
-                url: url.clone(),
-                files: vec![file],
-                directories: vec![],
-            });
-        }
-        cache.save()?;
-        Ok(())
-    }
-
-    fn add_directory_to_cache_manifest(
-        &self,
-        url: &Url,
-        path: &Path,
-        created_at: &DateTime<Utc>,
-    ) -> Result<()> {
-        let directory = Directory {
-            dir_name: path
-                .file_name()
-                .expect("Must have directory name")
-                .to_str()
-                .expect("Must be valid string")
-                .to_string(),
-            created_at: *created_at,
-        };
-
-        let mut cache = self.load_cache()?;
-        if let Some(d) = cache.manifest.downloads.iter_mut().find(|d| d.url == *url) {
-            d.directories.push(directory);
-        } else {
-            cache.manifest.downloads.push(Download {
-                url: url.clone(),
-                files: vec![],
-                directories: vec![directory],
-            });
+            cache.manifest.downloads.push(cache_item.make_download());
         }
         cache.save()?;
         Ok(())
@@ -307,9 +332,8 @@ impl PackageManagerContextOps for PackageManagerHelper {
             }
         }
 
-        let path = self.make_unique_path(url, CacheItemType::File)?;
+        let path = self.make_unique_path(url)?;
         let downloaded_at = Utc::now();
-
         Self::download_to_path(url, &path, options).await?;
         if let Some(checksum) = &options.checksum {
             if !checksum.validate_file(&path).await? {
@@ -318,7 +342,11 @@ impl PackageManagerContextOps for PackageManagerHelper {
             }
         }
 
-        self.add_file_to_cache_manifest(url, &path, &downloaded_at)?;
+        self.add_to_cache_manifest(&FileCacheItem {
+            url: url.clone(),
+            path: path.clone(),
+            downloaded_at,
+        })?;
         Ok(path)
     }
 
@@ -336,10 +364,14 @@ impl PackageManagerContextOps for PackageManagerHelper {
             }
         }
 
-        let path = self.make_unique_path(url, CacheItemType::Directory)?;
+        let path = self.make_unique_path(url)?;
         let created_at = Utc::now();
         create_dir_all(&path).await?;
-        self.add_directory_to_cache_manifest(url, &path, &created_at)?;
+        self.add_to_cache_manifest(&DirectoryCacheItem {
+            url: url.clone(),
+            path: path.clone(),
+            created_at,
+        })?;
         Ok(path)
     }
 }
