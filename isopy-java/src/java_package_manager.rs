@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::link_header::LinkHeader;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, GetDirOptionsBuilder, InstallPackageError, InstallPackageOptions,
@@ -29,7 +29,9 @@ use isopy_lib::{
     Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
-use std::fs::read_dir;
+use serde_json::Value;
+use std::fs::{read_dir, File};
+use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
 use tokio::fs::write;
@@ -46,6 +48,25 @@ impl JavaPackageManager {
             ctx,
             url: url.clone(),
         }
+    }
+
+    fn get_page_paths(dir: &Path) -> Result<Vec<PathBuf>> {
+        let mut pages = Vec::new();
+        for e in read_dir(dir)? {
+            let e = e?;
+            if let Some(suffix) = e
+                .file_name()
+                .to_str()
+                .ok_or_else(|| anyhow!("Invalid file in path {}", e.path().display()))?
+                .strip_prefix("page-")
+            {
+                let index = suffix.parse::<i32>()?;
+                pages.push((e.path(), index));
+            }
+        }
+
+        pages.sort_by_key(|p| p.1);
+        Ok(pages.into_iter().map(|p| p.0).collect())
     }
 
     async fn get_index(&self, show_progress: bool, create_new: bool) -> Result<PathBuf> {
@@ -107,9 +128,13 @@ impl PackageManagerOps for JavaPackageManager {
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
         let dir = self.get_index(options.show_progress, false).await?;
-        for e in read_dir(&dir)? {
-            let e = e?;
-            println!("e={e:?}");
+        for path in Self::get_page_paths(&dir)? {
+            let f = File::open(path)?;
+            let reader = BufReader::new(f);
+            let value: Value = serde_json::from_reader(reader)?;
+            for k in value.as_object().unwrap().keys() {
+                println!("k={k}");
+            }
         }
         todo!()
     }

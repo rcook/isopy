@@ -46,19 +46,19 @@ impl LinkHeader {
 
     #[allow(unused)]
     #[must_use]
-    pub(crate) fn next(&self) -> &Option<Url> {
+    pub(crate) const fn next(&self) -> &Option<Url> {
         &self.next
     }
 
     #[allow(unused)]
     #[must_use]
-    pub(crate) fn last(&self) -> &Option<Url> {
+    pub(crate) const fn last(&self) -> &Option<Url> {
         &self.last
     }
 
     #[allow(unused)]
     #[must_use]
-    pub(crate) fn links(&self) -> &HashMap<String, String> {
+    pub(crate) const fn links(&self) -> &HashMap<String, String> {
         &self.links
     }
 
