@@ -19,13 +19,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::progress_indicator_options::ProgressIndicatorOptions;
-use crate::Extent;
+use crate::extent::Extent;
 use anyhow::Result;
+use derive_builder::Builder;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
+
+#[derive(Builder, Default)]
+pub struct ProgressIndicatorOptions {
+    #[builder(default = "true")]
+    pub enabled: bool,
+
+    #[builder(default)]
+    pub extent: Extent,
+}
 
 #[derive(Clone)]
 pub struct ProgressIndicator(Option<Arc<ProgressBar>>);

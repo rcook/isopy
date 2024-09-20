@@ -21,8 +21,7 @@
 //
 use crate::extent::Extent;
 use crate::package_manager::InstallPackageOptions;
-use crate::progress_indicator::ProgressIndicator;
-use crate::progress_indicator_options::ProgressIndicatorOptions;
+use crate::progress_indicator::{ProgressIndicator, ProgressIndicatorOptionsBuilder};
 use anyhow::{bail, Result};
 use decompress::{decompress, ExtractOptsBuilder};
 use log::info;
@@ -69,9 +68,10 @@ impl ArchiveType {
         }
 
         let progress_indicator = ProgressIndicator::new(
-            &ProgressIndicatorOptions::default()
+            &ProgressIndicatorOptionsBuilder::default()
                 .enabled(options.show_progress)
-                .extent(Extent::Unknown),
+                .extent(Extent::Unknown)
+                .build()?,
         )?;
 
         {

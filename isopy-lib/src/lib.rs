@@ -49,7 +49,6 @@ mod package_manager_context;
 mod package_summary;
 mod plugin;
 mod progress_indicator;
-mod progress_indicator_options;
 mod sanitize;
 mod shell;
 mod source_filter;
@@ -80,8 +79,9 @@ pub use package_manager_context::{
 };
 pub use package_summary::PackageSummary;
 pub use plugin::{Plugin, PluginOps};
-pub use progress_indicator::ProgressIndicator;
-pub use progress_indicator_options::ProgressIndicatorOptions;
+pub use progress_indicator::{
+    ProgressIndicator, ProgressIndicatorOptions, ProgressIndicatorOptionsBuilder,
+};
 pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
 pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
 pub use source_filter::SourceFilter;

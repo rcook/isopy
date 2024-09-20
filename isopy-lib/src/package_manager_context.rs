@@ -60,7 +60,7 @@ impl DownloadFileOptionsBuilder {
 #[builder(default)]
 pub struct GetDirOptions {
     pub show_progress: bool,
-    pub update: bool,
+    pub create_new: bool,
 }
 
 #[async_trait]

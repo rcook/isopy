@@ -19,15 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::link_header::LinkHeader;
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, GetDirOptionsBuilder, InstallPackageError, InstallPackageOptions,
     ListPackagesOptions, ListTagsOptions, Package, PackageManagerContext, PackageManagerOps,
-    PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    PackageSummary, ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter,
+    Tags, UpdateIndexOptions, Version,
 };
-use std::path::Path;
+use reqwest::Client;
+use std::fs::read_dir;
+use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
+use tokio::fs::write;
 use url::Url;
 
 pub(crate) struct JavaPackageManager {
@@ -41,6 +46,47 @@ impl JavaPackageManager {
             ctx,
             url: url.clone(),
         }
+    }
+
+    async fn get_index(&self, show_progress: bool, create_new: bool) -> Result<PathBuf> {
+        let url = self.url.join("/v3/info/release_versions")?;
+        let dir = self
+            .ctx
+            .get_dir(
+                &url,
+                &GetDirOptionsBuilder::default()
+                    .show_progress(show_progress)
+                    .create_new(create_new)
+                    .build()?,
+            )
+            .await?;
+        if !create_new {
+            return Ok(dir);
+        }
+
+        let client = Client::new();
+        let mut request_builder = client.get(url);
+
+        let options = ProgressIndicatorOptionsBuilder::default()
+            .enabled(show_progress)
+            .build()?;
+
+        let progress_indicator = ProgressIndicator::new(&options)?;
+        for i in 0.. {
+            progress_indicator.set_message(format!("Downloading page {i}"));
+
+            let response = request_builder.send().await?.error_for_status()?;
+            let next_url = LinkHeader::from_response(&response)?.and_then(|x| x.next().clone());
+            let bytes = response.bytes().await?;
+            let path = dir.join(format!("page-{i:05}"));
+            write(path, bytes).await?;
+            let Some(next_url) = next_url else {
+                return Ok(dir);
+            };
+
+            request_builder = client.get(next_url);
+        }
+        unreachable!()
     }
 }
 
@@ -60,14 +106,12 @@ impl PackageManagerOps for JavaPackageManager {
         _tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
-        let url = self.url.join("example-url")?;
-        let options = GetDirOptionsBuilder::default()
-            .show_progress(options.show_progress)
-            .build()?;
-        let dir = self.ctx.get_dir(&url, &options).await?;
-        //let adoptium = Adoptium::new(&self.url);
-        //adoptium.demo().await?;
-        todo!("{dir:?}")
+        let dir = self.get_index(options.show_progress, false).await?;
+        for e in read_dir(&dir)? {
+            let e = e?;
+            println!("e={e:?}");
+        }
+        todo!()
     }
 
     async fn download_package(

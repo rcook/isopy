@@ -28,7 +28,7 @@ use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
 use isopy_lib::{
     DownloadFileOptions, Extent, FileNameParts, GetDirOptions, PackageManagerContext,
-    PackageManagerContextOps, ProgressIndicator, ProgressIndicatorOptions,
+    PackageManagerContextOps, ProgressIndicator, ProgressIndicatorOptionsBuilder,
 };
 use log::info;
 use reqwest::header::{ACCEPT, USER_AGENT};
@@ -161,13 +161,14 @@ impl PackageManagerHelper {
         response.error_for_status_ref()?;
 
         let progress_indicator = ProgressIndicator::new(
-            &ProgressIndicatorOptions::default()
+            &ProgressIndicatorOptionsBuilder::default()
                 .enabled(options.show_progress)
                 .extent(
                     response
                         .content_length()
                         .map_or(Extent::Unknown, Extent::Bytes),
-                ),
+                )
+                .build()?,
         )?;
 
         let mut stream = response.bytes_stream();
@@ -358,7 +359,7 @@ impl PackageManagerContextOps for PackageManagerHelper {
     }
 
     async fn get_dir(&self, url: &Url, options: &GetDirOptions) -> Result<PathBuf> {
-        if !options.update {
+        if !options.create_new {
             if let Some(path) = self.check_cache_for_directory(url)? {
                 return Ok(path);
             }
