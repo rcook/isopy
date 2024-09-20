@@ -43,6 +43,7 @@ mod java_package;
 mod java_package_manager;
 mod java_plugin;
 mod java_version;
+mod link_header;
 mod maven_version;
 mod maven_version_limit;
 mod maven_version_range;
