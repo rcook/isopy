@@ -19,31 +19,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::go_version::GoVersion;
+use crate::java_version::JavaVersion;
 use isopy_lib::{ArchiveType, Checksum, PackageKind, PackageOps, Version};
 use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
-pub(crate) struct GoPackage {
+pub(crate) struct JavaPackage {
     name: String,
     kind: PackageKind,
     archive_type: ArchiveType,
     url: Url,
-    version: GoVersion,
+    version: JavaVersion,
     other_version: Version,
     path: Option<PathBuf>,
     checksum: Checksum,
     tags: HashSet<String>,
 }
 
-impl GoPackage {
+impl JavaPackage {
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         name: &str,
         kind: PackageKind,
         archive_type: ArchiveType,
         url: &Url,
-        version: &GoVersion,
+        version: &JavaVersion,
         path: &Option<PathBuf>,
         checksum: Checksum,
         tags: Vec<String>,
@@ -80,7 +80,7 @@ impl GoPackage {
         &self.url
     }
 
-    pub(crate) const fn version(&self) -> &GoVersion {
+    pub(crate) const fn version(&self) -> &JavaVersion {
         &self.version
     }
 
@@ -97,7 +97,7 @@ impl GoPackage {
     }
 }
 
-impl PackageOps for GoPackage {
+impl PackageOps for JavaPackage {
     fn version(&self) -> &Version {
         &self.other_version
     }

@@ -39,9 +39,9 @@
 mod api;
 mod entrypoint;
 mod extra;
-mod go_package;
-mod go_package_manager;
-mod go_plugin;
-mod go_version;
+mod java_package;
+mod java_package_manager;
+mod java_plugin;
+mod java_version;
 
 pub use entrypoint::new_plugin;

@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::api::Release;
-use crate::go_package::GoPackage;
-use crate::go_version::GoVersion;
+use crate::java_package::JavaPackage;
+use crate::java_version::JavaVersion;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -54,17 +54,17 @@ macro_rules! downcast_version {
     ($version : expr) => {
         $version
             .as_any()
-            .downcast_ref::<$crate::go_version::GoVersion>()
+            .downcast_ref::<$crate::java_version::JavaVersion>()
             .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
     };
 }
 
-pub(crate) struct GoPackageManager {
+pub(crate) struct JavaPackageManager {
     ctx: PackageManagerContext,
     url: Url,
 }
 
-impl GoPackageManager {
+impl JavaPackageManager {
     pub(crate) fn new(ctx: PackageManagerContext, url: &Url) -> Self {
         Self {
             ctx,
@@ -84,7 +84,7 @@ impl GoPackageManager {
         Ok(index)
     }
 
-    async fn get_packages(&self, update: bool, show_progress: bool) -> Result<Vec<GoPackage>> {
+    async fn get_packages(&self, update: bool, show_progress: bool) -> Result<Vec<JavaPackage>> {
         let index = self.get_index(update, show_progress).await?;
         let mut packages = Vec::new();
         for release in serde_json::from_value::<Vec<Release>>(index)? {
@@ -96,7 +96,7 @@ impl GoPackageManager {
                             .into_iter()
                             .collect::<HashSet<_>>();
                         if tags.is_superset(&filter_tags) {
-                            let version = file.version.parse::<GoVersion>()?;
+                            let version = file.version.parse::<JavaVersion>()?;
                             let url = self.url.join(&file.file_name)?;
                             let (kind, path) = match self.ctx.get_file(&url).await {
                                 Ok(p) => (PackageKind::Local, Some(p)),
@@ -111,7 +111,7 @@ impl GoPackageManager {
                                 })?;
                             let checksum = file.sha256.parse()?;
                             let tags = vec![file.arch, file.os];
-                            packages.push(GoPackage::new(
+                            packages.push(JavaPackage::new(
                                 &file.file_name,
                                 kind,
                                 archive_type,
@@ -135,9 +135,9 @@ impl GoPackageManager {
         &self,
         update: bool,
         show_progress: bool,
-        version: &GoVersion,
+        version: &JavaVersion,
         _tags: &TagFilter,
-    ) -> Result<GoPackage> {
+    ) -> Result<JavaPackage> {
         let packages = self.get_packages(update, show_progress).await?;
         let mut packages = packages
             .into_iter()
@@ -157,7 +157,7 @@ impl GoPackageManager {
 }
 
 #[async_trait]
-impl PackageManagerOps for GoPackageManager {
+impl PackageManagerOps for JavaPackageManager {
     async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()> {
         self.get_index(true, options.show_progress).await?;
         Ok(())

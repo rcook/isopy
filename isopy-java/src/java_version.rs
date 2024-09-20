@@ -27,7 +27,7 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct GoVersion {
+pub(crate) struct JavaVersion {
     major: u32,
     minor: Option<u32>,
     build: Option<u32>,
@@ -35,7 +35,7 @@ pub(crate) struct GoVersion {
     raw: String,
 }
 
-impl GoVersion {
+impl JavaVersion {
     #[allow(unused)]
     #[must_use]
     pub(crate) const fn major(&self) -> u32 {
@@ -67,13 +67,13 @@ impl GoVersion {
     }
 }
 
-impl Display for GoVersion {
+impl Display for JavaVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.raw)
     }
 }
 
-impl FromStr for GoVersion {
+impl FromStr for JavaVersion {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
@@ -145,7 +145,7 @@ impl FromStr for GoVersion {
     }
 }
 
-impl VersionOps for GoVersion {
+impl VersionOps for JavaVersion {
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }

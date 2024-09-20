@@ -28,27 +28,27 @@ use std::path::Path;
 use std::sync::LazyLock;
 use url::Url;
 
-use crate::go_package_manager::GoPackageManager;
-use crate::go_version::GoVersion;
+use crate::java_package_manager::JavaPackageManager;
+use crate::java_version::JavaVersion;
 
 static INDEX_URL: LazyLock<Url> =
     LazyLock::new(|| "https://go.dev/dl/".parse().expect("Invalid index URL"));
 
-pub(crate) struct GoPlugin;
+pub(crate) struct JavaPlugin;
 
-impl GoPlugin {
+impl JavaPlugin {
     pub(crate) fn new() -> Plugin {
         Plugin::new(Self)
     }
 }
 
-impl PluginOps for GoPlugin {
+impl PluginOps for JavaPlugin {
     fn url(&self) -> &Url {
         &INDEX_URL
     }
 
     fn parse_version(&self, s: &str) -> Result<Version> {
-        Ok(Version::new(s.parse::<GoVersion>()?))
+        Ok(Version::new(s.parse::<JavaVersion>()?))
     }
 
     fn make_env_info(&self, dir: &Path) -> EnvInfo {
@@ -68,6 +68,6 @@ impl PluginOps for GoPlugin {
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(GoPackageManager::new(ctx, &INDEX_URL))
+        PackageManager::new(JavaPackageManager::new(ctx, &INDEX_URL))
     }
 }
