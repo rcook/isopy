@@ -29,7 +29,7 @@ use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 const GO: &str = "go";
-const JAVA: &str = "java";
+//const JAVA: &str = "java";
 const PYTHON: &str = "python";
 
 #[derive(Clone, Debug, EnumIter, PartialEq, ValueEnum)]
@@ -38,9 +38,9 @@ pub(crate) enum Moniker {
     #[clap(name = GO)]
     Go,
 
-    #[clap(name = JAVA)]
-    Java,
-
+    //#[clap(name = JAVA)]
+    //Java,
+    //
     #[clap(name = PYTHON)]
     Python,
 }
@@ -49,7 +49,7 @@ impl Moniker {
     pub(crate) const fn as_str(&self) -> &str {
         match self {
             Self::Go => GO,
-            Self::Java => JAVA,
+            //Self::Java => JAVA,
             Self::Python => PYTHON,
         }
     }
