@@ -33,6 +33,7 @@
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::option_if_let_else)]
+
 mod accept;
 mod archive_type;
 mod checksum;
