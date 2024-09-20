@@ -37,7 +37,6 @@
 mod accept;
 mod archive_type;
 mod checksum;
-mod download_file_options;
 mod env_info;
 mod error;
 mod extent;
@@ -63,7 +62,6 @@ mod version_triple;
 pub use accept::Accept;
 pub use archive_type::ArchiveType;
 pub use checksum::Checksum;
-pub use download_file_options::DownloadFileOptions;
 pub use env_info::EnvInfo;
 pub use error::InstallPackageError;
 pub use extent::Extent;
@@ -76,7 +74,10 @@ pub use package_manager::{
     ListTagsOptionsBuilder, PackageManager, PackageManagerOps, UpdateIndexOptions,
     UpdateIndexOptionsBuilder,
 };
-pub use package_manager_context::{PackageManagerContext, PackageManagerContextOps};
+pub use package_manager_context::{
+    DownloadFileOptions, DownloadFileOptionsBuilder, GetDirOptions, GetDirOptionsBuilder,
+    PackageManagerContext, PackageManagerContextOps,
+};
 pub use package_summary::PackageSummary;
 pub use plugin::{Plugin, PluginOps};
 pub use progress_indicator::ProgressIndicator;

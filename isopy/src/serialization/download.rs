@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::serialization::directory::Directory;
 use crate::serialization::file::File;
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -30,4 +31,7 @@ pub(crate) struct Download {
 
     #[serde(rename = "files")]
     pub(crate) files: Vec<File>,
+
+    #[serde(rename = "directories")]
+    pub(crate) directories: Vec<Directory>,
 }

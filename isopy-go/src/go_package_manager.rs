@@ -25,10 +25,10 @@ use crate::go_version::GoVersion;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, ArchiveType, DownloadFileOptions, DownloadPackageOptions, InstallPackageError,
-    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageKind,
-    PackageManagerContext, PackageManagerOps, PackageOps, PackageSummary, SourceFilter, TagFilter,
-    Tags, UpdateIndexOptions, Version,
+    dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
+    InstallPackageError, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
+    PackageKind, PackageManagerContext, PackageManagerOps, PackageOps, PackageSummary,
+    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -73,10 +73,11 @@ impl GoPackageManager {
     }
 
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
-        let options = DownloadFileOptions::json()
+        let options = DownloadFileOptionsBuilder::json()
             .update(update)
             .show_progress(show_progress)
-            .query(&[("include", "all"), ("mode", "json")]);
+            .query(query!([("include", "all"), ("mode", "json")]))
+            .build()?;
         let url = dir_url(&self.url);
         let path = self.ctx.download_file(&url, &options).await?;
         let s = read_to_string(path).await?;
@@ -220,10 +221,11 @@ impl PackageManagerOps for GoPackageManager {
         let package = self
             .get_package(false, options.show_progress, version, tags)
             .await?;
-        let options = DownloadFileOptions::default()
+        let options = DownloadFileOptionsBuilder::default()
             .update(false)
             .checksum(Some(package.checksum().clone()))
-            .show_progress(options.show_progress);
+            .show_progress(options.show_progress)
+            .build()?;
         _ = self.ctx.download_file(package.url(), &options).await?;
         Ok(())
     }

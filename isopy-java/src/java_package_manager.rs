@@ -22,25 +22,23 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageManagerContext, PackageManagerOps, PackageSummary,
-    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    DownloadPackageOptions, GetDirOptionsBuilder, InstallPackageError, InstallPackageOptions,
+    ListPackagesOptions, ListTagsOptions, Package, PackageManagerContext, PackageManagerOps,
+    PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use std::path::Path;
 use std::result::Result as StdResult;
 use url::Url;
 
-use crate::adoptium::Adoptium;
-
 pub(crate) struct JavaPackageManager {
-    _ctx: PackageManagerContext,
+    ctx: PackageManagerContext,
     url: Url,
 }
 
 impl JavaPackageManager {
     pub(crate) fn new(ctx: PackageManagerContext, url: &Url) -> Self {
         Self {
-            _ctx: ctx,
+            ctx,
             url: url.clone(),
         }
     }
@@ -60,11 +58,16 @@ impl PackageManagerOps for JavaPackageManager {
         &self,
         _sources: SourceFilter,
         _tags: &TagFilter,
-        _options: &ListPackagesOptions,
+        options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
-        let adoptium = Adoptium::new(&self.url);
-        adoptium.demo().await?;
-        todo!()
+        let url = self.url.join("example-url")?;
+        let options = GetDirOptionsBuilder::default()
+            .show_progress(options.show_progress)
+            .build()?;
+        let dir = self.ctx.get_dir(&url, &options).await?;
+        //let adoptium = Adoptium::new(&self.url);
+        //adoptium.demo().await?;
+        todo!("{dir:?}")
     }
 
     async fn download_package(

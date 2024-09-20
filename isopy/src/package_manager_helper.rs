@@ -21,28 +21,34 @@
 //
 use crate::cache::Cache;
 use crate::constants::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
-use crate::serialization::{Download, File};
+use crate::serialization::{Directory, Download, File};
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
 use isopy_lib::{
-    DownloadFileOptions, Extent, FileNameParts, PackageManagerContext, PackageManagerContextOps,
-    ProgressIndicator, ProgressIndicatorOptions,
+    DownloadFileOptions, Extent, FileNameParts, GetDirOptions, PackageManagerContext,
+    PackageManagerContextOps, ProgressIndicator, ProgressIndicatorOptions,
 };
 use log::info;
 use reqwest::header::{ACCEPT, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
-use std::fs::{create_dir_all, remove_file};
+use std::fs::remove_file;
 use std::path::{Path, PathBuf};
-use tokio::fs::File as FSFile;
+use tokio::fs::{create_dir_all, File as FSFile};
 use tokio::io::AsyncWriteExt;
 use url::Url;
 
 pub(crate) struct PackageManagerHelper {
     cache_dir: PathBuf,
+}
+
+#[derive(Clone, Copy)]
+enum CacheItemType {
+    File,
+    Directory,
 }
 
 impl PackageManagerHelper {
@@ -57,7 +63,8 @@ impl PackageManagerHelper {
             path.parent().ok_or_else(|| {
                 anyhow!("Cannot get parent directory from path {}", path.display())
             })?,
-        )?;
+        )
+        .await?;
 
         info!("Downloading {url}");
 
@@ -150,13 +157,13 @@ impl PackageManagerHelper {
         Cache::load(self.cache_dir.join(CACHE_FILE_NAME))
     }
 
-    fn check_cache(&self, url: &Url) -> Result<Option<PathBuf>> {
+    fn check_cache_for_file(&self, url: &Url) -> Result<Option<PathBuf>> {
         let cache = self.load_cache()?;
         let downloads = cache
             .manifest
             .downloads
             .iter()
-            .map(|f| (f.url.clone(), f))
+            .map(|d| (d.url.clone(), d))
             .collect::<HashMap<_, _>>();
 
         if let Some(download) = downloads.get(url) {
@@ -164,7 +171,6 @@ impl PackageManagerHelper {
                 let mut files = download.files.iter().collect::<Vec<_>>();
                 files.sort_by_cached_key(|f| f.downloaded_at);
                 files.reverse();
-
                 let file = files.first().expect("Must be at least one file");
                 let path = self.cache_dir.join(&file.file_name);
                 if !path.is_file() {
@@ -177,7 +183,33 @@ impl PackageManagerHelper {
         Ok(None)
     }
 
-    fn make_unique_path(&self, url: &Url) -> Result<PathBuf> {
+    fn check_cache_for_directory(&self, url: &Url) -> Result<Option<PathBuf>> {
+        let cache = self.load_cache()?;
+        let downloads = cache
+            .manifest
+            .downloads
+            .iter()
+            .map(|d| (d.url.clone(), d))
+            .collect::<HashMap<_, _>>();
+
+        if let Some(download) = downloads.get(url) {
+            if !download.directories.is_empty() {
+                let mut directories = download.directories.iter().collect::<Vec<_>>();
+                directories.sort_by_cached_key(|f| f.created_at);
+                directories.reverse();
+                let directory = directories.first().expect("Must be at least one file");
+                let path = self.cache_dir.join(&directory.dir_name);
+                if !path.is_dir() {
+                    bail!("Directory {} is missing from cache", path.display());
+                }
+                return Ok(Some(path));
+            }
+        }
+
+        Ok(None)
+    }
+
+    fn make_unique_path(&self, url: &Url, cache_item_type: CacheItemType) -> Result<PathBuf> {
         let file_name_parts = FileNameParts::from_url_safe(url)?;
         for i in 0.. {
             let file_name = if i == 0 {
@@ -189,14 +221,28 @@ impl PackageManagerHelper {
                 )
             };
             let p = self.cache_dir.join(file_name);
-            if !p.is_file() {
-                return Ok(p);
+            match cache_item_type {
+                CacheItemType::File => {
+                    if !p.is_file() {
+                        return Ok(p);
+                    }
+                }
+                CacheItemType::Directory => {
+                    if !p.is_dir() {
+                        return Ok(p);
+                    }
+                }
             }
         }
         unreachable!();
     }
 
-    fn update_cache(&self, url: &Url, path: &Path, downloaded_at: &DateTime<Utc>) -> Result<()> {
+    fn add_file_to_cache_manifest(
+        &self,
+        url: &Url,
+        path: &Path,
+        downloaded_at: &DateTime<Utc>,
+    ) -> Result<()> {
         let file = File {
             file_name: path
                 .file_name()
@@ -214,6 +260,37 @@ impl PackageManagerHelper {
             cache.manifest.downloads.push(Download {
                 url: url.clone(),
                 files: vec![file],
+                directories: vec![],
+            });
+        }
+        cache.save()?;
+        Ok(())
+    }
+
+    fn add_directory_to_cache_manifest(
+        &self,
+        url: &Url,
+        path: &Path,
+        created_at: &DateTime<Utc>,
+    ) -> Result<()> {
+        let directory = Directory {
+            dir_name: path
+                .file_name()
+                .expect("Must have directory name")
+                .to_str()
+                .expect("Must be valid string")
+                .to_string(),
+            created_at: *created_at,
+        };
+
+        let mut cache = self.load_cache()?;
+        if let Some(d) = cache.manifest.downloads.iter_mut().find(|d| d.url == *url) {
+            d.directories.push(directory);
+        } else {
+            cache.manifest.downloads.push(Download {
+                url: url.clone(),
+                files: vec![],
+                directories: vec![directory],
             });
         }
         cache.save()?;
@@ -225,12 +302,12 @@ impl PackageManagerHelper {
 impl PackageManagerContextOps for PackageManagerHelper {
     async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf> {
         if !options.update {
-            if let Some(path) = self.check_cache(url)? {
+            if let Some(path) = self.check_cache_for_file(url)? {
                 return Ok(path);
             }
         }
 
-        let path = self.make_unique_path(url)?;
+        let path = self.make_unique_path(url, CacheItemType::File)?;
         let downloaded_at = Utc::now();
 
         Self::download_to_path(url, &path, options).await?;
@@ -241,15 +318,28 @@ impl PackageManagerContextOps for PackageManagerHelper {
             }
         }
 
-        self.update_cache(url, &path, &downloaded_at)?;
-
+        self.add_file_to_cache_manifest(url, &path, &downloaded_at)?;
         Ok(path)
     }
 
     async fn get_file(&self, url: &Url) -> Result<PathBuf> {
-        match self.check_cache(url)? {
+        match self.check_cache_for_file(url)? {
             Some(path) => Ok(path),
             _ => bail!("File at URL {url} not found in cache"),
         }
+    }
+
+    async fn get_dir(&self, url: &Url, options: &GetDirOptions) -> Result<PathBuf> {
+        if !options.update {
+            if let Some(path) = self.check_cache_for_directory(url)? {
+                return Ok(path);
+            }
+        }
+
+        let path = self.make_unique_path(url, CacheItemType::Directory)?;
+        let created_at = Utc::now();
+        create_dir_all(&path).await?;
+        self.add_directory_to_cache_manifest(url, &path, &created_at)?;
+        Ok(path)
     }
 }

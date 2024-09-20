@@ -26,7 +26,7 @@ use crate::python_version::PythonVersion;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadFileOptions, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
+    DownloadFileOptionsBuilder, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
     ListPackagesOptions, ListTagsOptions, Package, PackageKind, PackageManagerContext,
     PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
@@ -185,9 +185,10 @@ impl PythonPackageManager {
     }
 
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
-        let options = DownloadFileOptions::json()
+        let options = DownloadFileOptionsBuilder::json()
             .update(update)
-            .show_progress(show_progress);
+            .show_progress(show_progress)
+            .build()?;
         let path = self.ctx.download_file(&self.url, &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
@@ -297,10 +298,11 @@ impl PackageManagerOps for PythonPackageManager {
         let index = self.get_index(false, options.show_progress).await?;
         let package = Self::get_package(&index, version, tags)?;
         let checksum = get_checksum(&package)?;
-        let options = DownloadFileOptions::default()
+        let options = DownloadFileOptionsBuilder::default()
             .update(false)
             .checksum(Some(checksum))
-            .show_progress(options.show_progress);
+            .show_progress(options.show_progress)
+            .build()?;
         _ = self.ctx.download_file(package.url(), &options).await?;
         Ok(())
     }
