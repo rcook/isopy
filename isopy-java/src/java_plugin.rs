@@ -31,8 +31,11 @@ use url::Url;
 use crate::java_package_manager::JavaPackageManager;
 use crate::java_version::JavaVersion;
 
-static INDEX_URL: LazyLock<Url> =
-    LazyLock::new(|| "https://go.dev/dl/".parse().expect("Invalid index URL"));
+static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
+    "https://api.adoptium.net/"
+        .parse()
+        .expect("Invalid index URL")
+});
 
 pub(crate) struct JavaPlugin;
 
