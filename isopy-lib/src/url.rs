@@ -51,7 +51,7 @@ fn helper(url: &Url, slash: bool) -> Cow<Url> {
 
 #[cfg(test)]
 mod tests {
-    use super::helper;
+    use crate::url::helper;
     use anyhow::Result;
     use rstest::rstest;
     use url::Url;

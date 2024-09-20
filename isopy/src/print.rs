@@ -177,7 +177,7 @@ pub(crate) fn humanize_size_base_2(bytes: u64) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::humanize_size_base_2;
+    use crate::print::humanize_size_base_2;
     use rstest::rstest;
 
     #[rstest]

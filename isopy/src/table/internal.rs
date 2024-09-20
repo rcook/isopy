@@ -173,8 +173,8 @@ impl Table {
 
 #[cfg(test)]
 mod tests {
-    use super::super::settings::TableSettings;
-    use super::{table_columns, Table};
+    use crate::table::internal::{table_columns, Table};
+    use crate::table::settings::TableSettings;
     use std::fmt::{Display, Formatter, Result as FmtResult};
 
     #[test]

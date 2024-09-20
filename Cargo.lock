@@ -1271,6 +1271,7 @@ dependencies = [
  "async-trait",
  "isopy-lib",
  "log",
+ "percent-encoding",
  "rstest 0.19.0",
  "serde",
  "serde_json",

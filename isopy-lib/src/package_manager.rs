@@ -91,7 +91,7 @@ dyn_trait_struct!(PackageManager, PackageManagerOps);
 
 #[cfg(test)]
 mod tests {
-    use super::ListPackagesOptionsBuilder;
+    use crate::package_manager::ListPackagesOptionsBuilder;
 
     #[test]
     fn basics() {

@@ -19,36 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::maven_version::MavenVersion;
+use crate::maven_version_limit::MavenVersionLimit;
 use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 const MAVEN_VERSION: &AsciiSet = &CONTROLS.add(b'(').add(b')').add(b',').add(b'[').add(b']');
 
-pub enum MavenVersionRange {
+#[allow(unused)]
+pub(crate) enum MavenVersionRange {
     #[allow(unused)]
     OpenJdkVersion(String),
     #[allow(unused)]
-    Value(MavenVersionValue),
-    Range(MavenVersionLimit, MavenVersionLimit),
+    Version(MavenVersion),
+    VersionRange(MavenVersionLimit, MavenVersionLimit),
 }
 
 impl MavenVersionRange {
+    #[allow(unused)]
     #[must_use]
-    pub fn to_path_segment(&self) -> String {
+    pub(crate) fn to_path_segment(&self) -> String {
         utf8_percent_encode(&self.to_string(), MAVEN_VERSION).to_string()
     }
 }
 
 impl Display for MavenVersionRange {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        use MavenVersionLimit::*;
+        use crate::maven_version_limit::MavenVersionLimit::*;
 
         match self {
             Self::OpenJdkVersion(s) => write!(f, "{s}"),
-            Self::Value(value) => {
+            Self::Version(value) => {
                 write!(f, "{value}")
             }
-            Self::Range(lower, upper) => {
+            Self::VersionRange(lower, upper) => {
                 let mut s = String::new();
                 match lower {
                     Open(None) => s.push('('),
@@ -81,38 +85,13 @@ impl Display for MavenVersionRange {
     }
 }
 
-pub struct MavenVersionValue {
-    pub major: u32,
-    pub minor: Option<u32>,
-}
-
-impl MavenVersionValue {
-    #[must_use]
-    pub const fn new(major: u32, minor: Option<u32>) -> Self {
-        Self { major, minor }
-    }
-}
-
-impl Display for MavenVersionValue {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        if let Some(minor) = self.minor {
-            write!(f, "{}.{}", self.major, minor)
-        } else {
-            write!(f, "{}", self.major)
-        }
-    }
-}
-
-pub enum MavenVersionLimit {
-    Open(Option<MavenVersionValue>),
-    Closed(Option<MavenVersionValue>),
-}
-
 #[cfg(test)]
 mod tests {
-    use super::MavenVersionLimit::{Closed, Open};
-    use super::MavenVersionRange::{self, OpenJdkVersion, Range, Value};
-    use super::MavenVersionValue;
+    use crate::maven_version::MavenVersion;
+    use crate::maven_version_limit::MavenVersionLimit::{Closed, Open};
+    use crate::maven_version_range::MavenVersionRange::{
+        self, OpenJdkVersion, Version, VersionRange,
+    };
     use rstest::rstest;
 
     #[rstest]
@@ -121,24 +100,24 @@ mod tests {
         "arbitrary/string",
         OpenJdkVersion(String::from("arbitrary/string"))
     )]
-    #[case("10", "10", Value(MavenVersionValue::new(10, None)))]
-    #[case("1.2", "1.2", Value(MavenVersionValue::new(1, Some(2))))]
-    #[case("(,)", "%28%2C%29", Range(Open(None), Open(None)))]
-    #[case("[,]", "%5B%2C%5D", Range(Closed(None), Closed(None)))]
+    #[case("10", "10", Version(MavenVersion::new(10, None)))]
+    #[case("1.2", "1.2", Version(MavenVersion::new(1, Some(2))))]
+    #[case("(,)", "%28%2C%29", VersionRange(Open(None), Open(None)))]
+    #[case("[,]", "%5B%2C%5D", VersionRange(Closed(None), Closed(None)))]
     #[case(
         "(22,)",
         "%2822%2C%29",
-        Range(Open(Some(MavenVersionValue::new(22, None))), Open(None))
+        VersionRange(Open(Some(MavenVersion::new(22, None))), Open(None))
     )]
     #[case(
         "(22.33,)",
         "%2822.33%2C%29",
-        Range(Open(Some(MavenVersionValue::new(22, Some(33)))), Open(None))
+        VersionRange(Open(Some(MavenVersion::new(22, Some(33)))), Open(None))
     )]
     #[case(
         "(,1000000.0]",
         "%28%2C1000000.0%5D",
-        Range(Open(None), Closed(Some(MavenVersionValue::new(1_000_000, Some(0)))))
+        VersionRange(Open(None), Closed(Some(MavenVersion::new(1_000_000, Some(0)))))
     )]
     fn basics(
         #[case] expected_str: &str,

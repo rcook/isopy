@@ -43,5 +43,8 @@ mod java_package;
 mod java_package_manager;
 mod java_plugin;
 mod java_version;
+mod maven_version;
+mod maven_version_limit;
+mod maven_version_range;
 
 pub use entrypoint::new_plugin;
