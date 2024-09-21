@@ -20,16 +20,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::link_header::LinkHeader;
+use crate::serialization::versions_response::VersionsResponse;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, MakeDirOptionsBuilder, Package, PackageManagerContext, PackageManagerOps,
-    PackageSummary, ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter,
-    Tags, UpdateIndexOptions, Version,
+    ListTagsOptions, MakeDirOptionsBuilder, Package, PackageKind, PackageManagerContext,
+    PackageManagerOps, PackageSummary, ProgressIndicator, ProgressIndicatorOptionsBuilder,
+    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
-use serde_json::Value;
 use std::fs::{read_dir, File};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
@@ -129,15 +129,23 @@ impl PackageManagerOps for JavaPackageManager {
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>> {
         let dir = self.get_index(options.show_progress, false).await?;
+        let mut package_summaries = Vec::new();
         for path in Self::get_page_paths(&dir)? {
             let f = File::open(path)?;
             let reader = BufReader::new(f);
-            let value: Value = serde_json::from_reader(reader)?;
-            for k in value.as_object().unwrap().keys() {
-                println!("k={k}");
-            }
+            let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
+            package_summaries.extend(response.versions.into_iter().map(|v| {
+                PackageSummary::new(
+                    PackageKind::Remote,
+                    v.semver.clone(),
+                    &Url::parse("https://httpbin.org").unwrap(),
+                    Version::new(v),
+                    None::<String>,
+                    None::<PathBuf>,
+                )
+            }));
         }
-        todo!()
+        Ok(package_summaries)
     }
 
     async fn download_package(

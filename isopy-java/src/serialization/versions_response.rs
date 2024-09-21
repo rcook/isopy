@@ -19,34 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::new_ret_no_self)]
-#![allow(clippy::option_if_let_else)]
-#![allow(clippy::redundant_pub_crate)]
+use crate::serialization::version::Version;
+use serde::Deserialize;
 
-mod adoptium;
-mod entrypoint;
-mod extra;
-mod java_package;
-mod java_package_manager;
-mod java_plugin;
-mod java_version;
-mod link_header;
-mod maven_version;
-mod maven_version_limit;
-mod maven_version_range;
-mod serialization;
-
-pub use entrypoint::new_plugin;
+#[derive(Deserialize)]
+pub(crate) struct VersionsResponse {
+    #[serde(rename = "versions")]
+    pub(crate) versions: Vec<Version>,
+}

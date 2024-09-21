@@ -36,17 +36,5 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
-mod adoptium;
-mod entrypoint;
-mod extra;
-mod java_package;
-mod java_package_manager;
-mod java_plugin;
-mod java_version;
-mod link_header;
-mod maven_version;
-mod maven_version_limit;
-mod maven_version_range;
-mod serialization;
-
-pub use entrypoint::new_plugin;
+pub(crate) mod version;
+pub(crate) mod versions_response;

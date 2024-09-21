@@ -42,7 +42,7 @@ macro_rules! g {
     ($e : expr) => {
         match $e {
             Some(value) => value,
-            None => bail!("Invalid index"),
+            None => ::anyhow::bail!("Invalid index"),
         }
     };
 }
