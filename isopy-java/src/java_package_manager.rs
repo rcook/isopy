@@ -23,8 +23,8 @@ use crate::link_header::LinkHeader;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, GetDirOptionsBuilder, InstallPackageError, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, Package, PackageManagerContext, PackageManagerOps,
+    DownloadPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
+    ListTagsOptions, MakeDirOptionsBuilder, Package, PackageManagerContext, PackageManagerOps,
     PackageSummary, ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter,
     Tags, UpdateIndexOptions, Version,
 };
@@ -71,20 +71,20 @@ impl JavaPackageManager {
 
     async fn get_index(&self, show_progress: bool, create_new: bool) -> Result<PathBuf> {
         let url = self.url.join("/v3/info/release_versions")?;
+        if !create_new {
+            return self.ctx.get_dir(&url).await;
+        }
+
         let dir = self
             .ctx
-            .get_dir(
+            .make_dir(
                 &url,
-                &GetDirOptionsBuilder::default()
+                &MakeDirOptionsBuilder::default()
                     .show_progress(show_progress)
-                    .create_new(create_new)
+                    .create_new(true)
                     .build()?,
             )
             .await?;
-        if !create_new {
-            return Ok(dir);
-        }
-
         let client = Client::new();
         let mut request_builder = client.get(url);
 
@@ -113,8 +113,9 @@ impl JavaPackageManager {
 
 #[async_trait]
 impl PackageManagerOps for JavaPackageManager {
-    async fn update_index(&self, _options: &UpdateIndexOptions) -> Result<()> {
-        todo!()
+    async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()> {
+        self.get_index(options.show_progress, true).await?;
+        Ok(())
     }
 
     async fn list_tags(&self, _options: &ListTagsOptions) -> Result<Tags> {

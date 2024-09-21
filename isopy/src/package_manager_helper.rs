@@ -27,7 +27,7 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
 use isopy_lib::{
-    DownloadFileOptions, Extent, FileNameParts, GetDirOptions, PackageManagerContext,
+    DownloadFileOptions, Extent, FileNameParts, MakeDirOptions, PackageManagerContext,
     PackageManagerContextOps, ProgressIndicator, ProgressIndicatorOptionsBuilder,
 };
 use log::info;
@@ -42,6 +42,8 @@ use tokio::io::AsyncWriteExt;
 use url::Url;
 
 trait CacheItem {
+    fn exists(path: &Path) -> bool;
+    fn most_recent_item_name(download: &Download) -> Option<&str>;
     fn url(&self) -> &Url;
     fn make_download(&self) -> Download;
     fn add_to_downloads(&self, download: &mut Download);
@@ -69,6 +71,17 @@ impl FileCacheItem {
 }
 
 impl CacheItem for FileCacheItem {
+    fn exists(path: &Path) -> bool {
+        path.is_file()
+    }
+
+    fn most_recent_item_name(download: &Download) -> Option<&str> {
+        let mut files = download.files.iter().collect::<Vec<_>>();
+        files.sort_by_cached_key(|f| f.downloaded_at);
+        files.reverse();
+        files.first().map(|f| f.file_name.as_str())
+    }
+
     fn url(&self) -> &Url {
         &self.url
     }
@@ -108,6 +121,17 @@ impl DirectoryCacheItem {
 }
 
 impl CacheItem for DirectoryCacheItem {
+    fn exists(path: &Path) -> bool {
+        path.is_dir()
+    }
+
+    fn most_recent_item_name(download: &Download) -> Option<&str> {
+        let mut directories = download.directories.iter().collect::<Vec<_>>();
+        directories.sort_by_cached_key(|f| f.created_at);
+        directories.reverse();
+        directories.first().map(|d| d.dir_name.as_str())
+    }
+
     fn url(&self) -> &Url {
         &self.url
     }
@@ -236,7 +260,7 @@ impl PackageManagerHelper {
         Cache::load(self.cache_dir.join(CACHE_FILE_NAME))
     }
 
-    fn check_cache_for_file(&self, url: &Url) -> Result<Option<PathBuf>> {
+    fn check_cache<C: CacheItem>(&self, url: &Url) -> Result<Option<PathBuf>> {
         let cache = self.load_cache()?;
         let downloads = cache
             .manifest
@@ -246,42 +270,12 @@ impl PackageManagerHelper {
             .collect::<HashMap<_, _>>();
 
         if let Some(download) = downloads.get(url) {
-            if !download.files.is_empty() {
-                let mut files = download.files.iter().collect::<Vec<_>>();
-                files.sort_by_cached_key(|f| f.downloaded_at);
-                files.reverse();
-                let file = files.first().expect("Must be at least one file");
-                let path = self.cache_dir.join(&file.file_name);
-                if !path.is_file() {
-                    bail!("File {} is missing from cache", path.display());
+            if let Some(name) = C::most_recent_item_name(download) {
+                let path = self.cache_dir.join(name);
+                if C::exists(&path) {
+                    return Ok(Some(path));
                 }
-                return Ok(Some(path));
-            }
-        }
-
-        Ok(None)
-    }
-
-    fn check_cache_for_directory(&self, url: &Url) -> Result<Option<PathBuf>> {
-        let cache = self.load_cache()?;
-        let downloads = cache
-            .manifest
-            .downloads
-            .iter()
-            .map(|d| (d.url.clone(), d))
-            .collect::<HashMap<_, _>>();
-
-        if let Some(download) = downloads.get(url) {
-            if !download.directories.is_empty() {
-                let mut directories = download.directories.iter().collect::<Vec<_>>();
-                directories.sort_by_cached_key(|f| f.created_at);
-                directories.reverse();
-                let directory = directories.first().expect("Must be at least one file");
-                let path = self.cache_dir.join(&directory.dir_name);
-                if !path.is_dir() {
-                    bail!("Directory {} is missing from cache", path.display());
-                }
-                return Ok(Some(path));
+                bail!("Expected item {} is missing from cache", path.display());
             }
         }
 
@@ -328,7 +322,7 @@ impl PackageManagerHelper {
 impl PackageManagerContextOps for PackageManagerHelper {
     async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf> {
         if !options.update {
-            if let Some(path) = self.check_cache_for_file(url)? {
+            if let Some(path) = self.check_cache::<FileCacheItem>(url)? {
                 return Ok(path);
             }
         }
@@ -352,15 +346,15 @@ impl PackageManagerContextOps for PackageManagerHelper {
     }
 
     async fn get_file(&self, url: &Url) -> Result<PathBuf> {
-        match self.check_cache_for_file(url)? {
+        match self.check_cache::<FileCacheItem>(url)? {
             Some(path) => Ok(path),
             _ => bail!("File at URL {url} not found in cache"),
         }
     }
 
-    async fn get_dir(&self, url: &Url, options: &GetDirOptions) -> Result<PathBuf> {
+    async fn make_dir(&self, url: &Url, options: &MakeDirOptions) -> Result<PathBuf> {
         if !options.create_new {
-            if let Some(path) = self.check_cache_for_directory(url)? {
+            if let Some(path) = self.check_cache::<DirectoryCacheItem>(url)? {
                 return Ok(path);
             }
         }
@@ -368,11 +362,19 @@ impl PackageManagerContextOps for PackageManagerHelper {
         let path = self.make_unique_path(url)?;
         let created_at = Utc::now();
         create_dir_all(&path).await?;
+
         self.add_to_cache_manifest(&DirectoryCacheItem {
             url: url.clone(),
             path: path.clone(),
             created_at,
         })?;
         Ok(path)
+    }
+
+    async fn get_dir(&self, url: &Url) -> Result<PathBuf> {
+        match self.check_cache::<DirectoryCacheItem>(url)? {
+            Some(path) => Ok(path),
+            _ => bail!("Directory for URL {url} not found in cache"),
+        }
     }
 }

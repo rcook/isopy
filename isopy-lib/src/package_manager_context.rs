@@ -58,7 +58,7 @@ impl DownloadFileOptionsBuilder {
 
 #[derive(Builder, Default)]
 #[builder(default)]
-pub struct GetDirOptions {
+pub struct MakeDirOptions {
     pub show_progress: bool,
     pub create_new: bool,
 }
@@ -67,6 +67,7 @@ pub struct GetDirOptions {
 pub trait PackageManagerContextOps: Send + Sync {
     async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf>;
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
-    async fn get_dir(&self, url: &Url, options: &GetDirOptions) -> Result<PathBuf>;
+    async fn make_dir(&self, url: &Url, options: &MakeDirOptions) -> Result<PathBuf>;
+    async fn get_dir(&self, url: &Url) -> Result<PathBuf>;
 }
 dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);

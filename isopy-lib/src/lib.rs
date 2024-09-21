@@ -74,7 +74,7 @@ pub use package_manager::{
     UpdateIndexOptionsBuilder,
 };
 pub use package_manager_context::{
-    DownloadFileOptions, DownloadFileOptionsBuilder, GetDirOptions, GetDirOptionsBuilder,
+    DownloadFileOptions, DownloadFileOptionsBuilder, MakeDirOptions, MakeDirOptionsBuilder,
     PackageManagerContext, PackageManagerContextOps,
 };
 pub use package_summary::PackageSummary;
