@@ -29,9 +29,9 @@ pub(crate) struct Download {
     #[serde(rename = "url")]
     pub(crate) url: Url,
 
-    #[serde(rename = "files")]
+    #[serde(rename = "files", skip_serializing_if = "Vec::is_empty", default)]
     pub(crate) files: Vec<File>,
 
-    #[serde(rename = "directories")]
+    #[serde(rename = "directories", skip_serializing_if = "Vec::is_empty", default)]
     pub(crate) directories: Vec<Directory>,
 }
