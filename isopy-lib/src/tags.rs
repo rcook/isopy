@@ -28,7 +28,7 @@ pub struct Tags {
 
 impl Tags {
     #[must_use]
-    pub fn new(tags: Vec<String>, default_tags: Vec<String>, other_tags: Vec<String>) -> Self {
+    pub const fn new(tags: Vec<String>, default_tags: Vec<String>, other_tags: Vec<String>) -> Self {
         Self {
             tags,
             default_tags,
