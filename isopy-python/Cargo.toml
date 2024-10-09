@@ -13,14 +13,14 @@ version = "0.4.2"
 
 [dependencies]
 anyhow = "1.0.89"
-async-trait = "0.1.82"
+async-trait = "0.1.83"
 include_dir = "0.7.4"
 isopy-lib = { path = "../isopy-lib" }
 log = "0.4.22"
-regex = "1.10.6"
+regex = "1.11.0"
 serde_json = "1.0.128"
 tokio = { version = "1.40.0", features = ["full"] }
 url = { version = "2.5.2", features = ["serde"] }
 
 [dev-dependencies]
-rstest = "0.22.0"
+rstest = "0.23.0"

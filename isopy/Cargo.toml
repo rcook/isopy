@@ -13,14 +13,14 @@ version = "0.4.2"
 
 [dependencies]
 anyhow = { version = "1.0.89", features = ["backtrace"] }
-async-trait = "0.1.82"
-clap = { version = "4.5.17", features = ["derive", "env"] }
-clap_complete = "4.5.26"
+async-trait = "0.1.83"
+clap = { version = "4.5.20", features = ["derive", "env"] }
+clap_complete = "4.5.33"
 chrono = "0.4.38"
 colored = "2.1.0"
 ctrlc = "3.4.5"
 dirs = "5.0.1"
-futures-util = "0.3.30"
+futures-util = "0.3.31"
 isopy-go = { path = "../isopy-go" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
@@ -30,7 +30,7 @@ joat-repo = "0.0.12"
 joatmon = "0.0.34"
 log = { version = "0.4.22", features = ["std"] }
 path-absolutize = "3.1.1"
-reqwest = { version = "0.12.7", features = ["stream"] }
+reqwest = { version = "0.12.8", features = ["stream"] }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_yaml = "0.9.34"
 tinytemplate = "1.2.1"
@@ -47,7 +47,7 @@ openssl-sys = { version = "0.9.103", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
-sysinfo = "0.31.4"
+sysinfo = "0.32.0"
 
 [dev-dependencies]
-rstest = "0.22.0"
+rstest = "0.23.0"
