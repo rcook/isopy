@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/rcook/isopy/actions/workflows/ci.yaml/badge.svg)][ci-workflow]
 [![Release](https://github.com/rcook/isopy/actions/workflows/release.yaml/badge.svg)][release-workflow]
+[![Latest release](https://img.shields.io/github/v/tag/rcook/isopy)][latest-release]
 
 [GitHub Pages documentation][github-pages] including [usage][usage]
 
@@ -49,6 +50,7 @@ This tool is similar in philosophy to the following projects:
 [cargo-book]: https://doc.rust-lang.org/cargo/
 [ci-workflow]: https://github.com/rcook/isopy/actions/workflows/ci.yaml
 [github-pages]: https://rcook.github.io/isopy/
+[latest-release]: https://github.com/rcook/isopy/releases
 [pyenv]: https://github.com/pyenv/pyenv
 [pyenv-win]: https://github.com/pyenv-win/pyenv-win
 [python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
