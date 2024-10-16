@@ -25,7 +25,7 @@ use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell as ClapCompleteShell;
-use isopy_lib::{Platform as IsopyLibPlatform, Shell as IsopyLibShell};
+use isopy_lib::{Platform as IsopyLibPlatform, Shell as IsopyLibShell, SourceFilter};
 use joat_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
@@ -220,14 +220,9 @@ pub(crate) enum Command {
         #[arg(help = "Package manager")]
         moniker: Option<Moniker>,
 
-        #[arg(
-            help = "Subset of packages to list",
-            short = 'f',
-            long = "filter",
-            default_value_t = PackageFilter::Local,
-            value_enum
-        )]
-        filter: PackageFilter,
+        //#[arg(help = "Subset of packages to list", short = 'f', long = "filter")]
+        #[command(flatten)]
+        filter: Option<PackageFilter>,
 
         #[arg(
             help = "Optional tags",
@@ -483,24 +478,30 @@ impl From<Shell> for IsopyLibShell {
     }
 }
 
-#[derive(Clone, Debug, ValueEnum)]
-pub(crate) enum PackageFilter {
-    #[clap(name = "all")]
-    All,
+#[derive(ClapArgs, Clone, Debug)]
+#[group(required = false, multiple = false)]
+pub(crate) struct PackageFilter {
+    #[arg(long = "all", help = "Show all packages")]
+    all: bool,
 
-    #[clap(name = "local")]
-    Local,
+    #[arg(long = "local", help = "Show local packages only [default]")]
+    local: bool,
 
-    #[clap(name = "remote")]
-    Remote,
+    #[arg(long = "remote", help = "Show remote packages only")]
+    remote: bool,
 }
 
-impl From<PackageFilter> for isopy_lib::SourceFilter {
-    fn from(value: PackageFilter) -> Self {
-        match value {
-            PackageFilter::All => Self::All,
-            PackageFilter::Local => Self::Local,
-            PackageFilter::Remote => Self::Remote,
+impl PackageFilter {
+    pub(crate) fn to_source_filter(value: Option<Self>) -> SourceFilter {
+        if let Some(filter) = value {
+            match (filter.all, filter.local, filter.remote) {
+                (true, false, false) => SourceFilter::All,
+                (false, true, false) => SourceFilter::Local,
+                (false, false, true) => SourceFilter::Remote,
+                _ => unreachable!(),
+            }
+        } else {
+            SourceFilter::Local
         }
     }
 }

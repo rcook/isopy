@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::args::{Args, Command};
+use crate::args::{Args, Command, PackageFilter};
 use crate::constants::CONFIG_DIR_NAME;
 use crate::env::set_up_env;
 use crate::status::Status;
@@ -107,7 +107,15 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
             moniker,
             filter,
             tags,
-        } => do_packages(&app, &moniker, filter.into(), &tags).await,
+        } => {
+            do_packages(
+                &app,
+                &moniker,
+                PackageFilter::to_source_filter(filter),
+                &tags,
+            )
+            .await
+        }
         Project { package_id } => do_project(&app, &package_id),
         Prompt(prompt_config) => do_prompt(&app, &prompt_config),
         Run { program, args } => do_run(app, &program, &args),
