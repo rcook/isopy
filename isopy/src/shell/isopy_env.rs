@@ -19,11 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::env::EnvKey;
 use anyhow::{bail, Result};
 use joat_repo::{DirInfo, LinkId, MetaId};
-use std::env::{set_var, var, VarError};
-
-const ISOPY_ENV_NAME: &str = "ISOPY_ENV";
+use std::env::VarError;
 
 #[derive(Clone, Debug)]
 pub(crate) struct IsopyEnv {
@@ -40,14 +39,14 @@ impl IsopyEnv {
     }
 
     pub(crate) fn get_vars() -> Result<Option<Self>> {
-        let value = match var(ISOPY_ENV_NAME) {
+        let value = match EnvKey::IsopyEnv.get() {
             Ok(value) => value,
             Err(VarError::NotPresent) => return Ok(None),
             Err(e) => return Err(e)?,
         };
 
         let Some((prefix, suffix)) = value.split_once('-') else {
-            bail!("invalid value for {ISOPY_ENV_NAME}: {value}");
+            bail!("invalid value for {name}: {value}", name = EnvKey::IsopyEnv);
         };
 
         let meta_id = prefix.parse::<MetaId>()?;
@@ -65,6 +64,6 @@ impl IsopyEnv {
     }
 
     pub(crate) fn set_vars(&self) {
-        set_var(ISOPY_ENV_NAME, format!("{}-{}", self.meta_id, self.link_id));
+        EnvKey::IsopyEnv.set(&format!("{}-{}", self.meta_id, self.link_id));
     }
 }

@@ -22,48 +22,88 @@
 use crate::bool_util::str_to_bool;
 use anyhow::{bail, Result};
 use std::env::{remove_var, set_var, var, VarError};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
 use std::sync::LazyLock;
-
-pub(crate) const ISOPY_BACKTRACE_ENV_NAME: &str = "ISOPY_BACKTRACE";
-pub(crate) const ISOPY_CONFIG_DIR_ENV_NAME: &str = "ISOPY_CONFIG_DIR";
-pub(crate) const ISOPY_LOG_LEVEL_ENV_NAME: &str = "ISOPY_LOG_LEVEL";
-pub(crate) const ISOPY_JAVA_ENV_NAME: &str = "ISOPY_JAVA";
-pub(crate) const RUST_BACKTRACE_ENV_NAME: &str = "RUST_BACKTRACE";
 
 pub(crate) const BOOL_TRUE_VALUE: &str = "true";
 pub(crate) const BOOL_FALSE_VALUE: &str = "false";
 
+#[derive(Clone, Copy)]
+pub(crate) enum EnvKey {
+    BacktraceEnabled,
+    ConfigDir,
+    LogLevel,
+    JavaEnabled,
+    RustBacktrace,
+    IsopyEnv,
+}
+
+impl EnvKey {
+    pub(crate) const fn name(&self) -> &str {
+        match self {
+            Self::BacktraceEnabled => "ISOPY_BACKTRACE",
+            Self::ConfigDir => "ISOPY_CONFIG_DIR",
+            Self::LogLevel => "ISOPY_LOG_LEVEL",
+            Self::JavaEnabled => "ISOPY_JAVA",
+            Self::RustBacktrace => "RUST_BACKTRACE",
+            Self::IsopyEnv => "ISOPY_ENV",
+        }
+    }
+
+    pub(crate) fn get(self) -> StdResult<String, VarError> {
+        var(self.name())
+    }
+
+    pub(crate) fn set(self, s: &str) {
+        set_var(self.name(), s);
+    }
+
+    pub(crate) fn is_present(self) -> bool {
+        self.get() != Err(VarError::NotPresent)
+    }
+
+    pub(crate) fn to_bool(self) -> bool {
+        self.get() == Ok(String::from(BOOL_TRUE_VALUE))
+    }
+}
+
+impl Display for EnvKey {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.name())
+    }
+}
+
+#[derive(Clone, Copy)]
 enum EnvType {
     Ignore,
     Bool,
 }
 
-static ENVS: LazyLock<Vec<(&'static str, EnvType)>> = LazyLock::new(|| {
+static CLI_ENVS: LazyLock<Vec<(EnvKey, EnvType)>> = LazyLock::new(|| {
     vec![
-        (ISOPY_BACKTRACE_ENV_NAME, EnvType::Bool),
-        (ISOPY_CONFIG_DIR_ENV_NAME, EnvType::Ignore),
-        (ISOPY_LOG_LEVEL_ENV_NAME, EnvType::Ignore),
-        (ISOPY_JAVA_ENV_NAME, EnvType::Bool),
+        (EnvKey::BacktraceEnabled, EnvType::Bool),
+        (EnvKey::ConfigDir, EnvType::Ignore),
+        (EnvKey::LogLevel, EnvType::Ignore),
+        (EnvKey::JavaEnabled, EnvType::Bool),
     ]
 });
 
-#[derive(Debug)]
 enum Op {
     DoNothing,
     SetVar(String),
     RemoveVar,
 }
 
-#[derive(Debug)]
 struct Action {
     key: String,
     op: Op,
 }
 
 impl Action {
-    fn make_all(envs: &[(&str, EnvType)]) -> Result<Vec<Self>> {
-        fn make(env_type: &EnvType, key: &str, value: &str) -> Action {
-            let key = String::from(key);
+    fn make_all(envs: &[(EnvKey, EnvType)]) -> Result<Vec<Self>> {
+        fn make(env_key: EnvKey, env_type: EnvType, value: &str) -> Action {
+            let key = env_key.to_string();
             match env_type {
                 EnvType::Ignore => Action {
                     key,
@@ -86,19 +126,17 @@ impl Action {
             }
         }
 
-        let mut actions = Vec::new();
-        for (key, t) in envs {
-            let action = match read_env(key)? {
-                Some(value) => make(t, key, &value),
-                None => Self {
-                    key: String::from(*key),
-                    op: Op::DoNothing,
-                },
-            };
-            actions.push(action);
-        }
-
-        Ok(actions)
+        envs.iter()
+            .map(|(k, v)| {
+                Ok(match read_env(*k)? {
+                    Some(value) => make(*k, *v, &value),
+                    None => Self {
+                        key: k.to_string(),
+                        op: Op::DoNothing,
+                    },
+                })
+            })
+            .collect::<Result<Vec<_>>>()
     }
 
     fn run(&self) {
@@ -111,29 +149,23 @@ impl Action {
 }
 
 pub(crate) fn set_up_env() -> Result<()> {
-    for action in Action::make_all(&ENVS)? {
+    for action in Action::make_all(&CLI_ENVS)? {
         action.run();
     }
 
-    if read_env_bool(ISOPY_BACKTRACE_ENV_NAME)
-        && var(RUST_BACKTRACE_ENV_NAME) == Err(VarError::NotPresent)
-    {
-        set_var(RUST_BACKTRACE_ENV_NAME, "1");
+    if EnvKey::BacktraceEnabled.to_bool() && !EnvKey::RustBacktrace.is_present() {
+        EnvKey::RustBacktrace.set("1");
     }
 
     Ok(())
 }
 
-pub(crate) fn read_env_bool(key: &str) -> bool {
-    var(key) == Ok(String::from(BOOL_TRUE_VALUE))
+pub(crate) fn get_env_keys() -> Vec<EnvKey> {
+    CLI_ENVS.iter().map(|(key, _)| *key).collect::<Vec<_>>()
 }
 
-pub(crate) fn get_env_keys() -> Vec<String> {
-    ENVS.iter().map(|e| String::from(e.0)).collect::<Vec<_>>()
-}
-
-pub(crate) fn read_env(key: &str) -> Result<Option<String>> {
-    match var(key) {
+pub(crate) fn read_env(key: EnvKey) -> Result<Option<String>> {
+    match var(key.name()) {
         Ok(s) => Ok(Some(s)),
         Err(VarError::NotPresent) => Ok(None),
         Err(e) => bail!(e),

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::{ISOPY_CONFIG_DIR_ENV_NAME, ISOPY_LOG_LEVEL_ENV_NAME};
+use crate::env::EnvKey;
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::wrapper_file_name::WrapperFileName;
@@ -52,7 +52,7 @@ pub(crate) struct Args {
         short = 'd',
         long = "config-dir",
         value_parser = parse_absolute_path,
-        env = ISOPY_CONFIG_DIR_ENV_NAME
+        env = EnvKey::ConfigDir.name()
     )]
     pub(crate) config_dir: Option<PathBuf>,
 
@@ -72,7 +72,7 @@ pub(crate) struct Args {
         long = "level",
         default_value_t = LogLevel::Info,
         value_enum,
-        env = ISOPY_LOG_LEVEL_ENV_NAME
+        env = EnvKey::LogLevel.name()
     )]
     pub(crate) log_level: LogLevel,
 

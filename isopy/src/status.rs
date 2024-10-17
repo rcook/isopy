@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::{read_env_bool, ISOPY_BACKTRACE_ENV_NAME};
+use crate::env::EnvKey;
 use anyhow::Error;
 use colored::Colorize;
 
@@ -74,10 +74,19 @@ pub(crate) use report_install_package_error;
 
 pub(crate) fn show_error(error: &Error) {
     eprintln!("{}", format!("{error}").bright_red());
-    if read_env_bool(ISOPY_BACKTRACE_ENV_NAME) {
+    if EnvKey::BacktraceEnabled.to_bool() {
         eprintln!("stack backtrace:\n{}", error.backtrace());
     } else {
         #[cfg(debug_assertions)]
-        eprintln!("{}", format!("note: run with `{ISOPY_BACKTRACE_ENV_NAME}={}` environment variable to display a backtrace", crate::env::BOOL_TRUE_VALUE).bright_white().bold());
+        eprintln!(
+            "{}",
+            format!(
+                "note: run with `{name}={value}` environment variable to display a backtrace",
+                name = EnvKey::BacktraceEnabled,
+                value = crate::env::BOOL_TRUE_VALUE
+            )
+            .bright_white()
+            .bold()
+        );
     }
 }

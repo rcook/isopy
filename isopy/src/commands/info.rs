@@ -46,12 +46,12 @@ pub(crate) fn do_info(app: &App) -> Result<Status> {
     table_columns!(table, "Configuration directory", app.config_dir().display());
 
     table_title!(table, "Environment variables");
-    let mut keys = get_env_keys();
-    keys.sort();
-    for key in keys {
-        let value = read_env(&key)?;
+    let mut env_keys = get_env_keys();
+    env_keys.sort_by(|a, b| a.name().cmp(b.name()));
+    for env_key in env_keys {
+        let value = read_env(env_key)?;
         let value_str = value.as_deref().unwrap_or(NO_VALUE);
-        table_columns!(table, key, value_str);
+        table_columns!(table, env_key, value_str);
     }
 
     table.print();

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::{read_env_bool, ISOPY_JAVA_ENV_NAME};
+use crate::env::EnvKey;
 use anyhow::{bail, Error};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
@@ -54,7 +54,7 @@ impl Moniker {
     }
 
     pub(crate) fn iter_enabled() -> impl Iterator<Item = Self> {
-        let java_enabled = read_env_bool(ISOPY_JAVA_ENV_NAME);
+        let java_enabled = EnvKey::JavaEnabled.to_bool();
         Self::iter().filter(move |member| match member {
             Self::Java => java_enabled,
             _ => true,
