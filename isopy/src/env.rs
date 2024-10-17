@@ -86,6 +86,8 @@ static CLI_ENVS: LazyLock<Vec<(EnvKey, EnvType)>> = LazyLock::new(|| {
         (EnvKey::ConfigDir, EnvType::Ignore),
         (EnvKey::LogLevel, EnvType::Ignore),
         (EnvKey::JavaEnabled, EnvType::Bool),
+        (EnvKey::RustBacktrace, EnvType::Ignore),
+        (EnvKey::IsopyEnv, EnvType::Ignore),
     ]
 });
 
