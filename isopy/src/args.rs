@@ -79,7 +79,7 @@ pub(crate) struct Args {
     // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
     // --show-progress/--no-show-progress with default of "true"
     #[arg(
-        help = "Show progress indicator",
+        help = "Show progress indicator [default]",
         long = "no-show-progress",
         default_value_t = true,
         action = ArgAction::SetFalse
