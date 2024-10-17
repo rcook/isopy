@@ -107,12 +107,15 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
             moniker,
             filter,
             tags,
+            verbose,
+            ..
         } => {
             do_packages(
                 &app,
                 &moniker,
                 PackageFilter::to_source_filter(filter),
                 &tags,
+                verbose,
             )
             .await
         }

@@ -39,6 +39,7 @@ pub(crate) async fn do_packages(
     moniker: &Option<Moniker>,
     filter: SourceFilter,
     tags: &TagFilter,
+    verbose: bool,
 ) -> Result<Status> {
     async fn list_packages(
         table: &mut Table,
@@ -47,6 +48,7 @@ pub(crate) async fn do_packages(
         filter: SourceFilter,
         tags: &TagFilter,
         options: &ListPackagesOptions,
+        verbose: bool,
     ) -> Result<()> {
         let plugin = app.plugin_manager().get_plugin(moniker);
         let package_summaries = app
@@ -54,7 +56,7 @@ pub(crate) async fn do_packages(
             .new_package_manager(moniker, app.config_dir())
             .list_packages(filter, tags, options)
             .await?;
-        add_plugin_rows(table, moniker, plugin, &package_summaries, filter)?;
+        add_plugin_rows(table, moniker, plugin, &package_summaries, filter, verbose)?;
         Ok(())
     }
 
@@ -65,11 +67,11 @@ pub(crate) async fn do_packages(
 
     match moniker {
         Some(moniker) => {
-            list_packages(&mut table, app, moniker, filter, tags, &options).await?;
+            list_packages(&mut table, app, moniker, filter, tags, &options, verbose).await?;
         }
         None => {
             for moniker in Moniker::iter_enabled() {
-                list_packages(&mut table, app, &moniker, filter, tags, &options).await?;
+                list_packages(&mut table, app, &moniker, filter, tags, &options, verbose).await?;
             }
         }
     }
@@ -85,6 +87,7 @@ fn add_plugin_rows(
     plugin: &Plugin,
     package_summaries: &Vec<PackageSummary>,
     filter: SourceFilter,
+    verbose: bool,
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package_summary: &PackageSummary) -> String {
         match package_summary.label() {
@@ -98,17 +101,32 @@ fn add_plugin_rows(
         }
     }
 
-    fn make_package_info(package_summary: &PackageSummary) -> Result<String> {
-        fn format_url(url: &Url) -> Result<ColoredString> {
+    fn make_package_info(package_summary: &PackageSummary, verbose: bool) -> Result<String> {
+        fn format_url(url: &Url, verbose: bool) -> Result<ColoredString> {
+            fn truncated_format(scheme: &str, domain: &str, path: &str) -> ColoredString {
+                match path.rfind('/') {
+                    Some(i) => {
+                        format!("{scheme}://{domain}/{}{}", "...".cyan(), &path[i..]).white()
+                    }
+                    None => verbose_format(scheme, domain, path),
+                }
+            }
+
+            fn verbose_format(scheme: &str, domain: &str, path: &str) -> ColoredString {
+                format!("{scheme}://{domain}{path}").white()
+            }
+
             let scheme = url.scheme();
             let Some(Host::Domain(domain)) = url.host() else {
                 bail!("Unsupport URL type {url}")
             };
 
             let path = url.path();
-            Ok(match path.rfind('/') {
-                Some(i) => format!("{scheme}://{domain}/{}{}", "...".cyan(), &path[i..]).white(),
-                None => format!("{scheme}://{domain}{path}").white(),
+
+            Ok(if verbose {
+                verbose_format(scheme, domain, path)
+            } else {
+                truncated_format(scheme, domain, path)
             })
         }
 
@@ -121,7 +139,10 @@ fn add_plugin_rows(
                     humanize_size_base_2(size).cyan()
                 ))
             }
-            None => Ok(format!("{}", format_url(package_summary.url())?.white())),
+            None => Ok(format!(
+                "{}",
+                format_url(package_summary.url(), verbose)?.white()
+            )),
         }
     }
 
@@ -152,7 +173,7 @@ fn add_plugin_rows(
         table_headings!(table, "Package ID", "Details");
         for package_summary in package_summaries {
             let package_id = make_package_id(moniker, package_summary);
-            let package_info = make_package_info(package_summary)?;
+            let package_info = make_package_info(package_summary, verbose)?;
             table_columns!(table, package_id, package_info);
         }
     }
