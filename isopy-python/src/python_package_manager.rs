@@ -27,8 +27,9 @@ use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptionsBuilder, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, Package, PackageKind, PackageManagerContext,
-    PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    IsPackageDownloadedOptions, ListPackagesOptions, ListTagsOptions, Package, PackageKind,
+    PackageManagerContext, PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags,
+    UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -286,6 +287,17 @@ impl PackageManagerOps for PythonPackageManager {
                 )
             })
             .collect())
+    }
+
+    async fn is_package_downloaded(
+        &self,
+        version: &Version,
+        tags: &TagFilter,
+        options: &IsPackageDownloadedOptions,
+    ) -> Result<bool> {
+        let version = downcast_version!(version);
+        let index = self.get_index(false, options.show_progress).await?;
+        Ok(Self::get_package(&index, version, tags).is_ok())
     }
 
     async fn download_package(

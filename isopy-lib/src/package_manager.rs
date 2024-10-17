@@ -35,6 +35,12 @@ use std::result::Result as StdResult;
 
 #[derive(Builder, Default)]
 #[builder(default)]
+pub struct IsPackageDownloadedOptions {
+    pub show_progress: bool,
+}
+
+#[derive(Builder, Default)]
+#[builder(default)]
 pub struct DownloadPackageOptions {
     pub show_progress: bool,
 }
@@ -73,6 +79,12 @@ pub trait PackageManagerOps: Send + Sync {
         tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageSummary>>;
+    async fn is_package_downloaded(
+        &self,
+        version: &Version,
+        tags: &TagFilter,
+        options: &IsPackageDownloadedOptions,
+    ) -> Result<bool>;
     async fn download_package(
         &self,
         version: &Version,

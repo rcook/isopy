@@ -24,10 +24,10 @@ use crate::serialization::versions_response::VersionsResponse;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, MakeDirOptionsBuilder, Package, PackageKind, PackageManagerContext,
-    PackageManagerOps, PackageSummary, ProgressIndicator, ProgressIndicatorOptionsBuilder,
-    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    DownloadPackageOptions, InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions,
+    ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageKind,
+    PackageManagerContext, PackageManagerOps, PackageSummary, ProgressIndicator,
+    ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
 use std::fs::{read_dir, File};
@@ -146,6 +146,15 @@ impl PackageManagerOps for JavaPackageManager {
             }));
         }
         Ok(package_summaries)
+    }
+
+    async fn is_package_downloaded(
+        &self,
+        _version: &Version,
+        _tags: &TagFilter,
+        _options: &IsPackageDownloadedOptions,
+    ) -> Result<bool> {
+        todo!()
     }
 
     async fn download_package(

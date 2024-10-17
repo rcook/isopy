@@ -29,7 +29,7 @@ use crate::shell::IsopyEnv;
 use anyhow::{bail, Result};
 use isopy_lib::{
     install_package_bail, install_package_error, EnvInfo, InstallPackageError,
-    InstallPackageOptions, Platform, Shell, Version,
+    InstallPackageOptions, IsPackageDownloadedOptions, Platform, Shell, Version,
 };
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
@@ -94,6 +94,20 @@ impl App {
             overwrite,
         )?;
         Ok(())
+    }
+
+    pub(crate) async fn is_package_downloaded(
+        &self,
+        moniker: &Moniker,
+        version: &Version,
+        options: &IsPackageDownloadedOptions,
+    ) -> Result<bool> {
+        let package_manager = self
+            .plugin_manager
+            .new_package_manager(moniker, &self.config_dir);
+        package_manager
+            .is_package_downloaded(version, &None, options)
+            .await
     }
 
     pub(crate) async fn install_package(

@@ -26,9 +26,9 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
-    InstallPackageError, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
-    PackageKind, PackageManagerContext, PackageManagerOps, PackageOps, PackageSummary,
-    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions, ListPackagesOptions,
+    ListTagsOptions, Package, PackageKind, PackageManagerContext, PackageManagerOps, PackageOps,
+    PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -215,6 +215,19 @@ impl PackageManagerOps for GoPackageManager {
             })
             .collect::<Vec<_>>();
         Ok(package_summaries)
+    }
+
+    async fn is_package_downloaded(
+        &self,
+        version: &Version,
+        tags: &TagFilter,
+        options: &IsPackageDownloadedOptions,
+    ) -> Result<bool> {
+        let version = downcast_version!(version);
+        Ok(self
+            .get_package(false, options.show_progress, version, tags)
+            .await
+            .is_ok())
     }
 
     async fn download_package(

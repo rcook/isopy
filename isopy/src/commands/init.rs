@@ -23,7 +23,9 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::status::{report_install_package_error, success, user_error, Status};
 use anyhow::Result;
-use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder};
+use isopy_lib::{
+    DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, IsPackageDownloadedOptionsBuilder,
+};
 
 pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
     if app.repo().get(app.cwd())?.is_some() {
@@ -40,21 +42,49 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
         );
     };
 
-    let download_package_options = DownloadPackageOptionsBuilder::default()
-        .show_progress(app.show_progress())
-        .build()?;
+    if download {
+        let download_package_options = DownloadPackageOptionsBuilder::default()
+            .show_progress(app.show_progress())
+            .build()?;
+
+        for package_id in &project.package_ids {
+            if download {
+                app.plugin_manager()
+                    .new_package_manager(package_id.moniker(), app.config_dir())
+                    .download_package(package_id.version(), &None, &download_package_options)
+                    .await?;
+            }
+        }
+    } else {
+        let is_package_download_options = IsPackageDownloadedOptionsBuilder::default()
+            .show_progress(app.show_progress())
+            .build()?;
+
+        let mut unavailable_package_ids = Vec::new();
+        for package_id in &project.package_ids {
+            let is_downloaded = app
+                .is_package_downloaded(
+                    package_id.moniker(),
+                    package_id.version(),
+                    &is_package_download_options,
+                )
+                .await?;
+            if !is_downloaded {
+                unavailable_package_ids.push(package_id.to_string());
+            }
+        }
+
+        if !unavailable_package_ids.is_empty() {
+            let package_id_str = unavailable_package_ids.join(", ");
+            user_error!("The following package(s) have not been downloaded: {package_id_str}; use \"download\" or \"init --download\" command");
+        }
+    }
+
     let install_package_options = InstallPackageOptionsBuilder::default()
         .show_progress(app.show_progress())
         .build()?;
 
-    for package_id in project.package_ids {
-        if download {
-            app.plugin_manager()
-                .new_package_manager(package_id.moniker(), app.config_dir())
-                .download_package(package_id.version(), &None, &download_package_options)
-                .await?;
-        }
-
+    for package_id in &project.package_ids {
         report_install_package_error!(
             app.install_package(
                 package_id.moniker(),

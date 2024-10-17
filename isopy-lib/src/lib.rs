@@ -69,9 +69,9 @@ pub use package::{Package, PackageOps};
 pub use package_kind::PackageKind;
 pub use package_manager::{
     DownloadPackageOptions, DownloadPackageOptionsBuilder, InstallPackageOptions,
-    InstallPackageOptionsBuilder, ListPackagesOptions, ListPackagesOptionsBuilder, ListTagsOptions,
-    ListTagsOptionsBuilder, PackageManager, PackageManagerOps, UpdateIndexOptions,
-    UpdateIndexOptionsBuilder,
+    InstallPackageOptionsBuilder, IsPackageDownloadedOptions, IsPackageDownloadedOptionsBuilder,
+    ListPackagesOptions, ListPackagesOptionsBuilder, ListTagsOptions, ListTagsOptionsBuilder,
+    PackageManager, PackageManagerOps, UpdateIndexOptions, UpdateIndexOptionsBuilder,
 };
 pub use package_manager_context::{
     DownloadFileOptions, DownloadFileOptionsBuilder, MakeDirOptions, MakeDirOptionsBuilder,
