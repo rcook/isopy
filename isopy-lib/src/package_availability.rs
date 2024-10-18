@@ -22,12 +22,12 @@
 use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum PackageKind {
+pub enum PackageAvailability {
     Local,
     Remote,
 }
 
-impl Ord for PackageKind {
+impl Ord for PackageAvailability {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (a, b) if a == b => Ordering::Equal,
@@ -37,7 +37,7 @@ impl Ord for PackageKind {
     }
 }
 
-impl PartialOrd for PackageKind {
+impl PartialOrd for PackageAvailability {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

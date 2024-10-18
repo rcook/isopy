@@ -25,7 +25,7 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions,
-    ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageKind,
+    ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
     PackageManagerContext, PackageManagerOps, PackageSummary, ProgressIndicator,
     ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
@@ -136,7 +136,7 @@ impl PackageManagerOps for JavaPackageManager {
             let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
             package_summaries.extend(response.versions.into_iter().map(|v| {
                 PackageSummary::new(
-                    PackageKind::Remote,
+                    PackageAvailability::Remote,
                     v.semver.clone(),
                     &Url::parse("https://httpbin.org").unwrap(),
                     Version::new(v),

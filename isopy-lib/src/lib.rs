@@ -43,7 +43,7 @@ mod extent;
 mod file_name_parts;
 mod macros;
 mod package;
-mod package_kind;
+mod package_availability;
 mod package_manager;
 mod package_manager_context;
 mod package_summary;
@@ -66,7 +66,7 @@ pub use error::InstallPackageError;
 pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
 pub use package::{Package, PackageOps};
-pub use package_kind::PackageKind;
+pub use package_availability::PackageAvailability;
 pub use package_manager::{
     DownloadPackageOptions, DownloadPackageOptionsBuilder, InstallPackageOptions,
     InstallPackageOptionsBuilder, IsPackageDownloadedOptions, IsPackageDownloadedOptionsBuilder,

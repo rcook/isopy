@@ -27,7 +27,7 @@ use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptionsBuilder, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
-    IsPackageDownloadedOptions, ListPackagesOptions, ListTagsOptions, Package, PackageKind,
+    IsPackageDownloadedOptions, ListPackagesOptions, ListTagsOptions, Package, PackageAvailability,
     PackageManagerContext, PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags,
     UpdateIndexOptions, Version,
 };
@@ -254,10 +254,10 @@ impl PackageManagerOps for PythonPackageManager {
             for package in Self::get_packages(item)? {
                 if Self::metadata_has_tags(package.metadata(), &tags) {
                     let (kind, path) = match self.ctx.get_file(package.url()).await {
-                        Ok(p) => (PackageKind::Local, Some(p)),
-                        _ => (PackageKind::Remote, None),
+                        Ok(p) => (PackageAvailability::Local, Some(p)),
+                        _ => (PackageAvailability::Remote, None),
                     };
-                    let is_local = kind == PackageKind::Local;
+                    let is_local = kind == PackageAvailability::Local;
                     match sources {
                         SourceFilter::All => records.push((kind, package, path)),
                         SourceFilter::Local if is_local => records.push((kind, package, path)),

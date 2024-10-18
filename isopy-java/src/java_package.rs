@@ -20,14 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::java_version::JavaVersion;
-use isopy_lib::{ArchiveType, Checksum, PackageKind, PackageOps, Version};
+use isopy_lib::{ArchiveType, Checksum, PackageAvailability, PackageOps, Version};
 use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
 #[allow(unused)]
 pub(crate) struct JavaPackage {
     name: String,
-    kind: PackageKind,
+    availability: PackageAvailability,
     archive_type: ArchiveType,
     url: Url,
     version: JavaVersion,
@@ -42,7 +42,7 @@ impl JavaPackage {
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         name: &str,
-        kind: PackageKind,
+        availability: PackageAvailability,
         archive_type: ArchiveType,
         url: &Url,
         version: &JavaVersion,
@@ -55,7 +55,7 @@ impl JavaPackage {
         let tags = tags.into_iter().collect::<HashSet<_>>();
         Self {
             name: String::from(name),
-            kind,
+            availability,
             archive_type,
             url: url.clone(),
             version,
@@ -72,8 +72,8 @@ impl JavaPackage {
     }
 
     #[allow(unused)]
-    pub(crate) const fn kind(&self) -> &PackageKind {
-        &self.kind
+    pub(crate) const fn kind(&self) -> &PackageAvailability {
+        &self.availability
     }
 
     #[allow(unused)]

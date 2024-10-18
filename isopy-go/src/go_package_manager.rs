@@ -27,8 +27,8 @@ use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
     InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageKind, PackageManagerContext, PackageManagerOps, PackageOps,
-    PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    ListTagsOptions, Package, PackageAvailability, PackageManagerContext, PackageManagerOps,
+    PackageOps, PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -106,8 +106,8 @@ impl GoPackageManager {
                             let version = file.version.parse::<GoVersion>()?;
                             let url = self.url.join(&file.file_name)?;
                             let (kind, path) = match self.ctx.get_file(&url).await {
-                                Ok(p) => (PackageKind::Local, Some(p)),
-                                _ => (PackageKind::Remote, None),
+                                Ok(p) => (PackageAvailability::Local, Some(p)),
+                                _ => (PackageAvailability::Remote, None),
                             };
                             let (archive_type, _) = ArchiveType::strip_suffix(&file.file_name)
                                 .ok_or_else(|| {
@@ -189,8 +189,8 @@ impl PackageManagerOps for GoPackageManager {
             if package.tags().is_superset(&filter_tags) {
                 match (sources, package.kind()) {
                     (SourceFilter::All, _)
-                    | (SourceFilter::Local, PackageKind::Local)
-                    | (SourceFilter::Remote, PackageKind::Remote) => {
+                    | (SourceFilter::Local, PackageAvailability::Local)
+                    | (SourceFilter::Remote, PackageAvailability::Remote) => {
                         packages.push(package);
                     }
                     _ => {}
@@ -205,7 +205,7 @@ impl PackageManagerOps for GoPackageManager {
             .into_iter()
             .map(|p| {
                 PackageSummary::new(
-                    PackageKind::Remote,
+                    PackageAvailability::Remote,
                     p.name(),
                     p.url(),
                     PackageOps::version(&p).clone(),
