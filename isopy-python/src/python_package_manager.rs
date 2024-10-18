@@ -89,7 +89,7 @@ impl PythonPackageManager {
         }
     }
 
-    fn get_packages(item: &Value) -> Result<Vec<PythonPackage>> {
+    fn parse_packages(item: &Value) -> Result<Vec<PythonPackage>> {
         fn filter_fn(name: &str) -> bool {
             name.starts_with("cpython-") && !name.ends_with(".sha256") && name != "SHA256SUMS"
         }
@@ -178,7 +178,7 @@ impl PythonPackageManager {
         let index = self.get_index(false, show_progress).await?;
         let mut packages = Vec::new();
         for item in g!(index.as_array()) {
-            for package in Self::get_packages(item)? {
+            for package in Self::parse_packages(item)? {
                 let (availability, path) = match self.ctx.get_file(package.url()).await {
                     Ok(p) => (PackageAvailability::Local, Some(p)),
                     _ => (PackageAvailability::Remote, None),
@@ -202,7 +202,7 @@ impl PythonPackageManager {
         let tags = Self::get_tags(tags);
         let mut packages = Vec::new();
         for item in g!(index.as_array()) {
-            packages.extend(Self::get_packages(item)?.into_iter().filter(|archive| {
+            packages.extend(Self::parse_packages(item)?.into_iter().filter(|archive| {
                 let m = archive.metadata();
                 Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
             }));
@@ -236,10 +236,10 @@ impl PackageManagerOps for PythonPackageManager {
         let mut other_tags = HashSet::new();
         let index = self.get_index(false, options.show_progress).await?;
         for item in g!(index.as_array()) {
-            for archive in Self::get_packages(item)? {
-                tags.extend(archive.metadata().tags().to_owned());
+            for package in Self::parse_packages(item)? {
+                tags.extend(package.metadata().tags().to_owned());
                 other_tags.insert(String::from(
-                    archive.metadata().index_version().release_group().as_str(),
+                    package.metadata().index_version().release_group().as_str(),
                 ));
             }
         }
