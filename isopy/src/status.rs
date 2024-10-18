@@ -72,7 +72,7 @@ macro_rules! report_install_package_error {
 pub(crate) use report_install_package_error;
 
 pub(crate) fn show_user_error(message: &str) {
-    eprintln!("{}", format!("{message}").bright_yellow());
+    eprintln!("{}", message.to_string().bright_yellow());
 }
 
 pub(crate) fn show_error(error: &Error) {
