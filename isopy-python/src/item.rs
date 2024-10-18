@@ -26,11 +26,11 @@ pub(crate) struct Item<'a> {
 }
 
 impl<'a> Item<'a> {
-    pub(crate) fn new(value: &'a Value) -> Self {
+    pub(crate) const fn new(value: &'a Value) -> Self {
         Self { value }
     }
 
-    pub(crate) fn value(&self) -> &Value {
-        &self.value
+    pub(crate) const fn value(&self) -> &Value {
+        self.value
     }
 }

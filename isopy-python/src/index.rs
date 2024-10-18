@@ -32,7 +32,7 @@ pub(crate) struct Index {
 }
 
 impl Index {
-    pub(crate) fn new(value: Value) -> Self {
+    pub(crate) const fn new(value: Value) -> Self {
         Self {
             value,
             empty_items: Vec::new(),
@@ -44,8 +44,8 @@ impl Index {
             .value
             .as_array()
             .unwrap_or(&self.empty_items)
-            .into_iter();
-        from_fn(move || iter.next().map(|value| Item::new(value)))
+            .iter();
+        from_fn(move || iter.next().map(Item::new))
     }
 }
 
@@ -53,6 +53,6 @@ impl FromStr for Index {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        Ok(Self::new(serde_json::from_str(&s)?))
+        Ok(Self::new(serde_json::from_str(s)?))
     }
 }

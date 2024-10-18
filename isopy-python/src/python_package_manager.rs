@@ -241,14 +241,12 @@ impl PackageManagerOps for PythonPackageManager {
         let tags = Self::get_tags(tags);
         let mut packages = packages
             .into_iter()
-            .filter(
-                |p| match (sources, p.availability == PackageAvailability::Local) {
-                    (All, _) => true,
-                    (Local, true) => true,
-                    (Remote, false) => true,
-                    _ => false,
-                },
-            )
+            .filter(|p| {
+                matches!(
+                    (sources, p.availability == PackageAvailability::Local),
+                    (All, _) | (Local, true) | (Remote, false)
+                )
+            })
             .filter(|p| Self::metadata_has_tags(p.package.metadata(), &tags))
             .collect::<Vec<_>>();
 
