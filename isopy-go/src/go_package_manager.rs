@@ -26,9 +26,9 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
-    InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions, ListPackagesOptions,
+    GetPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
     ListTagsOptions, Package, PackageAvailability, PackageInfo, PackageManagerContext,
-    PackageManagerOps, PackageOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -138,7 +138,7 @@ impl GoPackageManager {
         Ok(packages)
     }
 
-    async fn get_package(
+    async fn get_package_inner(
         &self,
         update: bool,
         show_progress: bool,
@@ -180,54 +180,44 @@ impl PackageManagerOps for GoPackageManager {
         _tags: &TagFilter, // TBD
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
+        use isopy_lib::SourceFilter::*;
         let filter_tags = DEFAULT_TAGS
             .into_iter()
             .map(String::from)
             .collect::<HashSet<_>>();
         let mut packages = Vec::new();
         for package in self.get_packages(false, options.show_progress).await? {
-            if package.tags().is_superset(&filter_tags) {
-                match (sources, package.kind()) {
-                    (SourceFilter::All, _)
-                    | (SourceFilter::Local, PackageAvailability::Local)
-                    | (SourceFilter::Remote, PackageAvailability::Remote) => {
-                        packages.push(package);
-                    }
-                    _ => {}
-                }
+            if package.tags().is_superset(&filter_tags) && matches!(
+                    (
+                        sources,
+                        package.availability() == PackageAvailability::Local
+                    ),
+                    (All, _) | (Local, true) | (Remote, false)
+                ) {
+                packages.push(package);
             }
         }
 
         packages.sort_by(|a, b| a.version().cmp(b.version()));
         packages.reverse();
 
-        let package_summaries = packages
+        Ok(packages
             .into_iter()
-            .map(|p| {
-                PackageInfo::new(
-                    PackageAvailability::Remote,
-                    p.name(),
-                    p.url(),
-                    PackageOps::version(&p).clone(),
-                    None::<String>,
-                    p.path().clone(),
-                )
-            })
-            .collect::<Vec<_>>();
-        Ok(package_summaries)
+            .map(GoPackage::into_package_info)
+            .collect::<Vec<_>>())
     }
 
-    async fn is_package_downloaded(
+    async fn get_package(
         &self,
         version: &Version,
         tags: &TagFilter,
-        options: &IsPackageDownloadedOptions,
-    ) -> Result<bool> {
+        options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>> {
         let version = downcast_version!(version);
-        Ok(self
-            .get_package(false, options.show_progress, version, tags)
-            .await
-            .is_ok())
+        let package = self
+            .get_package_inner(false, options.show_progress, version, tags)
+            .await?;
+        Ok(Some(package.into_package_info()))
     }
 
     async fn download_package(
@@ -238,7 +228,7 @@ impl PackageManagerOps for GoPackageManager {
     ) -> Result<()> {
         let version = downcast_version!(version);
         let package = self
-            .get_package(false, options.show_progress, version, tags)
+            .get_package_inner(false, options.show_progress, version, tags)
             .await?;
         let options = DownloadFileOptionsBuilder::default()
             .update(false)
@@ -252,21 +242,17 @@ impl PackageManagerOps for GoPackageManager {
     async fn install_package(
         &self,
         version: &Version,
-        tags: &TagFilter,
+        tag_filter: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
     ) -> StdResult<Package, InstallPackageError> {
         let version = downcast_version!(version);
         let Ok(package) = self
-            .get_package(false, options.show_progress, version, tags)
+            .get_package_inner(false, options.show_progress, version, tag_filter)
             .await
         else {
-            match tags {
-                Some(tags) => {
-                    log::error!("Release {} not found (tags {:?})", version, tags);
-                }
-                None => log::error!("Release {} not found", version),
-            }
+            let tags = tag_filter.tags(&[]);
+            log::error!("Release {version} not found with tags {tags:?}");
             return Err(InstallPackageError::VersionNotFound);
         };
 

@@ -24,7 +24,7 @@ use crate::serialization::versions_response::VersionsResponse;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions,
+    DownloadPackageOptions, GetPackageOptions, InstallPackageError, InstallPackageOptions,
     ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
     PackageInfo, PackageManagerContext, PackageManagerOps, ProgressIndicator,
     ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
@@ -125,16 +125,16 @@ impl PackageManagerOps for JavaPackageManager {
     async fn list_packages(
         &self,
         _sources: SourceFilter,
-        _tags: &TagFilter,
+        _tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         let dir = self.get_index(options.show_progress, false).await?;
-        let mut package_summaries = Vec::new();
+        let mut packages = Vec::new();
         for path in Self::get_page_paths(&dir)? {
             let f = File::open(path)?;
             let reader = BufReader::new(f);
             let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
-            package_summaries.extend(response.versions.into_iter().map(|v| {
+            packages.extend(response.versions.into_iter().map(|v| {
                 PackageInfo::new(
                     PackageAvailability::Remote,
                     v.semver.clone(),
@@ -145,15 +145,15 @@ impl PackageManagerOps for JavaPackageManager {
                 )
             }));
         }
-        Ok(package_summaries)
+        Ok(packages)
     }
 
-    async fn is_package_downloaded(
+    async fn get_package(
         &self,
         _version: &Version,
         _tags: &TagFilter,
-        _options: &IsPackageDownloadedOptions,
-    ) -> Result<bool> {
+        _options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>> {
         todo!()
     }
 

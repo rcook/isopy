@@ -31,3 +31,19 @@ pub(crate) static PYTHON_BIN_FILE_NAME: LazyLock<OsString> =
     LazyLock::new(|| OsString::from("python.exe"));
 
 pub(crate) static PYTHON_SCRIPT_EXT: LazyLock<OsString> = LazyLock::new(|| OsString::from("py"));
+
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
+pub(crate) const DEFAULT_TAGS: [&str; 5] = ["aarch64", "unknown", "linux", "gnu", "install_only"];
+
+#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+pub(crate) const DEFAULT_TAGS: [&str; 5] = ["x86_64", "unknown", "linux", "gnu", "install_only"];
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+pub(crate) const DEFAULT_TAGS: [&str; 4] = ["aarch64", "apple", "darwin", "install_only"];
+
+#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+pub(crate) const DEFAULT_TAGS: [&str; 4] = ["x86_64", "apple", "darwin", "install_only"];
+
+#[cfg(target_os = "windows")]
+pub(crate) const DEFAULT_TAGS: [&str; 6] =
+    ["x86_64", "pc", "windows", "msvc", "shared", "install_only"];

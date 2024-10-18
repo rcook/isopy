@@ -27,6 +27,7 @@ use crate::status::Status;
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
 use clap::Parser;
+use isopy_lib::TagFilter;
 use joat_logger::init_ui;
 use joat_repo::RepoConfig;
 use log::{set_max_level, LevelFilter};
@@ -93,7 +94,9 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
         Check { clean, .. } => do_check(&app, clean),
         Completions { shell } => Ok(do_completions(shell)),
         Delete { project_dir } => do_delete(&app, &project_dir).await,
-        Download { package_id, tags } => do_download(&app, &package_id, &tags).await,
+        Download { package_id, tags } => {
+            do_download(&app, &package_id, &TagFilter::new(tags)).await
+        }
         Env {
             package_id,
             download,
@@ -114,7 +117,7 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
                 &app,
                 &moniker,
                 PackageFilter::to_source_filter(filter),
-                &tags,
+                &TagFilter::new(tags),
                 verbose,
             )
             .await

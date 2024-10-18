@@ -23,6 +23,7 @@ use crate::python_index_version::PythonIndexVersion;
 use anyhow::{anyhow, bail, Error};
 use isopy_lib::ArchiveType;
 use std::collections::HashSet;
+use std::iter::once;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
@@ -49,6 +50,15 @@ impl Metadata {
 
     pub(crate) const fn tags(&self) -> &HashSet<String> {
         &self.tags
+    }
+
+    pub(crate) fn has_tags(&self, tags: &HashSet<&str>) -> bool {
+        self.tags
+            .iter()
+            .map(String::as_str)
+            .chain(once(self.index_version.release_group().as_str()))
+            .collect::<HashSet<_>>()
+            .is_superset(tags)
     }
 }
 

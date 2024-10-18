@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::package_id::PackageId;
 use crate::status::{report_install_package_error, success, Status};
 use anyhow::Result;
-use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder};
+use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, TagFilter};
 
 pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> Result<Status> {
     let download_package_options = DownloadPackageOptionsBuilder::default()
@@ -36,7 +36,11 @@ pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) ->
     if download {
         app.plugin_manager()
             .new_package_manager(package_id.moniker(), app.config_dir())
-            .download_package(package_id.version(), &None, &download_package_options)
+            .download_package(
+                package_id.version(),
+                &TagFilter::default(),
+                &download_package_options,
+            )
             .await?;
     }
 

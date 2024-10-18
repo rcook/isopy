@@ -19,4 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub type TagFilter = Option<Vec<String>>;
+use std::collections::HashSet;
+
+#[derive(Default)]
+pub struct TagFilter(Option<Vec<String>>);
+
+impl TagFilter {
+    #[must_use]
+    pub const fn new(tags: Option<Vec<String>>) -> Self {
+        Self(tags)
+    }
+
+    pub fn tags(&self, default_tags: &[&'static str]) -> HashSet<&str> {
+        match self.0 {
+            Some(ref tags) => tags
+                .iter()
+                .map(std::string::String::as_str)
+                .collect::<HashSet<_>>(),
+            None => default_tags.iter().copied().collect(),
+        }
+    }
+}

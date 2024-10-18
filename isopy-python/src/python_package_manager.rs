@@ -20,22 +20,20 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::checksum::get_checksum;
+use crate::constants::DEFAULT_TAGS;
 use crate::index::Index;
-use crate::metadata::Metadata;
 use crate::python_package::PythonPackage;
 use crate::python_package_info::PythonPackageInfo;
-use crate::python_version::PythonVersion;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadFileOptionsBuilder, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
-    IsPackageDownloadedOptions, ListPackagesOptions, ListTagsOptions, Package, PackageAvailability,
+    DownloadFileOptionsBuilder, DownloadPackageOptions, GetPackageOptions, InstallPackageError,
+    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageAvailability,
     PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags,
     UpdateIndexOptions, Version,
 };
 use std::cmp::Ordering;
 use std::collections::HashSet;
-use std::iter::once;
 use std::path::Path;
 use std::result::Result as StdResult;
 use tokio::fs::read_to_string;
@@ -50,21 +48,6 @@ macro_rules! downcast_version {
     };
 }
 
-#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
-const DEFAULT_TAGS: [&str; 5] = ["aarch64", "unknown", "linux", "gnu", "install_only"];
-
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-const DEFAULT_TAGS: [&str; 5] = ["x86_64", "unknown", "linux", "gnu", "install_only"];
-
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-const DEFAULT_TAGS: [&str; 4] = ["aarch64", "apple", "darwin", "install_only"];
-
-#[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-const DEFAULT_TAGS: [&str; 4] = ["x86_64", "apple", "darwin", "install_only"];
-
-#[cfg(target_os = "windows")]
-const DEFAULT_TAGS: [&str; 6] = ["x86_64", "pc", "windows", "msvc", "shared", "install_only"];
-
 pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
     moniker: String,
@@ -78,24 +61,6 @@ impl PythonPackageManager {
             moniker: String::from(moniker),
             url: url.clone(),
         }
-    }
-
-    fn get_tags(tags: &TagFilter) -> HashSet<&str> {
-        tags.as_ref().map_or(DEFAULT_TAGS.into(), |t| {
-            t.iter()
-                .map(std::string::String::as_str)
-                .collect::<HashSet<_>>()
-        })
-    }
-
-    fn metadata_has_tags(metadata: &Metadata, tags: &HashSet<&str>) -> bool {
-        metadata
-            .tags()
-            .iter()
-            .map(String::as_str)
-            .chain(once(metadata.index_version().release_group().as_str()))
-            .collect::<HashSet<_>>()
-            .is_superset(tags)
     }
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
@@ -137,56 +102,6 @@ impl PythonPackageManager {
         let path = self.ctx.download_file(&self.url, &options).await?;
         read_to_string(path).await?.parse()
     }
-
-    async fn get_packages(&self, index: &Index) -> Result<Vec<PythonPackageInfo>> {
-        let mut packages = Vec::new();
-        for item in index.items() {
-            for package in PythonPackage::from_item(&item)? {
-                let (availability, path) = match self.ctx.get_file(package.url()).await {
-                    Ok(p) => (PackageAvailability::Local, Some(p)),
-                    _ => (PackageAvailability::Remote, None),
-                };
-                packages.push(PythonPackageInfo {
-                    availability,
-                    details: package,
-                    path,
-                });
-            }
-        }
-        Ok(packages)
-    }
-
-    async fn get_package(
-        &self,
-        index: &Index,
-        version: &PythonVersion,
-        tags: &TagFilter,
-    ) -> Result<PythonPackageInfo> {
-        let tags = Self::get_tags(tags);
-        let mut packages = self
-            .get_packages(index)
-            .await?
-            .into_iter()
-            .filter(|p| {
-                let m = p.details.metadata();
-                Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
-            })
-            .collect::<Vec<_>>();
-
-        if packages.is_empty() {
-            bail!(
-                "No package with ID \"{moniker}:{version}\" found",
-                moniker = self.moniker
-            )
-        }
-
-        packages.sort_by_cached_key(|p| p.details.metadata().index_version().clone());
-        packages.reverse();
-        Ok(packages
-            .into_iter()
-            .next()
-            .expect("Vector must contain at least one element"))
-    }
 }
 
 #[async_trait]
@@ -201,7 +116,7 @@ impl PackageManagerOps for PythonPackageManager {
         let mut other_tags = HashSet::new();
         let index = self.get_index(false, options.show_progress).await?;
         for item in index.items() {
-            for package in PythonPackage::from_item(&item)? {
+            for package in PythonPackage::parse_multi(&item)? {
                 tags.extend(package.metadata().tags().to_owned());
                 other_tags.insert(String::from(
                     package.metadata().index_version().release_group().as_str(),
@@ -230,13 +145,13 @@ impl PackageManagerOps for PythonPackageManager {
     async fn list_packages(
         &self,
         sources: SourceFilter,
-        tags: &TagFilter,
+        tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
         let index = self.get_index(false, options.show_progress).await?;
-        let packages = self.get_packages(&index).await?;
-        let tags = Self::get_tags(tags);
+        let packages = PythonPackageInfo::read_multi(&self.ctx, &index).await?;
+        let tags = tag_filter.tags(&DEFAULT_TAGS);
         let mut packages = packages
             .into_iter()
             .filter(|p| {
@@ -245,7 +160,7 @@ impl PackageManagerOps for PythonPackageManager {
                     (All, _) | (Local, true) | (Remote, false)
                 )
             })
-            .filter(|p| Self::metadata_has_tags(p.details.metadata(), &tags))
+            .filter(|p| p.details.metadata().has_tags(&tags))
             .collect::<Vec<_>>();
 
         packages.sort_by(|a, b| {
@@ -265,27 +180,36 @@ impl PackageManagerOps for PythonPackageManager {
             .collect())
     }
 
-    async fn is_package_downloaded(
+    async fn get_package(
         &self,
         version: &Version,
-        tags: &TagFilter,
-        options: &IsPackageDownloadedOptions,
-    ) -> Result<bool> {
+        tag_filter: &TagFilter,
+        options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let package = self.get_package(&index, version, tags).await?;
-        Ok(package.path.is_some())
+        let tags = tag_filter.tags(&DEFAULT_TAGS);
+        let package = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?;
+        Ok(package.map(PythonPackageInfo::into_package_info))
     }
 
     async fn download_package(
         &self,
         version: &Version,
-        tags: &TagFilter,
+        tag_filter: &TagFilter,
         options: &DownloadPackageOptions,
     ) -> Result<()> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let package = self.get_package(&index, version, tags).await?;
+        let tags = tag_filter.tags(&DEFAULT_TAGS);
+        let Some(package) = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?
+        else {
+            bail!(
+                "No package with ID {moniker}:{version} found and tags {tags:?}",
+                moniker = self.moniker
+            );
+        };
+
         let checksum = get_checksum(&package.details)?;
         let options = DownloadFileOptionsBuilder::default()
             .update(false)
@@ -302,21 +226,19 @@ impl PackageManagerOps for PythonPackageManager {
     async fn install_package(
         &self,
         version: &Version,
-        tags: &TagFilter,
+        tag_filter: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
     ) -> StdResult<Package, InstallPackageError> {
         let version = downcast_version!(version);
-
         let index = self.get_index(false, options.show_progress).await?;
-
-        let Ok(package) = self.get_package(&index, version, tags).await else {
-            match tags {
-                Some(tags) => {
-                    log::error!("Package version {} not found (tags {:?})", version, tags);
-                }
-                None => log::error!("Package version {} not found", version),
-            }
+        let tags = tag_filter.tags(&DEFAULT_TAGS);
+        let Some(package) = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?
+        else {
+            log::error!(
+                "Package version {moniker}:{version} not found with tags {tags:?})",
+                moniker = self.moniker
+            );
             return Err(InstallPackageError::VersionNotFound);
         };
 

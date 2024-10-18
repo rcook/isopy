@@ -23,20 +23,20 @@ use crate::app::App;
 use crate::package_id::PackageId;
 use crate::status::{success, Status};
 use anyhow::Result;
-use isopy_lib::DownloadPackageOptionsBuilder;
+use isopy_lib::{DownloadPackageOptionsBuilder, TagFilter};
 use log::info;
 
 pub(crate) async fn do_download(
     app: &App,
     package_id: &PackageId,
-    tags: &Option<Vec<String>>,
+    tag_filter: &TagFilter,
 ) -> Result<Status> {
     let options = DownloadPackageOptionsBuilder::default()
         .show_progress(app.show_progress())
         .build()?;
     app.plugin_manager()
         .new_package_manager(package_id.moniker(), app.config_dir())
-        .download_package(package_id.version(), tags, &options)
+        .download_package(package_id.version(), tag_filter, &options)
         .await?;
 
     info!("Package {} is now available locally", package_id);

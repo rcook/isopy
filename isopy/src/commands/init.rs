@@ -24,7 +24,8 @@ use crate::fs::existing;
 use crate::status::{report_install_package_error, success, user_error, Status};
 use anyhow::Result;
 use isopy_lib::{
-    DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, IsPackageDownloadedOptionsBuilder,
+    DownloadPackageOptionsBuilder, GetPackageOptionsBuilder, InstallPackageOptionsBuilder,
+    TagFilter,
 };
 
 pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
@@ -51,25 +52,29 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
             if download {
                 app.plugin_manager()
                     .new_package_manager(package_id.moniker(), app.config_dir())
-                    .download_package(package_id.version(), &None, &download_package_options)
+                    .download_package(
+                        package_id.version(),
+                        &TagFilter::default(),
+                        &download_package_options,
+                    )
                     .await?;
             }
         }
     } else {
-        let is_package_download_options = IsPackageDownloadedOptionsBuilder::default()
+        let get_package_options = GetPackageOptionsBuilder::default()
             .show_progress(app.show_progress())
             .build()?;
 
         let mut unavailable_package_ids = Vec::new();
         for package_id in &project.package_ids {
-            let is_downloaded = app
-                .is_package_downloaded(
+            let package = app
+                .get_package(
                     package_id.moniker(),
                     package_id.version(),
-                    &is_package_download_options,
+                    &get_package_options,
                 )
                 .await?;
-            if !is_downloaded {
+            if package.is_none() {
                 unavailable_package_ids.push(package_id.to_string());
             }
         }

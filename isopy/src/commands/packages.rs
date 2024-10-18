@@ -37,7 +37,7 @@ pub(crate) async fn do_packages(
     app: &App,
     moniker: &Option<Moniker>,
     filter: SourceFilter,
-    tags: &TagFilter,
+    tag_filter: &TagFilter,
     verbose: bool,
 ) -> Result<Status> {
     async fn list_packages(
@@ -45,7 +45,7 @@ pub(crate) async fn do_packages(
         app: &App,
         moniker: &Moniker,
         filter: SourceFilter,
-        tags: &TagFilter,
+        tag_filter: &TagFilter,
         options: &ListPackagesOptions,
         verbose: bool,
     ) -> Result<()> {
@@ -53,7 +53,7 @@ pub(crate) async fn do_packages(
         let packages = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
-            .list_packages(filter, tags, options)
+            .list_packages(filter, tag_filter, options)
             .await?;
         add_plugin_rows(table, moniker, plugin, &packages, filter, verbose)?;
         Ok(())
@@ -66,11 +66,17 @@ pub(crate) async fn do_packages(
 
     match moniker {
         Some(moniker) => {
-            list_packages(&mut table, app, moniker, filter, tags, &options, verbose).await?;
+            list_packages(
+                &mut table, app, moniker, filter, tag_filter, &options, verbose,
+            )
+            .await?;
         }
         None => {
             for moniker in Moniker::iter_enabled() {
-                list_packages(&mut table, app, &moniker, filter, tags, &options, verbose).await?;
+                list_packages(
+                    &mut table, app, &moniker, filter, tag_filter, &options, verbose,
+                )
+                .await?;
             }
         }
     }

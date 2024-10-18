@@ -32,7 +32,7 @@ pub(crate) struct PythonPackage {
 }
 
 impl PythonPackage {
-    pub(crate) fn from_item(item: &Item) -> Result<Vec<Self>> {
+    pub(crate) fn parse_multi(item: &Item) -> Result<Vec<Self>> {
         macro_rules! g {
             ($e : expr) => {
                 match $e {

@@ -69,8 +69,8 @@ pub use package::{Package, PackageOps};
 pub use package_availability::PackageAvailability;
 pub use package_info::PackageInfo;
 pub use package_manager::{
-    DownloadPackageOptions, DownloadPackageOptionsBuilder, InstallPackageOptions,
-    InstallPackageOptionsBuilder, IsPackageDownloadedOptions, IsPackageDownloadedOptionsBuilder,
+    DownloadPackageOptions, DownloadPackageOptionsBuilder, GetPackageOptions,
+    GetPackageOptionsBuilder, InstallPackageOptions, InstallPackageOptionsBuilder,
     ListPackagesOptions, ListPackagesOptionsBuilder, ListTagsOptions, ListTagsOptionsBuilder,
     PackageManager, PackageManagerOps, UpdateIndexOptions, UpdateIndexOptionsBuilder,
 };

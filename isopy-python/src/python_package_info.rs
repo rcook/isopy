@@ -19,8 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::index::Index;
 use crate::python_package::PythonPackage;
-use isopy_lib::{PackageAvailability, PackageInfo, Version};
+use crate::python_version::PythonVersion;
+use anyhow::Result;
+use isopy_lib::{PackageAvailability, PackageInfo, PackageManagerContext, Version};
+use std::collections::HashSet;
 use std::path::PathBuf;
 
 pub(crate) struct PythonPackageInfo {
@@ -30,6 +34,46 @@ pub(crate) struct PythonPackageInfo {
 }
 
 impl PythonPackageInfo {
+    pub(crate) async fn read(
+        ctx: &PackageManagerContext,
+        index: &Index,
+        version: &PythonVersion,
+        tags: &HashSet<&str>,
+    ) -> Result<Option<Self>> {
+        let mut packages = Self::read_multi(ctx, index)
+            .await?
+            .into_iter()
+            .filter(|p| {
+                let m = p.details.metadata();
+                m.has_tags(tags) && m.index_version().matches(version)
+            })
+            .collect::<Vec<_>>();
+        packages.sort_by_cached_key(|p| p.details.metadata().index_version().clone());
+        packages.reverse();
+        Ok(packages.into_iter().next())
+    }
+
+    pub(crate) async fn read_multi(
+        ctx: &PackageManagerContext,
+        index: &Index,
+    ) -> Result<Vec<Self>> {
+        let mut packages = Vec::new();
+        for item in index.items() {
+            for package in PythonPackage::parse_multi(&item)? {
+                let (availability, path) = match ctx.get_file(package.url()).await {
+                    Ok(p) => (PackageAvailability::Local, Some(p)),
+                    _ => (PackageAvailability::Remote, None),
+                };
+                packages.push(Self {
+                    availability,
+                    details: package,
+                    path,
+                });
+            }
+        }
+        Ok(packages)
+    }
+
     pub(crate) fn into_package_info(self) -> PackageInfo {
         PackageInfo::new(
             self.availability,
