@@ -37,7 +37,7 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
 
     let Some(project) = existing(app.read_project_config())? else {
         user_error!(
-            "No project configuration file in directory {}",
+            "No project configuration file in directory {}: create one with \"isopy project <PACKAGE-ID>\"",
             app.cwd().display()
         );
     };
@@ -76,7 +76,7 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
 
         if !unavailable_package_ids.is_empty() {
             let package_id_str = unavailable_package_ids.join(", ");
-            user_error!("The following package(s) have not been downloaded: {package_id_str}; use \"download\" or \"init --download\" command");
+            user_error!("The following package(s) have not been downloaded: {package_id_str}; use \"isopy download <PACKAGE-ID>\" or \"isopy init --download\" command to download missing packages");
         }
     }
 
