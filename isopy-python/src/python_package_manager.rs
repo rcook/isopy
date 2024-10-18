@@ -138,8 +138,7 @@ impl PythonPackageManager {
         read_to_string(path).await?.parse()
     }
 
-    async fn get_packages(&self, show_progress: bool) -> Result<Vec<PythonPackageInfo>> {
-        let index = self.get_index(false, show_progress).await?;
+    async fn get_packages(&self, index: &Index) -> Result<Vec<PythonPackageInfo>> {
         let mut packages = Vec::new();
         for item in index.items() {
             for package in PythonPackage::from_item(&item)? {
@@ -149,7 +148,7 @@ impl PythonPackageManager {
                 };
                 packages.push(PythonPackageInfo {
                     availability,
-                    package,
+                    details: package,
                     path,
                 });
             }
@@ -157,24 +156,22 @@ impl PythonPackageManager {
         Ok(packages)
     }
 
-    fn get_package(
+    async fn get_package(
         &self,
         index: &Index,
         version: &PythonVersion,
         tags: &TagFilter,
-    ) -> Result<PythonPackage> {
+    ) -> Result<PythonPackageInfo> {
         let tags = Self::get_tags(tags);
-        let mut packages = Vec::new();
-        for item in index.items() {
-            packages.extend(
-                PythonPackage::from_item(&item)?
-                    .into_iter()
-                    .filter(|archive| {
-                        let m = archive.metadata();
-                        Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
-                    }),
-            );
-        }
+        let mut packages = self
+            .get_packages(index)
+            .await?
+            .into_iter()
+            .filter(|p| {
+                let m = p.details.metadata();
+                Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
+            })
+            .collect::<Vec<_>>();
 
         if packages.is_empty() {
             bail!(
@@ -183,7 +180,7 @@ impl PythonPackageManager {
             )
         }
 
-        packages.sort_by_cached_key(|p| p.metadata().index_version().clone());
+        packages.sort_by_cached_key(|p| p.details.metadata().index_version().clone());
         packages.reverse();
         Ok(packages
             .into_iter()
@@ -237,7 +234,8 @@ impl PackageManagerOps for PythonPackageManager {
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
-        let packages = self.get_packages(options.show_progress).await?;
+        let index = self.get_index(false, options.show_progress).await?;
+        let packages = self.get_packages(&index).await?;
         let tags = Self::get_tags(tags);
         let mut packages = packages
             .into_iter()
@@ -247,7 +245,7 @@ impl PackageManagerOps for PythonPackageManager {
                     (All, _) | (Local, true) | (Remote, false)
                 )
             })
-            .filter(|p| Self::metadata_has_tags(p.package.metadata(), &tags))
+            .filter(|p| Self::metadata_has_tags(p.details.metadata(), &tags))
             .collect::<Vec<_>>();
 
         packages.sort_by(|a, b| {
@@ -255,10 +253,10 @@ impl PackageManagerOps for PythonPackageManager {
             if temp != Ordering::Equal {
                 return temp;
             }
-            b.package
+            b.details
                 .metadata()
                 .index_version()
-                .cmp(a.package.metadata().index_version())
+                .cmp(a.details.metadata().index_version())
         });
 
         Ok(packages
@@ -275,8 +273,8 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<bool> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let package = self.get_package(&index, version, tags)?;
-        Ok(self.ctx.get_file(package.url()).await.is_ok())
+        let package = self.get_package(&index, version, tags).await?;
+        Ok(package.path.is_some())
     }
 
     async fn download_package(
@@ -287,14 +285,17 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<()> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let package = self.get_package(&index, version, tags)?;
-        let checksum = get_checksum(&package)?;
+        let package = self.get_package(&index, version, tags).await?;
+        let checksum = get_checksum(&package.details)?;
         let options = DownloadFileOptionsBuilder::default()
             .update(false)
             .checksum(Some(checksum))
             .show_progress(options.show_progress)
             .build()?;
-        _ = self.ctx.download_file(package.url(), &options).await?;
+        _ = self
+            .ctx
+            .download_file(package.details.url(), &options)
+            .await?;
         Ok(())
     }
 
@@ -309,7 +310,7 @@ impl PackageManagerOps for PythonPackageManager {
 
         let index = self.get_index(false, options.show_progress).await?;
 
-        let Ok(package) = self.get_package(&index, version, tags) else {
+        let Ok(package) = self.get_package(&index, version, tags).await else {
             match tags {
                 Some(tags) => {
                     log::error!("Package version {} not found (tags {:?})", version, tags);
@@ -319,13 +320,12 @@ impl PackageManagerOps for PythonPackageManager {
             return Err(InstallPackageError::VersionNotFound);
         };
 
-        let package_path = self
-            .ctx
-            .get_file(package.url())
-            .await
-            .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
+        let Some(package_path) = package.path else {
+            return Err(InstallPackageError::PackageNotDownloaded);
+        };
 
         package
+            .details
             .metadata()
             .archive_type()
             .unpack(&package_path, dir, options)
@@ -333,6 +333,6 @@ impl PackageManagerOps for PythonPackageManager {
 
         Self::on_after_install(dir)?;
 
-        Ok(Package::new(package))
+        Ok(Package::new(package.details))
     }
 }

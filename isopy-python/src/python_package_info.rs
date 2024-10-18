@@ -25,7 +25,7 @@ use std::path::PathBuf;
 
 pub(crate) struct PythonPackageInfo {
     pub(crate) availability: PackageAvailability,
-    pub(crate) package: PythonPackage,
+    pub(crate) details: PythonPackage,
     pub(crate) path: Option<PathBuf>,
 }
 
@@ -33,11 +33,11 @@ impl PythonPackageInfo {
     pub(crate) fn into_package_info(self) -> PackageInfo {
         PackageInfo::new(
             self.availability,
-            self.package.metadata().name(),
-            self.package.url(),
-            Version::new(self.package.metadata().index_version().version().clone()),
+            self.details.metadata().name(),
+            self.details.url(),
+            Version::new(self.details.metadata().index_version().version().clone()),
             Some(String::from(
-                self.package
+                self.details
                     .metadata()
                     .index_version()
                     .release_group()
