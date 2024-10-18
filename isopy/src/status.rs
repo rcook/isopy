@@ -26,7 +26,7 @@ use colored::Colorize;
 #[derive(Debug)]
 pub(crate) enum Status {
     Success,
-    UserError,
+    UserError(String),
 }
 
 #[macro_export]
@@ -53,8 +53,7 @@ pub(crate) use success;
 
 macro_rules! user_error {
     ($($arg: tt)*) => {{
-        ::log::error!($($arg)*);
-        return ::std::result::Result::Ok($crate::status::Status::UserError);
+        return ::std::result::Result::Ok($crate::status::Status::UserError(std::format!($($arg)*)));
     }};
 }
 pub(crate) use user_error;
@@ -71,6 +70,10 @@ macro_rules! report_install_package_error {
     };
 }
 pub(crate) use report_install_package_error;
+
+pub(crate) fn show_user_error(message: &str) {
+    eprintln!("{}", format!("{message}").bright_yellow());
+}
 
 pub(crate) fn show_error(error: &Error) {
     eprintln!("{}", format!("{error}").bright_red());

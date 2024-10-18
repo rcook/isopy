@@ -62,12 +62,15 @@ mod wrapper_file_name;
 #[tokio::main]
 async fn main() {
     use crate::run::run;
-    use crate::status::{show_error, Status};
+    use crate::status::{show_error, show_user_error, Status};
     use std::process::exit;
 
     exit(match run().await {
         Ok(Status::Success) => 0,
-        Ok(Status::UserError) => 2,
+        Ok(Status::UserError(message)) => {
+            show_user_error(&message);
+            2
+        }
         Err(e) => {
             show_error(&e);
             1
