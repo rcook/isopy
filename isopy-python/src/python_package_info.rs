@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Richard Cook
+// Copyright (c) 2024 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -19,34 +19,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::new_ret_no_self)]
-#![allow(clippy::option_if_let_else)]
-#![allow(clippy::redundant_pub_crate)]
+use crate::python_package::PythonPackage;
+use isopy_lib::{PackageAvailability, PackageInfo, Version};
+use std::path::PathBuf;
 
-mod checksum;
-mod constants;
-mod discriminator;
-mod entrypoint;
-mod metadata;
-mod python_index_version;
-mod python_package;
-mod python_package_info;
-mod python_package_manager;
-mod python_plugin;
-mod python_version;
-mod release_group;
+pub(crate) struct PythonPackageInfo {
+    pub(crate) availability: PackageAvailability,
+    pub(crate) package: PythonPackage,
+    pub(crate) path: Option<PathBuf>,
+}
 
-pub use entrypoint::new_plugin;
+impl PythonPackageInfo {
+    pub(crate) fn into_package_info(self) -> PackageInfo {
+        PackageInfo::new(
+            self.availability,
+            self.package.metadata().name(),
+            self.package.url(),
+            Version::new(self.package.metadata().index_version().version().clone()),
+            Some(String::from(
+                self.package
+                    .metadata()
+                    .index_version()
+                    .release_group()
+                    .as_str(),
+            )),
+            self.path,
+        )
+    }
+}

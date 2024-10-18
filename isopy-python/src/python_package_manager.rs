@@ -22,16 +22,18 @@
 use crate::checksum::get_checksum;
 use crate::metadata::Metadata;
 use crate::python_package::PythonPackage;
+use crate::python_package_info::PythonPackageInfo;
 use crate::python_version::PythonVersion;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptionsBuilder, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
     IsPackageDownloadedOptions, ListPackagesOptions, ListTagsOptions, Package, PackageAvailability,
-    PackageManagerContext, PackageManagerOps, PackageInfo, SourceFilter, TagFilter, Tags,
+    PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags,
     UpdateIndexOptions, Version,
 };
 use serde_json::Value;
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::iter::once;
 use std::path::Path;
@@ -172,6 +174,25 @@ impl PythonPackageManager {
         Ok(index)
     }
 
+    async fn get_all_packages(&self, show_progress: bool) -> Result<Vec<PythonPackageInfo>> {
+        let index = self.get_index(false, show_progress).await?;
+        let mut packages = Vec::new();
+        for item in g!(index.as_array()) {
+            for package in Self::get_packages(item)? {
+                let (availability, path) = match self.ctx.get_file(package.url()).await {
+                    Ok(p) => (PackageAvailability::Local, Some(p)),
+                    _ => (PackageAvailability::Remote, None),
+                };
+                packages.push(PythonPackageInfo {
+                    availability,
+                    package,
+                    path,
+                });
+            }
+        }
+        Ok(packages)
+    }
+
     fn get_package(
         &self,
         index: &Value,
@@ -247,51 +268,36 @@ impl PackageManagerOps for PythonPackageManager {
         tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
+        let packages = self.get_all_packages(options.show_progress).await?;
         let tags = Self::get_tags(tags);
-        let mut records = Vec::new();
-        let index = self.get_index(false, options.show_progress).await?;
-        for item in g!(index.as_array()) {
-            for package in Self::get_packages(item)? {
-                if Self::metadata_has_tags(package.metadata(), &tags) {
-                    let (kind, path) = match self.ctx.get_file(package.url()).await {
-                        Ok(p) => (PackageAvailability::Local, Some(p)),
-                        _ => (PackageAvailability::Remote, None),
-                    };
-                    let is_local = kind == PackageAvailability::Local;
-                    match sources {
-                        SourceFilter::All => records.push((kind, package, path)),
-                        SourceFilter::Local if is_local => records.push((kind, package, path)),
-                        SourceFilter::Remote if !is_local => records.push((kind, package, path)),
-                        _ => {}
-                    }
+        let mut packages = packages
+            .into_iter()
+            .filter(|p| {
+                let is_local = p.availability == PackageAvailability::Local;
+                match sources {
+                    SourceFilter::All => true,
+                    SourceFilter::Local if is_local => true,
+                    SourceFilter::Remote if !is_local => true,
+                    _ => false,
                 }
-            }
-        }
+            })
+            .filter(|p| Self::metadata_has_tags(p.package.metadata(), &tags))
+            .collect::<Vec<_>>();
 
-        records.sort_by(|a, b| {
-            if a.0 == b.0 {
-                b.1.metadata()
-                    .index_version()
-                    .cmp(a.1.metadata().index_version())
-            } else {
-                b.0.cmp(&a.0)
+        packages.sort_by(|a, b| {
+            let temp = b.availability.cmp(&a.availability);
+            if temp != Ordering::Equal {
+                return temp;
             }
+            b.package
+                .metadata()
+                .index_version()
+                .cmp(a.package.metadata().index_version())
         });
 
-        Ok(records
+        Ok(packages
             .into_iter()
-            .map(|(kind, archive, path)| {
-                PackageInfo::new(
-                    kind,
-                    archive.metadata().name(),
-                    archive.url(),
-                    Version::new(archive.metadata().index_version().version().clone()),
-                    Some(String::from(
-                        archive.metadata().index_version().release_group().as_str(),
-                    )),
-                    path,
-                )
-            })
+            .map(PythonPackageInfo::into_package_info)
             .collect())
     }
 
