@@ -205,7 +205,7 @@ impl PackageManagerOps for PythonPackageManager {
         let Some(package) = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?
         else {
             bail!(
-                "No package with ID {moniker}:{version} found and tags {tags:?}",
+                "No package with ID {moniker}:{version} and tags {tags:?} found",
                 moniker = self.moniker
             );
         };
@@ -236,7 +236,7 @@ impl PackageManagerOps for PythonPackageManager {
         let Some(package) = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?
         else {
             log::error!(
-                "Package version {moniker}:{version} not found with tags {tags:?})",
+                "No package with ID {moniker}:{version} and tags {tags:?} found",
                 moniker = self.moniker
             );
             return Err(InstallPackageError::VersionNotFound);
