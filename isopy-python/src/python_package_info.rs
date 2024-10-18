@@ -40,14 +40,24 @@ impl PythonPackageInfo {
         version: &PythonVersion,
         tags: &HashSet<&str>,
     ) -> Result<Option<Self>> {
-        let mut packages = Self::read_multi(ctx, index)
-            .await?
-            .into_iter()
-            .filter(|p| {
-                let m = p.details.metadata();
-                m.has_tags(tags) && m.index_version().matches(version)
-            })
-            .collect::<Vec<_>>();
+        let mut packages = Vec::new();
+        for item in index.items() {
+            for package in PythonPackage::parse_multi(&item)? {
+                let m = package.metadata();
+                if m.has_tags(tags) && m.index_version().matches(version) {
+                    let (availability, path) = match ctx.get_file(package.url()).await {
+                        Ok(p) => (PackageAvailability::Local, Some(p)),
+                        _ => (PackageAvailability::Remote, None),
+                    };
+                    packages.push(Self {
+                        availability,
+                        details: package,
+                        path,
+                    });
+                }
+            }
+        }
+
         packages.sort_by_cached_key(|p| p.details.metadata().index_version().clone());
         packages.reverse();
         Ok(packages.into_iter().next())
