@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::metadata::Metadata;
+use crate::{item::Item, metadata::Metadata};
+use anyhow::Result;
 use isopy_lib::{PackageOps, Version};
 use url::Url;
 
@@ -31,6 +32,40 @@ pub(crate) struct PythonPackage {
 }
 
 impl PythonPackage {
+    pub(crate) fn from_item(item: &Item) -> Result<Vec<Self>> {
+        macro_rules! g {
+            ($e : expr) => {
+                match $e {
+                    Some(value) => value,
+                    None => ::anyhow::bail!("Invalid index"),
+                }
+            };
+        }
+
+        fn filter_fn(name: &str) -> bool {
+            name.starts_with("cpython-") && !name.ends_with(".sha256") && name != "SHA256SUMS"
+        }
+
+        let assets = g!(g!(item.value().get("assets")).as_array())
+            .iter()
+            .map(|asset| {
+                let url = g!(g!(asset.get("browser_download_url")).as_str()).parse::<Url>()?;
+                let name = g!(g!(asset.get("name")).as_str());
+                Ok((url, name))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let packages = assets
+            .into_iter()
+            .filter(|(_, name)| filter_fn(name))
+            .map(|(url, name)| {
+                let metadata = name.parse::<Metadata>()?;
+                let archive_info = Self::new(&url, metadata);
+                Ok(archive_info)
+            })
+            .collect::<Result<Vec<_>>>()?;
+        Ok(packages)
+    }
+
     pub(crate) fn new(url: &Url, metadata: Metadata) -> Self {
         let version = Version::new(metadata.index_version().version().clone());
         Self {

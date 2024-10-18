@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::checksum::get_checksum;
+use crate::index::Index;
 use crate::metadata::Metadata;
 use crate::python_package::PythonPackage;
 use crate::python_package_info::PythonPackageInfo;
@@ -32,7 +33,6 @@ use isopy_lib::{
     PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags,
     UpdateIndexOptions, Version,
 };
-use serde_json::Value;
 use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::iter::once;
@@ -40,15 +40,6 @@ use std::path::Path;
 use std::result::Result as StdResult;
 use tokio::fs::read_to_string;
 use url::Url;
-
-macro_rules! g {
-    ($e : expr) => {
-        match $e {
-            Some(value) => value,
-            None => ::anyhow::bail!("Invalid index"),
-        }
-    };
-}
 
 macro_rules! downcast_version {
     ($version : expr) => {
@@ -87,31 +78,6 @@ impl PythonPackageManager {
             moniker: String::from(moniker),
             url: url.clone(),
         }
-    }
-
-    fn parse_packages(item: &Value) -> Result<Vec<PythonPackage>> {
-        fn filter_fn(name: &str) -> bool {
-            name.starts_with("cpython-") && !name.ends_with(".sha256") && name != "SHA256SUMS"
-        }
-
-        let assets = g!(g!(item.get("assets")).as_array())
-            .iter()
-            .map(|asset| {
-                let url = g!(g!(asset.get("browser_download_url")).as_str()).parse::<Url>()?;
-                let name = g!(g!(asset.get("name")).as_str());
-                Ok((url, name))
-            })
-            .collect::<Result<Vec<_>>>()?;
-        let packages = assets
-            .into_iter()
-            .filter(|(_, name)| filter_fn(name))
-            .map(|(url, name)| {
-                let metadata = name.parse::<Metadata>()?;
-                let archive_info = PythonPackage::new(&url, metadata);
-                Ok(archive_info)
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(packages)
     }
 
     fn get_tags(tags: &TagFilter) -> HashSet<&str> {
@@ -163,22 +129,20 @@ impl PythonPackageManager {
         Ok(())
     }
 
-    async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
+    async fn get_index(&self, update: bool, show_progress: bool) -> Result<Index> {
         let options = DownloadFileOptionsBuilder::json()
             .update(update)
             .show_progress(show_progress)
             .build()?;
         let path = self.ctx.download_file(&self.url, &options).await?;
-        let s = read_to_string(path).await?;
-        let index = serde_json::from_str(&s)?;
-        Ok(index)
+        read_to_string(path).await?.parse()
     }
 
-    async fn get_all_packages(&self, show_progress: bool) -> Result<Vec<PythonPackageInfo>> {
+    async fn get_packages(&self, show_progress: bool) -> Result<Vec<PythonPackageInfo>> {
         let index = self.get_index(false, show_progress).await?;
         let mut packages = Vec::new();
-        for item in g!(index.as_array()) {
-            for package in Self::parse_packages(item)? {
+        for item in index.items() {
+            for package in PythonPackage::from_item(&item)? {
                 let (availability, path) = match self.ctx.get_file(package.url()).await {
                     Ok(p) => (PackageAvailability::Local, Some(p)),
                     _ => (PackageAvailability::Remote, None),
@@ -195,17 +159,21 @@ impl PythonPackageManager {
 
     fn get_package(
         &self,
-        index: &Value,
+        index: &Index,
         version: &PythonVersion,
         tags: &TagFilter,
     ) -> Result<PythonPackage> {
         let tags = Self::get_tags(tags);
         let mut packages = Vec::new();
-        for item in g!(index.as_array()) {
-            packages.extend(Self::parse_packages(item)?.into_iter().filter(|archive| {
-                let m = archive.metadata();
-                Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
-            }));
+        for item in index.items() {
+            packages.extend(
+                PythonPackage::from_item(&item)?
+                    .into_iter()
+                    .filter(|archive| {
+                        let m = archive.metadata();
+                        Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
+                    }),
+            );
         }
 
         if packages.is_empty() {
@@ -215,7 +183,7 @@ impl PythonPackageManager {
             )
         }
 
-        packages.sort_by_cached_key(|archive| archive.metadata().index_version().clone());
+        packages.sort_by_cached_key(|p| p.metadata().index_version().clone());
         packages.reverse();
         Ok(packages
             .into_iter()
@@ -235,8 +203,8 @@ impl PackageManagerOps for PythonPackageManager {
         let mut tags = HashSet::new();
         let mut other_tags = HashSet::new();
         let index = self.get_index(false, options.show_progress).await?;
-        for item in g!(index.as_array()) {
-            for package in Self::parse_packages(item)? {
+        for item in index.items() {
+            for package in PythonPackage::from_item(&item)? {
                 tags.extend(package.metadata().tags().to_owned());
                 other_tags.insert(String::from(
                     package.metadata().index_version().release_group().as_str(),
@@ -269,7 +237,7 @@ impl PackageManagerOps for PythonPackageManager {
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
-        let packages = self.get_all_packages(options.show_progress).await?;
+        let packages = self.get_packages(options.show_progress).await?;
         let tags = Self::get_tags(tags);
         let mut packages = packages
             .into_iter()
