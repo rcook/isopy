@@ -32,26 +32,26 @@ pub(crate) fn do_shell(app: App, verbose: bool) -> Result<Status> {
     if let Some(isopy_env) = IsopyEnv::get_vars()? {
         if let Some(link) = app.find_link(isopy_env.link_id())? {
             user_error!(
-                "you are already in the isopy shell for project {}",
+                "You are already in the isopy shell for project {}",
                 link.project_dir().display()
             );
         }
 
         user_error!(
-            "you are already in an isopy shell (metadirectory ID {}",
+            "You are already in an isopy shell (metadirectory ID {}",
             isopy_env.meta_id()
         );
     };
 
     let Some(dir_info) = app.find_dir_info(None)? else {
         user_error!(
-            "could not find environment for directory {}",
+            "Could not find environment for directory {}: did you forget to run \"isopy init\" or \"isopy env\"?",
             app.cwd().display()
         );
     };
 
     let Some(env_info) = dir_info.make_env_info(&app)? else {
-        user_error!("could not get environment info");
+        user_error!("Could not get environment info");
     };
 
     if verbose {
