@@ -34,9 +34,9 @@ pub(crate) struct PluginManager {
 impl PluginManager {
     pub(crate) fn new() -> Self {
         Self {
-            go: isopy_go::new_plugin(),
-            java: isopy_java::new_plugin(),
-            python: isopy_python::new_plugin(),
+            go: isopy_go::new_plugin(Moniker::Go.as_str()),
+            java: isopy_java::new_plugin(Moniker::Java.as_str()),
+            python: isopy_python::new_plugin(Moniker::Python.as_str()),
         }
     }
 

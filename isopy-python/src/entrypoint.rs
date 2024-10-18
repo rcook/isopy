@@ -23,6 +23,6 @@ use crate::python_plugin::PythonPlugin;
 use isopy_lib::Plugin;
 
 #[must_use]
-pub fn new_plugin() -> Plugin {
-    PythonPlugin::new()
+pub fn new_plugin(moniker: &str) -> Plugin {
+    PythonPlugin::new(moniker)
 }

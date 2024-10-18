@@ -23,6 +23,6 @@ use crate::go_plugin::GoPlugin;
 use isopy_lib::Plugin;
 
 #[must_use]
-pub fn new_plugin() -> Plugin {
-    GoPlugin::new()
+pub fn new_plugin(moniker: &str) -> Plugin {
+    GoPlugin::new(moniker)
 }

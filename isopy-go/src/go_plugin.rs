@@ -37,7 +37,7 @@ static INDEX_URL: LazyLock<Url> =
 pub(crate) struct GoPlugin;
 
 impl GoPlugin {
-    pub(crate) fn new() -> Plugin {
+    pub(crate) fn new(_moniker: &str) -> Plugin {
         Plugin::new(Self)
     }
 }

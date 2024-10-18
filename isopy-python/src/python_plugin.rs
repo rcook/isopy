@@ -36,11 +36,15 @@ static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
         .expect("Invalid index URL")
 });
 
-pub(crate) struct PythonPlugin;
+pub(crate) struct PythonPlugin {
+    moniker: String,
+}
 
 impl PythonPlugin {
-    pub(crate) fn new() -> Plugin {
-        Plugin::new(Self)
+    pub(crate) fn new(moniker: &str) -> Plugin {
+        Plugin::new(Self {
+            moniker: String::from(moniker),
+        })
     }
 }
 
@@ -103,6 +107,6 @@ impl PluginOps for PythonPlugin {
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(PythonPackageManager::new(ctx, &INDEX_URL))
+        PackageManager::new(PythonPackageManager::new(ctx, &self.moniker, &INDEX_URL))
     }
 }

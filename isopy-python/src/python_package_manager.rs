@@ -74,13 +74,15 @@ const DEFAULT_TAGS: [&str; 6] = ["x86_64", "pc", "windows", "msvc", "shared", "i
 
 pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
+    moniker: String,
     url: Url,
 }
 
 impl PythonPackageManager {
-    pub(crate) fn new(ctx: PackageManagerContext, url: &Url) -> Self {
+    pub(crate) fn new(ctx: PackageManagerContext, moniker: &str, url: &Url) -> Self {
         Self {
             ctx,
+            moniker: String::from(moniker),
             url: url.clone(),
         }
     }
@@ -116,32 +118,6 @@ impl PythonPackageManager {
                 .map(std::string::String::as_str)
                 .collect::<HashSet<_>>()
         })
-    }
-
-    fn get_package(
-        index: &Value,
-        version: &PythonVersion,
-        tags: &TagFilter,
-    ) -> Result<PythonPackage> {
-        let tags = Self::get_tags(tags);
-        let mut packages = Vec::new();
-        for item in g!(index.as_array()) {
-            packages.extend(Self::get_packages(item)?.into_iter().filter(|archive| {
-                let m = archive.metadata();
-                Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
-            }));
-        }
-
-        if packages.is_empty() {
-            bail!("No matching archives found")
-        }
-
-        packages.sort_by_cached_key(|archive| archive.metadata().index_version().clone());
-        packages.reverse();
-        Ok(packages
-            .into_iter()
-            .next()
-            .expect("Vector must contain at least one element"))
     }
 
     fn metadata_has_tags(metadata: &Metadata, tags: &HashSet<&str>) -> bool {
@@ -194,6 +170,36 @@ impl PythonPackageManager {
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)
+    }
+
+    fn get_package(
+        &self,
+        index: &Value,
+        version: &PythonVersion,
+        tags: &TagFilter,
+    ) -> Result<PythonPackage> {
+        let tags = Self::get_tags(tags);
+        let mut packages = Vec::new();
+        for item in g!(index.as_array()) {
+            packages.extend(Self::get_packages(item)?.into_iter().filter(|archive| {
+                let m = archive.metadata();
+                Self::metadata_has_tags(m, &tags) && m.index_version().matches(version)
+            }));
+        }
+
+        if packages.is_empty() {
+            bail!(
+                "No package with ID \"{moniker}:{version}\" found",
+                moniker = self.moniker
+            )
+        }
+
+        packages.sort_by_cached_key(|archive| archive.metadata().index_version().clone());
+        packages.reverse();
+        Ok(packages
+            .into_iter()
+            .next()
+            .expect("Vector must contain at least one element"))
     }
 }
 
@@ -297,7 +303,8 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<bool> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        Ok(Self::get_package(&index, version, tags).is_ok())
+        let package = self.get_package(&index, version, tags)?;
+        Ok(self.ctx.get_file(package.url()).await.is_ok())
     }
 
     async fn download_package(
@@ -308,7 +315,7 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<()> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let package = Self::get_package(&index, version, tags)?;
+        let package = self.get_package(&index, version, tags)?;
         let checksum = get_checksum(&package)?;
         let options = DownloadFileOptionsBuilder::default()
             .update(false)
@@ -330,7 +337,7 @@ impl PackageManagerOps for PythonPackageManager {
 
         let index = self.get_index(false, options.show_progress).await?;
 
-        let Ok(package) = Self::get_package(&index, version, tags) else {
+        let Ok(package) = self.get_package(&index, version, tags) else {
             match tags {
                 Some(tags) => {
                     log::error!("Package version {} not found (tags {:?})", version, tags);
