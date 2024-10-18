@@ -22,7 +22,7 @@
 use crate::error::InstallPackageError;
 use crate::macros::dyn_trait_struct;
 use crate::package::Package;
-use crate::package_summary::PackageSummary;
+use crate::package_info::PackageInfo;
 use crate::tag_filter::TagFilter;
 use crate::tags::Tags;
 use crate::version::Version;
@@ -78,7 +78,7 @@ pub trait PackageManagerOps: Send + Sync {
         sources: SourceFilter,
         tags: &TagFilter,
         options: &ListPackagesOptions,
-    ) -> Result<Vec<PackageSummary>>;
+    ) -> Result<Vec<PackageInfo>>;
     async fn is_package_downloaded(
         &self,
         version: &Version,

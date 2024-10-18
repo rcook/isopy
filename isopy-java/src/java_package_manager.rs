@@ -26,7 +26,7 @@ use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions,
     ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
-    PackageManagerContext, PackageManagerOps, PackageSummary, ProgressIndicator,
+    PackageManagerContext, PackageManagerOps, PackageInfo, ProgressIndicator,
     ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
@@ -127,7 +127,7 @@ impl PackageManagerOps for JavaPackageManager {
         _sources: SourceFilter,
         _tags: &TagFilter,
         options: &ListPackagesOptions,
-    ) -> Result<Vec<PackageSummary>> {
+    ) -> Result<Vec<PackageInfo>> {
         let dir = self.get_index(options.show_progress, false).await?;
         let mut package_summaries = Vec::new();
         for path in Self::get_page_paths(&dir)? {
@@ -135,7 +135,7 @@ impl PackageManagerOps for JavaPackageManager {
             let reader = BufReader::new(f);
             let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
             package_summaries.extend(response.versions.into_iter().map(|v| {
-                PackageSummary::new(
+                PackageInfo::new(
                     PackageAvailability::Remote,
                     v.semver.clone(),
                     &Url::parse("https://httpbin.org").unwrap(),

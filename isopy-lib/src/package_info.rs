@@ -24,7 +24,7 @@ use crate::version::Version;
 use std::path::PathBuf;
 use url::Url;
 
-pub struct PackageSummary {
+pub struct PackageInfo {
     availability: PackageAvailability,
     name: String,
     url: Url,
@@ -33,7 +33,7 @@ pub struct PackageSummary {
     path: Option<PathBuf>,
 }
 
-impl PackageSummary {
+impl PackageInfo {
     pub fn new<S1: Into<String>, S2: Into<String>, P: Into<PathBuf>>(
         availability: PackageAvailability,
         name: S1,

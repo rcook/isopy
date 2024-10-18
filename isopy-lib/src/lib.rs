@@ -44,9 +44,9 @@ mod file_name_parts;
 mod macros;
 mod package;
 mod package_availability;
+mod package_info;
 mod package_manager;
 mod package_manager_context;
-mod package_summary;
 mod plugin;
 mod progress_indicator;
 mod sanitize;
@@ -67,6 +67,7 @@ pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
 pub use package::{Package, PackageOps};
 pub use package_availability::PackageAvailability;
+pub use package_info::PackageInfo;
 pub use package_manager::{
     DownloadPackageOptions, DownloadPackageOptionsBuilder, InstallPackageOptions,
     InstallPackageOptionsBuilder, IsPackageDownloadedOptions, IsPackageDownloadedOptionsBuilder,
@@ -77,7 +78,6 @@ pub use package_manager_context::{
     DownloadFileOptions, DownloadFileOptionsBuilder, MakeDirOptions, MakeDirOptionsBuilder,
     PackageManagerContext, PackageManagerContextOps,
 };
-pub use package_summary::PackageSummary;
 pub use plugin::{Plugin, PluginOps};
 pub use progress_indicator::{
     ProgressIndicator, ProgressIndicatorOptions, ProgressIndicatorOptionsBuilder,

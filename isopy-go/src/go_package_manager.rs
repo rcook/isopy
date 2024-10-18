@@ -27,8 +27,8 @@ use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
     InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageAvailability, PackageManagerContext, PackageManagerOps,
-    PackageOps, PackageSummary, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    ListTagsOptions, Package, PackageAvailability, PackageInfo, PackageManagerContext,
+    PackageManagerOps, PackageOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -179,7 +179,7 @@ impl PackageManagerOps for GoPackageManager {
         sources: SourceFilter,
         _tags: &TagFilter, // TBD
         options: &ListPackagesOptions,
-    ) -> Result<Vec<PackageSummary>> {
+    ) -> Result<Vec<PackageInfo>> {
         let filter_tags = DEFAULT_TAGS
             .into_iter()
             .map(String::from)
@@ -204,7 +204,7 @@ impl PackageManagerOps for GoPackageManager {
         let package_summaries = packages
             .into_iter()
             .map(|p| {
-                PackageSummary::new(
+                PackageInfo::new(
                     PackageAvailability::Remote,
                     p.name(),
                     p.url(),

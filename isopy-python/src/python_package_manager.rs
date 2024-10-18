@@ -28,7 +28,7 @@ use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptionsBuilder, DownloadPackageOptions, InstallPackageError, InstallPackageOptions,
     IsPackageDownloadedOptions, ListPackagesOptions, ListTagsOptions, Package, PackageAvailability,
-    PackageManagerContext, PackageManagerOps, PackageSummary, SourceFilter, TagFilter, Tags,
+    PackageManagerContext, PackageManagerOps, PackageInfo, SourceFilter, TagFilter, Tags,
     UpdateIndexOptions, Version,
 };
 use serde_json::Value;
@@ -246,7 +246,7 @@ impl PackageManagerOps for PythonPackageManager {
         sources: SourceFilter,
         tags: &TagFilter,
         options: &ListPackagesOptions,
-    ) -> Result<Vec<PackageSummary>> {
+    ) -> Result<Vec<PackageInfo>> {
         let tags = Self::get_tags(tags);
         let mut records = Vec::new();
         let index = self.get_index(false, options.show_progress).await?;
@@ -281,7 +281,7 @@ impl PackageManagerOps for PythonPackageManager {
         Ok(records
             .into_iter()
             .map(|(kind, archive, path)| {
-                PackageSummary::new(
+                PackageInfo::new(
                     kind,
                     archive.metadata().name(),
                     archive.url(),

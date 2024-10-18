@@ -28,8 +28,7 @@ use anyhow::bail;
 use anyhow::Result;
 use colored::{ColoredString, Colorize};
 use isopy_lib::{
-    ListPackagesOptions, ListPackagesOptionsBuilder, PackageSummary, Plugin, SourceFilter,
-    TagFilter,
+    ListPackagesOptions, ListPackagesOptionsBuilder, PackageInfo, Plugin, SourceFilter, TagFilter,
 };
 use std::fs::metadata;
 use url::{Host, Url};
@@ -51,12 +50,12 @@ pub(crate) async fn do_packages(
         verbose: bool,
     ) -> Result<()> {
         let plugin = app.plugin_manager().get_plugin(moniker);
-        let package_summaries = app
+        let packages = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
             .list_packages(filter, tags, options)
             .await?;
-        add_plugin_rows(table, moniker, plugin, &package_summaries, filter, verbose)?;
+        add_plugin_rows(table, moniker, plugin, &packages, filter, verbose)?;
         Ok(())
     }
 
@@ -85,23 +84,18 @@ fn add_plugin_rows(
     table: &mut Table,
     moniker: &Moniker,
     plugin: &Plugin,
-    package_summaries: &Vec<PackageSummary>,
+    packages: &Vec<PackageInfo>,
     filter: SourceFilter,
     verbose: bool,
 ) -> Result<()> {
-    fn make_package_id(moniker: &Moniker, package_summary: &PackageSummary) -> String {
-        match package_summary.label() {
-            Some(label) => format!(
-                "{}:{}:{}",
-                moniker.as_str(),
-                **package_summary.version(),
-                label
-            ),
-            None => format!("{}:{}", moniker.as_str(), **package_summary.version()),
+    fn make_package_id(moniker: &Moniker, package: &PackageInfo) -> String {
+        match package.label() {
+            Some(label) => format!("{}:{}:{}", moniker.as_str(), **package.version(), label),
+            None => format!("{}:{}", moniker.as_str(), **package.version()),
         }
     }
 
-    fn make_package_info(package_summary: &PackageSummary, verbose: bool) -> Result<String> {
+    fn make_package_summary(package: &PackageInfo, verbose: bool) -> Result<String> {
         fn format_url(url: &Url, verbose: bool) -> Result<ColoredString> {
             fn truncated_format(scheme: &str, domain: &str, path: &str) -> ColoredString {
                 match path.rfind('/') {
@@ -130,7 +124,7 @@ fn add_plugin_rows(
             })
         }
 
-        match package_summary.path() {
+        match package.path() {
             Some(p) => {
                 let size = metadata(p)?.len();
                 Ok(format!(
@@ -139,14 +133,11 @@ fn add_plugin_rows(
                     humanize_size_base_2(size).cyan()
                 ))
             }
-            None => Ok(format!(
-                "{}",
-                format_url(package_summary.url(), verbose)?.white()
-            )),
+            None => Ok(format!("{}", format_url(package.url(), verbose)?.white())),
         }
     }
 
-    if package_summaries.is_empty() {
+    if packages.is_empty() {
         match filter {
             SourceFilter::Local => table_divider!(
                 table,
@@ -171,10 +162,10 @@ fn add_plugin_rows(
         );
 
         table_headings!(table, "Package ID", "Details");
-        for package_summary in package_summaries {
-            let package_id = make_package_id(moniker, package_summary);
-            let package_info = make_package_info(package_summary, verbose)?;
-            table_columns!(table, package_id, package_info);
+        for package in packages {
+            let package_id = make_package_id(moniker, package);
+            let package_summary = make_package_summary(package, verbose)?;
+            table_columns!(table, package_id, package_summary);
         }
     }
 
