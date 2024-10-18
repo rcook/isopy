@@ -268,19 +268,19 @@ impl PackageManagerOps for PythonPackageManager {
         tags: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
+        use isopy_lib::SourceFilter::*;
         let packages = self.get_all_packages(options.show_progress).await?;
         let tags = Self::get_tags(tags);
         let mut packages = packages
             .into_iter()
-            .filter(|p| {
-                let is_local = p.availability == PackageAvailability::Local;
-                match sources {
-                    SourceFilter::All => true,
-                    SourceFilter::Local if is_local => true,
-                    SourceFilter::Remote if !is_local => true,
+            .filter(
+                |p| match (sources, p.availability == PackageAvailability::Local) {
+                    (All, _) => true,
+                    (Local, true) => true,
+                    (Remote, false) => true,
                     _ => false,
-                }
-            })
+                },
+            )
             .filter(|p| Self::metadata_has_tags(p.package.metadata(), &tags))
             .collect::<Vec<_>>();
 

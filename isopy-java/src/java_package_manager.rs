@@ -26,7 +26,7 @@ use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, InstallPackageError, InstallPackageOptions, IsPackageDownloadedOptions,
     ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
-    PackageManagerContext, PackageManagerOps, PackageInfo, ProgressIndicator,
+    PackageInfo, PackageManagerContext, PackageManagerOps, ProgressIndicator,
     ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
