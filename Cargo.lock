@@ -1213,7 +1213,7 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "isopy"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1250,7 +1250,7 @@ dependencies = [
 
 [[package]]
 name = "isopy-go"
-version = "0.4.0"
+version = "0.4.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1265,7 +1265,7 @@ dependencies = [
 
 [[package]]
 name = "isopy-java"
-version = "0.4.0"
+version = "0.4.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1282,7 +1282,7 @@ dependencies = [
 
 [[package]]
 name = "isopy-lib"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -1303,7 +1303,7 @@ dependencies = [
 
 [[package]]
 name = "isopy-python"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "anyhow",
  "async-trait",
