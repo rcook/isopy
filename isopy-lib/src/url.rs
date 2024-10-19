@@ -34,7 +34,7 @@ pub fn dir_url(url: &Url) -> Cow<Url> {
 
 fn helper(url: &Url, slash: bool) -> Cow<Url> {
     let path_str = url.path();
-    let trimmed = path_str.trim_end_matches(&['/']);
+    let trimmed = path_str.trim_end_matches(['/']);
     if !slash && trimmed == path_str {
         return Cow::Borrowed(url);
     }
