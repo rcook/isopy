@@ -40,11 +40,7 @@ impl Index {
     }
 
     pub(crate) fn items(&self) -> impl Iterator<Item = Item<'_>> {
-        let mut iter = self
-            .value
-            .as_array()
-            .unwrap_or(&self.empty_items)
-            .iter();
+        let mut iter = self.value.as_array().unwrap_or(&self.empty_items).iter();
         from_fn(move || iter.next().map(Item::new))
     }
 }

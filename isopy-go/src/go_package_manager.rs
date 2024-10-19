@@ -187,13 +187,15 @@ impl PackageManagerOps for GoPackageManager {
             .collect::<HashSet<_>>();
         let mut packages = Vec::new();
         for package in self.get_packages(false, options.show_progress).await? {
-            if package.tags().is_superset(&filter_tags) && matches!(
+            if package.tags().is_superset(&filter_tags)
+                && matches!(
                     (
                         sources,
                         package.availability() == PackageAvailability::Local
                     ),
                     (All, _) | (Local, true) | (Remote, false)
-                ) {
+                )
+            {
                 packages.push(package);
             }
         }
