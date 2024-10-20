@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::{ensure_file_executable_mode, is_executable_file};
-use crate::status::{success, user_error, Status};
+use crate::status::{success, user_error, StatusResult};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{anyhow, bail, Result};
 use isopy_lib::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
@@ -63,7 +63,7 @@ pub(crate) fn do_wrap(
     platform: Platform,
     shell: Shell,
     force: bool,
-) -> Result<Status> {
+) -> StatusResult {
     let Some(dir_info) = app.find_dir_info(None)? else {
         user_error!(
             "could not find environment for directory {}",

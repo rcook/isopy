@@ -21,12 +21,11 @@
 //
 use crate::app::App;
 use crate::print::{make_prop_table, print_link, print_metadir};
-use crate::status::{success, Status};
+use crate::status::{success, StatusResult};
 use crate::table::table_divider;
-use anyhow::Result;
 use joat_repo::Trash;
 
-pub(crate) fn do_check(app: &App, clean: bool) -> Result<Status> {
+pub(crate) fn do_check(app: &App, clean: bool) -> StatusResult {
     let mut trash = Trash::compute(app.repo())?;
 
     if trash.is_empty() {

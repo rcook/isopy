@@ -24,10 +24,9 @@ use crate::args::PromptConfig;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::shell::IsopyEnv;
-use crate::status::{success_quiet, Status};
-use anyhow::Result;
+use crate::status::{success, StatusResult};
 
-pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> Result<Status> {
+pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> StatusResult {
     let isopy_env = IsopyEnv::get_vars()?;
     let env = if let Some(d) = app.find_dir_info(isopy_env.as_ref())? {
         existing(d.read_env_config())?
@@ -58,5 +57,5 @@ pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> Result<Statu
         );
     }
 
-    success_quiet!();
+    success!();
 }

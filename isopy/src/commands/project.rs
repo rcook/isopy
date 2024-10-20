@@ -23,11 +23,10 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
-use crate::status::{success, user_error, Status};
-use anyhow::Result;
+use crate::status::{success, user_error, StatusResult};
 use log::info;
 
-pub(crate) fn do_project(app: &App, package_id: &PackageId) -> Result<Status> {
+pub(crate) fn do_project(app: &App, package_id: &PackageId) -> StatusResult {
     let mut package_ids =
         existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.package_ids);
 

@@ -19,30 +19,24 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::Result;
+
 #[derive(Debug)]
 pub(crate) enum Status {
-    Success,
+    Success(Option<String>),
     UserError(String),
 }
 
-#[macro_export]
-macro_rules! success_quiet {
-    () => {
-        return ::std::result::Result::Ok($crate::status::Status::Success);
-    };
-}
-pub(crate) use success_quiet;
+pub(crate) type StatusResult = Result<Status>;
 
 #[macro_export]
 macro_rules! success {
     () => {{
-        ::log::info!("isopy completed successfully");
-        return ::std::result::Result::Ok($crate::status::Status::Success);
+        return ::std::result::Result::Ok($crate::status::Status::Success(None));
     }};
 
     ($($arg: tt)*) => {{
-        ::log::info!($($arg)*);
-        return ::std::result::Result::Ok($crate::status::Status::Success);
+        return ::std::result::Result::Ok($crate::status::Status::Success(Some(::std::format!($($arg)*))));
     }};
 }
 pub(crate) use success;

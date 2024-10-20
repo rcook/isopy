@@ -22,13 +22,12 @@
 use crate::app::App;
 use crate::env::{get_env_keys, read_env};
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
-use crate::status::{success, Status};
+use crate::status::{success, StatusResult};
 use crate::table::{table_columns, table_title};
-use anyhow::Result;
 
 const NO_VALUE: &str = "(not set)";
 
-pub(crate) fn do_info(app: &App) -> Result<Status> {
+pub(crate) fn do_info(app: &App) -> StatusResult {
     let mut table = make_prop_table();
 
     table_title!(table, "Current directory");

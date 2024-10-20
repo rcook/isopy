@@ -69,6 +69,10 @@ async fn main() -> std::process::ExitCode {
     use anyhow::Error;
     use colored::Colorize;
 
+    fn show_message(message: &str) {
+        println!("{}", message.to_string().bright_green());
+    }
+
     fn show_user_error(message: &str) {
         eprintln!("{}", message.to_string().bright_yellow());
     }
@@ -95,7 +99,11 @@ async fn main() -> std::process::ExitCode {
     const USER_ERROR: u8 = 2;
 
     match run().await {
-        Ok(Success) => ExitCode::SUCCESS,
+        Ok(Success(Some(message))) => {
+            show_message(&message);
+            ExitCode::SUCCESS
+        }
+        Ok(Success(None)) => ExitCode::SUCCESS,
         Ok(UserError(message)) => {
             show_user_error(&message);
             ExitCode::from(USER_ERROR)

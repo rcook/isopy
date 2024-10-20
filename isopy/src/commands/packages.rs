@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::moniker::Moniker;
 use crate::print::{humanize_size_base_2, make_list_table};
-use crate::status::{success, Status};
+use crate::status::{success, StatusResult};
 use crate::table::{table_columns, table_divider, table_headings, Table};
 use anyhow::bail;
 use anyhow::Result;
@@ -40,7 +40,7 @@ pub(crate) async fn do_packages(
     filter: SourceFilter,
     tag_filter: &TagFilter,
     verbose: bool,
-) -> Result<Status> {
+) -> StatusResult {
     async fn list_packages(
         table: &mut Table,
         app: &App,

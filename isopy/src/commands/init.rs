@@ -21,14 +21,13 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::status::{success, user_error, Status};
-use anyhow::Result;
+use crate::status::{success, user_error, StatusResult};
 use isopy_lib::{
     DownloadPackageOptionsBuilder, GetPackageStateOptionsBuilder, InstallPackageOptionsBuilder,
     TagFilter,
 };
 
-pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
+pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
     if app.repo().get(app.cwd())?.is_some() {
         user_error!(
             "Project in directory {} already has an environment",

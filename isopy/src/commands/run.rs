@@ -22,11 +22,10 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::{Command, IsopyEnv};
-use crate::status::{success, user_error, Status};
-use anyhow::Result;
+use crate::status::{success, user_error, StatusResult};
 use std::ffi::OsString;
 
-pub(crate) fn do_run(app: App, program: &str, args: &[String]) -> Result<Status> {
+pub(crate) fn do_run(app: App, program: &str, args: &[String]) -> StatusResult {
     let mut command = Command::new(OsString::from(program));
     for arg in args {
         command.arg(OsString::from(arg));

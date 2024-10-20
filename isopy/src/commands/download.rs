@@ -21,8 +21,7 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{success, Status};
-use anyhow::Result;
+use crate::status::{success, StatusResult};
 use isopy_lib::{DownloadPackageOptionsBuilder, TagFilter};
 use log::info;
 
@@ -30,7 +29,7 @@ pub(crate) async fn do_download(
     app: &App,
     package_id: &PackageId,
     tag_filter: &TagFilter,
-) -> Result<Status> {
+) -> StatusResult {
     let options = DownloadPackageOptionsBuilder::default()
         .show_progress(app.show_progress())
         .build()?;

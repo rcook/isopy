@@ -21,12 +21,12 @@
 //
 use crate::app::App;
 use crate::moniker::Moniker;
-use crate::status::{success, Status};
+use crate::status::{success, StatusResult};
 use anyhow::Result;
 use isopy_lib::{UpdateIndexOptions, UpdateIndexOptionsBuilder};
 use log::info;
 
-pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> StatusResult {
     async fn update_index(
         app: &App,
         moniker: &Moniker,

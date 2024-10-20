@@ -22,13 +22,12 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::{Command, IsopyEnv};
-use crate::status::{success, user_error, Status};
-use anyhow::Result;
+use crate::status::{success, user_error, StatusResult};
 use colored::Colorize;
 use ctrlc::set_handler;
 use log::info;
 
-pub(crate) fn do_shell(app: App, verbose: bool) -> Result<Status> {
+pub(crate) fn do_shell(app: App, verbose: bool) -> StatusResult {
     if let Some(isopy_env) = IsopyEnv::get_vars()? {
         if let Some(link) = app.find_link(isopy_env.link_id())? {
             user_error!(

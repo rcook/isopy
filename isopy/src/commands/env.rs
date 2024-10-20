@@ -21,11 +21,10 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{success, Status};
-use anyhow::Result;
+use crate::status::{success, StatusResult};
 use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, TagFilter};
 
-pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> Result<Status> {
+pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> StatusResult {
     let download_package_options = DownloadPackageOptionsBuilder::default()
         .show_progress(app.show_progress())
         .build()?;

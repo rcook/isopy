@@ -20,13 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::status::{success, Status};
-use anyhow::Result;
+use crate::status::{success, StatusResult};
 use log::info;
 
 #[allow(clippy::unnecessary_wraps)]
 #[allow(clippy::unused_async)]
-pub(crate) async fn do_scratch(_app: &App) -> Result<Status> {
+pub(crate) async fn do_scratch(_app: &App) -> StatusResult {
     info!("scratch");
     success!("this is a sample log message");
 }

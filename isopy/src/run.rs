@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::args::{Args, Command, PackageFilter};
 use crate::constants::CONFIG_DIR_NAME;
 use crate::env::set_up_env;
-use crate::status::Status;
+use crate::status::StatusResult;
 use crate::terminal::reset_terminal;
 use anyhow::{bail, Result};
 use clap::Parser;
@@ -54,7 +54,7 @@ fn default_config_dir() -> Option<PathBuf> {
     }
 }
 
-pub(crate) async fn run() -> Result<Status> {
+pub(crate) async fn run() -> StatusResult {
     set_up()?;
 
     let args = Args::parse();
@@ -82,7 +82,7 @@ pub(crate) async fn run() -> Result<Status> {
     run_command(app, args.command).await
 }
 
-async fn run_command(app: App, command: Command) -> Result<Status> {
+async fn run_command(app: App, command: Command) -> StatusResult {
     use crate::args::Command::*;
     use crate::commands::{
         do_check, do_completions, do_delete, do_download, do_env, do_info, do_init, do_link,
@@ -92,7 +92,7 @@ async fn run_command(app: App, command: Command) -> Result<Status> {
 
     match command {
         Check { clean, .. } => do_check(&app, clean),
-        Completions { shell } => Ok(do_completions(shell)),
+        Completions { shell } => do_completions(shell),
         Delete { project_dir } => do_delete(&app, &project_dir).await,
         Download { package_id, tags } => {
             do_download(&app, &package_id, &TagFilter::new(tags)).await

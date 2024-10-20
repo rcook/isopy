@@ -23,13 +23,13 @@ use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::print::{make_prop_table, print_link, print_metadir};
-use crate::status::{success, Status};
+use crate::status::{success, StatusResult};
 use crate::table::{table_divider, table_title};
 use anyhow::Result;
 use colored::Colorize;
 use log::info;
 
-pub(crate) fn do_list(app: &App, verbose: bool) -> Result<Status> {
+pub(crate) fn do_list(app: &App, verbose: bool) -> StatusResult {
     if verbose {
         list_verbose(app)?;
     } else {

@@ -21,12 +21,12 @@
 //
 use crate::app::App;
 use crate::moniker::Moniker;
-use crate::status::{success, Status};
+use crate::status::{success, StatusResult};
 use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{ListTagsOptions, ListTagsOptionsBuilder};
 
-pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> Result<Status> {
+pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> StatusResult {
     async fn list_tags(app: &App, moniker: &Moniker, options: &ListTagsOptions) -> Result<()> {
         let tags = app
             .plugin_manager()

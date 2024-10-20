@@ -20,15 +20,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::args::Args;
-use crate::status::Status;
+use crate::status::{success, StatusResult};
 use clap::CommandFactory;
 use clap_complete::{generate, Shell};
 use std::io::stdout;
 
-pub(crate) fn do_completions(shell: Option<Shell>) -> Status {
+pub(crate) fn do_completions(shell: Option<Shell>) -> StatusResult {
     let shell = shell.unwrap_or(Shell::Bash);
     let mut command = Args::command();
     let name = command.get_name().to_string();
     generate(shell, &mut command, name, &mut stdout());
-    Status::Success
+    success!()
 }
