@@ -24,7 +24,7 @@ use crate::version::Version;
 use std::path::PathBuf;
 use url::Url;
 
-pub struct PackageInfo {
+pub struct PackageState {
     availability: PackageAvailability,
     name: String,
     url: Url,
@@ -33,7 +33,7 @@ pub struct PackageInfo {
     path: Option<PathBuf>,
 }
 
-impl PackageInfo {
+impl PackageState {
     pub fn new<S1: Into<String>, S2: Into<String>, P: Into<PathBuf>>(
         availability: PackageAvailability,
         name: S1,
@@ -51,6 +51,7 @@ impl PackageInfo {
             path: path.map(Into::into),
         }
     }
+
     #[must_use]
     pub const fn availability(&self) -> PackageAvailability {
         self.availability

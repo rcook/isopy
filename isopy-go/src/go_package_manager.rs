@@ -26,10 +26,11 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
-    GetPackageOptions, InstallPackageError, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageAvailability, PackageInfo, PackageManagerContext,
-    PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    GetPackageStateOptions, InstallPackageError, InstallPackageOptions, ListPackageStatesOptions,
+    ListTagsOptions, Package, PackageAvailability, PackageManagerContext, PackageManagerOps,
+    PackageState, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
+use log::error;
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;
@@ -174,12 +175,12 @@ impl PackageManagerOps for GoPackageManager {
         todo!()
     }
 
-    async fn list_packages(
+    async fn list_package_states(
         &self,
         sources: SourceFilter,
         _tags: &TagFilter, // TBD
-        options: &ListPackagesOptions,
-    ) -> Result<Vec<PackageInfo>> {
+        options: &ListPackageStatesOptions,
+    ) -> Result<Vec<PackageState>> {
         use isopy_lib::SourceFilter::*;
         let filter_tags = DEFAULT_TAGS
             .into_iter()
@@ -209,12 +210,12 @@ impl PackageManagerOps for GoPackageManager {
             .collect::<Vec<_>>())
     }
 
-    async fn get_package(
+    async fn get_package_state(
         &self,
         version: &Version,
         tags: &TagFilter,
-        options: &GetPackageOptions,
-    ) -> Result<Option<PackageInfo>> {
+        options: &GetPackageStateOptions,
+    ) -> Result<Option<PackageState>> {
         let version = downcast_version!(version);
         let package = self
             .get_package_inner(false, options.show_progress, version, tags)
@@ -254,7 +255,7 @@ impl PackageManagerOps for GoPackageManager {
             .await
         else {
             let tags = tag_filter.tags(&[]);
-            log::error!("Release {version} not found with tags {tags:?}");
+            error!("Release {version} not found with tags {tags:?}");
             return Err(InstallPackageError::VersionNotFound);
         };
 

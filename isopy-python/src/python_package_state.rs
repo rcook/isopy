@@ -23,17 +23,17 @@ use crate::index::Index;
 use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
 use anyhow::Result;
-use isopy_lib::{PackageAvailability, PackageInfo, PackageManagerContext, Version};
+use isopy_lib::{Package, PackageAvailability, PackageManagerContext, PackageState, Version};
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-pub(crate) struct PythonPackageInfo {
-    pub(crate) availability: PackageAvailability,
-    pub(crate) details: PythonPackage,
-    pub(crate) path: Option<PathBuf>,
+pub(crate) struct PythonPackageState {
+    availability: PackageAvailability,
+    package: PythonPackage,
+    path: Option<PathBuf>,
 }
 
-impl PythonPackageInfo {
+impl PythonPackageState {
     pub(crate) async fn read(
         ctx: &PackageManagerContext,
         index: &Index,
@@ -42,7 +42,7 @@ impl PythonPackageInfo {
     ) -> Result<Option<Self>> {
         let mut packages = Vec::new();
         for item in index.items() {
-            for package in PythonPackage::parse_multi(&item)? {
+            for package in PythonPackage::parse_all(&item)? {
                 let m = package.metadata();
                 if m.has_tags(tags) && m.index_version().matches(version) {
                     let (availability, path) = match ctx.get_file(package.url()).await {
@@ -51,32 +51,29 @@ impl PythonPackageInfo {
                     };
                     packages.push(Self {
                         availability,
-                        details: package,
+                        package,
                         path,
                     });
                 }
             }
         }
 
-        packages.sort_by_cached_key(|p| p.details.metadata().index_version().clone());
+        packages.sort_by_cached_key(|p| p.package.metadata().index_version().clone());
         packages.reverse();
         Ok(packages.into_iter().next())
     }
 
-    pub(crate) async fn read_multi(
-        ctx: &PackageManagerContext,
-        index: &Index,
-    ) -> Result<Vec<Self>> {
+    pub(crate) async fn read_all(ctx: &PackageManagerContext, index: &Index) -> Result<Vec<Self>> {
         let mut packages = Vec::new();
         for item in index.items() {
-            for package in PythonPackage::parse_multi(&item)? {
+            for package in PythonPackage::parse_all(&item)? {
                 let (availability, path) = match ctx.get_file(package.url()).await {
                     Ok(p) => (PackageAvailability::Local, Some(p)),
                     _ => (PackageAvailability::Remote, None),
                 };
                 packages.push(Self {
                     availability,
-                    details: package,
+                    package,
                     path,
                 });
             }
@@ -84,14 +81,30 @@ impl PythonPackageInfo {
         Ok(packages)
     }
 
-    pub(crate) fn into_package_info(self) -> PackageInfo {
-        PackageInfo::new(
+    pub(crate) const fn availability(&self) -> PackageAvailability {
+        self.availability
+    }
+
+    pub(crate) const fn package(&self) -> &PythonPackage {
+        &self.package
+    }
+
+    pub(crate) const fn path(&self) -> &Option<PathBuf> {
+        &self.path
+    }
+
+    pub(crate) fn into_package(self) -> Package {
+        Package::new(self.package)
+    }
+
+    pub(crate) fn into_package_state(self) -> PackageState {
+        PackageState::new(
             self.availability,
-            self.details.metadata().name(),
-            self.details.url(),
-            Version::new(self.details.metadata().index_version().version().clone()),
+            self.package.metadata().name(),
+            self.package.url(),
+            Version::new(self.package.metadata().index_version().version().clone()),
             Some(String::from(
-                self.details
+                self.package
                     .metadata()
                     .index_version()
                     .release_group()
