@@ -65,7 +65,7 @@ mod wrapper_file_name;
 async fn main() -> std::process::ExitCode {
     use crate::env::EnvKey;
     use crate::run::run;
-    use crate::status::Status;
+    use crate::status::Status::*;
     use anyhow::Error;
     use colored::Colorize;
 
@@ -95,8 +95,8 @@ async fn main() -> std::process::ExitCode {
     const USER_ERROR: u8 = 2;
 
     match run().await {
-        Ok(Status::Success) => ExitCode::SUCCESS,
-        Ok(Status::UserError(message)) => {
+        Ok(Success) => ExitCode::SUCCESS,
+        Ok(UserError(message)) => {
             show_user_error(&message);
             ExitCode::from(USER_ERROR)
         }
