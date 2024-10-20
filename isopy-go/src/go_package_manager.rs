@@ -26,15 +26,13 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
-    GetPackageStateOptions, InstallPackageError, InstallPackageOptions, ListPackageStatesOptions,
-    ListTagsOptions, Package, PackageAvailability, PackageManagerContext, PackageManagerOps,
-    PackageState, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    GetPackageStateOptions, InstallPackageOptions, ListPackageStatesOptions, ListTagsOptions,
+    Package, PackageAvailability, PackageManagerContext, PackageManagerOps, PackageState,
+    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
-use log::error;
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;
-use std::result::Result as StdResult;
 use tokio::fs::read_to_string;
 use url::Url;
 
@@ -248,27 +246,22 @@ impl PackageManagerOps for GoPackageManager {
         tag_filter: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
-    ) -> StdResult<Package, InstallPackageError> {
+    ) -> Result<Package> {
         let version = downcast_version!(version);
         let Ok(package) = self
             .get_package_inner(false, options.show_progress, version, tag_filter)
             .await
         else {
             let tags = tag_filter.tags(&[]);
-            error!("Release {version} not found with tags {tags:?}");
-            return Err(InstallPackageError::VersionNotFound);
+            bail!("No release {version} with tags {tags:?} found");
         };
 
-        let package_path = self
-            .ctx
-            .get_file(package.url())
-            .await
-            .map_err(|_| InstallPackageError::PackageNotDownloaded)?;
+        let Ok(path) = self.ctx.get_file(package.url()).await else {
+            let tags = tag_filter.tags(&[]);
+            bail!("Failed to download release {version} with tags {tags:?}");
+        };
 
-        package
-            .archive_type()
-            .unpack(&package_path, dir, options)
-            .await?;
+        package.archive_type().unpack(&path, dir, options).await?;
 
         Ok(Package::new(package))
     }

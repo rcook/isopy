@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::InstallPackageError;
 use crate::macros::dyn_trait_struct;
 use crate::package::Package;
 use crate::package_state::PackageState;
@@ -31,7 +30,6 @@ use anyhow::Result;
 use async_trait::async_trait;
 use derive_builder::Builder;
 use std::path::Path;
-use std::result::Result as StdResult;
 
 #[derive(Builder, Default)]
 #[builder(default)]
@@ -97,7 +95,7 @@ pub trait PackageManagerOps: Send + Sync {
         tag_filter: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
-    ) -> StdResult<Package, InstallPackageError>;
+    ) -> Result<Package>;
 }
 dyn_trait_struct!(PackageManager, PackageManagerOps);
 

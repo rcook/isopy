@@ -36,6 +36,8 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
+use std::process::ExitCode;
+
 mod app;
 mod args;
 mod bool_util;
@@ -60,20 +62,47 @@ mod terminal;
 mod wrapper_file_name;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> std::process::ExitCode {
+    use crate::env::EnvKey;
     use crate::run::run;
-    use crate::status::{show_error, show_user_error, Status};
-    use std::process::exit;
+    use crate::status::Status;
+    use anyhow::Error;
+    use colored::Colorize;
 
-    exit(match run().await {
-        Ok(Status::Success) => 0,
+    fn show_user_error(message: &str) {
+        eprintln!("{}", message.to_string().bright_yellow());
+    }
+
+    fn show_error(error: &Error) {
+        eprintln!("{}", error.to_string().bright_red());
+        if EnvKey::BacktraceEnabled.is_true() {
+            eprintln!("stack backtrace:\n{}", error.backtrace());
+        } else {
+            #[cfg(debug_assertions)]
+            eprintln!(
+                "{}",
+                format!(
+                    "note: run with `{name}={value}` environment variable to display a backtrace",
+                    name = EnvKey::BacktraceEnabled,
+                    value = crate::env::BOOL_TRUE_VALUE
+                )
+                .bright_white()
+                .bold()
+            );
+        }
+    }
+
+    const USER_ERROR: u8 = 2;
+
+    match run().await {
+        Ok(Status::Success) => ExitCode::SUCCESS,
         Ok(Status::UserError(message)) => {
             show_user_error(&message);
-            2
+            ExitCode::from(USER_ERROR)
         }
         Err(e) => {
             show_error(&e);
-            1
+            ExitCode::FAILURE
         }
-    })
+    }
 }

@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::status::{report_install_package_error, success, user_error, Status};
+use crate::status::{success, user_error, Status};
 use anyhow::Result;
 use isopy_lib::{
     DownloadPackageOptionsBuilder, GetPackageStateOptionsBuilder, InstallPackageOptionsBuilder,
@@ -90,14 +90,12 @@ pub(crate) async fn do_init(app: &App, download: bool) -> Result<Status> {
         .build()?;
 
     for package_id in &project.package_ids {
-        report_install_package_error!(
-            app.install_package(
-                package_id.moniker(),
-                package_id.version(),
-                &install_package_options,
-            )
-            .await
-        );
+        app.install_package(
+            package_id.moniker(),
+            package_id.version(),
+            &install_package_options,
+        )
+        .await?;
     }
 
     success!();

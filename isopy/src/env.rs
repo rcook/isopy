@@ -63,7 +63,7 @@ impl EnvKey {
         self.get() != Err(VarError::NotPresent)
     }
 
-    pub(crate) fn to_bool(self) -> bool {
+    pub(crate) fn is_true(self) -> bool {
         self.get() == Ok(String::from(BOOL_TRUE_VALUE))
     }
 }
@@ -155,7 +155,7 @@ pub(crate) fn set_up_env() -> Result<()> {
         action.run();
     }
 
-    if EnvKey::BacktraceEnabled.to_bool() && !EnvKey::RustBacktrace.is_present() {
+    if EnvKey::BacktraceEnabled.is_true() && !EnvKey::RustBacktrace.is_present() {
         EnvKey::RustBacktrace.set("1");
     }
 

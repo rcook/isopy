@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{report_install_package_error, success, Status};
+use crate::status::{success, Status};
 use anyhow::Result;
 use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, TagFilter};
 
@@ -44,14 +44,12 @@ pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) ->
             .await?;
     }
 
-    report_install_package_error!(
-        app.install_package(
-            package_id.moniker(),
-            package_id.version(),
-            &install_package_options
-        )
-        .await
-    );
+    app.install_package(
+        package_id.moniker(),
+        package_id.version(),
+        &install_package_options,
+    )
+    .await?;
 
     success!()
 }

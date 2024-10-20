@@ -28,15 +28,13 @@ use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadFileOptionsBuilder, DownloadPackageOptions, GetPackageStateOptions,
-    InstallPackageError, InstallPackageOptions, ListPackageStatesOptions, ListTagsOptions, Package,
-    PackageAvailability, PackageManagerContext, PackageManagerOps, PackageState, SourceFilter,
-    TagFilter, Tags, UpdateIndexOptions, Version,
+    InstallPackageOptions, ListPackageStatesOptions, ListTagsOptions, Package, PackageAvailability,
+    PackageManagerContext, PackageManagerOps, PackageState, SourceFilter, TagFilter, Tags,
+    UpdateIndexOptions, Version,
 };
-use log::error;
 use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::path::Path;
-use std::result::Result as StdResult;
 use tokio::fs::read_to_string;
 use url::Url;
 
@@ -205,7 +203,7 @@ impl PackageManagerOps for PythonPackageManager {
         let tags = tag_filter.tags(&DEFAULT_TAGS);
         let Some(state) = PythonPackageState::read(&self.ctx, &index, version, &tags).await? else {
             bail!(
-                "No package with ID {moniker}:{version} and tags {tags:?} found",
+                "No package with ID {moniker}:{version} and tags {tags:?} found in index",
                 moniker = self.moniker
             );
         };
@@ -229,20 +227,22 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         dir: &Path,
         options: &InstallPackageOptions,
-    ) -> StdResult<Package, InstallPackageError> {
+    ) -> Result<Package> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
         let tags = tag_filter.tags(&DEFAULT_TAGS);
         let Some(state) = PythonPackageState::read(&self.ctx, &index, version, &tags).await? else {
-            error!(
-                "No package with ID {moniker}:{version} and tags {tags:?} found",
+            bail!(
+                "No package with ID {moniker}:{version} and tags {tags:?} found in index",
                 moniker = self.moniker
             );
-            return Err(InstallPackageError::VersionNotFound);
         };
 
         let Some(path) = state.path() else {
-            return Err(InstallPackageError::PackageNotDownloaded);
+            bail!(
+                "Package with ID {moniker}:{version} and tags {tags:?} not downloaded",
+                moniker = self.moniker
+            );
         };
 
         state

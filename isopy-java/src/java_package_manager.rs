@@ -24,7 +24,7 @@ use crate::serialization::versions_response::VersionsResponse;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, GetPackageStateOptions, InstallPackageError, InstallPackageOptions,
+    DownloadPackageOptions, GetPackageStateOptions, InstallPackageOptions,
     ListPackageStatesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
     PackageManagerContext, PackageManagerOps, PackageState, ProgressIndicator,
     ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
@@ -33,7 +33,6 @@ use reqwest::Client;
 use std::fs::{read_dir, File};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
-use std::result::Result as StdResult;
 use tokio::fs::write;
 use url::Url;
 
@@ -172,7 +171,7 @@ impl PackageManagerOps for JavaPackageManager {
         _tags: &TagFilter,
         _dir: &Path,
         _options: &InstallPackageOptions,
-    ) -> StdResult<Package, InstallPackageError> {
+    ) -> Result<Package> {
         todo!()
     }
 }
