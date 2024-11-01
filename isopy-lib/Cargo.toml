@@ -12,7 +12,7 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.4.4"
 
 [dependencies]
-anyhow = "1.0.89"
+anyhow = "1.0.92"
 async-trait = "0.1.82"
 decompress = { git = "https://github.com/rcook/decompress.git", rev = "c00c3b288e430eeffe78d3ba44952cf93697b1f0" }
 derive_builder = "0.20.1"
