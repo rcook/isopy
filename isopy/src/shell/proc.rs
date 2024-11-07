@@ -27,7 +27,7 @@ pub(crate) fn get_pid() -> Result<Pid> {
 }
 
 pub(crate) fn get_process_from_pid(system: &mut System, pid: Pid) -> Result<&Process> {
-    if system.refresh_processes(ProcessesToUpdate::Some(&[pid])) == 1 {
+    if system.refresh_processes(ProcessesToUpdate::Some(&[pid]), true) == 1 {
         system
             .process(pid)
             .ok_or_else(|| anyhow!("Failed to get process info"))
