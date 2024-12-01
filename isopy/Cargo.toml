@@ -47,7 +47,7 @@ openssl-sys = { version = "0.9.104", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
-sysinfo = "0.32.0"
+sysinfo = "0.32.1"
 
 [dev-dependencies]
 rstest = "0.23.0"
