@@ -31,7 +31,7 @@ joatmon = "0.0.34"
 log = { version = "0.4.22", features = ["std"] }
 path-absolutize = "3.1.1"
 reqwest = { version = "0.12.9", features = ["stream"] }
-serde = { version = "1.0.215", features = ["derive"] }
+serde = { version = "1.0.217", features = ["derive"] }
 serde_yaml = "0.9.34"
 tinytemplate = "1.2.1"
 tokio = { version = "1.42.0", features = ["macros", "rt-multi-thread"] }
