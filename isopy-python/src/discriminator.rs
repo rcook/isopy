@@ -29,7 +29,7 @@ pub(crate) enum Discriminator {
 
 impl Discriminator {
     pub(crate) fn parse(s: &str) -> (Self, &str) {
-        if let Some(i) = s.find("a") {
+        if let Some(i) = s.find('a') {
             return (Self::String(String::from(&s[i..])), &s[0..i]);
         }
         if let Some(i) = s.find("rc") {
