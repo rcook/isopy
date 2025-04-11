@@ -53,7 +53,7 @@ This tool is similar in philosophy to the following projects:
 [latest-release]: https://github.com/rcook/isopy/releases
 [pyenv]: https://github.com/pyenv/pyenv
 [pyenv-win]: https://github.com/pyenv-win/pyenv-win
-[python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
+[python-build-standalone-releases]: https://github.com/astral-sh/python-build-standalone/releases
 [rbenv]: https://github.com/rbenv/rbenv
 [release-workflow]: https://github.com/rcook/isopy/actions/workflows/release.yaml
 [releases]: https://github.com/rcook/isopyrs/releases

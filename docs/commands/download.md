@@ -6,4 +6,4 @@ Downloads package from sources such as [Python Standalone Builds][python-build-s
 or [Adoptium][adoptium].
 
 [adoptium]: https://adoptium.net/
-[python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
+[python-build-standalone-releases]: https://github.com/astral-sh/python-build-standalone/releases

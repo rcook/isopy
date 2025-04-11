@@ -12,4 +12,4 @@ and can hit GitHub rate-limiting issues if called too frequently. isopy will
 check for updates on each.
 
 [adoptium]: https://adoptium.net/
-[python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
+[python-build-standalone-releases]: https://github.com/astral-sh/python-build-standalone/releases

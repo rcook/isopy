@@ -10,6 +10,6 @@ Manages multiple isolated versions of Python obtained from
 _[Usage](usage.md) \| [Concepts](concepts.md) \| [Cookbook](cookbook.md) \| [Developers][readme] \| [Issues][issues]_
 
 [issues]: https://github.com/rcook/isopy/issues
-[python-build-standalone-releases]: https://github.com/indygreg/python-build-standalone/releases
+[python-build-standalone-releases]: https://github.com/astral-sh/python-build-standalone/releases
 [readme]: https://github.com/rcook/isopy/blob/main/README.md
 [releases]: https://github.com/rcook/isopy/releases

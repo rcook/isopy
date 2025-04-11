@@ -31,7 +31,7 @@ use std::sync::LazyLock;
 use url::Url;
 
 static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
-    "https://api.github.com/repos/indygreg/python-build-standalone/releases"
+    "https://api.github.com/repos/astral-sh/python-build-standalone/releases"
         .parse()
         .expect("Invalid index URL")
 });

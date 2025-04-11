@@ -43,4 +43,4 @@ Think of these as symlinks for environments. With these you can
 associate an environment with a given directory without the need for an
 intrusive `.python-version.yaml` file.
 
-[python-standalone-builds]: https://github.com/indygreg/python-build-standalone/releases
+[python-standalone-builds]: https://github.com/astral-sh/python-build-standalone/releases
