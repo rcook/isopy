@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::discriminator::Discriminator;
+use crate::python_version::PythonVersion;
 use crate::release_group::ReleaseGroup;
-use crate::{discriminator::Discriminator, python_version::PythonVersion};
 use anyhow::{bail, Result};
 use isopy_lib::VersionTriple;
 use std::collections::HashSet;
@@ -136,5 +137,45 @@ impl PythonIndexVersion {
         }
 
         true
+    }
+}
+
+// Could not determine package version from tags {"aarch64", "debug", "full", "3.14.0a6+20250409", "darwin", "apple"}
+
+#[cfg(test)]
+mod tests {
+    use crate::{discriminator::Discriminator, python_index_version::PythonIndexVersion};
+    use anyhow::Result;
+    use isopy_lib::VersionTriple;
+    use std::collections::HashSet;
+
+    #[test]
+    fn basics() -> Result<()> {
+        let mut tags = vec![
+            "aarch64",
+            "debug",
+            "full",
+            "3.14.0a6+20250409",
+            "darwin",
+            "apple",
+        ]
+        .into_iter()
+        .map(String::from)
+        .collect::<HashSet<_>>();
+        let result = PythonIndexVersion::from_tags(&mut tags)?;
+        assert_eq!(
+            VersionTriple {
+                major: 3,
+                minor: 14,
+                revision: 0
+            },
+            result.version
+        );
+        assert_eq!(
+            Discriminator::String(String::from("a6")),
+            result.discriminator
+        );
+        assert_eq!("20250409", result.release_group.as_str());
+        Ok(())
     }
 }

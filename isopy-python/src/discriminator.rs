@@ -29,10 +29,13 @@ pub(crate) enum Discriminator {
 
 impl Discriminator {
     pub(crate) fn parse(s: &str) -> (Self, &str) {
-        s.find("rc").map_or_else(
-            || (Self::None, s),
-            |i| (Self::String(String::from(&s[i..])), &s[0..i]),
-        )
+        if let Some(i) = s.find("a") {
+            return (Self::String(String::from(&s[i..])), &s[0..i]);
+        }
+        if let Some(i) = s.find("rc") {
+            return (Self::String(String::from(&s[i..])), &s[0..i]);
+        }
+        (Self::None, s)
     }
 }
 
@@ -43,5 +46,34 @@ impl Display for Discriminator {
             Self::None => {}
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::too_many_arguments)]
+    use super::Discriminator;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(
+        Discriminator::String(String::from("rc2+20240909")),
+        "3.13.0",
+        "3.13.0rc2+20240909"
+    )]
+    #[case(
+        Discriminator::String(String::from("a6+20250409")),
+        "3.14.0",
+        "3.14.0a6+20250409"
+    )]
+    #[case(Discriminator::None, "3.10.13+20231002", "3.10.13+20231002")]
+    fn basics(
+        #[case] expected_discriminator: Discriminator,
+        #[case] expected_version_str: &str,
+        #[case] input: &str,
+    ) {
+        let result = Discriminator::parse(input);
+        assert_eq!(expected_discriminator, result.0);
+        assert_eq!(expected_version_str, result.1);
     }
 }
