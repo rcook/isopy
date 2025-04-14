@@ -62,7 +62,7 @@ impl FromStr for PythonVersion {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        let (prefix, group) = match s.rsplit_once(':') {
+        let (prefix, release_group) = match s.rsplit_once(':') {
             Some((prefix, suffix)) => (prefix, Some(suffix.parse()?)),
             None => (s, None),
         };
@@ -72,7 +72,7 @@ impl FromStr for PythonVersion {
         Ok(Self {
             version,
             discriminant,
-            release_group: group,
+            release_group,
         })
     }
 }
