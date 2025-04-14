@@ -19,26 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::discriminator::Discriminator;
+use crate::discriminant::Discriminant;
 use isopy_lib::{VersionOps, VersionTriple};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct VersionWithDiscriminator {
+pub(crate) struct VersionWithDiscriminant {
     pub(crate) version: VersionTriple,
-    pub(crate) discriminator: Discriminator,
+    pub(crate) discriminant: Discriminant,
 }
 
-impl Display for VersionWithDiscriminator {
+impl Display for VersionWithDiscriminant {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match &self.discriminator {
-            Discriminator::String(s) => write!(f, "{}{}", self.version, s),
+        match &self.discriminant {
+            Discriminant::String(s) => write!(f, "{}{}", self.version, s),
             _ => write!(f, "{}", self.version),
         }
     }
 }
 
-impl VersionOps for VersionWithDiscriminator {
+impl VersionOps for VersionWithDiscriminant {
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }

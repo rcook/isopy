@@ -19,19 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::discriminant::Discriminant;
+use crate::release_group::ReleaseGroup;
 use anyhow::Error;
 use isopy_lib::{VersionOps, VersionTriple};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
-use crate::discriminator::Discriminator;
-use crate::release_group::ReleaseGroup;
-
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonVersion {
     version: VersionTriple,
-    discriminator: Discriminator,
+    discriminant: Discriminant,
     release_group: Option<ReleaseGroup>,
 }
 
@@ -40,8 +39,8 @@ impl PythonVersion {
         &self.version
     }
 
-    pub(crate) const fn discriminator(&self) -> &Discriminator {
-        &self.discriminator
+    pub(crate) const fn discriminant(&self) -> &Discriminant {
+        &self.discriminant
     }
 
     pub(crate) const fn release_group(&self) -> &Option<ReleaseGroup> {
@@ -51,7 +50,7 @@ impl PythonVersion {
 
 impl Display for PythonVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}{}", self.version, self.discriminator)?;
+        write!(f, "{}{}", self.version, self.discriminant)?;
         if let Some(group) = &self.release_group {
             write!(f, ":{}", group.as_str())?;
         }
@@ -68,11 +67,11 @@ impl FromStr for PythonVersion {
             None => (s, None),
         };
 
-        let (discriminator, prefix) = Discriminator::parse(prefix);
+        let (discriminant, prefix) = Discriminant::parse(prefix);
         let version = prefix.parse()?;
         Ok(Self {
             version,
-            discriminator,
+            discriminant,
             release_group: group,
         })
     }

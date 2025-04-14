@@ -22,12 +22,12 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) enum Discriminator {
+pub(crate) enum Discriminant {
     String(String),
     None,
 }
 
-impl Discriminator {
+impl Discriminant {
     pub(crate) fn parse(s: &str) -> (Self, &str) {
         if let Some(i) = s.find('a') {
             return (Self::String(String::from(&s[i..])), &s[0..i]);
@@ -39,7 +39,7 @@ impl Discriminator {
     }
 }
 
-impl Display for Discriminator {
+impl Display for Discriminant {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
             Self::String(value) => write!(f, "{value}")?,
@@ -52,28 +52,28 @@ impl Display for Discriminator {
 #[cfg(test)]
 mod tests {
     #![allow(clippy::too_many_arguments)]
-    use super::Discriminator;
+    use super::Discriminant;
     use rstest::rstest;
 
     #[rstest]
     #[case(
-        Discriminator::String(String::from("rc2+20240909")),
+        Discriminant::String(String::from("rc2+20240909")),
         "3.13.0",
         "3.13.0rc2+20240909"
     )]
     #[case(
-        Discriminator::String(String::from("a6+20250409")),
+        Discriminant::String(String::from("a6+20250409")),
         "3.14.0",
         "3.14.0a6+20250409"
     )]
-    #[case(Discriminator::None, "3.10.13+20231002", "3.10.13+20231002")]
+    #[case(Discriminant::None, "3.10.13+20231002", "3.10.13+20231002")]
     fn basics(
-        #[case] expected_discriminator: Discriminator,
+        #[case] expected_discriminant: Discriminant,
         #[case] expected_version_str: &str,
         #[case] input: &str,
     ) {
-        let result = Discriminator::parse(input);
-        assert_eq!(expected_discriminator, result.0);
+        let result = Discriminant::parse(input);
+        assert_eq!(expected_discriminant, result.0);
         assert_eq!(expected_version_str, result.1);
     }
 }

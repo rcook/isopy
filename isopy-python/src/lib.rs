@@ -38,7 +38,7 @@
 
 mod checksum;
 mod constants;
-mod discriminator;
+mod discriminant;
 mod entrypoint;
 mod index;
 mod item;
@@ -50,6 +50,6 @@ mod python_package_state;
 mod python_plugin;
 mod python_version;
 mod release_group;
-mod version_with_discriminator;
+mod version_with_discriminant;
 
 pub use entrypoint::new_plugin;

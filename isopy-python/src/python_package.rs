@@ -67,12 +67,7 @@ impl PythonPackage {
     }
 
     pub(crate) fn new(url: &Url, metadata: Metadata) -> Self {
-        let version = Version::new(
-            metadata
-                .index_version()
-                .version_with_discriminator()
-                .clone(),
-        );
+        let version = Version::new(metadata.index_version().version().clone());
         Self {
             url: url.clone(),
             metadata,

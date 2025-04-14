@@ -19,16 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::discriminator::Discriminator;
+use crate::discriminant::Discriminant;
 use crate::python_version::PythonVersion;
 use crate::release_group::ReleaseGroup;
-use crate::version_with_discriminator::VersionWithDiscriminator;
+use crate::version_with_discriminant::VersionWithDiscriminant;
 use anyhow::{bail, Result};
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonIndexVersion {
-    version_with_discriminator: VersionWithDiscriminator,
+    version: VersionWithDiscriminant,
     release_group: ReleaseGroup,
 }
 
@@ -36,26 +36,26 @@ impl PythonIndexVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut result = None;
         let mut version = None;
-        let mut discriminator = None;
+        let mut discriminant = None;
         let mut release_group = None;
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
-                let (temp_discriminator, version_str) = Discriminator::parse(prefix);
+                let (temp_discriminant, version_str) = Discriminant::parse(prefix);
                 if let Ok(temp_version) = version_str.parse() {
                     if let Ok(temp_release_group) = suffix.parse() {
                         assert!(
                             result.is_none()
                                 && version.is_none()
-                                && discriminator.is_none()
+                                && discriminant.is_none()
                                 && release_group.is_none()
                         );
                         tags_to_remove.push(tag.clone());
                         result = Some(Self {
-                            version_with_discriminator: VersionWithDiscriminator {
+                            version: VersionWithDiscriminant {
                                 version: temp_version,
-                                discriminator: temp_discriminator,
+                                discriminant: temp_discriminant,
                             },
                             release_group: temp_release_group,
                         });
@@ -64,12 +64,12 @@ impl PythonIndexVersion {
                 }
             }
 
-            let (temp_discriminator, version_str) = Discriminator::parse(tag);
+            let (temp_discriminant, version_str) = Discriminant::parse(tag);
             if let Ok(temp_version) = version_str.parse() {
-                assert!(result.is_none() && version.is_none() && discriminator.is_none());
+                assert!(result.is_none() && version.is_none() && discriminant.is_none());
                 tags_to_remove.push(tag.clone());
                 version = Some(temp_version);
-                discriminator = Some(temp_discriminator);
+                discriminant = Some(temp_discriminant);
                 if release_group.is_some() {
                     break;
                 }
@@ -103,16 +103,16 @@ impl PythonIndexVersion {
         };
 
         Ok(Self {
-            version_with_discriminator: VersionWithDiscriminator {
+            version: VersionWithDiscriminant {
                 version,
-                discriminator: Discriminator::None,
+                discriminant: Discriminant::None,
             },
             release_group,
         })
     }
 
-    pub(crate) const fn version_with_discriminator(&self) -> &VersionWithDiscriminator {
-        &self.version_with_discriminator
+    pub(crate) const fn version(&self) -> &VersionWithDiscriminant {
+        &self.version
     }
 
     pub(crate) const fn release_group(&self) -> &ReleaseGroup {
@@ -120,11 +120,11 @@ impl PythonIndexVersion {
     }
 
     pub(crate) fn matches(&self, other: &PythonVersion) -> bool {
-        if self.version_with_discriminator.version != *other.version() {
+        if self.version.version != *other.version() {
             return false;
         }
 
-        if self.version_with_discriminator.discriminator != *other.discriminator() {
+        if self.version.discriminant != *other.discriminant() {
             return false;
         }
 
@@ -142,7 +142,7 @@ impl PythonIndexVersion {
 
 #[cfg(test)]
 mod tests {
-    use crate::{discriminator::Discriminator, python_index_version::PythonIndexVersion};
+    use crate::{discriminant::Discriminant, python_index_version::PythonIndexVersion};
     use anyhow::Result;
     use isopy_lib::VersionTriple;
     use std::collections::HashSet;
@@ -167,11 +167,11 @@ mod tests {
                 minor: 14,
                 revision: 0
             },
-            result.version_with_discriminator.version
+            result.version.version
         );
         assert_eq!(
-            Discriminator::String(String::from("a6")),
-            result.version_with_discriminator.discriminator
+            Discriminant::String(String::from("a6")),
+            result.version.discriminant
         );
         assert_eq!("20250409", result.release_group.as_str());
         Ok(())

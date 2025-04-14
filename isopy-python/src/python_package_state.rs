@@ -102,13 +102,7 @@ impl PythonPackageState {
             self.availability,
             self.package.metadata().name(),
             self.package.url(),
-            Version::new(
-                self.package
-                    .metadata()
-                    .index_version()
-                    .version_with_discriminator()
-                    .clone(),
-            ),
+            Version::new(self.package.metadata().index_version().version().clone()),
             Some(String::from(
                 self.package
                     .metadata()
