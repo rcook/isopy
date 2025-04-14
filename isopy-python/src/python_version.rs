@@ -79,3 +79,49 @@ impl VersionOps for PythonVersion {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::PythonVersion;
+    use crate::discriminant::Discriminant;
+    use crate::prerelease_type::PrereleaseType;
+    use crate::release_group::ReleaseGroup;
+    use anyhow::Result;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(1, 2, 3, Discriminant::None, None, "1.2.3")]
+    #[case(
+        1,
+        2,
+        3,
+        Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 5),
+        None,
+        "1.2.3rc5"
+    )]
+    #[case(
+        1,
+        2,
+        3,
+        Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 2),
+        Some("20250414".parse::<ReleaseGroup>().expect("Must succeed")),
+        "1.2.3rc2:20250414"
+    )]
+    fn basics(
+        #[case] expected_major: i32,
+        #[case] expected_minor: i32,
+        #[case] expected_revision: i32,
+        #[case] expected_discriminant: Discriminant,
+        #[case] expected_release_group: Option<ReleaseGroup>,
+        #[case] input: &str,
+    ) -> Result<()> {
+        let result = input.parse::<PythonVersion>()?;
+        let version = result.version();
+        assert_eq!(expected_major, version.version.major);
+        assert_eq!(expected_minor, version.version.minor);
+        assert_eq!(expected_revision, version.version.revision);
+        assert_eq!(expected_discriminant, version.discriminant);
+        assert_eq!(expected_release_group, result.release_group);
+        Ok(())
+    }
+}
