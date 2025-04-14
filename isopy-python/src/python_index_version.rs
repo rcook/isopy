@@ -118,8 +118,6 @@ impl PythonIndexVersion {
     }
 }
 
-// Could not determine package version from tags {"aarch64", "debug", "full", "3.14.0a6+20250409", "darwin", "apple"}
-
 #[cfg(test)]
 mod tests {
     use super::PythonIndexVersion;
