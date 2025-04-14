@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::version::VersionOps;
 use anyhow::{bail, Error};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
@@ -56,16 +55,6 @@ impl FromStr for VersionTriple {
             minor,
             revision,
         })
-    }
-}
-
-impl VersionOps for VersionTriple {
-    fn box_clone(&self) -> Box<dyn VersionOps> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
     }
 }
 

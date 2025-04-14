@@ -22,14 +22,13 @@
 use crate::discriminator::Discriminator;
 use crate::python_version::PythonVersion;
 use crate::release_group::ReleaseGroup;
+use crate::version_with_discriminator::VersionWithDiscriminator;
 use anyhow::{bail, Result};
-use isopy_lib::VersionTriple;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonIndexVersion {
-    version: VersionTriple,
-    discriminator: Discriminator,
+    version_with_discriminator: VersionWithDiscriminator,
     release_group: ReleaseGroup,
 }
 
@@ -54,8 +53,10 @@ impl PythonIndexVersion {
                         );
                         tags_to_remove.push(tag.clone());
                         result = Some(Self {
-                            version: temp_version,
-                            discriminator: temp_discriminator,
+                            version_with_discriminator: VersionWithDiscriminator {
+                                version: temp_version,
+                                discriminator: temp_discriminator,
+                            },
                             release_group: temp_release_group,
                         });
                         break;
@@ -102,19 +103,16 @@ impl PythonIndexVersion {
         };
 
         Ok(Self {
-            version,
-            discriminator: Discriminator::None,
+            version_with_discriminator: VersionWithDiscriminator {
+                version,
+                discriminator: Discriminator::None,
+            },
             release_group,
         })
     }
 
-    pub(crate) const fn version(&self) -> &VersionTriple {
-        &self.version
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn discriminator(&self) -> &Discriminator {
-        &self.discriminator
+    pub(crate) const fn version_with_discriminator(&self) -> &VersionWithDiscriminator {
+        &self.version_with_discriminator
     }
 
     pub(crate) const fn release_group(&self) -> &ReleaseGroup {
@@ -122,11 +120,11 @@ impl PythonIndexVersion {
     }
 
     pub(crate) fn matches(&self, other: &PythonVersion) -> bool {
-        if self.version != *other.version() {
+        if self.version_with_discriminator.version != *other.version() {
             return false;
         }
 
-        if self.discriminator != *other.discriminator() {
+        if self.version_with_discriminator.discriminator != *other.discriminator() {
             return false;
         }
 
@@ -169,11 +167,11 @@ mod tests {
                 minor: 14,
                 revision: 0
             },
-            result.version
+            result.version_with_discriminator.version
         );
         assert_eq!(
             Discriminator::String(String::from("a6")),
-            result.discriminator
+            result.version_with_discriminator.discriminator
         );
         assert_eq!("20250409", result.release_group.as_str());
         Ok(())
