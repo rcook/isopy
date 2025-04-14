@@ -12,13 +12,13 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.4.6"
 
 [dependencies]
-anyhow = { version = "1.0.95", features = ["backtrace"] }
-async-trait = "0.1.86"
-clap = { version = "4.5.27", features = ["derive", "env"] }
-clap_complete = "4.5.44"
-chrono = "0.4.39"
+anyhow = { version = "1.0.98", features = ["backtrace"] }
+async-trait = "0.1.88"
+clap = { version = "4.5.36", features = ["derive", "env"] }
+clap_complete = "4.5.47"
+chrono = "0.4.40"
 colored = "3.0.0"
-ctrlc = "3.4.5"
+ctrlc = "3.4.6"
 dirs = "6.0.0"
 futures-util = "0.3.31"
 isopy-go = { path = "../isopy-go" }
@@ -28,26 +28,26 @@ isopy-python = { path = "../isopy-python" }
 joat-logger = "0.0.5"
 joat-repo = "0.0.12"
 joatmon = "0.0.34"
-log = { version = "0.4.25", features = ["std"] }
+log = { version = "0.4.27", features = ["std"] }
 path-absolutize = "3.1.1"
-reqwest = { version = "0.12.12", features = ["stream"] }
-serde = { version = "1.0.217", features = ["derive"] }
+reqwest = { version = "0.12.15", features = ["stream"] }
+serde = { version = "1.0.219", features = ["derive"] }
 serde_yaml = "0.9.34"
 tinytemplate = "1.2.1"
-tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.44.2", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.5.4", features = ["serde"] }
-strum_macros = "0.26.4"
-strum = "0.26.3"
+strum_macros = "0.27.1"
+strum = "0.27.1"
 
 [target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
 exec = "0.3.1"
 
 [target."cfg(target_os = \"linux\")".dependencies]
-openssl-sys = { version = "0.9.105", features = ["vendored"] }
+openssl-sys = { version = "0.9.107", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
-sysinfo = "0.33.1"
+sysinfo = "0.34.2"
 
 [dev-dependencies]
-rstest = "0.24.0"
+rstest = "0.25.0"
