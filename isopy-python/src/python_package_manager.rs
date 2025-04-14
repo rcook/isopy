@@ -42,7 +42,7 @@ macro_rules! downcast_version {
     ($version : expr) => {
         $version
             .as_any()
-            .downcast_ref::<$crate::project_version::ProjectVersion>()
+            .downcast_ref::<$crate::python_version::PythonVersion>()
             .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
     };
 }
@@ -117,9 +117,9 @@ impl PackageManagerOps for PythonPackageManager {
         for item in index.items() {
             for package in PythonPackage::parse_all(&item)? {
                 tags.extend(package.metadata().tags().to_owned());
-                other_tags.insert(String::from(
-                    package.metadata().index_version().release_group().as_str(),
-                ));
+                if let Some(release_group) = package.metadata().version().release_group() {
+                    other_tags.insert(String::from(release_group.as_str()));
+                }
             }
         }
 
@@ -169,8 +169,8 @@ impl PackageManagerOps for PythonPackageManager {
             }
             b.package()
                 .metadata()
-                .index_version()
-                .cmp(a.package().metadata().index_version())
+                .version()
+                .cmp(a.package().metadata().version())
         });
 
         Ok(states

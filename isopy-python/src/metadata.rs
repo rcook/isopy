@@ -19,11 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::full_version::FullVersion;
+use crate::python_version::PythonVersion;
 use anyhow::{anyhow, bail, Error};
 use isopy_lib::ArchiveType;
 use std::collections::HashSet;
-use std::iter::once;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
@@ -31,7 +30,7 @@ use std::str::FromStr;
 pub(crate) struct Metadata {
     name: String,
     archive_type: ArchiveType,
-    index_version: FullVersion,
+    version: PythonVersion,
     tags: HashSet<String>,
 }
 
@@ -44,8 +43,8 @@ impl Metadata {
         &self.archive_type
     }
 
-    pub(crate) const fn index_version(&self) -> &FullVersion {
-        &self.index_version
+    pub(crate) const fn version(&self) -> &PythonVersion {
+        &self.version
     }
 
     pub(crate) const fn tags(&self) -> &HashSet<String> {
@@ -53,12 +52,12 @@ impl Metadata {
     }
 
     pub(crate) fn has_tags(&self, tags: &HashSet<&str>) -> bool {
-        self.tags
-            .iter()
-            .map(String::as_str)
-            .chain(once(self.index_version.release_group().as_str()))
-            .collect::<HashSet<_>>()
-            .is_superset(tags)
+        // TBD: How do we cache this?
+        let mut all_tags = self.tags.iter().map(String::as_str).collect::<HashSet<_>>();
+        if let Some(release_group) = self.version.release_group() {
+            all_tags.insert(release_group.as_str());
+        }
+        all_tags.is_superset(tags)
     }
 }
 
@@ -76,11 +75,11 @@ impl FromStr for Metadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let index_version = FullVersion::from_tags(&mut tags)?;
+        let version = PythonVersion::from_tags(&mut tags)?;
         Ok(Self {
             name,
             archive_type,
-            index_version,
+            version,
             tags,
         })
     }

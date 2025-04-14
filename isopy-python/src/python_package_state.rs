@@ -20,8 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::index::Index;
-use crate::project_version::ProjectVersion;
 use crate::python_package::PythonPackage;
+use crate::python_version::PythonVersion;
+use crate::release_group::ReleaseGroup;
 use anyhow::Result;
 use isopy_lib::{Package, PackageAvailability, PackageManagerContext, PackageState, Version};
 use std::collections::HashSet;
@@ -37,14 +38,14 @@ impl PythonPackageState {
     pub(crate) async fn read(
         ctx: &PackageManagerContext,
         index: &Index,
-        version: &ProjectVersion,
+        version: &PythonVersion,
         tags: &HashSet<&str>,
     ) -> Result<Option<Self>> {
         let mut packages = Vec::new();
         for item in index.items() {
             for package in PythonPackage::parse_all(&item)? {
                 let m = package.metadata();
-                if m.has_tags(tags) && m.index_version().matches(version) {
+                if m.has_tags(tags) && m.version().matches(version) {
                     let (availability, path) = match ctx.get_file(package.url()).await {
                         Ok(p) => (PackageAvailability::Local, Some(p)),
                         _ => (PackageAvailability::Remote, None),
@@ -58,7 +59,7 @@ impl PythonPackageState {
             }
         }
 
-        packages.sort_by_cached_key(|p| p.package.metadata().index_version().clone());
+        packages.sort_by_cached_key(|p| p.package.metadata().version().clone());
         packages.reverse();
         Ok(packages.into_iter().next())
     }
@@ -98,18 +99,19 @@ impl PythonPackageState {
     }
 
     pub(crate) fn into_package_state(self) -> PackageState {
+        let label = self
+            .package
+            .metadata()
+            .version()
+            .release_group()
+            .as_ref()
+            .map(ReleaseGroup::as_str);
         PackageState::new(
             self.availability,
             self.package.metadata().name(),
             self.package.url(),
-            Version::new(self.package.metadata().index_version().version().clone()),
-            Some(String::from(
-                self.package
-                    .metadata()
-                    .index_version()
-                    .release_group()
-                    .as_str(),
-            )),
+            Version::new(self.package.metadata().version().version().clone()),
+            label,
             self.path,
         )
     }

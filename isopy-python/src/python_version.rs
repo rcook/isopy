@@ -20,18 +20,21 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::base_version::BaseVersion;
-use crate::project_version::ProjectVersion;
 use crate::release_group::ReleaseGroup;
-use anyhow::{bail, Result};
+use anyhow::{bail, Error, Result};
+use isopy_lib::VersionOps;
 use std::collections::HashSet;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::result::Result as StdResult;
+use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct FullVersion {
+pub(crate) struct PythonVersion {
     version: BaseVersion,
-    release_group: ReleaseGroup,
+    release_group: Option<ReleaseGroup>,
 }
 
-impl FullVersion {
+impl PythonVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut result = None;
         let mut version = None;
@@ -46,7 +49,7 @@ impl FullVersion {
                         tags_to_remove.push(tag.clone());
                         result = Some(Self {
                             version: temp_version,
-                            release_group: temp_release_group,
+                            release_group: Some(temp_release_group),
                         });
                         break;
                     }
@@ -91,7 +94,7 @@ impl FullVersion {
 
         Ok(Self {
             version,
-            release_group,
+            release_group: Some(release_group),
         })
     }
 
@@ -99,18 +102,19 @@ impl FullVersion {
         &self.version
     }
 
-    pub(crate) const fn release_group(&self) -> &ReleaseGroup {
+    pub(crate) const fn release_group(&self) -> &Option<ReleaseGroup> {
         &self.release_group
     }
 
-    pub(crate) fn matches(&self, other: &ProjectVersion) -> bool {
+    pub(crate) fn matches(&self, other: &Self) -> bool {
         if self.version != *other.version() {
             return false;
         }
 
         if let Some(other_release_group) = other.release_group() {
-            if self.release_group != *other_release_group {
-                return false;
+            match &self.release_group {
+                Some(release_group) if release_group == other_release_group => {}
+                _ => return false,
             }
         }
 
@@ -118,42 +122,85 @@ impl FullVersion {
     }
 }
 
+impl Display for PythonVersion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        write!(f, "{}", self.version)?;
+        if let Some(release_group) = &self.release_group {
+            write!(f, ":{}", release_group.as_str())?;
+        }
+        Ok(())
+    }
+}
+
+impl FromStr for PythonVersion {
+    type Err = Error;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        let (prefix, release_group) = match s.rsplit_once(':') {
+            Some((prefix, suffix)) => (prefix, Some(suffix.parse()?)),
+            None => (s, None),
+        };
+
+        let version = BaseVersion::parse(prefix)?;
+        Ok(Self {
+            version,
+            release_group,
+        })
+    }
+}
+
+impl VersionOps for PythonVersion {
+    fn box_clone(&self) -> Box<dyn VersionOps> {
+        Box::new(self.clone())
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::FullVersion;
+    use super::PythonVersion;
     use crate::discriminant::Discriminant;
     use crate::prerelease_kind::PrereleaseKind;
+    use crate::release_group::ReleaseGroup;
     use anyhow::Result;
-    use isopy_lib::Triple;
-    use std::collections::HashSet;
+    use rstest::rstest;
 
-    #[test]
-    fn basics() -> Result<()> {
-        let mut tags = vec![
-            "aarch64",
-            "debug",
-            "full",
-            "3.14.0a6+20250409",
-            "darwin",
-            "apple",
-        ]
-        .into_iter()
-        .map(String::from)
-        .collect::<HashSet<_>>();
-        let result = FullVersion::from_tags(&mut tags)?;
-        assert_eq!(
-            Triple {
-                major: 3,
-                minor: 14,
-                revision: 0
-            },
-            result.version.triple
-        );
-        assert_eq!(
-            Discriminant::prerelease(PrereleaseKind::Alpha, 6),
-            result.version.discriminant
-        );
-        assert_eq!("20250409", result.release_group.as_str());
+    #[rstest]
+    #[case(1, 2, 3, Discriminant::None, None, "1.2.3")]
+    #[case(
+        1,
+        2,
+        3,
+        Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 5),
+        None,
+        "1.2.3rc5"
+    )]
+    #[case(
+        1,
+        2,
+        3,
+        Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 2),
+        Some("20250414".parse::<ReleaseGroup>().expect("Must succeed")),
+        "1.2.3rc2:20250414"
+    )]
+    fn basics(
+        #[case] expected_major: i32,
+        #[case] expected_minor: i32,
+        #[case] expected_revision: i32,
+        #[case] expected_discriminant: Discriminant,
+        #[case] expected_release_group: Option<ReleaseGroup>,
+        #[case] input: &str,
+    ) -> Result<()> {
+        let result = input.parse::<PythonVersion>()?;
+        let version = result.version();
+        assert_eq!(expected_major, version.triple.major);
+        assert_eq!(expected_minor, version.triple.minor);
+        assert_eq!(expected_revision, version.triple.revision);
+        assert_eq!(expected_discriminant, version.discriminant);
+        assert_eq!(expected_release_group, result.release_group);
         Ok(())
     }
 }

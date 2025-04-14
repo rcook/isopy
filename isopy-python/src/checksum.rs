@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_package::PythonPackage;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use include_dir::{include_dir, Dir};
 use isopy_lib::Checksum;
 use std::collections::HashMap;
@@ -40,7 +40,11 @@ pub(crate) fn get_checksum(package: &PythonPackage) -> Result<Checksum> {
             .collect::<HashMap<_, _>>()
     }
 
-    let release_group_str = package.metadata().index_version().release_group().as_str();
+    let Some(release_group) = package.metadata().version().release_group() else {
+        bail!("Python package has no release group")
+    };
+
+    let release_group_str = release_group.as_str();
     let file_name = format!("{release_group_str}.sha256sums");
     let file = SHA256SUMS_DIR
         .get_file(&file_name)

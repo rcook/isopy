@@ -41,17 +41,16 @@ mod checksum;
 mod constants;
 mod discriminant;
 mod entrypoint;
-mod full_version;
 mod index;
 mod item;
 mod metadata;
 mod prerelease_info;
 mod prerelease_kind;
-mod project_version;
 mod python_package;
 mod python_package_manager;
 mod python_package_state;
 mod python_plugin;
+mod python_version;
 mod release_group;
 
 pub use entrypoint::new_plugin;
