@@ -19,30 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::prerelease_discriminant::PrereleaseDiscriminant;
+use crate::prerelease_type::PrereleaseType;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) enum Discriminant {
-    String(String),
+    Prerelease(PrereleaseDiscriminant),
     None,
 }
 
 impl Discriminant {
-    pub(crate) fn parse(s: &str) -> (Self, &str) {
-        if let Some(i) = s.find('a') {
-            return (Self::String(String::from(&s[i..])), &s[0..i]);
-        }
-        if let Some(i) = s.find("rc") {
-            return (Self::String(String::from(&s[i..])), &s[0..i]);
-        }
-        (Self::None, s)
+    pub(crate) const fn prerelease(prerelease_type: PrereleaseType, number: i32) -> Self {
+        Self::Prerelease(PrereleaseDiscriminant::new(prerelease_type, number))
     }
 }
 
 impl Display for Discriminant {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            Self::String(value) => write!(f, "{value}")?,
+            Self::Prerelease(d) => write!(f, "{d}")?,
             Self::None => {}
         }
         Ok(())
@@ -51,29 +47,24 @@ impl Display for Discriminant {
 
 #[cfg(test)]
 mod tests {
-    #![allow(clippy::too_many_arguments)]
     use super::Discriminant;
-    use rstest::rstest;
+    use crate::prerelease_type::PrereleaseType;
 
-    #[rstest]
-    #[case(
-        Discriminant::String(String::from("rc2+20240909")),
-        "3.13.0",
-        "3.13.0rc2+20240909"
-    )]
-    #[case(
-        Discriminant::String(String::from("a6+20250409")),
-        "3.14.0",
-        "3.14.0a6+20250409"
-    )]
-    #[case(Discriminant::None, "3.10.13+20231002", "3.10.13+20231002")]
-    fn basics(
-        #[case] expected_discriminant: Discriminant,
-        #[case] expected_version_str: &str,
-        #[case] input: &str,
-    ) {
-        let result = Discriminant::parse(input);
-        assert_eq!(expected_discriminant, result.0);
-        assert_eq!(expected_version_str, result.1);
+    #[test]
+    fn order() {
+        let discriminant1 = Discriminant::prerelease(PrereleaseType::Alpha, 10);
+        let discriminant2 = Discriminant::prerelease(PrereleaseType::Alpha, 6);
+        let discriminant3 = Discriminant::prerelease(PrereleaseType::Alpha, 5);
+        let discriminant4 = Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 3);
+        let discriminant5 = Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 10);
+        assert!(discriminant1 > discriminant2);
+        assert!(discriminant2 > discriminant3);
+        assert!(discriminant4 > discriminant1);
+        assert!(discriminant5 > discriminant4);
+        assert!(discriminant1 < Discriminant::None);
+        assert!(discriminant2 < Discriminant::None);
+        assert!(discriminant3 < Discriminant::None);
+        assert!(discriminant4 < Discriminant::None);
+        assert!(discriminant5 < Discriminant::None);
     }
 }

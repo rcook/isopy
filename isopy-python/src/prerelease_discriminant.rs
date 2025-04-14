@@ -19,39 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::new_ret_no_self)]
-#![allow(clippy::option_if_let_else)]
-#![allow(clippy::redundant_pub_crate)]
+use crate::prerelease_type::PrereleaseType;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
-mod checksum;
-mod constants;
-mod discriminant;
-mod entrypoint;
-mod index;
-mod item;
-mod metadata;
-mod prerelease_discriminant;
-mod prerelease_type;
-mod python_index_version;
-mod python_package;
-mod python_package_manager;
-mod python_package_state;
-mod python_plugin;
-mod python_version;
-mod release_group;
-mod version_with_discriminant;
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub(crate) struct PrereleaseDiscriminant {
+    prerelease_type: PrereleaseType,
+    number: i32,
+}
 
-pub use entrypoint::new_plugin;
+impl PrereleaseDiscriminant {
+    pub(crate) const fn new(prerelease_type: PrereleaseType, number: i32) -> Self {
+        Self {
+            prerelease_type,
+            number,
+        }
+    }
+}
+
+impl Display for PrereleaseDiscriminant {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self.prerelease_type {
+            PrereleaseType::Alpha => write!(f, "a{}", self.number),
+            PrereleaseType::ReleaseCandidate => write!(f, "rc{}", self.number),
+        }
+    }
+}

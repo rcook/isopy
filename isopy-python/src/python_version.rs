@@ -21,6 +21,7 @@
 //
 use crate::discriminant::Discriminant;
 use crate::release_group::ReleaseGroup;
+use crate::version_with_discriminant::VersionWithDiscriminant;
 use anyhow::Error;
 use isopy_lib::{VersionOps, VersionTriple};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -67,11 +68,10 @@ impl FromStr for PythonVersion {
             None => (s, None),
         };
 
-        let (discriminant, prefix) = Discriminant::parse(prefix);
-        let version = prefix.parse()?;
+        let version_with_discriminant = VersionWithDiscriminant::parse(prefix)?;
         Ok(Self {
-            version,
-            discriminant,
+            version: version_with_discriminant.version,
+            discriminant: version_with_discriminant.discriminant,
             release_group,
         })
     }

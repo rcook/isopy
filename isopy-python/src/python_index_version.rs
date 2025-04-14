@@ -42,8 +42,7 @@ impl PythonIndexVersion {
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
-                let (temp_discriminant, version_str) = Discriminant::parse(prefix);
-                if let Ok(temp_version) = version_str.parse() {
+                if let Ok(temp_version) = VersionWithDiscriminant::parse(prefix) {
                     if let Ok(temp_release_group) = suffix.parse() {
                         assert!(
                             result.is_none()
@@ -53,10 +52,7 @@ impl PythonIndexVersion {
                         );
                         tags_to_remove.push(tag.clone());
                         result = Some(Self {
-                            version: VersionWithDiscriminant {
-                                version: temp_version,
-                                discriminant: temp_discriminant,
-                            },
+                            version: temp_version,
                             release_group: temp_release_group,
                         });
                         break;
@@ -64,12 +60,11 @@ impl PythonIndexVersion {
                 }
             }
 
-            let (temp_discriminant, version_str) = Discriminant::parse(tag);
-            if let Ok(temp_version) = version_str.parse() {
+            if let Ok(temp_version_with_discriminant) = VersionWithDiscriminant::parse(tag) {
                 assert!(result.is_none() && version.is_none() && discriminant.is_none());
                 tags_to_remove.push(tag.clone());
-                version = Some(temp_version);
-                discriminant = Some(temp_discriminant);
+                version = Some(temp_version_with_discriminant.version);
+                discriminant = Some(temp_version_with_discriminant.discriminant);
                 if release_group.is_some() {
                     break;
                 }
@@ -142,7 +137,9 @@ impl PythonIndexVersion {
 
 #[cfg(test)]
 mod tests {
-    use crate::{discriminant::Discriminant, python_index_version::PythonIndexVersion};
+    use super::PythonIndexVersion;
+    use crate::discriminant::Discriminant;
+    use crate::prerelease_type::PrereleaseType;
     use anyhow::Result;
     use isopy_lib::VersionTriple;
     use std::collections::HashSet;
@@ -170,7 +167,7 @@ mod tests {
             result.version.version
         );
         assert_eq!(
-            Discriminant::String(String::from("a6")),
+            Discriminant::prerelease(PrereleaseType::Alpha, 6),
             result.version.discriminant
         );
         assert_eq!("20250409", result.release_group.as_str());
