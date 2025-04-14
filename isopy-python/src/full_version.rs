@@ -19,19 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_version::PythonVersion;
+use crate::base_version::BaseVersion;
+use crate::project_version::ProjectVersion;
 use crate::release_group::ReleaseGroup;
-use crate::version_with_discriminant::VersionWithDiscriminant;
 use anyhow::{bail, Result};
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct PythonIndexVersion {
-    version: VersionWithDiscriminant,
+pub(crate) struct FullVersion {
+    version: BaseVersion,
     release_group: ReleaseGroup,
 }
 
-impl PythonIndexVersion {
+impl FullVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut result = None;
         let mut version = None;
@@ -40,7 +40,7 @@ impl PythonIndexVersion {
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
-                if let Ok(temp_version) = VersionWithDiscriminant::parse(prefix) {
+                if let Ok(temp_version) = BaseVersion::parse(prefix) {
                     if let Ok(temp_release_group) = suffix.parse() {
                         assert!(result.is_none() && version.is_none() && release_group.is_none());
                         tags_to_remove.push(tag.clone());
@@ -53,7 +53,7 @@ impl PythonIndexVersion {
                 }
             }
 
-            if let Ok(temp_version) = VersionWithDiscriminant::parse(tag) {
+            if let Ok(temp_version) = BaseVersion::parse(tag) {
                 assert!(result.is_none() && version.is_none());
                 tags_to_remove.push(tag.clone());
                 version = Some(temp_version);
@@ -95,7 +95,7 @@ impl PythonIndexVersion {
         })
     }
 
-    pub(crate) const fn version(&self) -> &VersionWithDiscriminant {
+    pub(crate) const fn version(&self) -> &BaseVersion {
         &self.version
     }
 
@@ -103,7 +103,7 @@ impl PythonIndexVersion {
         &self.release_group
     }
 
-    pub(crate) fn matches(&self, other: &PythonVersion) -> bool {
+    pub(crate) fn matches(&self, other: &ProjectVersion) -> bool {
         if self.version != *other.version() {
             return false;
         }
@@ -120,11 +120,11 @@ impl PythonIndexVersion {
 
 #[cfg(test)]
 mod tests {
-    use super::PythonIndexVersion;
+    use super::FullVersion;
     use crate::discriminant::Discriminant;
-    use crate::prerelease_type::PrereleaseType;
+    use crate::prerelease_kind::PrereleaseKind;
     use anyhow::Result;
-    use isopy_lib::VersionTriple;
+    use isopy_lib::Triple;
     use std::collections::HashSet;
 
     #[test]
@@ -140,17 +140,17 @@ mod tests {
         .into_iter()
         .map(String::from)
         .collect::<HashSet<_>>();
-        let result = PythonIndexVersion::from_tags(&mut tags)?;
+        let result = FullVersion::from_tags(&mut tags)?;
         assert_eq!(
-            VersionTriple {
+            Triple {
                 major: 3,
                 minor: 14,
                 revision: 0
             },
-            result.version.version
+            result.version.triple
         );
         assert_eq!(
-            Discriminant::prerelease(PrereleaseType::Alpha, 6),
+            Discriminant::prerelease(PrereleaseKind::Alpha, 6),
             result.version.discriminant
         );
         assert_eq!("20250409", result.release_group.as_str());

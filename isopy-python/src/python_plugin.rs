@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
+use crate::project_version::ProjectVersion;
 use crate::python_package_manager::PythonPackageManager;
-use crate::python_version::PythonVersion;
 use anyhow::Result;
 use isopy_lib::{render_absolute_path, EnvInfo, Platform, Shell};
 use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
@@ -54,7 +54,7 @@ impl PluginOps for PythonPlugin {
     }
 
     fn parse_version(&self, s: &str) -> Result<Version> {
-        Ok(Version::new(s.parse::<PythonVersion>()?))
+        Ok(Version::new(s.parse::<ProjectVersion>()?))
     }
 
     fn make_env_info(&self, dir: &Path) -> EnvInfo {

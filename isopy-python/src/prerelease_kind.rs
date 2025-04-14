@@ -19,29 +19,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::prerelease_type::PrereleaseType;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::cmp::Ordering;
 
-#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct PrereleaseDiscriminant {
-    prerelease_type: PrereleaseType,
-    number: i32,
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) enum PrereleaseKind {
+    Alpha,
+    ReleaseCandidate,
 }
 
-impl PrereleaseDiscriminant {
-    pub(crate) const fn new(prerelease_type: PrereleaseType, number: i32) -> Self {
-        Self {
-            prerelease_type,
-            number,
+impl Ord for PrereleaseKind {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (Self::Alpha, Self::Alpha) | (Self::ReleaseCandidate, Self::ReleaseCandidate) => {
+                Ordering::Equal
+            }
+            (Self::Alpha, Self::ReleaseCandidate) => Ordering::Less,
+            (Self::ReleaseCandidate, Self::Alpha) => Ordering::Greater,
         }
     }
 }
 
-impl Display for PrereleaseDiscriminant {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match self.prerelease_type {
-            PrereleaseType::Alpha => write!(f, "a{}", self.number),
-            PrereleaseType::ReleaseCandidate => write!(f, "rc{}", self.number),
-        }
+impl PartialOrd for PrereleaseKind {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }

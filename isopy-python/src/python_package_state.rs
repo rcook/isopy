@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::index::Index;
+use crate::project_version::ProjectVersion;
 use crate::python_package::PythonPackage;
-use crate::python_version::PythonVersion;
 use anyhow::Result;
 use isopy_lib::{Package, PackageAvailability, PackageManagerContext, PackageState, Version};
 use std::collections::HashSet;
@@ -37,7 +37,7 @@ impl PythonPackageState {
     pub(crate) async fn read(
         ctx: &PackageManagerContext,
         index: &Index,
-        version: &PythonVersion,
+        version: &ProjectVersion,
         tags: &HashSet<&str>,
     ) -> Result<Option<Self>> {
         let mut packages = Vec::new();

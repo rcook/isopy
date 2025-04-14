@@ -53,9 +53,9 @@ mod shell;
 mod source_filter;
 mod tag_filter;
 mod tags;
+mod triple;
 mod url;
 mod version;
-mod version_triple;
 
 pub use accept::Accept;
 pub use archive_type::ArchiveType;
@@ -86,6 +86,6 @@ pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform
 pub use source_filter::SourceFilter;
 pub use tag_filter::TagFilter;
 pub use tags::Tags;
+pub use triple::Triple;
 pub use url::{dir_url, file_url};
 pub use version::{Version, VersionOps};
-pub use version_triple::VersionTriple;

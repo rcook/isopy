@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_index_version::PythonIndexVersion;
+use crate::full_version::FullVersion;
 use anyhow::{anyhow, bail, Error};
 use isopy_lib::ArchiveType;
 use std::collections::HashSet;
@@ -31,7 +31,7 @@ use std::str::FromStr;
 pub(crate) struct Metadata {
     name: String,
     archive_type: ArchiveType,
-    index_version: PythonIndexVersion,
+    index_version: FullVersion,
     tags: HashSet<String>,
 }
 
@@ -44,7 +44,7 @@ impl Metadata {
         &self.archive_type
     }
 
-    pub(crate) const fn index_version(&self) -> &PythonIndexVersion {
+    pub(crate) const fn index_version(&self) -> &FullVersion {
         &self.index_version
     }
 
@@ -76,7 +76,7 @@ impl FromStr for Metadata {
             bail!("Archive {s} is not a valid Python archive")
         }
 
-        let index_version = PythonIndexVersion::from_tags(&mut tags)?;
+        let index_version = FullVersion::from_tags(&mut tags)?;
         Ok(Self {
             name,
             archive_type,

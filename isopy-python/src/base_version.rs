@@ -20,60 +20,60 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::discriminant::Discriminant;
-use crate::prerelease_type::PrereleaseType;
+use crate::prerelease_kind::PrereleaseKind;
 use anyhow::Result;
-use isopy_lib::{VersionOps, VersionTriple};
+use isopy_lib::{Triple, VersionOps};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct VersionWithDiscriminant {
-    pub(crate) version: VersionTriple,
+pub(crate) struct BaseVersion {
+    pub(crate) triple: Triple,
     pub(crate) discriminant: Discriminant,
 }
 
-impl VersionWithDiscriminant {
+impl BaseVersion {
     pub(crate) fn parse(s: &str) -> Result<Self> {
         fn prerelease_helper(
-            prerelease_type: PrereleaseType,
+            prerelease_type: PrereleaseKind,
             s: &str,
             i0: usize,
             i1: usize,
-        ) -> Result<VersionWithDiscriminant> {
+        ) -> Result<BaseVersion> {
             let version_str = &s[..i0];
             let version = version_str.parse()?;
             let number_str = &s[i1..];
             let number = number_str.parse()?;
             let discriminant = Discriminant::prerelease(prerelease_type, number);
-            Ok(VersionWithDiscriminant {
-                version,
+            Ok(BaseVersion {
+                triple: version,
                 discriminant,
             })
         }
         if let Some(i) = s.find('a') {
-            return prerelease_helper(PrereleaseType::Alpha, s, i, i + 1);
+            return prerelease_helper(PrereleaseKind::Alpha, s, i, i + 1);
         }
         if let Some(i) = s.find("rc") {
-            return prerelease_helper(PrereleaseType::ReleaseCandidate, s, i, i + 2);
+            return prerelease_helper(PrereleaseKind::ReleaseCandidate, s, i, i + 2);
         }
 
         let version = s.parse()?;
         Ok(Self {
-            version,
+            triple: version,
             discriminant: Discriminant::None,
         })
     }
 }
 
-impl Display for VersionWithDiscriminant {
+impl Display for BaseVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match &self.discriminant {
-            Discriminant::Prerelease(d) => write!(f, "{}{}", self.version, d),
-            _ => write!(f, "{}", self.version),
+            Discriminant::Prerelease(d) => write!(f, "{}{}", self.triple, d),
+            _ => write!(f, "{}", self.triple),
         }
     }
 }
 
-impl VersionOps for VersionWithDiscriminant {
+impl VersionOps for BaseVersion {
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }
@@ -87,9 +87,9 @@ impl VersionOps for VersionWithDiscriminant {
 mod tests {
     #![allow(clippy::too_many_arguments)]
 
-    use super::VersionWithDiscriminant;
+    use super::BaseVersion;
     use crate::discriminant::Discriminant;
-    use crate::prerelease_type::PrereleaseType;
+    use crate::prerelease_kind::PrereleaseKind;
     use anyhow::Result;
     use rstest::rstest;
 
@@ -98,28 +98,28 @@ mod tests {
         3,
         14,
         0,
-        Discriminant::prerelease(PrereleaseType::Alpha, 10),
+        Discriminant::prerelease(PrereleaseKind::Alpha, 10),
         "3.14.0a10"
     )]
     #[case(
         3,
         14,
         0,
-        Discriminant::prerelease(PrereleaseType::Alpha, 6),
+        Discriminant::prerelease(PrereleaseKind::Alpha, 6),
         "3.14.0a6"
     )]
     #[case(
         3,
         14,
         0,
-        Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 10),
+        Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 10),
         "3.14.0rc10"
     )]
     #[case(
         3,
         14,
         123,
-        Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 345),
+        Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 345),
         "3.14.123rc345"
     )]
     fn basics(
@@ -129,10 +129,10 @@ mod tests {
         #[case] expected_discriminant: Discriminant,
         #[case] input: &str,
     ) -> Result<()> {
-        let result = VersionWithDiscriminant::parse(input)?;
-        assert_eq!(expected_major, result.version.major);
-        assert_eq!(expected_minor, result.version.minor);
-        assert_eq!(expected_revision, result.version.revision);
+        let result = BaseVersion::parse(input)?;
+        assert_eq!(expected_major, result.triple.major);
+        assert_eq!(expected_minor, result.triple.minor);
+        assert_eq!(expected_revision, result.triple.revision);
         assert_eq!(expected_discriminant, result.discriminant);
         assert_eq!(input, result.to_string());
         Ok(())
@@ -140,6 +140,6 @@ mod tests {
 
     #[test]
     fn invalid() {
-        assert!(VersionWithDiscriminant::parse("3.14.0a10+20250409").is_err());
+        assert!(BaseVersion::parse("3.14.0a10+20250409").is_err());
     }
 }

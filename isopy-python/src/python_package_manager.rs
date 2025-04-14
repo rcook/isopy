@@ -42,7 +42,7 @@ macro_rules! downcast_version {
     ($version : expr) => {
         $version
             .as_any()
-            .downcast_ref::<$crate::python_version::PythonVersion>()
+            .downcast_ref::<$crate::project_version::ProjectVersion>()
             .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
     };
 }

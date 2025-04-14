@@ -19,28 +19,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use std::cmp::Ordering;
+use crate::prerelease_kind::PrereleaseKind;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) enum PrereleaseType {
-    Alpha,
-    ReleaseCandidate,
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub(crate) struct PrereleaseInfo {
+    kind: PrereleaseKind,
+    number: i32,
 }
 
-impl Ord for PrereleaseType {
-    fn cmp(&self, other: &Self) -> Ordering {
-        match (self, other) {
-            (Self::Alpha, Self::Alpha) | (Self::ReleaseCandidate, Self::ReleaseCandidate) => {
-                Ordering::Equal
-            }
-            (Self::Alpha, Self::ReleaseCandidate) => Ordering::Less,
-            (Self::ReleaseCandidate, Self::Alpha) => Ordering::Greater,
-        }
+impl PrereleaseInfo {
+    pub(crate) const fn new(kind: PrereleaseKind, number: i32) -> Self {
+        Self { kind, number }
     }
 }
 
-impl PartialOrd for PrereleaseType {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+impl Display for PrereleaseInfo {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self.kind {
+            PrereleaseKind::Alpha => write!(f, "a{}", self.number),
+            PrereleaseKind::ReleaseCandidate => write!(f, "rc{}", self.number),
+        }
     }
 }

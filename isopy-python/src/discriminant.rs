@@ -19,19 +19,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::prerelease_discriminant::PrereleaseDiscriminant;
-use crate::prerelease_type::PrereleaseType;
+use crate::prerelease_info::PrereleaseInfo;
+use crate::prerelease_kind::PrereleaseKind;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) enum Discriminant {
-    Prerelease(PrereleaseDiscriminant),
+    Prerelease(PrereleaseInfo),
     None,
 }
 
 impl Discriminant {
-    pub(crate) const fn prerelease(prerelease_type: PrereleaseType, number: i32) -> Self {
-        Self::Prerelease(PrereleaseDiscriminant::new(prerelease_type, number))
+    pub(crate) const fn prerelease(prerelease_type: PrereleaseKind, number: i32) -> Self {
+        Self::Prerelease(PrereleaseInfo::new(prerelease_type, number))
     }
 }
 
@@ -48,15 +48,15 @@ impl Display for Discriminant {
 #[cfg(test)]
 mod tests {
     use super::Discriminant;
-    use crate::prerelease_type::PrereleaseType;
+    use crate::prerelease_kind::PrereleaseKind;
 
     #[test]
     fn order() {
-        let discriminant1 = Discriminant::prerelease(PrereleaseType::Alpha, 10);
-        let discriminant2 = Discriminant::prerelease(PrereleaseType::Alpha, 6);
-        let discriminant3 = Discriminant::prerelease(PrereleaseType::Alpha, 5);
-        let discriminant4 = Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 3);
-        let discriminant5 = Discriminant::prerelease(PrereleaseType::ReleaseCandidate, 10);
+        let discriminant1 = Discriminant::prerelease(PrereleaseKind::Alpha, 10);
+        let discriminant2 = Discriminant::prerelease(PrereleaseKind::Alpha, 6);
+        let discriminant3 = Discriminant::prerelease(PrereleaseKind::Alpha, 5);
+        let discriminant4 = Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 3);
+        let discriminant5 = Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 10);
         assert!(discriminant1 > discriminant2);
         assert!(discriminant2 > discriminant3);
         assert!(discriminant4 > discriminant1);
