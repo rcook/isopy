@@ -170,7 +170,7 @@ impl PackageManagerOps for GoPackageManager {
     }
 
     async fn list_tags(&self, _options: &ListTagsOptions) -> Result<Tags> {
-        todo!()
+        Ok(Tags::default())
     }
 
     async fn list_packages(
