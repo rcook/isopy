@@ -154,7 +154,7 @@ impl PythonPackageManager {
         use isopy_lib::SourceFilter::*;
 
         let mut packages = {
-            let tags = tag_filter.tags(&PLATFORM_TAGS);
+            let tags = tag_filter.tags(&[]);
             let mut temp_packages = Vec::new();
             for package in packages {
                 if package.metadata().has_tags(&tags) {
@@ -207,13 +207,10 @@ impl PackageManagerOps for PythonPackageManager {
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags> {
         let mut tags = HashSet::new();
         let mut other_tags = HashSet::new();
-        let index = self.get_index(false, options.show_progress).await?;
-        for item in index.items() {
-            for package in PythonPackage::parse_all(&item)? {
-                tags.extend(package.metadata().tags().to_owned());
-                if let Some(release_group) = package.metadata().version().release_group() {
-                    other_tags.insert(String::from(release_group.as_str()));
-                }
+        for package in self.read_packages(options.show_progress).await? {
+            tags.extend(package.metadata().tags().to_owned());
+            if let Some(release_group) = package.metadata().version().release_group() {
+                other_tags.insert(String::from(release_group.as_str()));
             }
         }
 
@@ -255,7 +252,10 @@ impl PackageManagerOps for PythonPackageManager {
         options: &GetPackageOptions,
     ) -> Result<Option<PackageInfo>> {
         let version = downcast_version!(version);
+
+        // TBD: Use cache!
         let index = self.get_index(false, options.show_progress).await?;
+
         let tags = tag_filter.tags(&PLATFORM_TAGS);
         let package =
             PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?;
@@ -269,7 +269,10 @@ impl PackageManagerOps for PythonPackageManager {
         options: &DownloadPackageOptions,
     ) -> Result<()> {
         let version = downcast_version!(version);
+
+        // TBD: Use cache!
         let index = self.get_index(false, options.show_progress).await?;
+
         let tags = tag_filter.tags(&PLATFORM_TAGS);
         let Some(package) =
             PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?
@@ -301,7 +304,10 @@ impl PackageManagerOps for PythonPackageManager {
         options: &InstallPackageOptions,
     ) -> Result<Package> {
         let version = downcast_version!(version);
+
+        // TBD: Use cache!
         let index = self.get_index(false, options.show_progress).await?;
+
         let tags = tag_filter.tags(&PLATFORM_TAGS);
         let Some(package) =
             PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?
