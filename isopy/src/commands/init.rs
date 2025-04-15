@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::status::{success, user_error, StatusResult};
 use isopy_lib::{
-    DownloadPackageOptionsBuilder, GetPackageStateOptionsBuilder, InstallPackageOptionsBuilder,
+    DownloadPackageOptionsBuilder, GetPackageOptionsBuilder, InstallPackageOptionsBuilder,
     TagFilter,
 };
 
@@ -60,17 +60,17 @@ pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
             }
         }
     } else {
-        let get_package_state_options = GetPackageStateOptionsBuilder::default()
+        let get_package_options = GetPackageOptionsBuilder::default()
             .show_progress(app.show_progress())
             .build()?;
 
         let mut unavailable_package_ids = Vec::new();
         for package_id in &project.package_ids {
             let package = app
-                .get_package_state(
+                .get_package(
                     package_id.moniker(),
                     package_id.version(),
-                    &get_package_state_options,
+                    &get_package_options,
                 )
                 .await?;
             if package.is_none() {

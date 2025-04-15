@@ -24,17 +24,17 @@ use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
 use crate::release_group::ReleaseGroup;
 use anyhow::Result;
-use isopy_lib::{Package, PackageAvailability, PackageManagerContext, PackageState, Version};
+use isopy_lib::{Package, PackageAvailability, PackageInfo, PackageManagerContext, Version};
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-pub(crate) struct PythonPackageState {
+pub(crate) struct PythonPackageInfo {
     availability: PackageAvailability,
     package: PythonPackage,
     path: Option<PathBuf>,
 }
 
-impl PythonPackageState {
+impl PythonPackageInfo {
     pub(crate) async fn read(
         ctx: &PackageManagerContext,
         index: &Index,
@@ -98,7 +98,7 @@ impl PythonPackageState {
         Package::new(self.package)
     }
 
-    pub(crate) fn into_package_state(self) -> PackageState {
+    pub(crate) fn into_package_info(self) -> PackageInfo {
         let label = self
             .package
             .metadata()
@@ -106,7 +106,7 @@ impl PythonPackageState {
             .release_group()
             .as_ref()
             .map(ReleaseGroup::as_str);
-        PackageState::new(
+        PackageInfo::new(
             self.availability,
             self.package.metadata().name(),
             self.package.url(),

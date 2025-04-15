@@ -28,8 +28,8 @@ use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{bail, Result};
 use isopy_lib::{
-    EnvInfo, GetPackageStateOptions, InstallPackageOptions, PackageState, Platform, Shell,
-    TagFilter, Version,
+    EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
+    Version,
 };
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
@@ -95,15 +95,15 @@ impl App {
         Ok(())
     }
 
-    pub(crate) async fn get_package_state(
+    pub(crate) async fn get_package(
         &self,
         moniker: &Moniker,
         version: &Version,
-        options: &GetPackageStateOptions,
-    ) -> Result<Option<PackageState>> {
+        options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>> {
         self.plugin_manager
             .new_package_manager(moniker, &self.config_dir)
-            .get_package_state(version, &TagFilter::default(), options)
+            .get_package(version, &TagFilter::default(), options)
             .await
     }
 

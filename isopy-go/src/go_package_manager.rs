@@ -26,9 +26,9 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
-    GetPackageStateOptions, InstallPackageOptions, ListPackageStatesOptions, ListTagsOptions,
-    Package, PackageAvailability, PackageManagerContext, PackageManagerOps, PackageState,
-    SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    GetPackageOptions, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
+    PackageAvailability, PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter,
+    TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;
@@ -173,12 +173,12 @@ impl PackageManagerOps for GoPackageManager {
         todo!()
     }
 
-    async fn list_package_states(
+    async fn list_packages(
         &self,
         sources: SourceFilter,
         _tags: &TagFilter, // TBD
-        options: &ListPackageStatesOptions,
-    ) -> Result<Vec<PackageState>> {
+        options: &ListPackagesOptions,
+    ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
         let filter_tags = DEFAULT_TAGS
             .into_iter()
@@ -208,12 +208,12 @@ impl PackageManagerOps for GoPackageManager {
             .collect::<Vec<_>>())
     }
 
-    async fn get_package_state(
+    async fn get_package(
         &self,
         version: &Version,
         tags: &TagFilter,
-        options: &GetPackageStateOptions,
-    ) -> Result<Option<PackageState>> {
+        options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>> {
         let version = downcast_version!(version);
         let package = self
             .get_package_inner(false, options.show_progress, version, tags)

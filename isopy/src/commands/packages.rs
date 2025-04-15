@@ -28,8 +28,7 @@ use anyhow::bail;
 use anyhow::Result;
 use colored::{ColoredString, Colorize};
 use isopy_lib::{
-    ListPackageStatesOptions, ListPackageStatesOptionsBuilder, PackageState, Plugin, SourceFilter,
-    TagFilter,
+    ListPackagesOptions, ListPackagesOptionsBuilder, PackageInfo, Plugin, SourceFilter, TagFilter,
 };
 use std::fs::metadata;
 use url::{Host, Url};
@@ -47,21 +46,21 @@ pub(crate) async fn do_packages(
         moniker: &Moniker,
         filter: SourceFilter,
         tag_filter: &TagFilter,
-        options: &ListPackageStatesOptions,
+        options: &ListPackagesOptions,
         verbose: bool,
     ) -> Result<()> {
         let plugin = app.plugin_manager().get_plugin(moniker);
         let packages = app
             .plugin_manager()
             .new_package_manager(moniker, app.config_dir())
-            .list_package_states(filter, tag_filter, options)
+            .list_packages(filter, tag_filter, options)
             .await?;
         add_plugin_rows(table, moniker, plugin, &packages, filter, verbose)?;
         Ok(())
     }
 
     let mut table = make_list_table();
-    let options = ListPackageStatesOptionsBuilder::default()
+    let options = ListPackagesOptionsBuilder::default()
         .show_progress(app.show_progress())
         .build()?;
 
@@ -91,18 +90,18 @@ fn add_plugin_rows(
     table: &mut Table,
     moniker: &Moniker,
     plugin: &Plugin,
-    packages: &Vec<PackageState>,
+    packages: &Vec<PackageInfo>,
     filter: SourceFilter,
     verbose: bool,
 ) -> Result<()> {
-    fn make_package_id(moniker: &Moniker, package: &PackageState) -> String {
+    fn make_package_id(moniker: &Moniker, package: &PackageInfo) -> String {
         match package.label() {
             Some(label) => format!("{}:{}:{}", moniker.as_str(), **package.version(), label),
             None => format!("{}:{}", moniker.as_str(), **package.version()),
         }
     }
 
-    fn make_package_summary(package: &PackageState, verbose: bool) -> Result<String> {
+    fn make_package_summary(package: &PackageInfo, verbose: bool) -> Result<String> {
         fn format_url(url: &Url, verbose: bool) -> Result<ColoredString> {
             fn truncated_format(scheme: &str, domain: &str, path: &str) -> ColoredString {
                 match path.rfind('/') {

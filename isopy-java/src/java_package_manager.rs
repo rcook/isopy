@@ -24,9 +24,9 @@ use crate::serialization::versions_response::VersionsResponse;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, GetPackageStateOptions, InstallPackageOptions,
-    ListPackageStatesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
-    PackageManagerContext, PackageManagerOps, PackageState, ProgressIndicator,
+    DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
+    ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
+    PackageInfo, PackageManagerContext, PackageManagerOps, ProgressIndicator,
     ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
@@ -121,12 +121,12 @@ impl PackageManagerOps for JavaPackageManager {
         todo!()
     }
 
-    async fn list_package_states(
+    async fn list_packages(
         &self,
         _sources: SourceFilter,
         _tag_filter: &TagFilter,
-        options: &ListPackageStatesOptions,
-    ) -> Result<Vec<PackageState>> {
+        options: &ListPackagesOptions,
+    ) -> Result<Vec<PackageInfo>> {
         let dir = self.get_index(options.show_progress, false).await?;
         let mut packages = Vec::new();
         for path in Self::get_page_paths(&dir)? {
@@ -134,7 +134,7 @@ impl PackageManagerOps for JavaPackageManager {
             let reader = BufReader::new(f);
             let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
             packages.extend(response.versions.into_iter().map(|v| {
-                PackageState::new(
+                PackageInfo::new(
                     PackageAvailability::Remote,
                     v.semver.clone(),
                     &Url::parse("https://httpbin.org").unwrap(),
@@ -147,12 +147,12 @@ impl PackageManagerOps for JavaPackageManager {
         Ok(packages)
     }
 
-    async fn get_package_state(
+    async fn get_package(
         &self,
         _version: &Version,
         _tags: &TagFilter,
-        _options: &GetPackageStateOptions,
-    ) -> Result<Option<PackageState>> {
+        _options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>> {
         todo!()
     }
 

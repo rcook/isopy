@@ -21,7 +21,7 @@
 //
 use crate::python_version::PythonVersion;
 use anyhow::Result;
-use isopy_lib::{PackageAvailability, PackageState, Version};
+use isopy_lib::{PackageAvailability, PackageInfo, Version};
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::path::{Path, PathBuf};
@@ -54,8 +54,8 @@ struct Package {
     path: Option<PathBuf>,
 }
 
-pub(crate) fn write_package_cache(path: &Path, packages: &Vec<PackageState>) -> Result<()> {
-    fn transform(p: &PackageState) -> Package {
+pub(crate) fn write_package_cache(path: &Path, packages: &Vec<PackageInfo>) -> Result<()> {
+    fn transform(p: &PackageInfo) -> Package {
         Package {
             availability: p.availability(),
             name: String::from(p.name()),
@@ -77,10 +77,10 @@ pub(crate) fn write_package_cache(path: &Path, packages: &Vec<PackageState>) -> 
     Ok(())
 }
 
-pub(crate) fn read_package_cache(path: &Path) -> Result<Vec<PackageState>> {
-    fn transform(p: &Package) -> Result<PackageState> {
+pub(crate) fn read_package_cache(path: &Path) -> Result<Vec<PackageInfo>> {
+    fn transform(p: &Package) -> Result<PackageInfo> {
         let version = Version::new(p.version.parse::<PythonVersion>()?);
-        Ok(PackageState::new(
+        Ok(PackageInfo::new(
             p.availability,
             &p.name,
             &p.url,

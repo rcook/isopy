@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::go_version::GoVersion;
-use isopy_lib::{ArchiveType, Checksum, PackageAvailability, PackageOps, PackageState, Version};
+use isopy_lib::{ArchiveType, Checksum, PackageAvailability, PackageOps, PackageInfo, Version};
 use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
@@ -98,9 +98,9 @@ impl GoPackage {
         &self.tags
     }
 
-    pub(crate) fn into_package_info(self) -> PackageState {
+    pub(crate) fn into_package_info(self) -> PackageInfo {
         let version = PackageOps::version(&self).clone();
-        PackageState::new(
+        PackageInfo::new(
             PackageAvailability::Remote,
             self.name,
             &self.url,

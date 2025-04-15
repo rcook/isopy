@@ -21,7 +21,7 @@
 //
 use crate::macros::dyn_trait_struct;
 use crate::package::Package;
-use crate::package_state::PackageState;
+use crate::package_info::PackageInfo;
 use crate::tag_filter::TagFilter;
 use crate::tags::Tags;
 use crate::version::Version;
@@ -39,7 +39,7 @@ pub struct DownloadPackageOptions {
 
 #[derive(Builder, Default)]
 #[builder(default)]
-pub struct GetPackageStateOptions {
+pub struct GetPackageOptions {
     pub show_progress: bool,
 }
 
@@ -51,7 +51,7 @@ pub struct InstallPackageOptions {
 
 #[derive(Builder, Default)]
 #[builder(default)]
-pub struct ListPackageStatesOptions {
+pub struct ListPackagesOptions {
     pub show_progress: bool,
 }
 
@@ -71,18 +71,18 @@ pub struct UpdateIndexOptions {
 pub trait PackageManagerOps: Send + Sync {
     async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()>;
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags>;
-    async fn list_package_states(
+    async fn list_packages(
         &self,
         sources: SourceFilter,
         tag_filter: &TagFilter,
-        options: &ListPackageStatesOptions,
-    ) -> Result<Vec<PackageState>>;
-    async fn get_package_state(
+        options: &ListPackagesOptions,
+    ) -> Result<Vec<PackageInfo>>;
+    async fn get_package(
         &self,
         version: &Version,
         tag_filter: &TagFilter,
-        options: &GetPackageStateOptions,
-    ) -> Result<Option<PackageState>>;
+        options: &GetPackageOptions,
+    ) -> Result<Option<PackageInfo>>;
     async fn download_package(
         &self,
         version: &Version,
@@ -101,18 +101,18 @@ dyn_trait_struct!(PackageManager, PackageManagerOps);
 
 #[cfg(test)]
 mod tests {
-    use crate::package_manager::ListPackageStatesOptionsBuilder;
+    use crate::package_manager::ListPackagesOptionsBuilder;
 
     #[test]
     fn basics() {
         assert!(
-            !ListPackageStatesOptionsBuilder::default()
+            !ListPackagesOptionsBuilder::default()
                 .build()
                 .expect("Must succeed")
                 .show_progress
         );
         assert!(
-            ListPackageStatesOptionsBuilder::default()
+            ListPackagesOptionsBuilder::default()
                 .show_progress(true)
                 .build()
                 .expect("Must succeed")
