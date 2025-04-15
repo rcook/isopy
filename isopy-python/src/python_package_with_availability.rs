@@ -28,13 +28,14 @@ use isopy_lib::{Package, PackageAvailability, PackageInfo, PackageManagerContext
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-pub(crate) struct PythonPackageInfo {
-    availability: PackageAvailability,
-    package: PythonPackage,
-    path: Option<PathBuf>,
+#[derive(Clone)]
+pub(crate) struct PythonPackageWithAvailability {
+    pub(crate) package: PythonPackage,
+    pub(crate) availability: PackageAvailability,
+    pub(crate) path: Option<PathBuf>,
 }
 
-impl PythonPackageInfo {
+impl PythonPackageWithAvailability {
     pub(crate) async fn read(
         ctx: &PackageManagerContext,
         index: &Index,
@@ -50,11 +51,7 @@ impl PythonPackageInfo {
                         Ok(p) => (PackageAvailability::Local, Some(p)),
                         _ => (PackageAvailability::Remote, None),
                     };
-                    packages.push(Self {
-                        availability,
-                        package,
-                        path,
-                    });
+                    packages.push(Self { package, availability, path });
                 }
             }
         }
@@ -62,36 +59,6 @@ impl PythonPackageInfo {
         packages.sort_by_cached_key(|p| p.package.metadata().version().clone());
         packages.reverse();
         Ok(packages.into_iter().next())
-    }
-
-    pub(crate) async fn read_all(ctx: &PackageManagerContext, index: &Index) -> Result<Vec<Self>> {
-        let mut packages = Vec::new();
-        for item in index.items() {
-            for package in PythonPackage::parse_all(&item)? {
-                let (availability, path) = match ctx.get_file(package.url()).await {
-                    Ok(p) => (PackageAvailability::Local, Some(p)),
-                    _ => (PackageAvailability::Remote, None),
-                };
-                packages.push(Self {
-                    availability,
-                    package,
-                    path,
-                });
-            }
-        }
-        Ok(packages)
-    }
-
-    pub(crate) const fn availability(&self) -> PackageAvailability {
-        self.availability
-    }
-
-    pub(crate) const fn package(&self) -> &PythonPackage {
-        &self.package
-    }
-
-    pub(crate) const fn path(&self) -> &Option<PathBuf> {
-        &self.path
     }
 
     pub(crate) fn into_package(self) -> Package {

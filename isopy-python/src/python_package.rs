@@ -59,8 +59,8 @@ impl PythonPackage {
             .filter(|(_, name)| filter_fn(name))
             .map(|(url, name)| {
                 let metadata = name.parse::<Metadata>()?;
-                let archive_info = Self::new(&url, metadata);
-                Ok(archive_info)
+                let package = Self::new(&url, metadata);
+                Ok(package)
             })
             .collect::<Result<Vec<_>>>()?;
         Ok(packages)

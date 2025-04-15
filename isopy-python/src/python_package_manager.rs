@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::checksum::get_checksum;
-use crate::constants::DEFAULT_TAGS;
+use crate::constants::PLATFORM_TAGS;
 use crate::index::Index;
 use crate::package_cache::{read_package_cache, write_package_cache};
 use crate::python_package::PythonPackage;
-use crate::python_package_info::PythonPackageInfo;
+use crate::python_package_with_availability::PythonPackageWithAvailability;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -109,44 +109,90 @@ impl PythonPackageManager {
     async fn fetch_packages(
         &self,
         cache_path: &Path,
+        show_progress: bool,
+    ) -> Result<Vec<PythonPackage>> {
+        let index = self.get_index(false, show_progress).await?;
+        let platform_tags = PLATFORM_TAGS.iter().copied().collect::<HashSet<_>>();
+        let mut packages = Vec::new();
+        for item in index.items() {
+            for package in PythonPackage::parse_all(&item)? {
+                if package.metadata().has_tags(&platform_tags) {
+                    packages.push(package);
+                }
+            }
+        }
+
+        write_package_cache(cache_path, &packages)?;
+        Ok(packages)
+    }
+
+    async fn read_packages(&self, show_progress: bool) -> Result<Vec<PythonPackage>> {
+        let cache_path = self.ctx.cache_dir().join(PACKAGE_CACHE_FILE_NAME);
+        if !cache_path.exists() {
+            return self.fetch_packages(&cache_path, show_progress).await;
+        }
+
+        let Some(index_path) = self.ctx.file_exists(&self.url)? else {
+            return read_package_cache(&cache_path);
+        };
+
+        let index_created_at = metadata(&index_path)?.created()?;
+        let cache_created_at = metadata(&cache_path)?.created()?;
+        if index_created_at > cache_created_at {
+            return self.fetch_packages(&cache_path, show_progress).await;
+        }
+
+        read_package_cache(&cache_path)
+    }
+
+    fn filter_packages(
+        &self,
+        packages: Vec<PythonPackage>,
         sources: SourceFilter,
         tag_filter: &TagFilter,
-        options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
 
-        let index = self.get_index(false, options.show_progress).await?;
-        let tags = tag_filter.tags(&DEFAULT_TAGS);
-        let mut packages = PythonPackageInfo::read_all(&self.ctx, &index)
-            .await?
-            .into_iter()
-            .filter(|p| {
-                matches!(
-                    (sources, p.availability() == PackageAvailability::Local),
-                    (All, _) | (Local, true) | (Remote, false)
-                )
-            })
-            .filter(|p| p.package().metadata().has_tags(&tags))
-            .collect::<Vec<_>>();
+        let mut packages = {
+            let tags = tag_filter.tags(&PLATFORM_TAGS);
+            let mut temp_packages = Vec::new();
+            for package in packages {
+                if package.metadata().has_tags(&tags) {
+                    let (availability, path) = match self.ctx.file_exists(package.url())? {
+                        Some(p) => (PackageAvailability::Local, Some(p)),
+                        None => (PackageAvailability::Remote, None),
+                    };
+
+                    if matches!(
+                        (sources, availability == PackageAvailability::Local),
+                        (All, _) | (Local, true) | (Remote, false)
+                    ) {
+                        temp_packages.push(PythonPackageWithAvailability {
+                            package,
+                            availability,
+                            path,
+                        });
+                    }
+                }
+            }
+            temp_packages
+        };
 
         packages.sort_by(|a, b| {
-            let temp = b.availability().cmp(&a.availability());
+            let temp = b.availability.cmp(&a.availability);
             if temp != Ordering::Equal {
                 return temp;
             }
-            b.package()
+            b.package
                 .metadata()
                 .version()
-                .cmp(a.package().metadata().version())
+                .cmp(a.package.metadata().version())
         });
 
         let packages = packages
             .into_iter()
-            .map(PythonPackageInfo::into_package_info)
+            .map(PythonPackageWithAvailability::into_package_info)
             .collect::<Vec<_>>();
-
-        write_package_cache(&cache_path, &packages)?;
-
         Ok(packages)
     }
 }
@@ -179,7 +225,7 @@ impl PackageManagerOps for PythonPackageManager {
         other_tags.sort();
         let other_tags: Vec<String> = other_tags;
 
-        let mut default_tags = DEFAULT_TAGS
+        let mut default_tags = PLATFORM_TAGS
             .into_iter()
             .map(String::from)
             .collect::<Vec<_>>();
@@ -195,30 +241,11 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
-        let cache_path = self.ctx.cache_dir().join(PACKAGE_CACHE_FILE_NAME);
-        let index_path = self.ctx.file_exists(&self.url)?;
-        let Some(index_path) = index_path else {
-            return Ok(self
-                .fetch_packages(&cache_path, sources, tag_filter, options)
-                .await?);
-        };
-
-        if !cache_path.exists() {
-            return Ok(self
-                .fetch_packages(&cache_path, sources, tag_filter, options)
-                .await?);
-        }
-
-        let index_created_at = metadata(&index_path)?.created()?;
-        let cache_created_at = metadata(&cache_path)?.created()?;
-
-        if index_created_at > cache_created_at {
-            return Ok(self
-                .fetch_packages(&cache_path, sources, tag_filter, options)
-                .await?);
-        }
-
-        return Ok(read_package_cache(&cache_path)?);
+        self.filter_packages(
+            self.read_packages(options.show_progress).await?,
+            sources,
+            tag_filter,
+        )
     }
 
     async fn get_package(
@@ -229,9 +256,10 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<Option<PackageInfo>> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let tags = tag_filter.tags(&DEFAULT_TAGS);
-        let package = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?;
-        Ok(package.map(PythonPackageInfo::into_package_info))
+        let tags = tag_filter.tags(&PLATFORM_TAGS);
+        let package =
+            PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?;
+        Ok(package.map(PythonPackageWithAvailability::into_package_info))
     }
 
     async fn download_package(
@@ -242,8 +270,9 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<()> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let tags = tag_filter.tags(&DEFAULT_TAGS);
-        let Some(package) = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?
+        let tags = tag_filter.tags(&PLATFORM_TAGS);
+        let Some(package) =
+            PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?
         else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
@@ -251,7 +280,7 @@ impl PackageManagerOps for PythonPackageManager {
             );
         };
 
-        let checksum = get_checksum(package.package())?;
+        let checksum = get_checksum(&package.package)?;
         let options = DownloadFileOptionsBuilder::default()
             .update(false)
             .checksum(Some(checksum))
@@ -259,7 +288,7 @@ impl PackageManagerOps for PythonPackageManager {
             .build()?;
         _ = self
             .ctx
-            .download_file(package.package().url(), &options)
+            .download_file(package.package.url(), &options)
             .await?;
         Ok(())
     }
@@ -273,8 +302,9 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<Package> {
         let version = downcast_version!(version);
         let index = self.get_index(false, options.show_progress).await?;
-        let tags = tag_filter.tags(&DEFAULT_TAGS);
-        let Some(package) = PythonPackageInfo::read(&self.ctx, &index, version, &tags).await?
+        let tags = tag_filter.tags(&PLATFORM_TAGS);
+        let Some(package) =
+            PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?
         else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
@@ -282,7 +312,7 @@ impl PackageManagerOps for PythonPackageManager {
             );
         };
 
-        let Some(path) = package.path() else {
+        let Some(path) = &package.path else {
             bail!(
                 "Package with ID {moniker}:{version} and tags {tags:?} not downloaded",
                 moniker = self.moniker
@@ -290,7 +320,7 @@ impl PackageManagerOps for PythonPackageManager {
         };
 
         package
-            .package()
+            .package
             .metadata()
             .archive_type()
             .unpack(path, dir, options)
