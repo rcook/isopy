@@ -25,7 +25,7 @@ use crate::go_version::GoVersion;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, query, ArchiveType, DownloadFileOptionsBuilder, DownloadPackageOptions,
+    dir_url, query, ArchiveType, DownloadAssetOptionsBuilder, DownloadPackageOptions,
     GetPackageOptions, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
     PackageAvailability, PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter,
     TagFilter, Tags, UpdateIndexOptions, Version,
@@ -78,13 +78,13 @@ impl GoPackageManager {
     }
 
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
-        let options = DownloadFileOptionsBuilder::json()
+        let options = DownloadAssetOptionsBuilder::json()
             .update(update)
             .show_progress(show_progress)
             .query(query!([("include", "all"), ("mode", "json")]))
             .build()?;
         let url = dir_url(&self.url);
-        let path = self.ctx.download_file(&url, &options).await?;
+        let path = self.ctx.download_asset(&url, &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)
@@ -104,9 +104,9 @@ impl GoPackageManager {
                         if tags.is_superset(&filter_tags) {
                             let version = file.version.parse::<GoVersion>()?;
                             let url = self.url.join(&file.file_name)?;
-                            let (kind, path) = match self.ctx.get_file(&url).await {
-                                Ok(p) => (PackageAvailability::Local, Some(p)),
-                                _ => (PackageAvailability::Remote, None),
+                            let (kind, path) = match self.ctx.check_asset(&url)? {
+                                Some(p) => (PackageAvailability::Local, Some(p)),
+                                None => (PackageAvailability::Remote, None),
                             };
                             let (archive_type, _) = ArchiveType::strip_suffix(&file.file_name)
                                 .ok_or_else(|| {
@@ -231,12 +231,12 @@ impl PackageManagerOps for GoPackageManager {
         let package = self
             .get_package_inner(false, options.show_progress, version, tags)
             .await?;
-        let options = DownloadFileOptionsBuilder::default()
+        let options = DownloadAssetOptionsBuilder::default()
             .update(false)
             .checksum(Some(package.checksum().clone()))
             .show_progress(options.show_progress)
             .build()?;
-        _ = self.ctx.download_file(package.url(), &options).await?;
+        _ = self.ctx.download_asset(package.url(), &options).await?;
         Ok(())
     }
 
@@ -256,7 +256,7 @@ impl PackageManagerOps for GoPackageManager {
             bail!("No release {version} with tags {tags:?} found");
         };
 
-        let Ok(path) = self.ctx.get_file(package.url()).await else {
+        let Some(path) = self.ctx.check_asset(package.url())? else {
             let tags = tag_filter.tags(&[]);
             bail!("Failed to download release {version} with tags {tags:?}");
         };

@@ -22,7 +22,7 @@
 use crate::python_package::PythonPackage;
 use crate::python_plugin::CHECKSUM_BASE_URL;
 use anyhow::{anyhow, bail, Result};
-use isopy_lib::{Checksum, DownloadFileOptionsBuilder, PackageManagerContext};
+use isopy_lib::{Checksum, DownloadAssetOptionsBuilder, PackageManagerContext};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 
@@ -51,11 +51,11 @@ pub(crate) async fn get_checksum(
     let file_name = format!("{release_group_str}.sha256sums");
     let url = CHECKSUM_BASE_URL.join(&file_name)?;
 
-    let options = DownloadFileOptionsBuilder::default()
+    let options = DownloadAssetOptionsBuilder::default()
         .update(false)
         .show_progress(show_progress)
         .build()?;
-    let path = ctx.download_file(&url, &options).await?;
+    let path = ctx.download_asset(&url, &options).await?;
     let content = read_to_string(path)?;
     let checksum_strs = parse_checksums(&content);
 

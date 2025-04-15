@@ -36,7 +36,7 @@ pub(crate) struct PythonPackageWithAvailability {
 }
 
 impl PythonPackageWithAvailability {
-    pub(crate) async fn read(
+    pub(crate) fn read(
         ctx: &PackageManagerContext,
         index: &Index,
         version: &PythonVersion,
@@ -47,11 +47,15 @@ impl PythonPackageWithAvailability {
             for package in PythonPackage::parse_all(&item)? {
                 let m = package.metadata();
                 if m.has_tags(tags) && m.version().matches(version) {
-                    let (availability, path) = match ctx.get_file(package.url()).await {
-                        Ok(p) => (PackageAvailability::Local, Some(p)),
-                        _ => (PackageAvailability::Remote, None),
+                    let (availability, path) = match ctx.check_asset(package.url())? {
+                        Some(p) => (PackageAvailability::Local, Some(p)),
+                        None => (PackageAvailability::Remote, None),
                     };
-                    packages.push(Self { package, availability, path });
+                    packages.push(Self {
+                        package,
+                        availability,
+                        path,
+                    });
                 }
             }
         }

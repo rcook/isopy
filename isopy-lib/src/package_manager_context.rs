@@ -30,7 +30,7 @@ use url::Url;
 
 #[derive(Builder, Default)]
 #[builder(default)]
-pub struct DownloadFileOptions {
+pub struct DownloadAssetOptions {
     pub show_progress: bool,
     pub update: bool,
     pub accept: Option<Accept>,
@@ -47,7 +47,7 @@ macro_rules! query {
     };
 }
 
-impl DownloadFileOptionsBuilder {
+impl DownloadAssetOptionsBuilder {
     #[must_use]
     pub fn json() -> Self {
         let mut me = Self::default();
@@ -56,20 +56,12 @@ impl DownloadFileOptionsBuilder {
     }
 }
 
-#[derive(Builder, Default)]
-#[builder(default)]
-pub struct MakeDirOptions {
-    pub show_progress: bool,
-    pub create_new: bool,
-}
-
 #[async_trait]
 pub trait PackageManagerContextOps: Send + Sync {
-    fn cache_dir(&self) -> &Path;
-    fn file_exists(&self, url: &Url) -> Result<Option<PathBuf>>;
-    async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf>;
-    async fn get_file(&self, url: &Url) -> Result<PathBuf>;
-    async fn make_dir(&self, url: &Url, options: &MakeDirOptions) -> Result<PathBuf>;
-    async fn get_dir(&self, url: &Url) -> Result<PathBuf>;
+    fn base_dir(&self) -> &Path;
+    fn check_asset(&self, url: &Url) -> Result<Option<PathBuf>>;
+    fn check_asset_dir(&self, url: &Url) -> Result<Option<PathBuf>>;
+    fn make_asset_dir(&self, url: &Url, create_new: bool) -> Result<PathBuf>;
+    async fn download_asset(&self, url: &Url, options: &DownloadAssetOptions) -> Result<PathBuf>;
 }
 dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);

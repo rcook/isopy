@@ -21,13 +21,13 @@
 //
 use crate::link_header::LinkHeader;
 use crate::serialization::versions_response::VersionsResponse;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, MakeDirOptionsBuilder, Package, PackageAvailability,
-    PackageInfo, PackageManagerContext, PackageManagerOps, ProgressIndicator,
-    ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    DownloadPackageOptions, GetPackageOptions, InstallPackageOptions, ListPackagesOptions,
+    ListTagsOptions, Package, PackageAvailability, PackageInfo, PackageManagerContext,
+    PackageManagerOps, ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter,
+    Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
 use std::fs::{read_dir, File};
@@ -71,19 +71,14 @@ impl JavaPackageManager {
     async fn get_index(&self, show_progress: bool, create_new: bool) -> Result<PathBuf> {
         let url = self.url.join("/v3/info/release_versions")?;
         if !create_new {
-            return self.ctx.get_dir(&url).await;
+            let d = self.ctx.check_asset_dir(&url)?;
+            if let Some(p) = d {
+                return Ok(p);
+            }
+            bail!("No asset directory for {url}")
         }
 
-        let dir = self
-            .ctx
-            .make_dir(
-                &url,
-                &MakeDirOptionsBuilder::default()
-                    .show_progress(show_progress)
-                    .create_new(true)
-                    .build()?,
-            )
-            .await?;
+        let dir = self.ctx.make_asset_dir(&url, true)?;
         let client = Client::new();
         let mut request_builder = client.get(url);
 

@@ -28,7 +28,7 @@ use crate::python_package_with_availability::PythonPackageWithAvailability;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadFileOptionsBuilder, DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
+    DownloadAssetOptionsBuilder, DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
     ListPackagesOptions, ListTagsOptions, Package, PackageAvailability, PackageInfo,
     PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions,
     Version,
@@ -98,11 +98,11 @@ impl PythonPackageManager {
     }
 
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Index> {
-        let options = DownloadFileOptionsBuilder::json()
+        let options = DownloadAssetOptionsBuilder::json()
             .update(update)
             .show_progress(show_progress)
             .build()?;
-        let path = self.ctx.download_file(&self.url, &options).await?;
+        let path = self.ctx.download_asset(&self.url, &options).await?;
         read_to_string(path).await?.parse()
     }
 
@@ -127,22 +127,26 @@ impl PythonPackageManager {
     }
 
     async fn read_packages(&self, show_progress: bool) -> Result<Vec<PythonPackage>> {
-        let cache_path = self.ctx.cache_dir().join(PACKAGE_CACHE_FILE_NAME);
-        if !cache_path.exists() {
-            return self.fetch_packages(&cache_path, show_progress).await;
+        let package_cache_path = self.ctx.base_dir().join(PACKAGE_CACHE_FILE_NAME);
+        if !package_cache_path.exists() {
+            return self
+                .fetch_packages(&package_cache_path, show_progress)
+                .await;
         }
 
-        let Some(index_path) = self.ctx.file_exists(&self.url)? else {
-            return read_package_cache(&cache_path);
+        let Some(index_path) = self.ctx.check_asset(&self.url)? else {
+            return read_package_cache(&package_cache_path);
         };
 
         let index_created_at = metadata(&index_path)?.created()?;
-        let cache_created_at = metadata(&cache_path)?.created()?;
+        let cache_created_at = metadata(&package_cache_path)?.created()?;
         if index_created_at > cache_created_at {
-            return self.fetch_packages(&cache_path, show_progress).await;
+            return self
+                .fetch_packages(&package_cache_path, show_progress)
+                .await;
         }
 
-        read_package_cache(&cache_path)
+        read_package_cache(&package_cache_path)
     }
 
     fn filter_packages(
@@ -158,7 +162,7 @@ impl PythonPackageManager {
             let mut temp_packages = Vec::new();
             for package in packages {
                 if package.metadata().has_tags(&tags) {
-                    let (availability, path) = match self.ctx.file_exists(package.url())? {
+                    let (availability, path) = match self.ctx.check_asset(package.url())? {
                         Some(p) => (PackageAvailability::Local, Some(p)),
                         None => (PackageAvailability::Remote, None),
                     };
@@ -257,8 +261,7 @@ impl PackageManagerOps for PythonPackageManager {
         let index = self.get_index(false, options.show_progress).await?;
 
         let tags = tag_filter.tags(&PLATFORM_TAGS);
-        let package =
-            PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?;
+        let package = PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags)?;
         Ok(package.map(PythonPackageWithAvailability::into_package_info))
     }
 
@@ -274,8 +277,7 @@ impl PackageManagerOps for PythonPackageManager {
         let index = self.get_index(false, options.show_progress).await?;
 
         let tags = tag_filter.tags(&PLATFORM_TAGS);
-        let Some(package) =
-            PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?
+        let Some(package) = PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags)?
         else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
@@ -284,14 +286,14 @@ impl PackageManagerOps for PythonPackageManager {
         };
 
         let checksum = get_checksum(&self.ctx, &package.package, options.show_progress).await?;
-        let options = DownloadFileOptionsBuilder::default()
+        let options = DownloadAssetOptionsBuilder::default()
             .update(false)
             .checksum(Some(checksum))
             .show_progress(options.show_progress)
             .build()?;
         _ = self
             .ctx
-            .download_file(package.package.url(), &options)
+            .download_asset(package.package.url(), &options)
             .await?;
         Ok(())
     }
@@ -309,8 +311,7 @@ impl PackageManagerOps for PythonPackageManager {
         let index = self.get_index(false, options.show_progress).await?;
 
         let tags = tag_filter.tags(&PLATFORM_TAGS);
-        let Some(package) =
-            PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags).await?
+        let Some(package) = PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags)?
         else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",

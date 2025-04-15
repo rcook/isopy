@@ -73,8 +73,8 @@ pub use package_manager::{
     PackageManager, PackageManagerOps, UpdateIndexOptions, UpdateIndexOptionsBuilder,
 };
 pub use package_manager_context::{
-    DownloadFileOptions, DownloadFileOptionsBuilder, MakeDirOptions, MakeDirOptionsBuilder,
-    PackageManagerContext, PackageManagerContextOps,
+    DownloadAssetOptions, DownloadAssetOptionsBuilder, PackageManagerContext,
+    PackageManagerContextOps,
 };
 pub use plugin::{Plugin, PluginOps};
 pub use progress_indicator::{
