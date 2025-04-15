@@ -124,12 +124,6 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
-    #[command(name = "delete", about = "Delete project or non-project environment")]
-    Delete {
-        #[arg(help = "Project directory", value_parser = parse_absolute_path)]
-        project_dir: PathBuf,
-    },
-
     #[command(name = "download", about = "Download package into local cache")]
     Download {
         #[arg(help = "Package ID")]
@@ -195,7 +189,7 @@ pub(crate) enum Command {
         dir_id: MetaId,
     },
 
-    #[command(name = "list", about = "List environments")]
+    #[command(name = "ls", about = "List environments")]
     List {
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
         // --verbose/--no-verbose with default of "true"
@@ -258,6 +252,12 @@ pub(crate) enum Command {
     #[command(name = "prompt", about = "Show brief information in shell prompt")]
     Prompt(PromptConfig),
 
+    #[command(name = "rm", about = "Remove project or non-project environment")]
+    Remove {
+        #[arg(help = "Project directory", value_parser = parse_absolute_path)]
+        project_dir: PathBuf,
+    },
+
     #[command(name = "run", about = "Run command in environment")]
     Run {
         #[arg(help = "Program")]
@@ -274,7 +274,7 @@ pub(crate) enum Command {
     #[command(name = "scratch", about = "Experimental stuff")]
     Scratch,
 
-    #[command(name = "shell", about = "Start environment shell")]
+    #[command(name = "sh", about = "Start environment shell")]
     Shell {
         // Reference: https://jwodder.github.io/kbits/posts/clap-bool-negate/
         // --verbose/--no-verbose with default of "true"

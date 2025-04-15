@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::status::{success, user_error, StatusResult};
 use std::path::Path;
 
-pub(crate) async fn do_delete(app: &App, project_dir: &Path) -> StatusResult {
+pub(crate) async fn do_remove(app: &App, project_dir: &Path) -> StatusResult {
     if app.get_dir_info(project_dir)?.is_none() {
         user_error!(
             "No environment exists for project directory {}",

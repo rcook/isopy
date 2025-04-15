@@ -1,3 +1,3 @@
-## `shell` command
+## `sh` command
 
 _Starts environment shell_

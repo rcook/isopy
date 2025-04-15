@@ -21,7 +21,6 @@
 //
 mod check;
 mod completions;
-mod delete;
 mod download;
 mod env;
 mod info;
@@ -31,6 +30,7 @@ mod list;
 mod packages;
 mod project;
 mod prompt;
+mod remove;
 mod run;
 mod scratch;
 mod shell;
@@ -40,7 +40,6 @@ mod wrap;
 
 pub(crate) use check::do_check;
 pub(crate) use completions::do_completions;
-pub(crate) use delete::do_delete;
 pub(crate) use download::do_download;
 pub(crate) use env::do_env;
 pub(crate) use info::do_info;
@@ -50,6 +49,7 @@ pub(crate) use list::do_list;
 pub(crate) use packages::do_packages;
 pub(crate) use project::do_project;
 pub(crate) use prompt::do_prompt;
+pub(crate) use remove::do_remove;
 pub(crate) use run::do_run;
 pub(crate) use scratch::do_scratch;
 pub(crate) use shell::do_shell;
