@@ -321,7 +321,7 @@ impl PackageManagerOps for PythonPackageManager {
 
         let Some(path) = &package.path else {
             bail!(
-                "Package with ID {moniker}:{version} and tags {tags:?} not downloaded",
+                "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing pacakges",
                 moniker = self.moniker
             );
         };

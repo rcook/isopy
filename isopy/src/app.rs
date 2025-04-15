@@ -147,9 +147,17 @@ impl App {
 
         let dir_name = Path::new(moniker.as_str());
         let output_path = dir_info.data_dir().join(dir_name);
-        let package = package_manager
+
+        let package = match package_manager
             .install_package(version, &TagFilter::default(), &output_path, options)
-            .await?;
+            .await
+        {
+            Ok(p) => p,
+            Err(e) => {
+                _ = self.remove_project_env(project_dir);
+                bail!(e)
+            }
+        };
 
         packages.push(EnvPackage {
             package_id: PackageId::new(moniker, package.version()),
