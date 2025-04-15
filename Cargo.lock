@@ -1371,6 +1371,7 @@ dependencies = [
  "indicatif",
  "log",
  "rstest",
+ "serde",
  "sha2",
  "strum",
  "strum_macros",
@@ -1390,7 +1391,9 @@ dependencies = [
  "log",
  "regex",
  "rstest",
+ "serde",
  "serde_json",
+ "serde_yaml",
  "tokio",
  "url",
 ]

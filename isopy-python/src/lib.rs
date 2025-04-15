@@ -44,6 +44,7 @@ mod entrypoint;
 mod index;
 mod item;
 mod metadata;
+mod package_cache;
 mod prerelease_info;
 mod prerelease_kind;
 mod python_package;

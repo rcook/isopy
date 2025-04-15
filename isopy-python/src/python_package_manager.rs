@@ -22,6 +22,7 @@
 use crate::checksum::get_checksum;
 use crate::constants::DEFAULT_TAGS;
 use crate::index::Index;
+use crate::package_cache::{read_package_cache, write_package_cache};
 use crate::python_package::PythonPackage;
 use crate::python_package_state::PythonPackageState;
 use anyhow::{bail, Result};
@@ -34,6 +35,7 @@ use isopy_lib::{
 };
 use std::cmp::Ordering;
 use std::collections::HashSet;
+use std::fs::metadata;
 use std::path::Path;
 use tokio::fs::read_to_string;
 use url::Url;
@@ -101,6 +103,50 @@ impl PythonPackageManager {
         let path = self.ctx.download_file(&self.url, &options).await?;
         read_to_string(path).await?.parse()
     }
+
+    async fn fetch_package_states(
+        &self,
+        cache_path: &Path,
+        sources: SourceFilter,
+        tag_filter: &TagFilter,
+        options: &ListPackageStatesOptions,
+    ) -> Result<Vec<PackageState>> {
+        use isopy_lib::SourceFilter::*;
+
+        let index = self.get_index(false, options.show_progress).await?;
+        let tags = tag_filter.tags(&DEFAULT_TAGS);
+        let mut states = PythonPackageState::read_all(&self.ctx, &index)
+            .await?
+            .into_iter()
+            .filter(|p| {
+                matches!(
+                    (sources, p.availability() == PackageAvailability::Local),
+                    (All, _) | (Local, true) | (Remote, false)
+                )
+            })
+            .filter(|p| p.package().metadata().has_tags(&tags))
+            .collect::<Vec<_>>();
+
+        states.sort_by(|a, b| {
+            let temp = b.availability().cmp(&a.availability());
+            if temp != Ordering::Equal {
+                return temp;
+            }
+            b.package()
+                .metadata()
+                .version()
+                .cmp(a.package().metadata().version())
+        });
+
+        let packages = states
+            .into_iter()
+            .map(PythonPackageState::into_package_state)
+            .collect::<Vec<_>>();
+
+        write_package_cache(&cache_path, &packages)?;
+
+        Ok(packages)
+    }
 }
 
 #[async_trait]
@@ -129,7 +175,7 @@ impl PackageManagerOps for PythonPackageManager {
 
         let mut other_tags = other_tags.into_iter().collect::<Vec<_>>();
         other_tags.sort();
-        let other_tags = other_tags;
+        let other_tags: Vec<String> = other_tags;
 
         let mut default_tags = DEFAULT_TAGS
             .into_iter()
@@ -147,36 +193,30 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         options: &ListPackageStatesOptions,
     ) -> Result<Vec<PackageState>> {
-        use isopy_lib::SourceFilter::*;
-        let index = self.get_index(false, options.show_progress).await?;
-        let tags = tag_filter.tags(&DEFAULT_TAGS);
-        let mut states = PythonPackageState::read_all(&self.ctx, &index)
-            .await?
-            .into_iter()
-            .filter(|p| {
-                matches!(
-                    (sources, p.availability() == PackageAvailability::Local),
-                    (All, _) | (Local, true) | (Remote, false)
-                )
-            })
-            .filter(|p| p.package().metadata().has_tags(&tags))
-            .collect::<Vec<_>>();
+        let cache_path = self.ctx.cache_dir().join("packages.yaml");
+        let index_path = self.ctx.file_exists(&self.url)?;
+        let Some(index_path) = index_path else {
+            return Ok(self
+                .fetch_package_states(&cache_path, sources, tag_filter, options)
+                .await?);
+        };
 
-        states.sort_by(|a, b| {
-            let temp = b.availability().cmp(&a.availability());
-            if temp != Ordering::Equal {
-                return temp;
-            }
-            b.package()
-                .metadata()
-                .version()
-                .cmp(a.package().metadata().version())
-        });
+        if !cache_path.exists() {
+            return Ok(self
+                .fetch_package_states(&cache_path, sources, tag_filter, options)
+                .await?);
+        }
 
-        Ok(states
-            .into_iter()
-            .map(PythonPackageState::into_package_state)
-            .collect())
+        let index_created_at = metadata(&index_path)?.created()?;
+        let cache_created_at = metadata(&cache_path)?.created()?;
+
+        if index_created_at > cache_created_at {
+            return Ok(self
+                .fetch_package_states(&cache_path, sources, tag_filter, options)
+                .await?);
+        }
+
+        return Ok(read_package_cache(&cache_path)?);
     }
 
     async fn get_package_state(

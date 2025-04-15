@@ -25,7 +25,7 @@ use crate::macros::dyn_trait_struct;
 use anyhow::Result;
 use async_trait::async_trait;
 use derive_builder::Builder;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use url::Url;
 
 #[derive(Builder, Default)]
@@ -65,6 +65,8 @@ pub struct MakeDirOptions {
 
 #[async_trait]
 pub trait PackageManagerContextOps: Send + Sync {
+    fn cache_dir(&self) -> &Path;
+    fn file_exists(&self, url: &Url) -> Result<Option<PathBuf>>;
     async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf>;
     async fn get_file(&self, url: &Url) -> Result<PathBuf>;
     async fn make_dir(&self, url: &Url, options: &MakeDirOptions) -> Result<PathBuf>;

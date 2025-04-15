@@ -320,6 +320,14 @@ impl PackageManagerHelper {
 
 #[async_trait]
 impl PackageManagerContextOps for PackageManagerHelper {
+    fn cache_dir(&self) -> &Path {
+        &self.cache_dir
+    }
+
+    fn file_exists(&self, url: &Url) -> Result<Option<PathBuf>> {
+        Ok(self.check_cache::<FileCacheItem>(url)?)
+    }
+
     async fn download_file(&self, url: &Url, options: &DownloadFileOptions) -> Result<PathBuf> {
         if !options.update {
             if let Some(path) = self.check_cache::<FileCacheItem>(url)? {
