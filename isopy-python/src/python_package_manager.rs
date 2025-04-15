@@ -283,7 +283,7 @@ impl PackageManagerOps for PythonPackageManager {
             );
         };
 
-        let checksum = get_checksum(&package.package)?;
+        let checksum = get_checksum(&self.ctx, &package.package, options.show_progress).await?;
         let options = DownloadFileOptionsBuilder::default()
             .update(false)
             .checksum(Some(checksum))

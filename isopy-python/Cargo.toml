@@ -14,7 +14,6 @@ version = "0.4.9"
 [dependencies]
 anyhow = "1.0.98"
 async-trait = "0.1.88"
-include_dir = "0.7.4"
 isopy-lib = { path = "../isopy-lib" }
 log = "0.4.27"
 regex = "1.11.1"

@@ -20,14 +20,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_package::PythonPackage;
+use crate::python_plugin::CHECKSUM_BASE_URL;
 use anyhow::{anyhow, bail, Result};
-use include_dir::{include_dir, Dir};
-use isopy_lib::Checksum;
+use isopy_lib::{Checksum, DownloadFileOptionsBuilder, PackageManagerContext};
 use std::collections::HashMap;
+use std::fs::read_to_string;
 
-const SHA256SUMS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/sha256sums");
-
-pub(crate) fn get_checksum(package: &PythonPackage) -> Result<Checksum> {
+pub(crate) async fn get_checksum(
+    ctx: &PackageManagerContext,
+    package: &PythonPackage,
+    show_progress: bool,
+) -> Result<Checksum> {
     fn parse_checksums(content: &str) -> HashMap<&str, &str> {
         content
             .lines()
@@ -46,17 +49,21 @@ pub(crate) fn get_checksum(package: &PythonPackage) -> Result<Checksum> {
 
     let release_group_str = release_group.as_str();
     let file_name = format!("{release_group_str}.sha256sums");
-    let file = SHA256SUMS_DIR
-        .get_file(&file_name)
-        .ok_or_else(|| anyhow!("Resource file {} not found", file_name))?;
-    let checksum_strs = parse_checksums(
-        file.contents_utf8()
-            .ok_or_else(|| anyhow!("Resource file {} could not be decoded as UTF-8", file_name))?,
-    );
+    let url = CHECKSUM_BASE_URL.join(&file_name)?;
+
+    let options = DownloadFileOptionsBuilder::default()
+        .update(false)
+        .show_progress(show_progress)
+        .build()?;
+    let path = ctx.download_file(&url, &options).await?;
+    let content = read_to_string(path)?;
+    let checksum_strs = parse_checksums(&content);
+
     let package_name = package.metadata().name();
     let checksum_str = checksum_strs
         .get(package_name)
         .ok_or_else(|| anyhow!("No checksum found for archive {package_name}"))?;
     let checksum = checksum_str.parse()?;
+
     Ok(checksum)
 }
