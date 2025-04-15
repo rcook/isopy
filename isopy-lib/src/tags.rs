@@ -21,37 +21,22 @@
 //
 #[derive(Default)]
 pub struct Tags {
-    tags: Vec<String>,
-    default_tags: Vec<String>,
-    other_tags: Vec<String>,
+    pub platform_tags: Vec<String>,
+    pub common_tags: Vec<String>,
+    pub other_tags: Vec<String>,
 }
 
 impl Tags {
     #[must_use]
     pub const fn new(
-        tags: Vec<String>,
-        default_tags: Vec<String>,
+        platform_tags: Vec<String>,
+        common_tags: Vec<String>,
         other_tags: Vec<String>,
     ) -> Self {
         Self {
-            tags,
-            default_tags,
+            platform_tags,
+            common_tags,
             other_tags,
         }
-    }
-
-    #[must_use]
-    pub const fn tags(&self) -> &Vec<String> {
-        &self.tags
-    }
-
-    #[must_use]
-    pub const fn default_tags(&self) -> &Vec<String> {
-        &self.default_tags
-    }
-
-    #[must_use]
-    pub const fn other_tags(&self) -> &Vec<String> {
-        &self.other_tags
     }
 }

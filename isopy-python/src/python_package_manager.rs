@@ -209,31 +209,35 @@ impl PackageManagerOps for PythonPackageManager {
     }
 
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags> {
-        let mut tags = HashSet::new();
+        let mut common_tags = HashSet::new();
         let mut other_tags = HashSet::new();
         for package in self.read_packages(options.show_progress).await? {
-            tags.extend(package.metadata().tags().to_owned());
+            common_tags.extend(package.metadata().tags().to_owned());
             if let Some(release_group) = package.metadata().version().release_group() {
                 other_tags.insert(String::from(release_group.as_str()));
             }
         }
 
-        let mut tags = tags.into_iter().collect::<Vec<_>>();
-        tags.sort();
-        let tags = tags;
+        let platform_tags = PLATFORM_TAGS
+            .iter()
+            .copied()
+            .map(String::from)
+            .collect::<HashSet<_>>();
+
+        common_tags.retain(|t| !platform_tags.contains(t));
+        let mut common_tags = common_tags.into_iter().collect::<Vec<_>>();
+        common_tags.sort();
+        let common_tags = common_tags;
+
+        let mut platform_tags = platform_tags.into_iter().collect::<Vec<_>>();
+        platform_tags.sort();
+        let platform_tags = platform_tags;
 
         let mut other_tags = other_tags.into_iter().collect::<Vec<_>>();
         other_tags.sort();
         let other_tags: Vec<String> = other_tags;
 
-        let mut default_tags = PLATFORM_TAGS
-            .into_iter()
-            .map(String::from)
-            .collect::<Vec<_>>();
-        default_tags.sort();
-        let default_tags = default_tags;
-
-        Ok(Tags::new(tags, default_tags, other_tags))
+        Ok(Tags::new(platform_tags, common_tags, other_tags))
     }
 
     async fn list_packages(

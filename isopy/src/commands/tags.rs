@@ -40,23 +40,23 @@ pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> StatusResul
             moniker.as_str().bright_magenta()
         );
 
-        if !tags.tags().is_empty() {
-            println!("  {}:", "Tags".bright_yellow());
-            for tag in tags.tags() {
+        if !tags.platform_tags.is_empty() {
+            println!("  {}:", "Platform tags".bright_yellow());
+            for tag in tags.platform_tags {
                 println!("    {}", tag.cyan());
             }
         }
 
-        if !tags.default_tags().is_empty() {
-            println!("  {}:", "Default tags".bright_yellow());
-            for tag in tags.default_tags() {
+        if !tags.common_tags.is_empty() {
+            println!("  {}:", "Common tags".bright_yellow());
+            for tag in tags.common_tags {
                 println!("    {}", tag.cyan());
             }
         }
 
-        if !tags.other_tags().is_empty() {
+        if !tags.other_tags.is_empty() {
             println!("  {}:", "Other tags".bright_yellow());
-            for tag in tags.other_tags() {
+            for tag in tags.other_tags {
                 println!("    {}", tag.cyan());
             }
         }
