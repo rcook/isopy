@@ -23,19 +23,17 @@ use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::python_package_manager::PythonPackageManager;
 use crate::python_version::PythonVersion;
 use anyhow::Result;
-use isopy_lib::{render_absolute_path, DirUrl, EnvInfo, Platform, Shell};
+use isopy_lib::{render_absolute_path, DirUrl, EnvInfo, FileUrl, Platform, Shell};
 use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use url::Url;
 
-fn file_url(s: &str) -> Url {
-    s.trim_end_matches('/').parse().expect("Invalid URL")
-}
-
-static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
-    file_url("https://api.github.com/repos/astral-sh/python-build-standalone/releases")
+static INDEX_URL: LazyLock<FileUrl> = LazyLock::new(|| {
+    "https://api.github.com/repos/astral-sh/python-build-standalone/releases"
+        .parse()
+        .expect("Invalid URL")
 });
 
 pub(crate) static CHECKSUM_BASE_URL: LazyLock<DirUrl> = LazyLock::new(|| {
@@ -58,7 +56,7 @@ impl PythonPlugin {
 
 impl PluginOps for PythonPlugin {
     fn url(&self) -> &Url {
-        &INDEX_URL
+        INDEX_URL.as_url()
     }
 
     fn parse_version(&self, s: &str) -> Result<Version> {
@@ -115,6 +113,10 @@ impl PluginOps for PythonPlugin {
     }
 
     fn new_package_manager(&self, ctx: PackageManagerContext) -> PackageManager {
-        PackageManager::new(PythonPackageManager::new(ctx, &self.moniker, &INDEX_URL))
+        PackageManager::new(PythonPackageManager::new(
+            ctx,
+            &self.moniker,
+            INDEX_URL.as_url(),
+        ))
     }
 }
