@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::base_version::BaseVersion;
-use crate::release_group::ReleaseGroup;
+use crate::build_label::BuildLabel;
 use anyhow::{bail, Error, Result};
 use isopy_lib::VersionOps;
 use std::collections::HashSet;
@@ -31,25 +31,25 @@ use std::str::FromStr;
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonVersion {
     version: BaseVersion,
-    release_group: Option<ReleaseGroup>,
+    label: Option<BuildLabel>,
 }
 
 impl PythonVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut result = None;
         let mut version = None;
-        let mut release_group = None;
+        let mut label = None;
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
                 if let Ok(temp_version) = BaseVersion::parse(prefix) {
-                    if let Ok(temp_release_group) = suffix.parse() {
-                        assert!(result.is_none() && version.is_none() && release_group.is_none());
+                    if let Ok(temp_label) = suffix.parse() {
+                        assert!(result.is_none() && version.is_none() && label.is_none());
                         tags_to_remove.push(tag.clone());
                         result = Some(Self {
                             version: temp_version,
-                            release_group: Some(temp_release_group),
+                            label: Some(temp_label),
                         });
                         break;
                     }
@@ -60,15 +60,15 @@ impl PythonVersion {
                 assert!(result.is_none() && version.is_none());
                 tags_to_remove.push(tag.clone());
                 version = Some(temp_version);
-                if release_group.is_some() {
+                if label.is_some() {
                     break;
                 }
             }
 
-            if let Ok(temp_release_group) = tag.parse() {
-                assert!(result.is_none() && release_group.is_none());
+            if let Ok(temp_label) = tag.parse() {
+                assert!(result.is_none() && label.is_none());
                 tags_to_remove.push(tag.clone());
-                release_group = Some(temp_release_group);
+                label = Some(temp_label);
                 if version.is_some() {
                     break;
                 }
@@ -80,7 +80,7 @@ impl PythonVersion {
         }
 
         if let Some(result) = result {
-            assert!(version.is_none() && release_group.is_none());
+            assert!(version.is_none() && label.is_none());
             return Ok(result);
         }
 
@@ -88,13 +88,13 @@ impl PythonVersion {
             bail!("Could not determine package version from tags {tags:?}")
         };
 
-        let Some(release_group) = release_group else {
-            bail!("Could not determine package release group from tags {tags:?}")
+        let Some(label) = label else {
+            bail!("Could not determine package build label from tags {tags:?}")
         };
 
         Ok(Self {
             version,
-            release_group: Some(release_group),
+            label: Some(label),
         })
     }
 
@@ -102,8 +102,8 @@ impl PythonVersion {
         &self.version
     }
 
-    pub(crate) const fn release_group(&self) -> &Option<ReleaseGroup> {
-        &self.release_group
+    pub(crate) const fn label(&self) -> &Option<BuildLabel> {
+        &self.label
     }
 
     pub(crate) fn matches(&self, other: &Self) -> bool {
@@ -111,9 +111,9 @@ impl PythonVersion {
             return false;
         }
 
-        if let Some(other_release_group) = other.release_group() {
-            match &self.release_group {
-                Some(release_group) if release_group == other_release_group => {}
+        if let Some(other_label) = other.label() {
+            match &self.label {
+                Some(label) if label == other_label => {}
                 _ => return false,
             }
         }
@@ -125,8 +125,8 @@ impl PythonVersion {
 impl Display for PythonVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.version)?;
-        if let Some(release_group) = &self.release_group {
-            write!(f, ":{}", release_group.as_str())?;
+        if let Some(label) = &self.label {
+            write!(f, ":{}", label.as_str())?;
         }
         Ok(())
     }
@@ -136,16 +136,13 @@ impl FromStr for PythonVersion {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        let (prefix, release_group) = match s.rsplit_once(':') {
+        let (prefix, label) = match s.rsplit_once(':') {
             Some((prefix, suffix)) => (prefix, Some(suffix.parse()?)),
             None => (s, None),
         };
 
         let version = BaseVersion::parse(prefix)?;
-        Ok(Self {
-            version,
-            release_group,
-        })
+        Ok(Self { version, label })
     }
 }
 
@@ -162,9 +159,9 @@ impl VersionOps for PythonVersion {
 #[cfg(test)]
 mod tests {
     use super::PythonVersion;
+    use crate::build_label::BuildLabel;
     use crate::discriminant::Discriminant;
     use crate::prerelease_kind::PrereleaseKind;
-    use crate::release_group::ReleaseGroup;
     use anyhow::Result;
     use rstest::rstest;
 
@@ -183,7 +180,7 @@ mod tests {
         2,
         3,
         Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 2),
-        Some("20250414".parse::<ReleaseGroup>().expect("Must succeed")),
+        Some("20250414".parse::<BuildLabel>().expect("Must succeed")),
         "1.2.3rc2:20250414"
     )]
     fn basics(
@@ -191,7 +188,7 @@ mod tests {
         #[case] expected_minor: i32,
         #[case] expected_revision: i32,
         #[case] expected_discriminant: Discriminant,
-        #[case] expected_release_group: Option<ReleaseGroup>,
+        #[case] expected_label: Option<BuildLabel>,
         #[case] input: &str,
     ) -> Result<()> {
         let result = input.parse::<PythonVersion>()?;
@@ -200,7 +197,7 @@ mod tests {
         assert_eq!(expected_minor, version.triple.minor);
         assert_eq!(expected_revision, version.triple.revision);
         assert_eq!(expected_discriminant, version.discriminant);
-        assert_eq!(expected_release_group, result.release_group);
+        assert_eq!(expected_label, result.label);
         Ok(())
     }
 }

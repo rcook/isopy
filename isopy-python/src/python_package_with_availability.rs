@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::build_label::BuildLabel;
 use crate::index::Index;
 use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
-use crate::release_group::ReleaseGroup;
 use anyhow::Result;
 use isopy_lib::{Package, PackageAvailability, PackageInfo, PackageManagerContext, Version};
 use std::collections::HashSet;
@@ -74,9 +74,9 @@ impl PythonPackageWithAvailability {
             .package
             .metadata()
             .version()
-            .release_group()
+            .label()
             .as_ref()
-            .map(ReleaseGroup::as_str);
+            .map(BuildLabel::as_str);
         PackageInfo::new(
             self.availability,
             self.package.metadata().name(),

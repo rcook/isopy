@@ -213,8 +213,8 @@ impl PackageManagerOps for PythonPackageManager {
         let mut other_tags = HashSet::new();
         for package in self.read_packages(options.show_progress).await? {
             common_tags.extend(package.metadata().tags().to_owned());
-            if let Some(release_group) = package.metadata().version().release_group() {
-                other_tags.insert(String::from(release_group.as_str()));
+            if let Some(label) = package.metadata().version().label() {
+                other_tags.insert(String::from(label.as_str()));
             }
         }
 

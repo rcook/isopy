@@ -43,12 +43,12 @@ pub(crate) async fn get_checksum(
             .collect::<HashMap<_, _>>()
     }
 
-    let Some(release_group) = package.metadata().version().release_group() else {
-        bail!("Python package has no release group")
+    let Some(label) = package.metadata().version().label() else {
+        bail!("Python package has no build label")
     };
 
-    let release_group_str = release_group.as_str();
-    let file_name = format!("{release_group_str}.sha256sums");
+    let label_str = label.as_str();
+    let file_name = format!("{label_str}.sha256sums");
     let url = CHECKSUM_BASE_URL.as_url().join(&file_name)?;
 
     let options = DownloadAssetOptionsBuilder::default()

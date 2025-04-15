@@ -37,6 +37,7 @@
 #![allow(clippy::redundant_pub_crate)]
 
 mod base_version;
+mod build_label;
 mod checksum;
 mod constants;
 mod discriminant;
@@ -52,6 +53,5 @@ mod python_package_manager;
 mod python_package_with_availability;
 mod python_plugin;
 mod python_version;
-mod release_group;
 
 pub use entrypoint::new_plugin;

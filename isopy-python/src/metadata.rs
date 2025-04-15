@@ -54,8 +54,8 @@ impl Metadata {
     pub(crate) fn has_tags(&self, tags: &HashSet<&str>) -> bool {
         // TBD: How do we cache this?
         let mut all_tags = self.tags.iter().map(String::as_str).collect::<HashSet<_>>();
-        if let Some(release_group) = self.version.release_group() {
-            all_tags.insert(release_group.as_str());
+        if let Some(label) = self.version.label() {
+            all_tags.insert(label.as_str());
         }
         all_tags.is_superset(tags)
     }
