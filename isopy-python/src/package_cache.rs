@@ -47,10 +47,10 @@ struct Package {
     #[serde(rename = "version")]
     version: String,
 
-    #[serde(rename = "label")]
+    #[serde(rename = "label", skip_serializing_if = "Option::is_none")]
     label: Option<String>,
 
-    #[serde(rename = "path")]
+    #[serde(rename = "path", skip_serializing_if = "Option::is_none")]
     path: Option<PathBuf>,
 }
 
