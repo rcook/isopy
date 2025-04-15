@@ -40,6 +40,8 @@ use std::path::Path;
 use tokio::fs::read_to_string;
 use url::Url;
 
+const PACKAGE_CACHE_FILE_NAME: &str = "package-cache.yaml";
+
 macro_rules! downcast_version {
     ($version : expr) => {
         $version
@@ -193,7 +195,7 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         options: &ListPackageStatesOptions,
     ) -> Result<Vec<PackageState>> {
-        let cache_path = self.ctx.cache_dir().join("packages.yaml");
+        let cache_path = self.ctx.cache_dir().join(PACKAGE_CACHE_FILE_NAME);
         let index_path = self.ctx.file_exists(&self.url)?;
         let Some(index_path) = index_path else {
             return Ok(self
