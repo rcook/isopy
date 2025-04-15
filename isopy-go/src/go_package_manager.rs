@@ -25,7 +25,7 @@ use crate::go_version::GoVersion;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, query, ArchiveType, DownloadAssetOptionsBuilder, DownloadPackageOptions,
+    query, ArchiveType, DirUrl, DownloadAssetOptionsBuilder, DownloadPackageOptions,
     GetPackageOptions, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
     PackageAvailability, PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter,
     TagFilter, Tags, UpdateIndexOptions, Version,
@@ -83,8 +83,8 @@ impl GoPackageManager {
             .show_progress(show_progress)
             .query(query!([("include", "all"), ("mode", "json")]))
             .build()?;
-        let url = dir_url(&self.url);
-        let path = self.ctx.download_asset(&url, &options).await?;
+        let url: DirUrl = self.url.clone().into();
+        let path = self.ctx.download_asset(url.as_url(), &options).await?;
         let s = read_to_string(path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)

@@ -23,7 +23,7 @@ use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::python_package_manager::PythonPackageManager;
 use crate::python_version::PythonVersion;
 use anyhow::Result;
-use isopy_lib::{render_absolute_path, EnvInfo, Platform, Shell};
+use isopy_lib::{render_absolute_path, DirUrl, EnvInfo, Platform, Shell};
 use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
@@ -34,19 +34,15 @@ fn file_url(s: &str) -> Url {
     s.trim_end_matches('/').parse().expect("Invalid URL")
 }
 
-fn dir_url(s: &str) -> Url {
-    let s = s.trim_end_matches('/');
-    let mut s = String::from(s);
-    s.push('/');
-    s.parse().expect("Invalid URL")
-}
-
 static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
     file_url("https://api.github.com/repos/astral-sh/python-build-standalone/releases")
 });
 
-pub(crate) static CHECKSUM_BASE_URL: LazyLock<Url> =
-    LazyLock::new(|| dir_url("https://blog.rcook.org/assets/isopy"));
+pub(crate) static CHECKSUM_BASE_URL: LazyLock<DirUrl> = LazyLock::new(|| {
+    "https://blog.rcook.org/assets/isopy"
+        .parse()
+        .expect("Invalid URL")
+});
 
 pub(crate) struct PythonPlugin {
     moniker: String,
