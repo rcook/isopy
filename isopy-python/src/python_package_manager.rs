@@ -40,7 +40,7 @@ use std::path::Path;
 use tokio::fs::read_to_string;
 use url::Url;
 
-const PACKAGE_CACHE_FILE_NAME: &str = "package-cache.yaml";
+const PACKAGE_CACHE_FILE_NAME: &str = "packages.yaml";
 
 macro_rules! downcast_version {
     ($version : expr) => {

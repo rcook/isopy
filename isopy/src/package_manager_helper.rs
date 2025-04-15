@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::cache::Cache;
-use crate::constants::{CACHE_FILE_NAME, ISOPY_USER_AGENT};
+use crate::constants::{DOWNLOAD_CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::serialization::{Directory, Download, File};
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
@@ -264,7 +264,7 @@ impl PackageManagerHelper {
     }
 
     fn load_cache(&self) -> Result<Cache> {
-        Cache::load(self.base_dir.join(CACHE_FILE_NAME))
+        Cache::load(self.base_dir.join(DOWNLOAD_CACHE_FILE_NAME))
     }
 
     fn check_cache<C: CacheItem>(&self, url: &Url) -> Result<Option<PathBuf>> {

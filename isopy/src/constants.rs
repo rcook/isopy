@@ -22,7 +22,7 @@
 pub(crate) const ENV_CONFIG_FILE_NAME: &str = "env.yaml";
 pub(crate) const PROJECT_CONFIG_FILE_NAME: &str = ".isopy.yaml";
 pub(crate) const CACHE_DIR_NAME: &str = "cache";
-pub(crate) const CACHE_FILE_NAME: &str = "cache.yaml";
+pub(crate) const DOWNLOAD_CACHE_FILE_NAME: &str = "downloads.yaml";
 pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
 pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
 
