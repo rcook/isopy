@@ -19,17 +19,54 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::Error;
 use std::borrow::Cow;
+use std::result::Result as StdResult;
+use std::str::FromStr;
 use url::Url;
 
-#[must_use]
-pub fn file_url(url: &Url) -> Cow<Url> {
-    helper(url, false)
+pub struct FileUrl(Url);
+
+impl FileUrl {
+    pub fn url(&self) -> &Url {
+        &self.0
+    }
 }
 
-#[must_use]
-pub fn dir_url(url: &Url) -> Cow<Url> {
-    helper(url, true)
+impl FromStr for FileUrl {
+    type Err = Error;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(s.parse::<Url>()?.into())
+    }
+}
+
+impl From<Url> for FileUrl {
+    fn from(item: Url) -> Self {
+        Self(helper(&item, false).into_owned())
+    }
+}
+
+pub struct DirUrl(Url);
+
+impl DirUrl {
+    pub fn url(&self) -> &Url {
+        &self.0
+    }
+}
+
+impl FromStr for DirUrl {
+    type Err = Error;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(s.parse::<Url>()?.into())
+    }
+}
+
+impl From<Url> for DirUrl {
+    fn from(item: Url) -> Self {
+        Self(helper(&item, true).into_owned())
+    }
 }
 
 fn helper(url: &Url, slash: bool) -> Cow<Url> {

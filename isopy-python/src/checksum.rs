@@ -49,7 +49,7 @@ pub(crate) async fn get_checksum(
 
     let release_group_str = release_group.as_str();
     let file_name = format!("{release_group_str}.sha256sums");
-    let url = CHECKSUM_BASE_URL.join(&file_name)?;
+    let url = CHECKSUM_BASE_URL.url().join(&file_name)?;
 
     let options = DownloadAssetOptionsBuilder::default()
         .update(false)

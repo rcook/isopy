@@ -25,10 +25,10 @@ use crate::go_version::GoVersion;
 use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
-    dir_url, query, ArchiveType, DownloadAssetOptionsBuilder, DownloadPackageOptions,
-    GetPackageOptions, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
-    PackageAvailability, PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter,
-    TagFilter, Tags, UpdateIndexOptions, Version,
+    query, ArchiveType, DownloadAssetOptionsBuilder, DownloadPackageOptions, GetPackageOptions,
+    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageAvailability,
+    PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags,
+    UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::collections::HashSet;

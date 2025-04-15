@@ -86,5 +86,5 @@ pub use source_filter::SourceFilter;
 pub use tag_filter::TagFilter;
 pub use tags::Tags;
 pub use triple::Triple;
-pub use url::{dir_url, file_url};
+pub use url::{DirUrl, FileUrl};
 pub use version::{Version, VersionOps};
