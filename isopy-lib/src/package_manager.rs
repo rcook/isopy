@@ -73,7 +73,7 @@ pub trait PackageManagerOps: Send + Sync {
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags>;
     async fn list_packages(
         &self,
-        sources: SourceFilter,
+        source_filter: SourceFilter,
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>>;

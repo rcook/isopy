@@ -185,7 +185,7 @@ impl PackageManagerOps for GoPackageManager {
 
     async fn list_packages(
         &self,
-        sources: SourceFilter,
+        source_filter: SourceFilter,
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
@@ -199,14 +199,14 @@ impl PackageManagerOps for GoPackageManager {
         tags.extend(PLATFORM_TAGS.into_iter().map(String::from));
 
         let mut packages = Vec::new();
-        for package in self.get_packages(false, options.show_progress).await? {
-            if package.tags.is_superset(&tags)
+        for p in self.get_packages(false, options.show_progress).await? {
+            if p.tags.is_superset(&tags)
                 && matches!(
-                    (sources, package.availability == PackageAvailability::Local),
+                    (source_filter, p.availability == PackageAvailability::Local),
                     (All, _) | (Local, true) | (Remote, false)
                 )
             {
-                packages.push(package);
+                packages.push(p);
             }
         }
 

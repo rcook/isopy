@@ -118,7 +118,7 @@ impl PackageManagerOps for JavaPackageManager {
 
     async fn list_packages(
         &self,
-        _sources: SourceFilter,
+        _source_filter: SourceFilter,
         _tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {

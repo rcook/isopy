@@ -171,45 +171,42 @@ impl PythonPackageManager {
     fn filter_packages(
         &self,
         packages: Vec<PythonPackage>,
-        sources: SourceFilter,
+        source_filter: SourceFilter,
         version: Option<&PythonVersion>,
         tag_filter: &TagFilter,
     ) -> Result<Vec<AvailabilityInfo>> {
         use isopy_lib::SourceFilter::*;
 
-        let mut infos = {
-            let tags = tag_filter
-                .tags
-                .iter()
-                .map(String::clone)
-                .collect::<HashSet<_>>();
-            let mut temp_infos = Vec::new();
-            for package in packages {
-                let m = &package.metadata;
-                let version_matches = match version {
-                    Some(version) => m.version.matches(version),
-                    None => true,
+        let tags = tag_filter
+            .tags
+            .iter()
+            .map(String::clone)
+            .collect::<HashSet<_>>();
+        let mut infos = Vec::new();
+        for package in packages {
+            let m = &package.metadata;
+            let version_matches = match version {
+                Some(version) => m.version.matches(version),
+                None => true,
+            };
+            if version_matches && m.tags.is_superset(&tags) {
+                let (availability, path) = match self.ctx.check_asset(&package.url)? {
+                    Some(p) => (PackageAvailability::Local, Some(p)),
+                    None => (PackageAvailability::Remote, None),
                 };
-                if version_matches && m.tags.is_superset(&tags) {
-                    let (availability, path) = match self.ctx.check_asset(&package.url)? {
-                        Some(p) => (PackageAvailability::Local, Some(p)),
-                        None => (PackageAvailability::Remote, None),
-                    };
 
-                    if matches!(
-                        (sources, availability == PackageAvailability::Local),
-                        (All, _) | (Local, true) | (Remote, false)
-                    ) {
-                        temp_infos.push(AvailabilityInfo {
-                            package,
-                            availability,
-                            path,
-                        });
-                    }
+                if matches!(
+                    (source_filter, availability == PackageAvailability::Local),
+                    (All, _) | (Local, true) | (Remote, false)
+                ) {
+                    infos.push(AvailabilityInfo {
+                        package,
+                        availability,
+                        path,
+                    });
                 }
             }
-            temp_infos
-        };
+        }
 
         // Must sort _before_ uniquifying
         infos.sort_by(|a, b| {
@@ -277,14 +274,14 @@ impl PackageManagerOps for PythonPackageManager {
 
     async fn list_packages(
         &self,
-        sources: SourceFilter,
+        source_filter: SourceFilter,
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         Ok(self
             .filter_packages(
                 self.read_packages(options.show_progress).await?,
-                sources,
+                source_filter,
                 None,
                 tag_filter,
             )?
