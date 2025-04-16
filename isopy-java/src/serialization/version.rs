@@ -72,6 +72,10 @@ impl VersionOps for Version {
         Cow::Owned(format!("{self}"))
     }
 
+    fn label(&self) -> Option<Cow<String>> {
+        None
+    }
+
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }

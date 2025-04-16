@@ -22,9 +22,7 @@
 use crate::discriminant::Discriminant;
 use crate::prerelease_kind::PrereleaseKind;
 use anyhow::Result;
-use isopy_lib::{Triple, VersionOps};
-use std::any::Any;
-use std::borrow::Cow;
+use isopy_lib::Triple;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -72,20 +70,6 @@ impl Display for BaseVersion {
             Discriminant::Prerelease(d) => write!(f, "{}{}", self.triple, d),
             _ => write!(f, "{}", self.triple),
         }
-    }
-}
-
-impl VersionOps for BaseVersion {
-    fn as_str(&self) -> Cow<String> {
-        Cow::Owned(format!("{self}"))
-    }
-
-    fn box_clone(&self) -> Box<dyn VersionOps> {
-        Box::new(self.clone())
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
     }
 }
 

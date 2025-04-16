@@ -150,7 +150,13 @@ impl FromStr for PythonVersion {
 
 impl VersionOps for PythonVersion {
     fn as_str(&self) -> Cow<String> {
-        Cow::Owned(format!("{self}"))
+        Cow::Owned(format!("{}", self.version))
+    }
+
+    fn label(&self) -> Option<Cow<String>> {
+        self.label
+            .as_ref()
+            .map(|l| Cow::Owned(String::from(l.as_str())))
     }
 
     fn box_clone(&self) -> Box<dyn VersionOps> {

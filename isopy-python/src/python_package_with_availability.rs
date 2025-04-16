@@ -48,7 +48,7 @@ impl PythonPackageWithAvailability {
             self.availability,
             self.package.metadata().name(),
             self.package.url(),
-            Version::new(self.package.metadata().version().version().clone()),
+            Version::new(self.package.metadata().version().clone()),
             label,
             self.path,
         )
