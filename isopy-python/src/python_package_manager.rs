@@ -105,13 +105,13 @@ impl PythonPackageManager {
         Ok(())
     }
 
-    fn make_package_info(package: AvailabilityInfo) -> PackageInfo {
+    fn make_package_info(info: AvailabilityInfo) -> PackageInfo {
         PackageInfo::new(
-            package.availability,
-            package.package.metadata.name.clone(),
-            &package.package.url,
-            Version::new(package.package.metadata.version.clone()),
-            package.path,
+            info.availability,
+            info.package.metadata.name.clone(),
+            &info.package.url,
+            Version::new(info.package.metadata.version.clone()),
+            info.path,
         )
     }
 
@@ -175,13 +175,13 @@ impl PythonPackageManager {
     ) -> Result<Vec<AvailabilityInfo>> {
         use isopy_lib::SourceFilter::*;
 
-        let mut packages = {
+        let mut infos = {
             let tags = tag_filter
                 .tags
                 .iter()
                 .map(String::clone)
                 .collect::<HashSet<_>>();
-            let mut temp_packages = Vec::new();
+            let mut temp_infos = Vec::new();
             for package in packages {
                 let m = &package.metadata;
                 let version_matches = match version {
@@ -198,7 +198,7 @@ impl PythonPackageManager {
                         (sources, availability == PackageAvailability::Local),
                         (All, _) | (Local, true) | (Remote, false)
                     ) {
-                        temp_packages.push(AvailabilityInfo {
+                        temp_infos.push(AvailabilityInfo {
                             package,
                             availability,
                             path,
@@ -206,11 +206,11 @@ impl PythonPackageManager {
                     }
                 }
             }
-            temp_packages
+            temp_infos
         };
 
         // Must sort _before_ uniquifying
-        packages.sort_by(|a, b| {
+        infos.sort_by(|a, b| {
             let temp = b.availability.cmp(&a.availability);
             if temp != Ordering::Equal {
                 return temp;
@@ -219,8 +219,7 @@ impl PythonPackageManager {
         });
 
         // Ensure there is exactly one matching package for a given version and build label
-        let packages = choose_best(packages);
-        Ok(packages)
+        Ok(choose_best(infos))
     }
 
     async fn read_package(
