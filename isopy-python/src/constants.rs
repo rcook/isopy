@@ -45,5 +45,4 @@ pub(crate) const PLATFORM_TAGS: [&str; 4] = ["aarch64", "apple", "darwin", "inst
 pub(crate) const PLATFORM_TAGS: [&str; 4] = ["x86_64", "apple", "darwin", "install_only"];
 
 #[cfg(target_os = "windows")]
-pub(crate) const PLATFORM_TAGS: [&str; 6] =
-    ["x86_64", "pc", "windows", "msvc", "shared", "install_only"];
+pub(crate) const PLATFORM_TAGS: [&str; 5] = ["x86_64", "pc", "windows", "msvc", "install_only"];
