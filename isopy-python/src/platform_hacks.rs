@@ -35,8 +35,7 @@ pub(crate) fn uniquify_packages(
         .iter()
         .chunk_by(|p| p.package.metadata().version().clone())
     {
-        let packages = group.collect::<Vec<_>>();
-        let package_count = packages.len();
+        let package_count = group.count();
         if package_count > 1 {
             bail!("There is more than one viable candidate for package {key}")
         }

@@ -51,6 +51,7 @@ impl Metadata {
         &self.tags
     }
 
+    #[allow(unused)]
     pub(crate) fn has_tag(&self, tag: &str) -> bool {
         self.tags.contains(tag)
     }
