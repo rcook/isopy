@@ -37,7 +37,7 @@ static INDEX_URL: LazyLock<FileUrl> = LazyLock::new(|| {
 });
 
 pub(crate) static CHECKSUM_BASE_URL: LazyLock<DirUrl> = LazyLock::new(|| {
-    "https://blog.rcook.org/assets/isopy"
+    "https://rcook.github.io/isopy/checksums"
         .parse()
         .expect("Invalid URL")
 });
