@@ -31,6 +31,7 @@ use isopy_lib::{
     TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use serde_json::Value;
+use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::path::Path;
 use tokio::fs::read_to_string;
@@ -210,8 +211,13 @@ impl PackageManagerOps for GoPackageManager {
             }
         }
 
-        packages.sort_by(|a, b| a.version.cmp(&b.version));
-        packages.reverse();
+        packages.sort_by(|a, b| {
+            let temp = b.availability.cmp(&a.availability);
+            if temp != Ordering::Equal {
+                return temp;
+            }
+            b.version.cmp(&a.version)
+        });
 
         Ok(packages
             .into_iter()
