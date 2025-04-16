@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::availability_info::AvailabilityInfo;
 use crate::checksum::get_checksum;
 use crate::constants::PLATFORM_TAGS;
 use crate::index::Index;
 use crate::package_cache::{read_package_cache, write_package_cache};
-use crate::platform_hacks::uniquify_packages;
+use crate::platform_hacks::choose_best;
 use crate::python_package::PythonPackage;
-use crate::python_package_with_availability::PythonPackageWithAvailability;
 use crate::python_version::PythonVersion;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
@@ -105,7 +105,7 @@ impl PythonPackageManager {
         Ok(())
     }
 
-    fn make_package_info(package: PythonPackageWithAvailability) -> PackageInfo {
+    fn make_package_info(package: AvailabilityInfo) -> PackageInfo {
         PackageInfo::new(
             package.availability,
             package.package.metadata.name.clone(),
@@ -172,7 +172,7 @@ impl PythonPackageManager {
         sources: SourceFilter,
         version: Option<&PythonVersion>,
         tag_filter: &TagFilter,
-    ) -> Result<Vec<PythonPackageWithAvailability>> {
+    ) -> Result<Vec<AvailabilityInfo>> {
         use isopy_lib::SourceFilter::*;
 
         let mut packages = {
@@ -198,7 +198,7 @@ impl PythonPackageManager {
                         (sources, availability == PackageAvailability::Local),
                         (All, _) | (Local, true) | (Remote, false)
                     ) {
-                        temp_packages.push(PythonPackageWithAvailability {
+                        temp_packages.push(AvailabilityInfo {
                             package,
                             availability,
                             path,
@@ -219,7 +219,7 @@ impl PythonPackageManager {
         });
 
         // Ensure there is exactly one matching package for a given version and build label
-        let packages = uniquify_packages(packages);
+        let packages = choose_best(packages);
         Ok(packages)
     }
 
@@ -228,7 +228,7 @@ impl PythonPackageManager {
         version: &PythonVersion,
         tag_filter: &TagFilter,
         show_progress: bool,
-    ) -> Result<Option<PythonPackageWithAvailability>> {
+    ) -> Result<Option<AvailabilityInfo>> {
         Ok(self
             .filter_packages(
                 self.read_packages(show_progress).await?,

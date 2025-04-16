@@ -36,6 +36,7 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
+mod availability_info;
 mod base_version;
 mod build_label;
 mod checksum;
@@ -51,7 +52,6 @@ mod prerelease_info;
 mod prerelease_kind;
 mod python_package;
 mod python_package_manager;
-mod python_package_with_availability;
 mod python_plugin;
 mod python_version;
 

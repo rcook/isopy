@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_package_with_availability::PythonPackageWithAvailability;
+use crate::availability_info::AvailabilityInfo;
 use itertools::Itertools;
 
 // On some platforms, most notably Windows, we will get more than one package
@@ -27,12 +27,10 @@ use itertools::Itertools;
 // there is exactly one matching package for a given version and build label
 
 #[cfg(not(target_os = "windows"))]
-pub(crate) fn uniquify_packages(
-    packages: Vec<PythonPackageWithAvailability>,
-) -> Vec<PythonPackageWithAvailability> {
-    for (key, group) in &packages
+pub(crate) fn choose_best(infos: Vec<AvailabilityInfo>) -> Vec<AvailabilityInfo> {
+    for (key, group) in &infos
         .iter()
-        .chunk_by(|p| p.package.metadata.version.clone())
+        .chunk_by(|i| i.package.metadata.version.clone())
     {
         assert_eq!(
             1,
@@ -40,39 +38,38 @@ pub(crate) fn uniquify_packages(
             "More than one viable candidate for package {key}"
         );
     }
-    packages
+    infos
 }
 
 // On Windows, we prefer the "shared" library over the "static" library and
 // choose the default otherwise
 #[cfg(target_os = "windows")]
-pub(crate) fn uniquify_packages(
-    packages: Vec<PythonPackageWithAvailability>,
-) -> Vec<PythonPackageWithAvailability> {
-    let mut filtered_packages = Vec::new();
-    for (key, group) in &packages
+pub(crate) fn choose_best(infos: Vec<AvailabilityInfo>) -> Vec<AvailabilityInfo> {
+    let mut best_infos = Vec::new();
+    for (key, group) in &infos
         .into_iter()
-        .chunk_by(|p| p.package.metadata().version.clone())
+        .chunk_by(|i| i.package.metadata.version.clone())
     {
-        let packages = group.collect::<Vec<_>>();
-        let package_count = packages.len();
-        assert_ne!(0, package_count);
+        let infos = group.collect::<Vec<_>>();
+        let info_count = infos.len();
+        assert_ne!(0, info_count);
 
-        if package_count > 1 {
+        if info_count > 1 {
             let mut temp_shared = None;
             let mut temp_static = None;
             let mut temp_default = None;
 
-            for package in packages {
-                if package.package.metadata().has_tag("shared") {
+            for info in infos {
+                let tags = &info.package.metadata.tags;
+                if tags.contains("shared") {
                     assert!(temp_shared.is_none());
-                    temp_shared = Some(package);
-                } else if package.package.metadata().has_tag("static") {
+                    temp_shared = Some(info);
+                } else if tags.contains("static") {
                     assert!(temp_static.is_none());
-                    temp_static = Some(package);
+                    temp_static = Some(info);
                 } else {
                     assert!(temp_default.is_none());
-                    temp_default = Some(package);
+                    temp_default = Some(info);
                 }
             }
 
@@ -81,23 +78,23 @@ pub(crate) fn uniquify_packages(
                 "No viable candidate for package {key}"
             );
 
-            if let Some(package) = temp_shared {
-                filtered_packages.push(package);
-            } else if let Some(package) = temp_default {
-                filtered_packages.push(package);
-            } else if let Some(package) = temp_static {
-                filtered_packages.push(package);
+            if let Some(info) = temp_shared {
+                best_infos.push(info);
+            } else if let Some(info) = temp_default {
+                best_infos.push(info);
+            } else if let Some(info) = temp_static {
+                best_infos.push(info);
             } else {
                 unreachable!()
             }
         } else {
-            let package = packages
+            let info = infos
                 .into_iter()
                 .next()
                 .expect("Must have exactly one element");
-            filtered_packages.push(package);
+            best_infos.push(info);
         }
     }
 
-    filtered_packages
+    best_infos
 }

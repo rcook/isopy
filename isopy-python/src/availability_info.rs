@@ -23,7 +23,7 @@ use crate::python_package::PythonPackage;
 use isopy_lib::PackageAvailability;
 use std::path::PathBuf;
 
-pub(crate) struct PythonPackageWithAvailability {
+pub(crate) struct AvailabilityInfo {
     pub(crate) package: PythonPackage,
     pub(crate) availability: PackageAvailability,
     pub(crate) path: Option<PathBuf>,
