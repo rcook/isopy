@@ -51,6 +51,10 @@ impl Metadata {
         &self.tags
     }
 
+    pub(crate) fn has_tag(&self, tag: &str) -> bool {
+        self.tags.contains(tag)
+    }
+
     pub(crate) fn has_tags(&self, tags: &HashSet<&str>) -> bool {
         // TBD: How do we cache this?
         let mut all_tags = self.tags.iter().map(String::as_str).collect::<HashSet<_>>();

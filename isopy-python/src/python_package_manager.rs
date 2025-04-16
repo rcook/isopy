@@ -23,6 +23,7 @@ use crate::checksum::get_checksum;
 use crate::constants::PLATFORM_TAGS;
 use crate::index::Index;
 use crate::package_cache::{read_package_cache, write_package_cache};
+use crate::platform_hacks::uniquify_packages;
 use crate::python_package::PythonPackage;
 use crate::python_package_with_availability::PythonPackageWithAvailability;
 use crate::python_version::PythonVersion;
@@ -193,6 +194,7 @@ impl PythonPackageManager {
             temp_packages
         };
 
+        // Must sort _before_ uniquifying
         packages.sort_by(|a, b| {
             let temp = b.availability.cmp(&a.availability);
             if temp != Ordering::Equal {
@@ -203,6 +205,9 @@ impl PythonPackageManager {
                 .version()
                 .cmp(a.package.metadata().version())
         });
+
+        // Ensure there is exactly one matching package for a given version and build label
+        let packages = uniquify_packages(packages)?;
 
         Ok(packages)
     }
