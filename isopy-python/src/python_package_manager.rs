@@ -25,6 +25,7 @@ use crate::index::Index;
 use crate::package_cache::{read_package_cache, write_package_cache};
 use crate::python_package::PythonPackage;
 use crate::python_package_with_availability::PythonPackageWithAvailability;
+use crate::python_version::PythonVersion;
 use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -154,14 +155,20 @@ impl PythonPackageManager {
         packages: Vec<PythonPackage>,
         sources: SourceFilter,
         tag_filter: &TagFilter,
-    ) -> Result<Vec<PackageInfo>> {
+        version: Option<&PythonVersion>,
+    ) -> Result<Vec<PythonPackageWithAvailability>> {
         use isopy_lib::SourceFilter::*;
 
         let mut packages = {
             let tags = tag_filter.tags(&[]);
             let mut temp_packages = Vec::new();
             for package in packages {
-                if package.metadata().has_tags(&tags) {
+                let m = package.metadata();
+                let matches_version = match version {
+                    Some(version) => m.version().matches(version),
+                    None => true,
+                };
+                if matches_version && m.has_tags(&tags) {
                     let (availability, path) = match self.ctx.check_asset(package.url())? {
                         Some(p) => (PackageAvailability::Local, Some(p)),
                         None => (PackageAvailability::Remote, None),
@@ -193,10 +200,6 @@ impl PythonPackageManager {
                 .cmp(a.package.metadata().version())
         });
 
-        let packages = packages
-            .into_iter()
-            .map(PythonPackageWithAvailability::into_package_info)
-            .collect::<Vec<_>>();
         Ok(packages)
     }
 }
@@ -246,11 +249,16 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
-        self.filter_packages(
-            self.read_packages(options.show_progress).await?,
-            sources,
-            tag_filter,
-        )
+        Ok(self
+            .filter_packages(
+                self.read_packages(options.show_progress).await?,
+                sources,
+                tag_filter,
+                None,
+            )?
+            .into_iter()
+            .map(PythonPackageWithAvailability::into_package_info)
+            .collect::<Vec<_>>())
     }
 
     async fn get_package(
@@ -277,15 +285,18 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<()> {
         let version = downcast_version!(version);
 
-        // TBD: Use cache!
-        let index = self.get_index(false, options.show_progress).await?;
+        let packages = self.filter_packages(
+            self.read_packages(options.show_progress).await?,
+            SourceFilter::All,
+            tag_filter,
+            Some(version),
+        )?;
 
-        let tags = tag_filter.tags(&PLATFORM_TAGS);
-        let Some(package) = PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags)?
-        else {
+        let Some(package) = packages.into_iter().next() else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
-                moniker = self.moniker
+                moniker = self.moniker,
+                tags = tag_filter.tags(&[])
             );
         };
 
