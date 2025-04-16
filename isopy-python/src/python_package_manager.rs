@@ -38,7 +38,7 @@ use isopy_lib::{
 use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::fs::metadata;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tokio::fs::read_to_string;
 use url::Url;
 
@@ -115,13 +115,12 @@ impl PythonPackageManager {
         )
     }
 
-    async fn get_index(&self, update: bool, show_progress: bool) -> Result<Index> {
+    async fn get_index_path(&self, update: bool, show_progress: bool) -> Result<PathBuf> {
         let options = DownloadAssetOptionsBuilder::json()
             .update(update)
             .show_progress(show_progress)
             .build()?;
-        let path = self.ctx.download_asset(&self.url, &options).await?;
-        read_to_string(path).await?.parse()
+        self.ctx.download_asset(&self.url, &options).await
     }
 
     async fn fetch_packages(
@@ -129,14 +128,17 @@ impl PythonPackageManager {
         cache_path: &Path,
         show_progress: bool,
     ) -> Result<Vec<PythonPackage>> {
-        let index = self.get_index(false, show_progress).await?;
+        let index_path = self.get_index_path(false, show_progress).await?;
+        let index = read_to_string(index_path).await?.parse::<Index>()?;
         let mut packages = Vec::new();
         for item in index.items() {
-            for package in PythonPackage::from_index_item(&item)? {
-                if package.metadata.tags.is_superset(&self.platform_tags) {
-                    packages.push(package);
+            packages.extend(PythonPackage::read_all(&item)?.into_iter().filter_map(|p| {
+                if p.metadata.tags.is_superset(&self.platform_tags) {
+                    Some(p)
+                } else {
+                    None
                 }
-            }
+            }));
         }
 
         write_package_cache(cache_path, &packages)?;
@@ -243,7 +245,7 @@ impl PythonPackageManager {
 #[async_trait]
 impl PackageManagerOps for PythonPackageManager {
     async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()> {
-        self.get_index(true, options.show_progress).await?;
+        self.get_index_path(true, options.show_progress).await?;
         Ok(())
     }
 

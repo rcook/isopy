@@ -33,7 +33,7 @@ pub(crate) struct PythonPackage {
 }
 
 impl PythonPackage {
-    pub(crate) fn from_index_item(item: &IndexItem) -> Result<Vec<Self>> {
+    pub(crate) fn read_all(item: &IndexItem) -> Result<Vec<Self>> {
         macro_rules! g {
             ($e : expr) => {
                 match $e {
