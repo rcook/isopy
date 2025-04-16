@@ -32,7 +32,7 @@ pub(crate) fn uniquify_packages(
 ) -> Vec<PythonPackageWithAvailability> {
     for (key, group) in &packages
         .iter()
-        .chunk_by(|p| p.package.metadata().version.clone())
+        .chunk_by(|p| p.package.metadata.version.clone())
     {
         assert_eq!(
             1,

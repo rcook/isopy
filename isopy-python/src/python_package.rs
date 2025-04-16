@@ -19,16 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::{item::Item, metadata::Metadata};
+use crate::item::Item;
+use crate::metadata::Metadata;
 use anyhow::Result;
 use isopy_lib::{PackageOps, Version};
 use url::Url;
 
 #[derive(Clone, Debug)]
 pub(crate) struct PythonPackage {
-    url: Url,
-    metadata: Metadata,
-    version: Version,
+    pub(crate) url: Url,
+    pub(crate) metadata: Metadata,
+    pub(crate) version: Version,
 }
 
 impl PythonPackage {
@@ -74,14 +75,6 @@ impl PythonPackage {
             version,
         }
     }
-
-    pub(crate) const fn url(&self) -> &Url {
-        &self.url
-    }
-
-    pub(crate) const fn metadata(&self) -> &Metadata {
-        &self.metadata
-    }
 }
 
 impl PackageOps for PythonPackage {
@@ -90,6 +83,6 @@ impl PackageOps for PythonPackage {
     }
 
     fn url(&self) -> &Url {
-        self.url()
+        &self.url
     }
 }

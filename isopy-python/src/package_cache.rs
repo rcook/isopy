@@ -47,11 +47,10 @@ struct Package {
 
 pub(crate) fn write_package_cache(path: &Path, packages: &[PythonPackage]) -> Result<()> {
     fn transform(package: &PythonPackage) -> Package {
-        let m = package.metadata();
         Package {
-            name: m.name.clone(),
-            url: package.url().clone(),
-            version: m.version.to_string(),
+            name: package.metadata.name.clone(),
+            url: package.url.clone(),
+            version: package.metadata.version.to_string(),
         }
     }
 
