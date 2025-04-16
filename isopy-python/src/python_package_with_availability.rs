@@ -20,12 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::build_label::BuildLabel;
-use crate::index::Index;
 use crate::python_package::PythonPackage;
-use crate::python_version::PythonVersion;
-use anyhow::Result;
-use isopy_lib::{Package, PackageAvailability, PackageInfo, PackageManagerContext, Version};
-use std::collections::HashSet;
+use isopy_lib::{Package, PackageAvailability, PackageInfo, Version};
 use std::path::PathBuf;
 
 #[derive(Clone)]
@@ -36,35 +32,6 @@ pub(crate) struct PythonPackageWithAvailability {
 }
 
 impl PythonPackageWithAvailability {
-    pub(crate) fn read(
-        ctx: &PackageManagerContext,
-        index: &Index,
-        version: &PythonVersion,
-        tags: &HashSet<&str>,
-    ) -> Result<Option<Self>> {
-        let mut packages = Vec::new();
-        for item in index.items() {
-            for package in PythonPackage::parse_all(&item)? {
-                let m = package.metadata();
-                if m.has_tags(tags) && m.version().matches(version) {
-                    let (availability, path) = match ctx.check_asset(package.url())? {
-                        Some(p) => (PackageAvailability::Local, Some(p)),
-                        None => (PackageAvailability::Remote, None),
-                    };
-                    packages.push(Self {
-                        package,
-                        availability,
-                        path,
-                    });
-                }
-            }
-        }
-
-        packages.sort_by_cached_key(|p| p.package.metadata().version().clone());
-        packages.reverse();
-        Ok(packages.into_iter().next())
-    }
-
     pub(crate) fn into_package(self) -> Package {
         Package::new(self.package)
     }

@@ -192,8 +192,8 @@ impl PackageManagerOps for GoPackageManager {
         use isopy_lib::SourceFilter::*;
 
         let mut tags = tag_filter
-            .tags(&[])
-            .into_iter()
+            .tags()
+            .iter()
             .map(String::from)
             .collect::<HashSet<_>>();
         tags.extend(PLATFORM_TAGS.into_iter().map(String::from));
@@ -266,13 +266,17 @@ impl PackageManagerOps for GoPackageManager {
             .get_package_inner(false, options.show_progress, version, tag_filter)
             .await
         else {
-            let tags = tag_filter.tags(&[]);
-            bail!("No release {version} with tags {tags:?} found");
+            bail!(
+                "No release {version} with tags {tags:?} found",
+                tags = tag_filter.tags()
+            );
         };
 
         let Some(path) = self.ctx.check_asset(package.url())? else {
-            let tags = tag_filter.tags(&[]);
-            bail!("Failed to download release {version} with tags {tags:?}");
+            bail!(
+                "Failed to download release {version} with tags {tags:?}",
+                tags = tag_filter.tags()
+            );
         };
 
         package.archive_type().unpack(&path, dir, options).await?;

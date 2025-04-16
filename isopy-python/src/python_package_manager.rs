@@ -160,15 +160,19 @@ impl PythonPackageManager {
         use isopy_lib::SourceFilter::*;
 
         let mut packages = {
-            let tags = tag_filter.tags(&[]);
+            let tags = tag_filter
+                .tags()
+                .iter()
+                .map(String::as_str)
+                .collect::<HashSet<_>>();
             let mut temp_packages = Vec::new();
             for package in packages {
                 let m = package.metadata();
-                let matches_version = match version {
+                let version_matches = match version {
                     Some(version) => m.version().matches(version),
                     None => true,
                 };
-                if matches_version && m.has_tags(&tags) {
+                if version_matches && m.has_tags(&tags) {
                     let (availability, path) = match self.ctx.check_asset(package.url())? {
                         Some(p) => (PackageAvailability::Local, Some(p)),
                         None => (PackageAvailability::Remote, None),
@@ -201,6 +205,23 @@ impl PythonPackageManager {
         });
 
         Ok(packages)
+    }
+
+    async fn read_package(
+        &self,
+        version: &PythonVersion,
+        tag_filter: &TagFilter,
+        show_progress: bool,
+    ) -> Result<Option<PythonPackageWithAvailability>> {
+        Ok(self
+            .filter_packages(
+                self.read_packages(show_progress).await?,
+                SourceFilter::All,
+                Some(version),
+                tag_filter,
+            )?
+            .into_iter()
+            .next())
     }
 }
 
@@ -268,12 +289,9 @@ impl PackageManagerOps for PythonPackageManager {
         options: &GetPackageOptions,
     ) -> Result<Option<PackageInfo>> {
         let version = downcast_version!(version);
-
-        // TBD: Use cache!
-        let index = self.get_index(false, options.show_progress).await?;
-
-        let tags = tag_filter.tags(&PLATFORM_TAGS);
-        let package = PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags)?;
+        let package = self
+            .read_package(version, tag_filter, options.show_progress)
+            .await?;
         Ok(package.map(PythonPackageWithAvailability::into_package_info))
     }
 
@@ -284,19 +302,14 @@ impl PackageManagerOps for PythonPackageManager {
         options: &DownloadPackageOptions,
     ) -> Result<()> {
         let version = downcast_version!(version);
-
-        let packages = self.filter_packages(
-            self.read_packages(options.show_progress).await?,
-            SourceFilter::All,
-            Some(version),
-            tag_filter,
-        )?;
-
-        let Some(package) = packages.into_iter().next() else {
+        let Some(package) = self
+            .read_package(version, tag_filter, options.show_progress)
+            .await?
+        else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
                 moniker = self.moniker,
-                tags = tag_filter.tags(&[])
+                tags = tag_filter.tags()
             );
         };
 
@@ -321,19 +334,14 @@ impl PackageManagerOps for PythonPackageManager {
         options: &InstallPackageOptions,
     ) -> Result<Package> {
         let version = downcast_version!(version);
-
-        let packages = self.filter_packages(
-            self.read_packages(options.show_progress).await?,
-            SourceFilter::All,
-            Some(version),
-            tag_filter,
-        )?;
-
-        let Some(package) = packages.into_iter().next() else {
+        let Some(package) = self
+            .read_package(version, tag_filter, options.show_progress)
+            .await?
+        else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
                 moniker = self.moniker,
-                tags = tag_filter.tags(&[])
+                tags = tag_filter.tags()
             );
         };
 
@@ -341,7 +349,7 @@ impl PackageManagerOps for PythonPackageManager {
             bail!(
                 "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing packages",
                 moniker = self.moniker,
-                tags=tag_filter.tags(&[])
+                tags=tag_filter.tags()
             );
         };
 
