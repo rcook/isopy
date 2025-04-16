@@ -20,28 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_package::PythonPackage;
-use isopy_lib::{Package, PackageAvailability, PackageInfo, Version};
+use isopy_lib::PackageAvailability;
 use std::path::PathBuf;
 
-#[derive(Clone)]
 pub(crate) struct PythonPackageWithAvailability {
     pub(crate) package: PythonPackage,
     pub(crate) availability: PackageAvailability,
     pub(crate) path: Option<PathBuf>,
-}
-
-impl PythonPackageWithAvailability {
-    pub(crate) fn into_package(self) -> Package {
-        Package::new(self.package)
-    }
-
-    pub(crate) fn into_package_info(self) -> PackageInfo {
-        PackageInfo::new(
-            self.availability,
-            self.package.metadata().name(),
-            self.package.url(),
-            Version::new(self.package.metadata().version().clone()),
-            self.path,
-        )
-    }
 }

@@ -99,6 +99,16 @@ impl PythonPackageManager {
         Ok(())
     }
 
+    fn make_package_info(package: PythonPackageWithAvailability) -> PackageInfo {
+        PackageInfo::new(
+            package.availability,
+            package.package.metadata().name(),
+            package.package.url(),
+            Version::new(package.package.metadata().version().clone()),
+            package.path,
+        )
+    }
+
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Index> {
         let options = DownloadAssetOptionsBuilder::json()
             .update(update)
@@ -282,7 +292,7 @@ impl PackageManagerOps for PythonPackageManager {
                 tag_filter,
             )?
             .into_iter()
-            .map(PythonPackageWithAvailability::into_package_info)
+            .map(Self::make_package_info)
             .collect::<Vec<_>>())
     }
 
@@ -296,7 +306,7 @@ impl PackageManagerOps for PythonPackageManager {
         let package = self
             .read_package(version, tag_filter, options.show_progress)
             .await?;
-        Ok(package.map(PythonPackageWithAvailability::into_package_info))
+        Ok(package.map(Self::make_package_info))
     }
 
     async fn download_package(
@@ -366,6 +376,6 @@ impl PackageManagerOps for PythonPackageManager {
 
         Self::on_after_install(dir)?;
 
-        Ok(package.into_package())
+        Ok(Package::new(package.package))
     }
 }
