@@ -32,7 +32,7 @@ pub(crate) fn uniquify_packages(
 ) -> Vec<PythonPackageWithAvailability> {
     for (key, group) in &packages
         .iter()
-        .chunk_by(|p| p.package.metadata().version().clone())
+        .chunk_by(|p| p.package.metadata().version.clone())
     {
         assert_eq!(
             1,
@@ -52,7 +52,7 @@ pub(crate) fn uniquify_packages(
     let mut filtered_packages = Vec::new();
     for (key, group) in &packages
         .into_iter()
-        .chunk_by(|p| p.package.metadata().version().clone())
+        .chunk_by(|p| p.package.metadata().version.clone())
     {
         let packages = group.collect::<Vec<_>>();
         let package_count = packages.len();

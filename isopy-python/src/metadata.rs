@@ -28,33 +28,10 @@ use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Metadata {
-    name: String,
-    archive_type: ArchiveType,
-    version: PythonVersion,
-    tags: HashSet<String>,
-}
-
-impl Metadata {
-    pub(crate) fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub(crate) const fn archive_type(&self) -> &ArchiveType {
-        &self.archive_type
-    }
-
-    pub(crate) const fn version(&self) -> &PythonVersion {
-        &self.version
-    }
-
-    pub(crate) const fn tags(&self) -> &HashSet<String> {
-        &self.tags
-    }
-
-    #[allow(unused)]
-    pub(crate) fn has_tag(&self, tag: &str) -> bool {
-        self.tags.contains(tag)
-    }
+    pub(crate) name: String,
+    pub(crate) archive_type: ArchiveType,
+    pub(crate) version: PythonVersion,
+    pub(crate) tags: HashSet<String>,
 }
 
 impl FromStr for Metadata {

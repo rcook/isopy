@@ -43,7 +43,7 @@ pub(crate) async fn get_checksum(
             .collect::<HashMap<_, _>>()
     }
 
-    let Some(label) = package.metadata().version().label() else {
+    let Some(label) = package.metadata().version.label() else {
         bail!("Python package has no build label")
     };
 
@@ -59,7 +59,7 @@ pub(crate) async fn get_checksum(
     let content = read_to_string(path)?;
     let checksum_strs = parse_checksums(&content);
 
-    let package_name = package.metadata().name();
+    let package_name = package.metadata().name.as_str();
     let checksum_str = checksum_strs
         .get(package_name)
         .ok_or_else(|| anyhow!("No checksum found for archive {package_name}"))?;

@@ -108,9 +108,9 @@ impl PythonPackageManager {
     fn make_package_info(package: PythonPackageWithAvailability) -> PackageInfo {
         PackageInfo::new(
             package.availability,
-            package.package.metadata().name(),
+            package.package.metadata().name.clone(),
             package.package.url(),
-            Version::new(package.package.metadata().version().clone()),
+            Version::new(package.package.metadata().version.clone()),
             package.path,
         )
     }
@@ -133,7 +133,7 @@ impl PythonPackageManager {
         let mut packages = Vec::new();
         for item in index.items() {
             for package in PythonPackage::parse_all(&item)? {
-                if package.metadata().tags().is_superset(&self.platform_tags) {
+                if package.metadata().tags.is_superset(&self.platform_tags) {
                     packages.push(package);
                 }
             }
@@ -185,10 +185,10 @@ impl PythonPackageManager {
             for package in packages {
                 let m = package.metadata();
                 let version_matches = match version {
-                    Some(version) => m.version().matches(version),
+                    Some(version) => m.version.matches(version),
                     None => true,
                 };
-                if version_matches && m.tags().is_superset(&tags) {
+                if version_matches && m.tags.is_superset(&tags) {
                     let (availability, path) = match self.ctx.check_asset(package.url())? {
                         Some(p) => (PackageAvailability::Local, Some(p)),
                         None => (PackageAvailability::Remote, None),
@@ -217,8 +217,8 @@ impl PythonPackageManager {
             }
             b.package
                 .metadata()
-                .version()
-                .cmp(a.package.metadata().version())
+                .version
+                .cmp(&a.package.metadata().version)
         });
 
         // Ensure there is exactly one matching package for a given version and build label
@@ -255,8 +255,8 @@ impl PackageManagerOps for PythonPackageManager {
         let mut common_tags = HashSet::new();
         let mut other_tags = HashSet::new();
         for package in self.read_packages(options.show_progress).await? {
-            common_tags.extend(package.metadata().tags().to_owned());
-            if let Some(label) = package.metadata().version().label() {
+            common_tags.extend(package.metadata().tags.clone());
+            if let Some(label) = package.metadata().version.label() {
                 other_tags.insert(String::from(label.as_str()));
             }
         }
@@ -369,7 +369,7 @@ impl PackageManagerOps for PythonPackageManager {
         package
             .package
             .metadata()
-            .archive_type()
+            .archive_type
             .unpack(path, dir, options)
             .await?;
 

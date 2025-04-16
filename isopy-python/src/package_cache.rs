@@ -49,9 +49,9 @@ pub(crate) fn write_package_cache(path: &Path, packages: &[PythonPackage]) -> Re
     fn transform(package: &PythonPackage) -> Package {
         let m = package.metadata();
         Package {
-            name: String::from(m.name()),
+            name: m.name.clone(),
             url: package.url().clone(),
-            version: m.version().to_string(),
+            version: m.version.to_string(),
         }
     }
 
