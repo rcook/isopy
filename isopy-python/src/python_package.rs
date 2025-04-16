@@ -47,7 +47,7 @@ impl PythonPackage {
             name.starts_with("cpython-") && !name.ends_with(".sha256") && name != "SHA256SUMS"
         }
 
-        let assets = g!(g!(item.value().get("assets")).as_array())
+        let assets = g!(g!(item.value.get("assets")).as_array())
             .iter()
             .map(|asset| {
                 let url = g!(g!(asset.get("browser_download_url")).as_str()).parse::<Url>()?;

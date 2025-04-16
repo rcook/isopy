@@ -22,15 +22,11 @@
 use serde_json::Value;
 
 pub(crate) struct Item<'a> {
-    value: &'a Value,
+    pub(crate) value: &'a Value,
 }
 
 impl<'a> Item<'a> {
     pub(crate) const fn new(value: &'a Value) -> Self {
         Self { value }
-    }
-
-    pub(crate) const fn value(&self) -> &Value {
-        self.value
     }
 }
