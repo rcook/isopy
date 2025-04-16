@@ -157,7 +157,12 @@ fn add_plugin_rows(
                 moniker.as_str().cyan(),
                 plugin.url().as_str().bright_magenta()
             ),
-            SourceFilter::Remote => todo!(),
+            SourceFilter::Remote => table_divider!(
+                table,
+                "No remote packages found for {} ({})",
+                moniker.as_str().cyan(),
+                plugin.url().as_str().bright_magenta()
+            ),
         }
     } else {
         table_divider!(
