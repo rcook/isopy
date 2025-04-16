@@ -29,7 +29,7 @@ use url::Url;
 pub(crate) struct PythonPackage {
     pub(crate) url: Url,
     pub(crate) metadata: Metadata,
-    pub(crate) version: Version,
+    version: Version,
 }
 
 impl PythonPackage {
