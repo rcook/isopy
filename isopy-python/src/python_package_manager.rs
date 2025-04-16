@@ -57,6 +57,7 @@ pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
     moniker: String,
     url: Url,
+    platform_tags: HashSet<String>,
 }
 
 impl PythonPackageManager {
@@ -65,6 +66,11 @@ impl PythonPackageManager {
             ctx,
             moniker: String::from(moniker),
             url: url.clone(),
+            platform_tags: PLATFORM_TAGS
+                .iter()
+                .copied()
+                .map(String::from)
+                .collect::<HashSet<_>>(),
         }
     }
 
@@ -124,11 +130,10 @@ impl PythonPackageManager {
         show_progress: bool,
     ) -> Result<Vec<PythonPackage>> {
         let index = self.get_index(false, show_progress).await?;
-        let platform_tags = PLATFORM_TAGS.iter().copied().collect::<HashSet<_>>();
         let mut packages = Vec::new();
         for item in index.items() {
             for package in PythonPackage::parse_all(&item)? {
-                if package.metadata().has_tags(&platform_tags) {
+                if package.metadata().tags().is_superset(&self.platform_tags) {
                     packages.push(package);
                 }
             }
@@ -174,7 +179,7 @@ impl PythonPackageManager {
             let tags = tag_filter
                 .tags()
                 .iter()
-                .map(String::as_str)
+                .map(String::clone)
                 .collect::<HashSet<_>>();
             let mut temp_packages = Vec::new();
             for package in packages {
@@ -183,7 +188,7 @@ impl PythonPackageManager {
                     Some(version) => m.version().matches(version),
                     None => true,
                 };
-                if version_matches && m.has_tags(&tags) {
+                if version_matches && m.tags().is_superset(&tags) {
                     let (availability, path) = match self.ctx.check_asset(package.url())? {
                         Some(p) => (PackageAvailability::Local, Some(p)),
                         None => (PackageAvailability::Remote, None),
@@ -256,18 +261,12 @@ impl PackageManagerOps for PythonPackageManager {
             }
         }
 
-        let platform_tags = PLATFORM_TAGS
-            .iter()
-            .copied()
-            .map(String::from)
-            .collect::<HashSet<_>>();
-
-        common_tags.retain(|t| !platform_tags.contains(t));
+        common_tags.retain(|t| !self.platform_tags.contains(t));
         let mut common_tags = common_tags.into_iter().collect::<Vec<_>>();
         common_tags.sort();
         let common_tags = common_tags;
 
-        let mut platform_tags = platform_tags.into_iter().collect::<Vec<_>>();
+        let mut platform_tags = self.platform_tags.clone().into_iter().collect::<Vec<_>>();
         platform_tags.sort();
         let platform_tags = platform_tags;
 

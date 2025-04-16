@@ -55,15 +55,6 @@ impl Metadata {
     pub(crate) fn has_tag(&self, tag: &str) -> bool {
         self.tags.contains(tag)
     }
-
-    pub(crate) fn has_tags(&self, tags: &HashSet<&str>) -> bool {
-        // TBD: How do we cache this?
-        let mut all_tags = self.tags.iter().map(String::as_str).collect::<HashSet<_>>();
-        if let Some(label) = self.version.label() {
-            all_tags.insert(label.as_str());
-        }
-        all_tags.is_superset(tags)
-    }
 }
 
 impl FromStr for Metadata {
@@ -81,6 +72,10 @@ impl FromStr for Metadata {
         }
 
         let version = PythonVersion::from_tags(&mut tags)?;
+        if let Some(label) = version.label() {
+            tags.insert(String::from(label.as_str()));
+        }
+
         Ok(Self {
             name,
             archive_type,
