@@ -65,46 +65,6 @@ impl JavaPackage {
             tags,
         }
     }
-
-    #[allow(unused)]
-    pub(crate) fn name(&self) -> &str {
-        self.name.as_str()
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn kind(&self) -> &PackageAvailability {
-        &self.availability
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn archive_type(&self) -> &ArchiveType {
-        &self.archive_type
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn url(&self) -> &Url {
-        &self.url
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn version(&self) -> &JavaVersion {
-        &self.version
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn path(&self) -> &Option<PathBuf> {
-        &self.path
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn checksum(&self) -> &Checksum {
-        &self.checksum
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn tags(&self) -> &HashSet<String> {
-        &self.tags
-    }
 }
 
 impl PackageOps for JavaPackage {

@@ -25,15 +25,15 @@ use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
 pub(crate) struct GoPackage {
-    name: String,
-    availability: PackageAvailability,
-    archive_type: ArchiveType,
-    url: Url,
-    version: GoVersion,
-    other_version: Version,
-    path: Option<PathBuf>,
-    checksum: Checksum,
-    tags: HashSet<String>,
+    pub(crate) name: String,
+    pub(crate) availability: PackageAvailability,
+    pub(crate) archive_type: ArchiveType,
+    pub(crate) url: Url,
+    pub(crate) version: GoVersion,
+    pub(crate) other_version: Version,
+    pub(crate) path: Option<PathBuf>,
+    pub(crate) checksum: Checksum,
+    pub(crate) tags: HashSet<String>,
 }
 
 impl GoPackage {
@@ -62,40 +62,6 @@ impl GoPackage {
             checksum,
             tags,
         }
-    }
-
-    #[allow(unused)]
-    pub(crate) fn name(&self) -> &str {
-        self.name.as_str()
-    }
-
-    pub(crate) const fn availability(&self) -> PackageAvailability {
-        self.availability
-    }
-
-    pub(crate) const fn archive_type(&self) -> &ArchiveType {
-        &self.archive_type
-    }
-
-    pub(crate) const fn url(&self) -> &Url {
-        &self.url
-    }
-
-    pub(crate) const fn version(&self) -> &GoVersion {
-        &self.version
-    }
-
-    #[allow(unused)]
-    pub(crate) const fn path(&self) -> &Option<PathBuf> {
-        &self.path
-    }
-
-    pub(crate) const fn checksum(&self) -> &Checksum {
-        &self.checksum
-    }
-
-    pub(crate) const fn tags(&self) -> &HashSet<String> {
-        &self.tags
     }
 
     pub(crate) fn into_package_info(self) -> PackageInfo {

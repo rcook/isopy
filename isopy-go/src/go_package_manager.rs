@@ -147,13 +147,13 @@ impl GoPackageManager {
         let packages = self.get_packages(update, show_progress).await?;
         let mut packages = packages
             .into_iter()
-            .filter(|p| p.version() == version)
+            .filter(|p| &p.version == version)
             .collect::<Vec<_>>();
         if packages.is_empty() {
             bail!("No matching packages found")
         }
 
-        packages.sort_by_cached_key(|p| p.version().clone());
+        packages.sort_by_cached_key(|p| p.version.clone());
         packages.reverse();
         Ok(packages
             .into_iter()
@@ -200,12 +200,9 @@ impl PackageManagerOps for GoPackageManager {
 
         let mut packages = Vec::new();
         for package in self.get_packages(false, options.show_progress).await? {
-            if package.tags().is_superset(&tags)
+            if package.tags.is_superset(&tags)
                 && matches!(
-                    (
-                        sources,
-                        package.availability() == PackageAvailability::Local
-                    ),
+                    (sources, package.availability == PackageAvailability::Local),
                     (All, _) | (Local, true) | (Remote, false)
                 )
             {
@@ -213,7 +210,7 @@ impl PackageManagerOps for GoPackageManager {
             }
         }
 
-        packages.sort_by(|a, b| a.version().cmp(b.version()));
+        packages.sort_by(|a, b| a.version.cmp(&b.version));
         packages.reverse();
 
         Ok(packages
@@ -247,10 +244,10 @@ impl PackageManagerOps for GoPackageManager {
             .await?;
         let options = DownloadAssetOptionsBuilder::default()
             .update(false)
-            .checksum(Some(package.checksum().clone()))
+            .checksum(Some(package.checksum.clone()))
             .show_progress(options.show_progress)
             .build()?;
-        _ = self.ctx.download_asset(package.url(), &options).await?;
+        _ = self.ctx.download_asset(&package.url, &options).await?;
         Ok(())
     }
 
@@ -272,14 +269,14 @@ impl PackageManagerOps for GoPackageManager {
             );
         };
 
-        let Some(path) = self.ctx.check_asset(package.url())? else {
+        let Some(path) = self.ctx.check_asset(&package.url)? else {
             bail!(
                 "Failed to download release {version} with tags {tags:?}",
                 tags = tag_filter.tags()
             );
         };
 
-        package.archive_type().unpack(&path, dir, options).await?;
+        package.archive_type.unpack(&path, dir, options).await?;
 
         Ok(Package::new(package))
     }

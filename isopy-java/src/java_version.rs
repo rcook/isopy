@@ -37,38 +37,6 @@ pub(crate) struct JavaVersion {
     raw: String,
 }
 
-impl JavaVersion {
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn major(&self) -> u32 {
-        self.major
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn minor(&self) -> Option<u32> {
-        self.minor
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn build(&self) -> Option<u32> {
-        self.build
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn extra(&self) -> Extra {
-        self.extra
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) fn raw(&self) -> &str {
-        self.raw.as_str()
-    }
-}
-
 impl Display for JavaVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.raw)
