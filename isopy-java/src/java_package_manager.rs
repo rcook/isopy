@@ -134,7 +134,6 @@ impl PackageManagerOps for JavaPackageManager {
                     v.semver.clone(),
                     &Url::parse("https://httpbin.org").unwrap(),
                     Version::new(v),
-                    None::<String>,
                     None::<PathBuf>,
                 )
             }));

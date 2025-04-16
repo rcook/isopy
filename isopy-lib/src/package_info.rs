@@ -29,17 +29,15 @@ pub struct PackageInfo {
     name: String,
     url: Url,
     version: Version,
-    label: Option<String>,
     path: Option<PathBuf>,
 }
 
 impl PackageInfo {
-    pub fn new<S1: Into<String>, S2: Into<String>, P: Into<PathBuf>>(
+    pub fn new<S: Into<String>, P: Into<PathBuf>>(
         availability: PackageAvailability,
-        name: S1,
+        name: S,
         url: &Url,
         version: Version,
-        label: Option<S2>,
         path: Option<P>,
     ) -> Self {
         Self {
@@ -47,7 +45,6 @@ impl PackageInfo {
             name: name.into(),
             url: url.clone(),
             version,
-            label: label.map(Into::into),
             path: path.map(Into::into),
         }
     }
@@ -70,11 +67,6 @@ impl PackageInfo {
     #[must_use]
     pub const fn version(&self) -> &Version {
         &self.version
-    }
-
-    #[must_use]
-    pub const fn label(&self) -> &Option<String> {
-        &self.label
     }
 
     #[must_use]

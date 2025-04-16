@@ -105,7 +105,6 @@ impl GoPackage {
             self.name,
             &self.url,
             version,
-            None::<String>,
             self.path,
         )
     }

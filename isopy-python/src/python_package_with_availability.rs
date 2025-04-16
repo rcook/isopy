@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::build_label::BuildLabel;
 use crate::python_package::PythonPackage;
 use isopy_lib::{Package, PackageAvailability, PackageInfo, Version};
 use std::path::PathBuf;
@@ -37,19 +36,11 @@ impl PythonPackageWithAvailability {
     }
 
     pub(crate) fn into_package_info(self) -> PackageInfo {
-        let label = self
-            .package
-            .metadata()
-            .version()
-            .label()
-            .as_ref()
-            .map(BuildLabel::as_str);
         PackageInfo::new(
             self.availability,
             self.package.metadata().name(),
             self.package.url(),
             Version::new(self.package.metadata().version().clone()),
-            label,
             self.path,
         )
     }
