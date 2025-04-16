@@ -26,17 +26,17 @@ use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, Tag
 
 pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> StatusResult {
     let download_package_options = DownloadPackageOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
     let install_package_options = InstallPackageOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
 
     if download {
-        app.plugin_manager()
-            .new_package_manager(package_id.moniker(), app.config_dir())
+        app.plugin_manager
+            .new_package_manager(&package_id.moniker, &app.config_dir)
             .download_package(
-                package_id.version(),
+                &package_id.version,
                 &TagFilter::default(),
                 &download_package_options,
             )
@@ -44,8 +44,8 @@ pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) ->
     }
 
     app.install_package(
-        package_id.moniker(),
-        package_id.version(),
+        &package_id.moniker,
+        &package_id.version,
         &install_package_options,
     )
     .await?;

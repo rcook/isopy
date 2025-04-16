@@ -33,18 +33,6 @@ impl MavenVersion {
     pub(crate) const fn new(major: u32, minor: Option<u32>) -> Self {
         Self { major, minor }
     }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn major(&self) -> u32 {
-        self.major
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn minor(&self) -> &Option<u32> {
-        &self.minor
-    }
 }
 
 impl Display for MavenVersion {

@@ -29,8 +29,8 @@ use isopy_lib::{ListTagsOptions, ListTagsOptionsBuilder};
 pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> StatusResult {
     async fn list_tags(app: &App, moniker: &Moniker, options: &ListTagsOptions) -> Result<()> {
         let tags = app
-            .plugin_manager()
-            .new_package_manager(moniker, app.config_dir())
+            .plugin_manager
+            .new_package_manager(moniker, &app.config_dir)
             .list_tags(options)
             .await?;
 
@@ -65,7 +65,7 @@ pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> StatusResul
     }
 
     let options = ListTagsOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
 
     match moniker {

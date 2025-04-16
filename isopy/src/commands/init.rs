@@ -28,31 +28,31 @@ use isopy_lib::{
 };
 
 pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
-    if app.repo().get(app.cwd())?.is_some() {
+    if app.repo.get(&app.cwd)?.is_some() {
         user_error!(
             "Project in directory {} already has an environment",
-            app.cwd().display()
+            app.cwd.display()
         );
     }
 
     let Some(project) = existing(app.read_project_config())? else {
         user_error!(
             "No project configuration file in directory {}: create one with \"isopy project <PACKAGE-ID>\"",
-            app.cwd().display()
+            app.cwd.display()
         );
     };
 
     if download {
         let download_package_options = DownloadPackageOptionsBuilder::default()
-            .show_progress(app.show_progress())
+            .show_progress(app.show_progress)
             .build()?;
 
         for package_id in &project.package_ids {
             if download {
-                app.plugin_manager()
-                    .new_package_manager(package_id.moniker(), app.config_dir())
+                app.plugin_manager
+                    .new_package_manager(&package_id.moniker, &app.config_dir)
                     .download_package(
-                        package_id.version(),
+                        &package_id.version,
                         &TagFilter::default(),
                         &download_package_options,
                     )
@@ -61,15 +61,15 @@ pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
         }
     } else {
         let get_package_options = GetPackageOptionsBuilder::default()
-            .show_progress(app.show_progress())
+            .show_progress(app.show_progress)
             .build()?;
 
         let mut unavailable_package_ids = Vec::new();
         for package_id in &project.package_ids {
             let package = app
                 .get_package(
-                    package_id.moniker(),
-                    package_id.version(),
+                    &package_id.moniker,
+                    &package_id.version,
                     &get_package_options,
                 )
                 .await?;
@@ -85,13 +85,13 @@ pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
     }
 
     let install_package_options = InstallPackageOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
 
     for package_id in &project.package_ids {
         app.install_package(
-            package_id.moniker(),
-            package_id.version(),
+            &package_id.moniker,
+            &package_id.version,
             &install_package_options,
         )
         .await?;

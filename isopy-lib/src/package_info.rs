@@ -25,11 +25,11 @@ use std::path::PathBuf;
 use url::Url;
 
 pub struct PackageInfo {
-    availability: PackageAvailability,
-    name: String,
-    url: Url,
-    version: Version,
-    path: Option<PathBuf>,
+    pub availability: PackageAvailability,
+    pub name: String,
+    pub url: Url,
+    pub version: Version,
+    pub path: Option<PathBuf>,
 }
 
 impl PackageInfo {
@@ -47,30 +47,5 @@ impl PackageInfo {
             version,
             path: path.map(Into::into),
         }
-    }
-
-    #[must_use]
-    pub const fn availability(&self) -> PackageAvailability {
-        self.availability
-    }
-
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    #[must_use]
-    pub const fn url(&self) -> &Url {
-        &self.url
-    }
-
-    #[must_use]
-    pub const fn version(&self) -> &Version {
-        &self.version
-    }
-
-    #[must_use]
-    pub const fn path(&self) -> &Option<PathBuf> {
-        &self.path
     }
 }

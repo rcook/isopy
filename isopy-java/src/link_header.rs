@@ -28,8 +28,12 @@ use url::Url;
 
 #[derive(Debug)]
 pub(crate) struct LinkHeader {
-    next: Option<Url>,
+    pub(crate) next: Option<Url>,
+
+    #[allow(unused)]
     last: Option<Url>,
+
+    #[allow(unused)]
     links: HashMap<String, String>,
 }
 
@@ -42,24 +46,6 @@ impl LinkHeader {
 
         let s = link_header.to_str().map_err(|e| anyhow!(e))?;
         Ok(Some(s.parse::<Self>()?))
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn next(&self) -> &Option<Url> {
-        &self.next
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn last(&self) -> &Option<Url> {
-        &self.last
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub(crate) const fn links(&self) -> &HashMap<String, String> {
-        &self.links
     }
 
     fn parse_link_header(s: &str) -> HashMap<String, String> {

@@ -31,11 +31,11 @@ pub(crate) async fn do_download(
     tag_filter: &TagFilter,
 ) -> StatusResult {
     let options = DownloadPackageOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
-    app.plugin_manager()
-        .new_package_manager(package_id.moniker(), app.config_dir())
-        .download_package(package_id.version(), tag_filter, &options)
+    app.plugin_manager
+        .new_package_manager(&package_id.moniker, &app.config_dir)
+        .download_package(&package_id.version, tag_filter, &options)
         .await?;
 
     info!("Package {} is now available locally", package_id);

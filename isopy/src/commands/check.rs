@@ -26,7 +26,7 @@ use crate::table::table_divider;
 use joat_repo::Trash;
 
 pub(crate) fn do_check(app: &App, clean: bool) -> StatusResult {
-    let mut trash = Trash::compute(app.repo())?;
+    let mut trash = Trash::compute(&app.repo)?;
 
     if trash.is_empty() {
         success!("no clean-up required");

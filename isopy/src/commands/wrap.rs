@@ -67,7 +67,7 @@ pub(crate) fn do_wrap(
     let Some(dir_info) = app.find_dir_info(None)? else {
         user_error!(
             "could not find environment for directory {}",
-            app.cwd().display()
+            app.cwd.display()
         );
     };
 
@@ -180,8 +180,8 @@ fn make_script_command(
 fn make_wrapper_path(app: &App, wrapper_file_name: &WrapperFileName) -> Result<PathBuf> {
     fn make_path(app: &App, wrapper_file_name: &WrapperFileName) -> Result<PathBuf> {
         Ok(match wrapper_file_name {
-            WrapperFileName::FileNameOnly(c) => app.config_dir().join("bin").join(c),
-            WrapperFileName::Path(p) => p.absolutize_from(app.cwd())?.to_path_buf(),
+            WrapperFileName::FileNameOnly(c) => app.config_dir.join("bin").join(c),
+            WrapperFileName::Path(p) => p.absolutize_from(&app.cwd)?.to_path_buf(),
         })
     }
 

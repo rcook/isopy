@@ -32,8 +32,8 @@ pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> StatusRes
         moniker: &Moniker,
         options: &UpdateIndexOptions,
     ) -> Result<()> {
-        app.plugin_manager()
-            .new_package_manager(moniker, app.config_dir())
+        app.plugin_manager
+            .new_package_manager(moniker, &app.config_dir)
             .update_index(options)
             .await?;
         info!("Updated index for package manager {moniker}");
@@ -41,7 +41,7 @@ pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> StatusRes
     }
 
     let options = UpdateIndexOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
 
     match moniker {

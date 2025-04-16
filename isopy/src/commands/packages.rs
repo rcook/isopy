@@ -49,10 +49,10 @@ pub(crate) async fn do_packages(
         options: &ListPackagesOptions,
         verbose: bool,
     ) -> Result<()> {
-        let plugin = app.plugin_manager().get_plugin(moniker);
+        let plugin = app.plugin_manager.get_plugin(moniker);
         let packages = app
-            .plugin_manager()
-            .new_package_manager(moniker, app.config_dir())
+            .plugin_manager
+            .new_package_manager(moniker, &app.config_dir)
             .list_packages(filter, tag_filter, options)
             .await?;
         add_plugin_rows(table, moniker, plugin, &packages, filter, verbose)?;
@@ -61,7 +61,7 @@ pub(crate) async fn do_packages(
 
     let mut table = make_list_table();
     let options = ListPackagesOptionsBuilder::default()
-        .show_progress(app.show_progress())
+        .show_progress(app.show_progress)
         .build()?;
 
     match moniker {
@@ -95,14 +95,14 @@ fn add_plugin_rows(
     verbose: bool,
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package: &PackageInfo) -> String {
-        match package.version().label() {
+        match package.version.label() {
             Some(label) => format!(
                 "{}:{}:{}",
                 moniker.as_str(),
-                package.version().as_str(),
+                package.version.as_str(),
                 label
             ),
-            None => format!("{}:{}", moniker.as_str(), package.version().as_str()),
+            None => format!("{}:{}", moniker.as_str(), package.version.as_str()),
         }
     }
 
@@ -135,7 +135,7 @@ fn add_plugin_rows(
             })
         }
 
-        match package.path() {
+        match package.path.as_ref() {
             Some(p) => {
                 let size = metadata(p)?.len();
                 Ok(format!(
@@ -144,7 +144,7 @@ fn add_plugin_rows(
                     humanize_size_base_2(size).cyan()
                 ))
             }
-            None => Ok(format!("{}", format_url(package.url(), verbose)?.white())),
+            None => Ok(format!("{}", format_url(&package.url, verbose)?.white())),
         }
     }
 

@@ -91,7 +91,7 @@ impl JavaPackageManager {
             progress_indicator.set_message(format!("Downloading page {i}"));
 
             let response = request_builder.send().await?.error_for_status()?;
-            let next_url = LinkHeader::from_response(&response)?.and_then(|x| x.next().clone());
+            let next_url = LinkHeader::from_response(&response)?.and_then(|x| x.next);
             let bytes = response.bytes().await?;
             let path = dir.join(format!("page-{i:05}"));
             write(path, bytes).await?;

@@ -177,7 +177,7 @@ impl PythonPackageManager {
 
         let mut packages = {
             let tags = tag_filter
-                .tags()
+                .tags
                 .iter()
                 .map(String::clone)
                 .collect::<HashSet<_>>();
@@ -319,7 +319,7 @@ impl PackageManagerOps for PythonPackageManager {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
                 moniker = self.moniker,
-                tags = tag_filter.tags()
+                tags = tag_filter.tags
             );
         };
 
@@ -351,7 +351,7 @@ impl PackageManagerOps for PythonPackageManager {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
                 moniker = self.moniker,
-                tags = tag_filter.tags()
+                tags = tag_filter.tags
             );
         };
 
@@ -359,7 +359,7 @@ impl PackageManagerOps for PythonPackageManager {
             bail!(
                 "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing packages",
                 moniker = self.moniker,
-                tags=tag_filter.tags()
+                tags=tag_filter.tags
             );
         };
 

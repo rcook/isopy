@@ -38,12 +38,12 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 pub(crate) struct App {
-    config_dir: PathBuf,
-    cwd: PathBuf,
-    repo: Repo,
-    project_config_path: PathBuf,
-    plugin_manager: PluginManager,
-    show_progress: bool,
+    pub(crate) config_dir: PathBuf,
+    pub(crate) cwd: PathBuf,
+    pub(crate) repo: Repo,
+    pub(crate) project_config_path: PathBuf,
+    pub(crate) plugin_manager: PluginManager,
+    pub(crate) show_progress: bool,
 }
 
 impl App {
@@ -56,26 +56,6 @@ impl App {
             plugin_manager: PluginManager::new(),
             show_progress,
         }
-    }
-
-    pub(crate) fn config_dir(&self) -> &Path {
-        &self.config_dir
-    }
-
-    pub(crate) fn cwd(&self) -> &Path {
-        &self.cwd
-    }
-
-    pub(crate) const fn repo(&self) -> &Repo {
-        &self.repo
-    }
-
-    pub(crate) const fn plugin_manager(&self) -> &PluginManager {
-        &self.plugin_manager
-    }
-
-    pub(crate) const fn show_progress(&self) -> bool {
-        self.show_progress
     }
 
     pub(crate) fn has_project_config_file(&self) -> bool {
@@ -137,7 +117,7 @@ impl App {
             (dir_info, Vec::new())
         };
 
-        if packages.iter().any(|p| p.package_id.moniker() == moniker) {
+        if packages.iter().any(|p| &p.package_id.moniker == moniker) {
             bail!("Environment already has a package for package manager {moniker} configured");
         }
 
@@ -198,7 +178,7 @@ impl App {
 
     pub(crate) fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
         if let Some(isopy_env) = isopy_env {
-            let Some(link) = self.find_link(isopy_env.link_id())? else {
+            let Some(link) = self.find_link(&isopy_env.link_id)? else {
                 return Ok(None);
             };
 
@@ -239,7 +219,7 @@ impl App {
 
     pub(crate) fn make_env_info(&self, data_dir: &Path, package: &EnvPackage) -> EnvInfo {
         self.plugin_manager
-            .get_plugin(package.package_id.moniker())
+            .get_plugin(&package.package_id.moniker)
             .make_env_info(&data_dir.join(&package.dir))
     }
 
@@ -250,7 +230,7 @@ impl App {
         platform: Platform,
         shell: Shell,
     ) -> Result<Option<OsString>> {
-        let plugin = self.plugin_manager.get_plugin(package.package_id.moniker());
+        let plugin = self.plugin_manager.get_plugin(&package.package_id.moniker);
         plugin.make_script_command(script_path, platform, shell)
     }
 

@@ -34,7 +34,7 @@ pub(crate) fn do_run(app: App, program: &str, args: &[String]) -> StatusResult {
     let Some(dir_info) = app.find_dir_info(None)? else {
         user_error!(
             "could not find environment for directory {}",
-            app.cwd().display()
+            app.cwd.display()
         );
     };
 

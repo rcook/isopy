@@ -30,13 +30,10 @@ pub(crate) fn do_project(app: &App, package_id: &PackageId) -> StatusResult {
     let mut package_ids =
         existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.package_ids);
 
-    if package_ids
-        .iter()
-        .any(|p| p.moniker() == package_id.moniker())
-    {
+    if package_ids.iter().any(|p| p.moniker == package_id.moniker) {
         user_error!(
             "Environment already has a package from package manager \"{}\"",
-            package_id.moniker().as_str()
+            package_id.moniker.as_str()
         );
     }
 
@@ -46,7 +43,7 @@ pub(crate) fn do_project(app: &App, package_id: &PackageId) -> StatusResult {
     info!(
         "Added package \"{}\" to project at {}",
         package_id,
-        app.cwd().display()
+        app.cwd.display()
     );
     success!();
 }

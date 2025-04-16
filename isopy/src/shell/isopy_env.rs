@@ -26,8 +26,8 @@ use std::env::VarError;
 
 #[derive(Clone, Debug)]
 pub(crate) struct IsopyEnv {
-    link_id: LinkId,
-    meta_id: MetaId,
+    pub(crate) link_id: LinkId,
+    pub(crate) meta_id: MetaId,
 }
 
 impl IsopyEnv {
@@ -53,14 +53,6 @@ impl IsopyEnv {
         let link_id = suffix.parse::<LinkId>()?;
 
         Ok(Some(Self { link_id, meta_id }))
-    }
-
-    pub(crate) const fn link_id(&self) -> &LinkId {
-        &self.link_id
-    }
-
-    pub(crate) const fn meta_id(&self) -> &MetaId {
-        &self.meta_id
     }
 
     pub(crate) fn set_vars(&self) {

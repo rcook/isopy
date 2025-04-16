@@ -20,19 +20,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 #[derive(Default)]
-pub struct TagFilter(Vec<String>);
+pub struct TagFilter {
+    pub tags: Vec<String>,
+}
 
 impl TagFilter {
     #[must_use]
     pub fn new(tags: Option<Vec<String>>) -> Self {
         match tags {
-            Some(tags) => Self(tags),
-            None => Self(Vec::new()),
+            Some(tags) => Self { tags },
+            None => Self { tags: Vec::new() },
         }
-    }
-
-    #[must_use]
-    pub const fn tags(&self) -> &Vec<String> {
-        &self.0
     }
 }

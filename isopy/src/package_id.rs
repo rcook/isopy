@@ -30,8 +30,8 @@ use std::str::FromStr;
 
 #[derive(Clone, Debug)]
 pub(crate) struct PackageId {
-    moniker: Moniker,
-    version: Version,
+    pub(crate) moniker: Moniker,
+    pub(crate) version: Version,
 }
 
 impl PackageId {
@@ -40,14 +40,6 @@ impl PackageId {
             moniker: moniker.clone(),
             version: version.clone(),
         }
-    }
-
-    pub(crate) const fn moniker(&self) -> &Moniker {
-        &self.moniker
-    }
-
-    pub(crate) const fn version(&self) -> &Version {
-        &self.version
     }
 }
 

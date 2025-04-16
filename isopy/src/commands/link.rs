@@ -26,10 +26,10 @@ use crate::status::{success, user_error, StatusResult};
 use joat_repo::MetaId;
 
 pub(crate) fn do_link(app: &App, dir_id: &MetaId) -> StatusResult {
-    let Some(dir_info) = app.repo().link(dir_id, app.cwd())? else {
+    let Some(dir_info) = app.repo.link(dir_id, &app.cwd)? else {
         user_error!(
             "directory {} is already linked to metadirectory with ID {}",
-            app.cwd().display(),
+            app.cwd.display(),
             dir_id
         );
     };

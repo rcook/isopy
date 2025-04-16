@@ -42,7 +42,7 @@ pub(crate) fn do_list(app: &App, verbose: bool) -> StatusResult {
 fn list_verbose(app: &App) -> Result<()> {
     let mut table = make_prop_table();
 
-    let manifests = app.repo().list_manifests()?;
+    let manifests = app.repo.list_manifests()?;
     if !manifests.is_empty() {
         table_title!(table, "Package directories");
         for (idx, manifest) in manifests.iter().enumerate() {
@@ -57,7 +57,7 @@ fn list_verbose(app: &App) -> Result<()> {
         }
     }
 
-    let links = app.repo().list_links()?;
+    let links = app.repo.list_links()?;
     if !links.is_empty() {
         table_title!(table, "Links");
 
@@ -79,7 +79,7 @@ fn list_verbose(app: &App) -> Result<()> {
 }
 
 fn list_brief(app: &App) -> Result<()> {
-    let manifests = app.repo().list_manifests()?;
+    let manifests = app.repo.list_manifests()?;
     if manifests.is_empty() {
         info!("You have no metadirectories");
     } else {
@@ -89,7 +89,7 @@ fn list_brief(app: &App) -> Result<()> {
         }
     }
 
-    let links = app.repo().list_links()?;
+    let links = app.repo.list_links()?;
     if links.is_empty() {
         info!("You have no project directories linked to metadirectories");
     } else {
