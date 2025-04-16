@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::go_version::GoVersion;
-use isopy_lib::{ArchiveType, Checksum, PackageAvailability, PackageOps, PackageInfo, Version};
+use isopy_lib::{ArchiveType, Checksum, PackageAvailability, PackageInfo, PackageOps, Version};
 use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 

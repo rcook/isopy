@@ -23,7 +23,8 @@
 pub struct TagFilter(Vec<String>);
 
 impl TagFilter {
-    #[must_use] pub fn new(tags: Option<Vec<String>>) -> Self {
+    #[must_use]
+    pub fn new(tags: Option<Vec<String>>) -> Self {
         match tags {
             Some(tags) => Self(tags),
             None => Self(Vec::new()),
