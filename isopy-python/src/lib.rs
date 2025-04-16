@@ -37,7 +37,6 @@
 #![allow(clippy::redundant_pub_crate)]
 
 mod availability_info;
-mod base_version;
 mod build_label;
 mod checksum;
 mod constants;

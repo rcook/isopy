@@ -19,9 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::base_version::BaseVersion;
 use crate::build_label::BuildLabel;
+use crate::discriminant::Discriminant;
+use crate::prerelease_kind::PrereleaseKind;
 use anyhow::{bail, Error, Result};
+use isopy_lib::Triple;
 use isopy_lib::VersionOps;
 use std::any::Any;
 use std::borrow::Cow;
@@ -32,25 +34,54 @@ use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonVersion {
-    pub(crate) version: BaseVersion,
+    pub(crate) triple: Triple,
+    pub(crate) discriminant: Discriminant,
     pub(crate) label: Option<BuildLabel>,
+}
+
+fn parse_triple_discriminant_helper(s: &str) -> Result<(Triple, Discriminant)> {
+    fn prerelease_helper(
+        prerelease_type: PrereleaseKind,
+        s: &str,
+        i0: usize,
+        i1: usize,
+    ) -> Result<(Triple, Discriminant)> {
+        let triple_str = &s[..i0];
+        let triple = triple_str.parse()?;
+        let number_str = &s[i1..];
+        let number = number_str.parse()?;
+        let discriminant = Discriminant::prerelease(prerelease_type, number);
+        Ok((triple, discriminant))
+    }
+    if let Some(i) = s.find('a') {
+        return prerelease_helper(PrereleaseKind::Alpha, s, i, i + 1);
+    }
+    if let Some(i) = s.find("rc") {
+        return prerelease_helper(PrereleaseKind::ReleaseCandidate, s, i, i + 2);
+    }
+
+    let triple = s.parse()?;
+    Ok((triple, Discriminant::None))
 }
 
 impl PythonVersion {
     pub(crate) fn from_tags(tags: &mut HashSet<String>) -> Result<Self> {
         let mut result = None;
-        let mut version = None;
+        let mut triple_discriminant = None;
         let mut label = None;
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
             if let Some((prefix, suffix)) = tag.split_once('+') {
-                if let Ok(temp_version) = BaseVersion::parse(prefix) {
+                if let Ok(temp_triple_discriminant) = parse_triple_discriminant_helper(prefix) {
                     if let Ok(temp_label) = suffix.parse() {
-                        assert!(result.is_none() && version.is_none() && label.is_none());
+                        assert!(
+                            result.is_none() && triple_discriminant.is_none() && label.is_none()
+                        );
                         tags_to_remove.push(tag.clone());
                         result = Some(Self {
-                            version: temp_version,
+                            triple: temp_triple_discriminant.0,
+                            discriminant: temp_triple_discriminant.1,
                             label: Some(temp_label),
                         });
                         break;
@@ -58,10 +89,10 @@ impl PythonVersion {
                 }
             }
 
-            if let Ok(temp_version) = BaseVersion::parse(tag) {
-                assert!(result.is_none() && version.is_none());
+            if let Ok(temp_triple_discriminant) = parse_triple_discriminant_helper(tag) {
+                assert!(result.is_none() && triple_discriminant.is_none());
                 tags_to_remove.push(tag.clone());
-                version = Some(temp_version);
+                triple_discriminant = Some(temp_triple_discriminant);
                 if label.is_some() {
                     break;
                 }
@@ -71,7 +102,7 @@ impl PythonVersion {
                 assert!(result.is_none() && label.is_none());
                 tags_to_remove.push(tag.clone());
                 label = Some(temp_label);
-                if version.is_some() {
+                if triple_discriminant.is_some() {
                     break;
                 }
             }
@@ -82,11 +113,11 @@ impl PythonVersion {
         }
 
         if let Some(result) = result {
-            assert!(version.is_none() && label.is_none());
+            assert!(triple_discriminant.is_none() && label.is_none());
             return Ok(result);
         }
 
-        let Some(version) = version else {
+        let Some(triple_discriminant) = triple_discriminant else {
             bail!("Could not determine package version from tags {tags:?}")
         };
 
@@ -95,13 +126,17 @@ impl PythonVersion {
         };
 
         Ok(Self {
-            version,
+            triple: triple_discriminant.0,
+            discriminant: triple_discriminant.1,
             label: Some(label),
         })
     }
 
     pub(crate) fn matches(&self, other: &Self) -> bool {
-        if self.version != other.version {
+        if self.triple != other.triple {
+            return false;
+        }
+        if self.discriminant != other.discriminant {
             return false;
         }
 
@@ -118,7 +153,7 @@ impl PythonVersion {
 
 impl Display for PythonVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}", self.version)?;
+        write!(f, "{}", self.as_str())?;
         if let Some(label) = &self.label {
             write!(f, ":{}", label.as_str())?;
         }
@@ -135,14 +170,21 @@ impl FromStr for PythonVersion {
             None => (s, None),
         };
 
-        let version = BaseVersion::parse(prefix)?;
-        Ok(Self { version, label })
+        let (triple, discriminant) = parse_triple_discriminant_helper(prefix)?;
+        Ok(Self {
+            triple,
+            discriminant,
+            label,
+        })
     }
 }
 
 impl VersionOps for PythonVersion {
     fn as_str(&self) -> Cow<String> {
-        Cow::Owned(format!("{}", self.version))
+        match &self.discriminant {
+            Discriminant::Prerelease(d) => Cow::Owned(format!("{}{}", self.triple, d)),
+            Discriminant::None => Cow::Owned(self.triple.to_string()),
+        }
     }
 
     fn label(&self) -> Option<Cow<String>> {
@@ -162,12 +204,63 @@ impl VersionOps for PythonVersion {
 
 #[cfg(test)]
 mod tests {
+    use super::parse_triple_discriminant_helper;
     use super::PythonVersion;
     use crate::build_label::BuildLabel;
     use crate::discriminant::Discriminant;
     use crate::prerelease_kind::PrereleaseKind;
     use anyhow::Result;
     use rstest::rstest;
+
+    #[rstest]
+    #[case(
+        3,
+        14,
+        0,
+        Discriminant::prerelease(PrereleaseKind::Alpha, 10),
+        "3.14.0a10"
+    )]
+    #[case(
+        3,
+        14,
+        0,
+        Discriminant::prerelease(PrereleaseKind::Alpha, 6),
+        "3.14.0a6"
+    )]
+    #[case(
+        3,
+        14,
+        0,
+        Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 10),
+        "3.14.0rc10"
+    )]
+    #[case(
+        3,
+        14,
+        123,
+        Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 345),
+        "3.14.123rc345"
+    )]
+    fn parse_triple_discriminant_helper_basics(
+        #[case] expected_major: i32,
+        #[case] expected_minor: i32,
+        #[case] expected_revision: i32,
+        #[case] expected_discriminant: Discriminant,
+        #[case] input: &str,
+    ) -> Result<()> {
+        let (triple, discriminant) = parse_triple_discriminant_helper(input)?;
+        assert_eq!(expected_major, triple.major);
+        assert_eq!(expected_minor, triple.minor);
+        assert_eq!(expected_revision, triple.revision);
+        assert_eq!(expected_discriminant, discriminant);
+        //assert_eq!(input, result.to_string());
+        Ok(())
+    }
+
+    #[test]
+    fn invalid() {
+        assert!(parse_triple_discriminant_helper("3.14.0a10+20250409").is_err());
+    }
 
     #[rstest]
     #[case(1, 2, 3, Discriminant::None, None, "1.2.3")]
@@ -196,11 +289,10 @@ mod tests {
         #[case] input: &str,
     ) -> Result<()> {
         let result = input.parse::<PythonVersion>()?;
-        let version = &result.version;
-        assert_eq!(expected_major, version.triple.major);
-        assert_eq!(expected_minor, version.triple.minor);
-        assert_eq!(expected_revision, version.triple.revision);
-        assert_eq!(expected_discriminant, version.discriminant);
+        assert_eq!(expected_major, result.triple.major);
+        assert_eq!(expected_minor, result.triple.minor);
+        assert_eq!(expected_revision, result.triple.revision);
+        assert_eq!(expected_discriminant, result.discriminant);
         assert_eq!(expected_label, result.label);
         Ok(())
     }
