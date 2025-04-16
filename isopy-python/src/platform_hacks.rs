@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_package_with_availability::PythonPackageWithAvailability;
-use anyhow::{bail, Result};
 use itertools::Itertools;
 
 // On some platforms, most notably Windows, we will get more than one package
@@ -30,18 +29,18 @@ use itertools::Itertools;
 #[cfg(not(target_os = "windows"))]
 pub(crate) fn uniquify_packages(
     packages: Vec<PythonPackageWithAvailability>,
-) -> Result<Vec<PythonPackageWithAvailability>> {
+) -> Vec<PythonPackageWithAvailability> {
     for (key, group) in &packages
         .iter()
         .chunk_by(|p| p.package.metadata().version().clone())
     {
-        let package_count = group.count();
-        if package_count > 1 {
-            bail!("There is more than one viable candidate for package {key}")
-        }
+        assert_eq!(
+            1,
+            group.count(),
+            "More than one viable candidate for package {key}"
+        );
     }
-
-    Ok(packages)
+    packages
 }
 
 // On Windows, we prefer the "shared" library over the "static" library and
@@ -49,7 +48,7 @@ pub(crate) fn uniquify_packages(
 #[cfg(target_os = "windows")]
 pub(crate) fn uniquify_packages(
     packages: Vec<PythonPackageWithAvailability>,
-) -> Result<Vec<PythonPackageWithAvailability>> {
+) -> Vec<PythonPackageWithAvailability> {
     let mut filtered_packages = Vec::new();
     for (key, group) in &packages
         .into_iter()
@@ -57,7 +56,8 @@ pub(crate) fn uniquify_packages(
     {
         let packages = group.collect::<Vec<_>>();
         let package_count = packages.len();
-        debug_assert_ne!(0, package_count);
+        assert_ne!(0, package_count);
+
         if package_count > 1 {
             let mut temp_shared = None;
             let mut temp_static = None;
@@ -76,6 +76,11 @@ pub(crate) fn uniquify_packages(
                 }
             }
 
+            assert!(
+                temp_shared.is_some() || temp_default.is_some() || temp_static.is_some(),
+                "No viable candidate for package {key}"
+            );
+
             if let Some(package) = temp_shared {
                 filtered_packages.push(package);
             } else if let Some(package) = temp_default {
@@ -83,7 +88,7 @@ pub(crate) fn uniquify_packages(
             } else if let Some(package) = temp_static {
                 filtered_packages.push(package);
             } else {
-                bail!("There is no viable candidate for package {key}")
+                unreachable!()
             }
         } else {
             let package = packages
@@ -94,5 +99,5 @@ pub(crate) fn uniquify_packages(
         }
     }
 
-    Ok(filtered_packages)
+    filtered_packages
 }

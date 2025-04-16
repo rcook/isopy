@@ -207,8 +207,7 @@ impl PythonPackageManager {
         });
 
         // Ensure there is exactly one matching package for a given version and build label
-        let packages = uniquify_packages(packages)?;
-
+        let packages = uniquify_packages(packages);
         Ok(packages)
     }
 
