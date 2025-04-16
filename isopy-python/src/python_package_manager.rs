@@ -253,7 +253,7 @@ impl PackageManagerOps for PythonPackageManager {
         let mut other_tags = HashSet::new();
         for package in self.read_packages(options.show_progress).await? {
             common_tags.extend(package.metadata.tags.clone());
-            if let Some(label) = package.metadata.version.label() {
+            if let Some(label) = package.metadata.version.label {
                 other_tags.insert(String::from(label.as_str()));
             }
         }

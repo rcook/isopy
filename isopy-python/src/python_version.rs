@@ -32,8 +32,8 @@ use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonVersion {
-    version: BaseVersion,
-    label: Option<BuildLabel>,
+    pub(crate) version: BaseVersion,
+    pub(crate) label: Option<BuildLabel>,
 }
 
 impl PythonVersion {
@@ -100,22 +100,14 @@ impl PythonVersion {
         })
     }
 
-    pub(crate) const fn version(&self) -> &BaseVersion {
-        &self.version
-    }
-
-    pub(crate) const fn label(&self) -> &Option<BuildLabel> {
-        &self.label
-    }
-
     pub(crate) fn matches(&self, other: &Self) -> bool {
-        if self.version != *other.version() {
+        if self.version != other.version {
             return false;
         }
 
         if let Some(other_label) = other.label() {
             match &self.label {
-                Some(label) if label == other_label => {}
+                Some(label) if label.as_str() == other_label.as_str() => {}
                 _ => return false,
             }
         }
@@ -204,7 +196,7 @@ mod tests {
         #[case] input: &str,
     ) -> Result<()> {
         let result = input.parse::<PythonVersion>()?;
-        let version = result.version();
+        let version = &result.version;
         assert_eq!(expected_major, version.triple.major);
         assert_eq!(expected_minor, version.triple.minor);
         assert_eq!(expected_revision, version.triple.revision);

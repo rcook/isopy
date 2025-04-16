@@ -43,7 +43,7 @@ pub(crate) async fn get_checksum(
             .collect::<HashMap<_, _>>()
     }
 
-    let Some(label) = package.metadata.version.label() else {
+    let Some(label) = package.metadata.version.label.as_ref() else {
         bail!("Python package has no build label")
     };
 

@@ -49,7 +49,7 @@ impl FromStr for Metadata {
         }
 
         let version = PythonVersion::from_tags(&mut tags)?;
-        if let Some(label) = version.label() {
+        if let Some(label) = version.label.as_ref() {
             tags.insert(String::from(label.as_str()));
         }
 
