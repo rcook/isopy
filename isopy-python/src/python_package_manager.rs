@@ -311,7 +311,7 @@ impl PackageManagerOps for PythonPackageManager {
         options: &DownloadPackageOptions,
     ) -> Result<()> {
         let version = downcast_version!(version);
-        let Some(package) = self
+        let Some(info) = self
             .read_package(version, tag_filter, options.show_progress)
             .await?
         else {
@@ -322,16 +322,13 @@ impl PackageManagerOps for PythonPackageManager {
             );
         };
 
-        let checksum = get_checksum(&self.ctx, &package.package, options.show_progress).await?;
+        let checksum = get_checksum(&self.ctx, &info.package, options.show_progress).await?;
         let options = DownloadAssetOptionsBuilder::default()
             .update(false)
             .checksum(Some(checksum))
             .show_progress(options.show_progress)
             .build()?;
-        _ = self
-            .ctx
-            .download_asset(&package.package.url, &options)
-            .await?;
+        _ = self.ctx.download_asset(&info.package.url, &options).await?;
         Ok(())
     }
 
@@ -343,7 +340,7 @@ impl PackageManagerOps for PythonPackageManager {
         options: &InstallPackageOptions,
     ) -> Result<Package> {
         let version = downcast_version!(version);
-        let Some(package) = self
+        let Some(info) = self
             .read_package(version, tag_filter, options.show_progress)
             .await?
         else {
@@ -354,7 +351,7 @@ impl PackageManagerOps for PythonPackageManager {
             );
         };
 
-        let Some(path) = &package.path else {
+        let Some(path) = &info.path else {
             bail!(
                 "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing packages",
                 moniker = self.moniker,
@@ -362,8 +359,7 @@ impl PackageManagerOps for PythonPackageManager {
             );
         };
 
-        package
-            .package
+        info.package
             .metadata
             .archive_type
             .unpack(path, dir, options)
@@ -371,6 +367,6 @@ impl PackageManagerOps for PythonPackageManager {
 
         Self::on_after_install(dir)?;
 
-        Ok(Package::new(package.package))
+        Ok(Package::new(info.package))
     }
 }
