@@ -32,7 +32,6 @@ use isopy_lib::{
 };
 use serde_json::Value;
 use std::collections::HashSet;
-use std::default;
 use std::path::Path;
 use tokio::fs::read_to_string;
 use url::Url;
@@ -179,7 +178,7 @@ impl PackageManagerOps for GoPackageManager {
         platform_tags.sort();
         let platform_tags = platform_tags;
         Ok(Tags {
-            platform_tags: platform_tags,
+            platform_tags,
             ..Default::default()
         })
     }
@@ -187,17 +186,21 @@ impl PackageManagerOps for GoPackageManager {
     async fn list_packages(
         &self,
         sources: SourceFilter,
-        _tags: &TagFilter, // TBD
+        tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
-        let filter_tags = PLATFORM_TAGS
+
+        let mut tags = tag_filter
+            .tags(&[])
             .into_iter()
             .map(String::from)
             .collect::<HashSet<_>>();
+        tags.extend(PLATFORM_TAGS.into_iter().map(String::from));
+
         let mut packages = Vec::new();
         for package in self.get_packages(false, options.show_progress).await? {
-            if package.tags().is_superset(&filter_tags)
+            if package.tags().is_superset(&tags)
                 && matches!(
                     (
                         sources,
