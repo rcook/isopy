@@ -73,7 +73,7 @@ impl FromStr for PackageId {
 
 impl Display for PackageId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "{}:{}", self.moniker, *self.version)
+        write!(f, "{}:{}", self.moniker, self.version.as_str())
     }
 }
 

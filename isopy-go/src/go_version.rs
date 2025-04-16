@@ -22,6 +22,8 @@
 use crate::extra::Extra;
 use anyhow::{bail, Error, Result};
 use isopy_lib::VersionOps;
+use std::any::Any;
+use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
@@ -146,11 +148,15 @@ impl FromStr for GoVersion {
 }
 
 impl VersionOps for GoVersion {
+    fn as_str(&self) -> Cow<String> {
+        Cow::Owned(format!("{self}"))
+    }
+
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }

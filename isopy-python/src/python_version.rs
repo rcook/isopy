@@ -23,6 +23,8 @@ use crate::base_version::BaseVersion;
 use crate::build_label::BuildLabel;
 use anyhow::{bail, Error, Result};
 use isopy_lib::VersionOps;
+use std::any::Any;
+use std::borrow::Cow;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
@@ -147,11 +149,15 @@ impl FromStr for PythonVersion {
 }
 
 impl VersionOps for PythonVersion {
+    fn as_str(&self) -> Cow<String> {
+        Cow::Owned(format!("{self}"))
+    }
+
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }

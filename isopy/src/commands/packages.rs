@@ -96,8 +96,13 @@ fn add_plugin_rows(
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package: &PackageInfo) -> String {
         match package.label() {
-            Some(label) => format!("{}:{}:{}", moniker.as_str(), **package.version(), label),
-            None => format!("{}:{}", moniker.as_str(), **package.version()),
+            Some(label) => format!(
+                "{}:{}:{}",
+                moniker.as_str(),
+                package.version().as_str(),
+                label
+            ),
+            None => format!("{}:{}", moniker.as_str(), package.version().as_str()),
         }
     }
 

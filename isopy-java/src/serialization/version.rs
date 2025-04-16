@@ -21,6 +21,8 @@
 //
 use isopy_lib::VersionOps;
 use serde::Deserialize;
+use std::any::Any;
+use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Deserialize)]
@@ -66,11 +68,15 @@ impl Display for Version {
 }
 
 impl VersionOps for Version {
+    fn as_str(&self) -> Cow<String> {
+        Cow::Owned(format!("{self}"))
+    }
+
     fn box_clone(&self) -> Box<dyn VersionOps> {
         Box::new(self.clone())
     }
 
-    fn as_any(&self) -> &dyn std::any::Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
