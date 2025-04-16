@@ -32,27 +32,28 @@ use isopy_lib::{
 };
 use serde_json::Value;
 use std::collections::HashSet;
+use std::default;
 use std::path::Path;
 use tokio::fs::read_to_string;
 use url::Url;
 
 #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
-const DEFAULT_TAGS: [&str; 2] = ["arm64", "linux"];
+const PLATFORM_TAGS: [&str; 2] = ["arm64", "linux"];
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-const DEFAULT_TAGS: [&str; 2] = ["amd64", "linux"];
+const PLATFORM_TAGS: [&str; 2] = ["amd64", "linux"];
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-const DEFAULT_TAGS: [&str; 2] = ["arm64", "darwin"];
+const PLATFORM_TAGS: [&str; 2] = ["arm64", "darwin"];
 
 #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
-const DEFAULT_TAGS: [&str; 2] = ["amd64", "darwin"];
+const PLATFORM_TAGS: [&str; 2] = ["amd64", "darwin"];
 
 #[cfg(all(target_os = "windows", target_arch = "aarch64"))]
-const DEFAULT_TAGS: [&str; 2] = ["arm64", "windows"];
+const PLATFORM_TAGS: [&str; 2] = ["arm64", "windows"];
 
 #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
-const DEFAULT_TAGS: [&str; 2] = ["amd64", "windows"];
+const PLATFORM_TAGS: [&str; 2] = ["amd64", "windows"];
 
 #[allow(unused)]
 macro_rules! downcast_version {
@@ -94,7 +95,7 @@ impl GoPackageManager {
         let index = self.get_index(update, show_progress).await?;
         let mut packages = Vec::new();
         for release in serde_json::from_value::<Vec<Release>>(index)? {
-            let filter_tags = HashSet::from(DEFAULT_TAGS);
+            let filter_tags = HashSet::from(PLATFORM_TAGS);
             for file in release.files {
                 match file.kind.as_str() {
                     "archive" => {
@@ -170,7 +171,17 @@ impl PackageManagerOps for GoPackageManager {
     }
 
     async fn list_tags(&self, _options: &ListTagsOptions) -> Result<Tags> {
-        Ok(Tags::default())
+        let mut platform_tags = PLATFORM_TAGS
+            .iter()
+            .copied()
+            .map(String::from)
+            .collect::<Vec<_>>();
+        platform_tags.sort();
+        let platform_tags = platform_tags;
+        Ok(Tags {
+            platform_tags: platform_tags,
+            ..Default::default()
+        })
     }
 
     async fn list_packages(
@@ -180,7 +191,7 @@ impl PackageManagerOps for GoPackageManager {
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
         use isopy_lib::SourceFilter::*;
-        let filter_tags = DEFAULT_TAGS
+        let filter_tags = PLATFORM_TAGS
             .into_iter()
             .map(String::from)
             .collect::<HashSet<_>>();
