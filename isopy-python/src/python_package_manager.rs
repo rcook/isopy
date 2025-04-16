@@ -132,7 +132,7 @@ impl PythonPackageManager {
         let index = self.get_index(false, show_progress).await?;
         let mut packages = Vec::new();
         for item in index.items() {
-            for package in PythonPackage::parse_all(&item)? {
+            for package in PythonPackage::from_index_item(&item)? {
                 if package.metadata.tags.is_superset(&self.platform_tags) {
                     packages.push(package);
                 }

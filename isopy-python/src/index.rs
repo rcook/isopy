@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::item::Item;
+use crate::index_item::IndexItem;
 use anyhow::Error;
 use serde_json::Value;
 use std::iter::from_fn;
@@ -39,9 +39,9 @@ impl Index {
         }
     }
 
-    pub(crate) fn items(&self) -> impl Iterator<Item = Item<'_>> {
+    pub(crate) fn items(&self) -> impl Iterator<Item = IndexItem<'_>> {
         let mut iter = self.value.as_array().unwrap_or(&self.empty_items).iter();
-        from_fn(move || iter.next().map(Item::new))
+        from_fn(move || iter.next().map(IndexItem::new))
     }
 }
 

@@ -43,7 +43,7 @@ mod constants;
 mod discriminant;
 mod entrypoint;
 mod index;
-mod item;
+mod index_item;
 mod metadata;
 mod package_cache;
 mod platform_hacks;

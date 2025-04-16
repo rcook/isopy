@@ -21,11 +21,11 @@
 //
 use serde_json::Value;
 
-pub(crate) struct Item<'a> {
+pub(crate) struct IndexItem<'a> {
     pub(crate) value: &'a Value,
 }
 
-impl<'a> Item<'a> {
+impl<'a> IndexItem<'a> {
     pub(crate) const fn new(value: &'a Value) -> Self {
         Self { value }
     }

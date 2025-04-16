@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::item::Item;
+use crate::index_item::IndexItem;
 use crate::metadata::Metadata;
 use anyhow::Result;
 use isopy_lib::{PackageOps, Version};
@@ -33,7 +33,7 @@ pub(crate) struct PythonPackage {
 }
 
 impl PythonPackage {
-    pub(crate) fn parse_all(item: &Item) -> Result<Vec<Self>> {
+    pub(crate) fn from_index_item(item: &IndexItem) -> Result<Vec<Self>> {
         macro_rules! g {
             ($e : expr) => {
                 match $e {
