@@ -42,3 +42,22 @@ impl Display for PrereleaseInfo {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::PrereleaseInfo;
+    use crate::prerelease_kind::PrereleaseKind;
+
+    #[test]
+    fn order() {
+        let info1 = PrereleaseInfo::new(PrereleaseKind::ReleaseCandidate, 2);
+        let info2 = PrereleaseInfo::new(PrereleaseKind::ReleaseCandidate, 10);
+        let info3 = PrereleaseInfo::new(PrereleaseKind::Alpha, 100);
+        assert!(info1 < info2);
+        assert!(info2 > info1);
+        assert!(info1 > info3);
+        assert!(info3 < info1);
+        assert!(info2 > info3);
+        assert!(info3 < info2);
+    }
+}

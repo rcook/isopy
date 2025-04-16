@@ -44,3 +44,14 @@ impl PartialOrd for PrereleaseKind {
         Some(self.cmp(other))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::PrereleaseKind;
+
+    #[test]
+    fn order() {
+        assert!(PrereleaseKind::ReleaseCandidate > PrereleaseKind::Alpha);
+        assert!(PrereleaseKind::Alpha < PrereleaseKind::ReleaseCandidate);
+    }
+}
