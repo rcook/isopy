@@ -154,8 +154,8 @@ impl PythonPackageManager {
         &self,
         packages: Vec<PythonPackage>,
         sources: SourceFilter,
-        tag_filter: &TagFilter,
         version: Option<&PythonVersion>,
+        tag_filter: &TagFilter,
     ) -> Result<Vec<PythonPackageWithAvailability>> {
         use isopy_lib::SourceFilter::*;
 
@@ -253,8 +253,8 @@ impl PackageManagerOps for PythonPackageManager {
             .filter_packages(
                 self.read_packages(options.show_progress).await?,
                 sources,
-                tag_filter,
                 None,
+                tag_filter,
             )?
             .into_iter()
             .map(PythonPackageWithAvailability::into_package_info)
@@ -288,8 +288,8 @@ impl PackageManagerOps for PythonPackageManager {
         let packages = self.filter_packages(
             self.read_packages(options.show_progress).await?,
             SourceFilter::All,
-            tag_filter,
             Some(version),
+            tag_filter,
         )?;
 
         let Some(package) = packages.into_iter().next() else {
@@ -322,22 +322,26 @@ impl PackageManagerOps for PythonPackageManager {
     ) -> Result<Package> {
         let version = downcast_version!(version);
 
-        // TBD: Use cache!
-        let index = self.get_index(false, options.show_progress).await?;
+        let packages = self.filter_packages(
+            self.read_packages(options.show_progress).await?,
+            SourceFilter::All,
+            Some(version),
+            tag_filter,
+        )?;
 
-        let tags = tag_filter.tags(&PLATFORM_TAGS);
-        let Some(package) = PythonPackageWithAvailability::read(&self.ctx, &index, version, &tags)?
-        else {
+        let Some(package) = packages.into_iter().next() else {
             bail!(
                 "No package with ID {moniker}:{version} and tags {tags:?} found in index",
-                moniker = self.moniker
+                moniker = self.moniker,
+                tags = tag_filter.tags(&[])
             );
         };
 
         let Some(path) = &package.path else {
             bail!(
-                "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing pacakges",
-                moniker = self.moniker
+                "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing packages",
+                moniker = self.moniker,
+                tags=tag_filter.tags(&[])
             );
         };
 
