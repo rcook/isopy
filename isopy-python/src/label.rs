@@ -77,3 +77,19 @@ impl PartialOrd for Label {
         Some(self.cmp(other))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Label;
+    #[test]
+    fn basics() {
+        let label1 = Label::NewStyle(String::from("label"));
+        let label2 = Label::NewStyle(String::from("label"));
+        let label3 = Label::OldStyle(String::from("label"));
+        assert_eq!(label1, label2);
+        assert_ne!(label1, label3);
+        assert_ne!(label2, label3);
+        assert!(label1 > label3);
+        assert!(label3 < label2);
+    }
+}
