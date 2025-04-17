@@ -42,7 +42,6 @@ mod extent;
 mod file_name_parts;
 mod macros;
 mod package;
-mod package_availability;
 mod package_info;
 mod package_manager;
 mod package_manager_context;
@@ -64,7 +63,6 @@ pub use env_info::EnvInfo;
 pub use extent::Extent;
 pub use file_name_parts::FileNameParts;
 pub use package::{Package, PackageOps};
-pub use package_availability::PackageAvailability;
 pub use package_info::PackageInfo;
 pub use package_manager::{
     DownloadPackageOptions, DownloadPackageOptionsBuilder, GetPackageOptions,

@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::availability_info::AvailabilityInfo;
+use crate::local_package_info::LocalPackageInfo;
 use itertools::Itertools;
 
 // On some platforms, most notably Windows, we will get more than one package
@@ -27,7 +27,7 @@ use itertools::Itertools;
 // there is exactly one matching package for a given version and build label
 
 #[cfg(not(target_os = "windows"))]
-pub(crate) fn choose_best(infos: Vec<AvailabilityInfo>) -> Vec<AvailabilityInfo> {
+pub(crate) fn choose_best(infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo> {
     for (key, group) in &infos
         .iter()
         .chunk_by(|i| i.package.metadata.version.clone())
@@ -44,7 +44,7 @@ pub(crate) fn choose_best(infos: Vec<AvailabilityInfo>) -> Vec<AvailabilityInfo>
 // On Windows, we prefer the "shared" library over the "static" library and
 // choose the default otherwise
 #[cfg(target_os = "windows")]
-pub(crate) fn choose_best(infos: Vec<AvailabilityInfo>) -> Vec<AvailabilityInfo> {
+pub(crate) fn choose_best(infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo> {
     let mut best_infos = Vec::new();
     for (key, group) in &infos
         .into_iter()

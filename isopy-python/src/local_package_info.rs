@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Richard Cook
+// Copyright (c) 2024 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -19,26 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use std::cmp::Ordering;
+use crate::python_package::PythonPackage;
+use std::path::PathBuf;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum PackageAvailability {
-    Local,
-    Remote,
-}
-
-impl Ord for PackageAvailability {
-    fn cmp(&self, other: &Self) -> Ordering {
-        match (self, other) {
-            (a, b) if a == b => Ordering::Equal,
-            (Self::Local, _) => Ordering::Greater,
-            (Self::Remote, _) => Ordering::Less,
-        }
-    }
-}
-
-impl PartialOrd for PackageAvailability {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
+pub(crate) struct LocalPackageInfo {
+    pub(crate) package: PythonPackage,
+    pub(crate) path: Option<PathBuf>,
 }

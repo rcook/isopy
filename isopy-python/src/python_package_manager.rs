@@ -19,10 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::availability_info::AvailabilityInfo;
 use crate::checksum::get_checksum;
 use crate::constants::PLATFORM_TAGS;
 use crate::index::Index;
+use crate::local_package_info::LocalPackageInfo;
 use crate::package_cache::{read_package_cache, write_package_cache};
 use crate::platform_hacks::choose_best;
 use crate::python_package::PythonPackage;
@@ -31,9 +31,8 @@ use anyhow::{bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadAssetOptionsBuilder, DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, Package, PackageAvailability, PackageInfo,
-    PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions,
-    Version,
+    ListPackagesOptions, ListTagsOptions, Package, PackageInfo, PackageManagerContext,
+    PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
 use std::cmp::Ordering;
 use std::collections::HashSet;
@@ -105,9 +104,8 @@ impl PythonPackageManager {
         Ok(())
     }
 
-    fn make_package_info(info: AvailabilityInfo) -> PackageInfo {
+    fn make_package_info(info: LocalPackageInfo) -> PackageInfo {
         PackageInfo::new(
-            info.availability,
             info.package.metadata.name.clone(),
             &info.package.url,
             Version::new(info.package.metadata.version.clone()),
@@ -174,7 +172,7 @@ impl PythonPackageManager {
         source_filter: SourceFilter,
         version: Option<&PythonVersion>,
         tag_filter: &TagFilter,
-    ) -> Result<Vec<AvailabilityInfo>> {
+    ) -> Result<Vec<LocalPackageInfo>> {
         use isopy_lib::SourceFilter::*;
 
         let tags = tag_filter
@@ -190,31 +188,21 @@ impl PythonPackageManager {
                 None => true,
             };
             if version_matches && m.tags.is_superset(&tags) {
-                let (availability, path) = match self.ctx.check_asset(&package.url)? {
-                    Some(p) => (PackageAvailability::Local, Some(p)),
-                    None => (PackageAvailability::Remote, None),
-                };
-
+                let path = self.ctx.check_asset(&package.url)?;
                 if matches!(
-                    (source_filter, availability == PackageAvailability::Local),
+                    (source_filter, path.is_some()),
                     (All, _) | (Local, true) | (Remote, false)
                 ) {
-                    infos.push(AvailabilityInfo {
-                        package,
-                        availability,
-                        path,
-                    });
+                    infos.push(LocalPackageInfo { package, path });
                 }
             }
         }
 
         // Must sort _before_ uniquifying
-        infos.sort_by(|a, b| {
-            let temp = b.availability.cmp(&a.availability);
-            if temp != Ordering::Equal {
-                return temp;
-            }
-            b.package.metadata.version.cmp(&a.package.metadata.version)
+        infos.sort_by(|a, b| match (b.path.is_some(), a.path.is_some()) {
+            (true, false) => Ordering::Greater,
+            (false, true) => Ordering::Less,
+            _ => b.package.metadata.version.cmp(&a.package.metadata.version),
         });
 
         // Ensure there is exactly one matching package for a given version and build label
@@ -226,7 +214,7 @@ impl PythonPackageManager {
         version: &PythonVersion,
         tag_filter: &TagFilter,
         show_progress: bool,
-    ) -> Result<Option<AvailabilityInfo>> {
+    ) -> Result<Option<LocalPackageInfo>> {
         Ok(self
             .filter_packages(
                 self.read_packages(show_progress).await?,

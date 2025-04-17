@@ -36,7 +36,6 @@
 #![allow(clippy::option_if_let_else)]
 #![allow(clippy::redundant_pub_crate)]
 
-mod availability_info;
 mod build_label;
 mod checksum;
 mod constants;
@@ -44,6 +43,7 @@ mod discriminant;
 mod entrypoint;
 mod index;
 mod index_item;
+mod local_package_info;
 mod metadata;
 mod package_cache;
 mod platform_hacks;

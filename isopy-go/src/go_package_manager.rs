@@ -27,8 +27,8 @@ use async_trait::async_trait;
 use isopy_lib::{
     query, ArchiveType, DirUrl, DownloadAssetOptionsBuilder, DownloadPackageOptions,
     GetPackageOptions, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
-    PackageAvailability, PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter,
-    TagFilter, Tags, UpdateIndexOptions, Version,
+    PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags,
+    UpdateIndexOptions, Version,
 };
 use serde_json::Value;
 use std::cmp::Ordering;
@@ -105,10 +105,7 @@ impl GoPackageManager {
                         if tags.is_superset(&filter_tags) {
                             let version = file.version.parse::<GoVersion>()?;
                             let url = self.url.join(&file.file_name)?;
-                            let (kind, path) = match self.ctx.check_asset(&url)? {
-                                Some(p) => (PackageAvailability::Local, Some(p)),
-                                None => (PackageAvailability::Remote, None),
-                            };
+                            let path = self.ctx.check_asset(&url)?;
                             let (archive_type, _) = ArchiveType::strip_suffix(&file.file_name)
                                 .ok_or_else(|| {
                                     anyhow!(
@@ -120,7 +117,6 @@ impl GoPackageManager {
                             let tags = vec![file.arch, file.os];
                             packages.push(GoPackage::new(
                                 &file.file_name,
-                                kind,
                                 archive_type,
                                 &url,
                                 &version,
@@ -203,7 +199,7 @@ impl PackageManagerOps for GoPackageManager {
         for p in self.get_packages(false, options.show_progress).await? {
             if p.tags.is_superset(&tags)
                 && matches!(
-                    (source_filter, p.availability == PackageAvailability::Local),
+                    (source_filter, p.path.is_some()),
                     (All, _) | (Local, true) | (Remote, false)
                 )
             {
@@ -211,12 +207,10 @@ impl PackageManagerOps for GoPackageManager {
             }
         }
 
-        packages.sort_by(|a, b| {
-            let temp = b.availability.cmp(&a.availability);
-            if temp != Ordering::Equal {
-                return temp;
-            }
-            b.version.cmp(&a.version)
+        packages.sort_by(|a, b| match (b.path.is_some(), a.path.is_some()) {
+            (true, false) => Ordering::Greater,
+            (false, true) => Ordering::Less,
+            _ => b.version.cmp(&a.version),
         });
 
         Ok(packages

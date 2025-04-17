@@ -25,9 +25,9 @@ use anyhow::{anyhow, bail, Result};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, GetPackageOptions, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageAvailability, PackageInfo, PackageManagerContext,
-    PackageManagerOps, ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter,
-    Tags, UpdateIndexOptions, Version,
+    ListTagsOptions, Package, PackageInfo, PackageManagerContext, PackageManagerOps,
+    ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags,
+    UpdateIndexOptions, Version,
 };
 use reqwest::Client;
 use std::fs::{read_dir, File};
@@ -130,7 +130,6 @@ impl PackageManagerOps for JavaPackageManager {
             let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
             packages.extend(response.versions.into_iter().map(|v| {
                 PackageInfo::new(
-                    PackageAvailability::Remote,
                     v.semver.clone(),
                     &Url::parse("https://httpbin.org").unwrap(),
                     Version::new(v),

@@ -19,13 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::package_availability::PackageAvailability;
 use crate::version::Version;
 use std::path::PathBuf;
 use url::Url;
 
 pub struct PackageInfo {
-    pub availability: PackageAvailability,
     pub name: String,
     pub url: Url,
     pub version: Version,
@@ -34,14 +32,12 @@ pub struct PackageInfo {
 
 impl PackageInfo {
     pub fn new<S: Into<String>, P: Into<PathBuf>>(
-        availability: PackageAvailability,
         name: S,
         url: &Url,
         version: Version,
         path: Option<P>,
     ) -> Self {
         Self {
-            availability,
             name: name.into(),
             url: url.clone(),
             version,
