@@ -20,6 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
+use crate::constants::CONFIG_NAMES;
 use crate::env::{get_env_keys, read_env};
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
 use crate::status::{success, StatusResult};
@@ -51,6 +52,17 @@ pub(crate) fn do_info(app: &App) -> StatusResult {
         let value = read_env(env_key)?;
         let value_str = value.as_deref().unwrap_or(NO_VALUE);
         table_columns!(table, env_key, value_str);
+    }
+
+    table_title!(table, "Configuration values");
+    let config_values = app.get_config_values()?;
+    let mut names = CONFIG_NAMES.into_iter().collect::<Vec<_>>();
+    names.sort_unstable();
+    for name in names {
+        match config_values.get(name) {
+            Some(value) => table_columns!(table, name, value),
+            None => table_columns!(table, name, NO_VALUE),
+        }
     }
 
     table.print();

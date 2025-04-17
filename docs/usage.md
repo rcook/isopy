@@ -8,7 +8,6 @@
 * [`init`](commands/init.md)
 * [`link`](commands/link.md)
 * [`ls`](commands/ls.md)
-* [`ls-config`](commands/ls-config.md)
 * [`packages`](commands/packages.md)
 * [`project`](commands/project.md)
 * [`prompt`](commands/prompt.md)

@@ -209,9 +209,6 @@ pub(crate) enum Command {
         _no_verbose: bool,
     },
 
-    #[command(name = "ls-config", about = "List configuration values")]
-    ListConfig,
-
     #[command(name = "packages", about = "List local and/or remote packages")]
     Packages {
         #[arg(help = "Package manager")]

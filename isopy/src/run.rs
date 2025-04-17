@@ -21,7 +21,6 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command, PackageFilter};
-use crate::commands::{do_list_config, do_set_config};
 use crate::constants::{CONFIG_DIR_NAME, DEFAULT_MONIKER_CONFIG_NAME};
 use crate::env::set_up_env;
 use crate::moniker::Moniker;
@@ -101,8 +100,8 @@ async fn run_command(app: App, command: Command) -> StatusResult {
     use crate::args::Command::*;
     use crate::commands::{
         do_check, do_completions, do_download, do_env, do_info, do_init, do_link, do_list,
-        do_packages, do_project, do_prompt, do_remove, do_run, do_scratch, do_shell, do_tags,
-        do_update, do_wrap,
+        do_packages, do_project, do_prompt, do_remove, do_run, do_scratch, do_set_config, do_shell,
+        do_tags, do_update, do_wrap,
     };
 
     match command {
@@ -120,7 +119,6 @@ async fn run_command(app: App, command: Command) -> StatusResult {
         Init { download, .. } => do_init(&app, download).await,
         Link { dir_id } => do_link(&app, &dir_id),
         List { verbose, .. } => do_list(&app, verbose),
-        ListConfig => do_list_config(&app),
         Packages {
             moniker,
             filter,
