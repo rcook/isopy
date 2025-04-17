@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -24,25 +22,37 @@ use std::collections::HashSet;
 use crate::app::App;
 use crate::constants::CONFIG_NAMES;
 use crate::status::{success, user_error, StatusResult};
+use log::info;
+use std::collections::HashSet;
 
 pub(crate) fn do_set_config(app: &App, name: &str, value: &Option<String>) -> StatusResult {
     let names = CONFIG_NAMES.into_iter().collect::<HashSet<_>>();
     if !names.contains(name) {
-        user_error!("Invalid configuration name {name}")
+        let mut names = names
+            .into_iter()
+            .map(|n| format!("\"{n}\""))
+            .collect::<Vec<_>>();
+        names.sort_unstable();
+        let s = names.join(", ");
+        user_error!("No such configuration value \"{name}\"; available values: {s}")
     }
 
     let old_value = app.get_config_value(name)?;
     if let Some(s) = value {
         app.set_config_value(name, s)?;
         match old_value {
-            Some(value) => println!("Configuration value {name} changed from {value} to {s}",),
-            None => println!("Configuration value {name} set to {s}"),
+            Some(value) => {
+                info!("Configuration value \"{name}\" changed from \"{value}\" to \"{s}\"");
+            }
+            None => info!("Configuration value \"{name}\" set to \"{s}\""),
         }
     } else {
         app.delete_config_value(name)?;
         match old_value {
-            Some(value) => println!("Configuration value {name} cleared (previous value: {value})"),
-            None => println!("Configuration value {name} cleared"),
+            Some(value) => {
+                info!("Configuration value \"{name}\" cleared (previous value: \"{value}\")");
+            }
+            None => info!("Configuration value \"{name}\" cleared"),
         }
     };
     success!()
