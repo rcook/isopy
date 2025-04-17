@@ -20,7 +20,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::DEFAULT_MONIKER_CONFIG_NAME;
 use crate::moniker::Moniker;
 use crate::print::{humanize_size_base_2, make_list_table};
 use crate::status::{success, StatusResult};
@@ -73,17 +72,6 @@ pub(crate) async fn do_packages(
         Ok(())
     }
 
-    let moniker = match moniker {
-        Some(m) => Some(m.clone()),
-        None => {
-            if let Some(value) = app.get_config_value(DEFAULT_MONIKER_CONFIG_NAME)? {
-                Some(value.parse()?)
-            } else {
-                None
-            }
-        }
-    };
-
     let mut table = make_list_table();
     let options = ListPackagesOptionsBuilder::default()
         .show_progress(app.show_progress)
@@ -94,7 +82,7 @@ pub(crate) async fn do_packages(
             list_packages(
                 &mut table,
                 app,
-                &moniker,
+                moniker,
                 source_filter,
                 tag_filter,
                 &options,
