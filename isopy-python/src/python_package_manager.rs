@@ -20,11 +20,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::checksum::get_checksum;
+use crate::choose_best::choose_best;
 use crate::constants::PLATFORM_TAGS;
 use crate::index::Index;
 use crate::local_package_info::LocalPackageInfo;
 use crate::package_cache::{read_package_cache, write_package_cache};
-use crate::platform_hacks::choose_best;
 use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
 use anyhow::{bail, Result};
