@@ -2,5 +2,5 @@
 
 _Installs configured project packages into environment_
 
-Adds packages defined in `.isopy.yaml` into the environment associated with
-the current directory.
+Adds packages defined in the current project directory's `.isopy.yaml`
+file into the project's environment.

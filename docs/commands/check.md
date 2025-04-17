@@ -1,3 +1,3 @@
 ## `check` command
 
-_Checks integrity of metadata directory and optionally clean up_
+_Checks integrity of metadata directory and optionally cleans up_
