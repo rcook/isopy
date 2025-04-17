@@ -2,6 +2,8 @@
 
 * [`check`](commands/check.md)
 * [`completions`](commands/completions.md)
+* [`config-values`](commands/config-values.md)
+* [`default`](commands/default.md)
 * [`download`](commands/download.md)
 * [`env`](commands/env.md)
 * [`info`](commands/info.md)

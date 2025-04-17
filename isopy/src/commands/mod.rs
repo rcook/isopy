@@ -21,6 +21,8 @@
 //
 mod check;
 mod completions;
+mod config_values;
+mod default;
 mod download;
 mod env;
 mod info;
@@ -40,6 +42,8 @@ mod wrap;
 
 pub(crate) use check::do_check;
 pub(crate) use completions::do_completions;
+pub(crate) use config_values::do_config_values;
+pub(crate) use default::do_default;
 pub(crate) use download::do_download;
 pub(crate) use env::do_env;
 pub(crate) use info::do_info;

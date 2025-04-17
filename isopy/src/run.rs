@@ -21,6 +21,7 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command, PackageFilter};
+use crate::commands::{do_config_values, do_default};
 use crate::constants::CONFIG_DIR_NAME;
 use crate::env::set_up_env;
 use crate::status::StatusResult;
@@ -93,6 +94,8 @@ async fn run_command(app: App, command: Command) -> StatusResult {
     match command {
         Check { clean, .. } => do_check(&app, clean),
         Completions { shell } => do_completions(shell),
+        ConfigValues => do_config_values(&app),
+        Default { moniker } => do_default(&app, &moniker),
         Download { package_id, tags } => {
             do_download(&app, &package_id, &TagFilter::new(tags)).await
         }

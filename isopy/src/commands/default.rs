@@ -19,13 +19,32 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub(crate) const ENV_CONFIG_FILE_NAME: &str = "env.yaml";
-pub(crate) const PROJECT_CONFIG_FILE_NAME: &str = ".isopy.yaml";
-pub(crate) const CACHE_DIR_NAME: &str = "cache";
-pub(crate) const DOWNLOAD_CACHE_FILE_NAME: &str = "downloads.yaml";
-pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
-pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
-pub(crate) const DEFAULT_MONIKER_CONFIG_NAME: &str = "default_moniker";
+use crate::app::App;
+use crate::constants::DEFAULT_MONIKER_CONFIG_NAME;
+use crate::moniker::Moniker;
+use crate::status::{success, StatusResult};
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-pub(crate) const EXECUTABLE_MASK: u32 = 0o100;
+pub(crate) fn do_default(app: &App, moniker: &Option<Moniker>) -> StatusResult {
+    let old_value = app.get_config_value(DEFAULT_MONIKER_CONFIG_NAME)?;
+
+    if let Some(m) = moniker {
+        app.set_config_value(DEFAULT_MONIKER_CONFIG_NAME, m.as_str())?;
+        match old_value {
+            Some(value) => println!(
+                "Default package manager changed from {value} to {new_value}",
+                new_value = m.as_str()
+            ),
+            None => println!(
+                "Default package manager changed to {new_value}",
+                new_value = m.as_str()
+            ),
+        }
+    } else {
+        app.delete_config_value(DEFAULT_MONIKER_CONFIG_NAME)?;
+        match old_value {
+            Some(value) => println!("Default package manager cleared (previous value: {value})"),
+            None => println!("Default package manager cleared"),
+        }
+    };
+    success!()
+}

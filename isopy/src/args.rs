@@ -124,6 +124,15 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
+    #[command(name = "config-values", about = "Show configuration values")]
+    ConfigValues,
+
+    #[command(name = "default", about = "Set default package manager")]
+    Default {
+        #[arg(help = "Package manager")]
+        moniker: Option<Moniker>,
+    },
+
     #[command(name = "download", about = "Download package into local cache")]
     Download {
         #[arg(help = "Package ID")]

@@ -35,15 +35,17 @@ use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
 use std::collections::HashMap;
 use std::ffi::OsString;
+use std::fs::File;
 use std::path::{Path, PathBuf};
 
 pub(crate) struct App {
     pub(crate) config_dir: PathBuf,
     pub(crate) cwd: PathBuf,
     pub(crate) repo: Repo,
-    pub(crate) project_config_path: PathBuf,
     pub(crate) plugin_manager: PluginManager,
     pub(crate) show_progress: bool,
+    project_config_path: PathBuf,
+    config_value_path: PathBuf,
 }
 
 impl App {
@@ -52,10 +54,54 @@ impl App {
             config_dir: config_dir.to_path_buf(),
             cwd: cwd.to_path_buf(),
             repo,
-            project_config_path: cwd.join(PROJECT_CONFIG_FILE_NAME),
             plugin_manager: PluginManager::new(),
             show_progress,
+            project_config_path: cwd.join(PROJECT_CONFIG_FILE_NAME),
+            config_value_path: config_dir.join("config-values.yaml"),
         }
+    }
+
+    pub(crate) fn get_config_values(&self) -> Result<HashMap<String, String>> {
+        if self.config_value_path.is_file() {
+            Ok(read_yaml_file::<HashMap<String, String>>(
+                &self.config_value_path,
+            )?)
+        } else {
+            Ok(HashMap::new())
+        }
+    }
+
+    pub(crate) fn get_config_value(&self, name: &str) -> Result<Option<String>> {
+        if !self.config_value_path.is_file() {
+            return Ok(None);
+        }
+
+        let config_values = read_yaml_file::<HashMap<String, String>>(&self.config_value_path)?;
+        Ok(config_values.get(name).cloned())
+    }
+
+    pub(crate) fn set_config_value(&self, name: &str, value: &str) -> Result<()> {
+        let mut config_values = if self.config_value_path.is_file() {
+            read_yaml_file::<HashMap<String, String>>(&self.config_value_path)?
+        } else {
+            HashMap::new()
+        };
+        _ = config_values.insert(String::from(name), String::from(value));
+        let f = File::create(&self.config_value_path)?;
+        serde_yaml::to_writer(f, &config_values)?;
+        Ok(())
+    }
+
+    pub(crate) fn delete_config_value(&self, name: &str) -> Result<()> {
+        if self.config_value_path.is_file() {
+            let mut config_values =
+                read_yaml_file::<HashMap<String, String>>(&self.config_value_path)?;
+            if config_values.remove(name).is_some() {
+                let f = File::create(&self.config_value_path)?;
+                serde_yaml::to_writer(f, &config_values)?;
+            }
+        }
+        Ok(())
     }
 
     pub(crate) fn has_project_config_file(&self) -> bool {

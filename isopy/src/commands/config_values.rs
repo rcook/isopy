@@ -19,13 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub(crate) const ENV_CONFIG_FILE_NAME: &str = "env.yaml";
-pub(crate) const PROJECT_CONFIG_FILE_NAME: &str = ".isopy.yaml";
-pub(crate) const CACHE_DIR_NAME: &str = "cache";
-pub(crate) const DOWNLOAD_CACHE_FILE_NAME: &str = "downloads.yaml";
-pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
-pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
-pub(crate) const DEFAULT_MONIKER_CONFIG_NAME: &str = "default_moniker";
+use crate::app::App;
+use crate::status::{success, StatusResult};
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-pub(crate) const EXECUTABLE_MASK: u32 = 0o100;
+pub(crate) fn do_config_values(app: &App) -> StatusResult {
+    let config_values = app.get_config_values()?;
+    if config_values.is_empty() {
+        println!("There are no configuration values set.");
+    } else {
+        for (name, value) in config_values {
+            println!("{name} = {value}");
+        }
+    }
+    success!()
+}
