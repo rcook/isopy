@@ -26,7 +26,7 @@ pub(crate) const DOWNLOAD_CACHE_FILE_NAME: &str = "downloads.yaml";
 pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
 pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
 pub(crate) const DEFAULT_MONIKER_CONFIG_NAME: &str = "default_moniker";
-pub(crate) const CONFIG_NAMES: [&str; 2] = [DEFAULT_MONIKER_CONFIG_NAME, "test"];
+pub(crate) const CONFIG_NAMES: [&str; 1] = [DEFAULT_MONIKER_CONFIG_NAME];
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(crate) const EXECUTABLE_MASK: u32 = 0o100;
