@@ -36,7 +36,7 @@ use url::{Host, Url};
 pub(crate) async fn do_packages(
     app: &App,
     moniker: &Option<Moniker>,
-    filter: SourceFilter,
+    source_filter: SourceFilter,
     tag_filter: &TagFilter,
     verbose: bool,
 ) -> StatusResult {
@@ -44,7 +44,7 @@ pub(crate) async fn do_packages(
         table: &mut Table,
         app: &App,
         moniker: &Moniker,
-        filter: SourceFilter,
+        source_filter: SourceFilter,
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
         verbose: bool,
@@ -53,9 +53,22 @@ pub(crate) async fn do_packages(
         let packages = app
             .plugin_manager
             .new_package_manager(moniker, &app.config_dir)
-            .list_packages(filter, tag_filter, options)
+            .list_packages(source_filter, tag_filter, options)
             .await?;
-        add_plugin_rows(table, moniker, plugin, &packages, filter, verbose)?;
+
+        let packages = match source_filter {
+            SourceFilter::All => {
+                // List local packages before remote packages
+                let mut partitions = packages
+                    .into_iter()
+                    .partition::<Vec<_>, _>(|p| p.path.is_some());
+                partitions.0.append(&mut partitions.1);
+                partitions.0
+            }
+            SourceFilter::Local | SourceFilter::Remote => packages,
+        };
+
+        add_plugin_rows(table, moniker, plugin, &packages, source_filter, verbose)?;
         Ok(())
     }
 
@@ -67,14 +80,26 @@ pub(crate) async fn do_packages(
     match moniker {
         Some(moniker) => {
             list_packages(
-                &mut table, app, moniker, filter, tag_filter, &options, verbose,
+                &mut table,
+                app,
+                moniker,
+                source_filter,
+                tag_filter,
+                &options,
+                verbose,
             )
             .await?;
         }
         None => {
             for moniker in Moniker::iter_enabled() {
                 list_packages(
-                    &mut table, app, &moniker, filter, tag_filter, &options, verbose,
+                    &mut table,
+                    app,
+                    &moniker,
+                    source_filter,
+                    tag_filter,
+                    &options,
+                    verbose,
                 )
                 .await?;
             }
@@ -91,7 +116,7 @@ fn add_plugin_rows(
     moniker: &Moniker,
     plugin: &Plugin,
     packages: &Vec<PackageInfo>,
-    filter: SourceFilter,
+    source_filter: SourceFilter,
     verbose: bool,
 ) -> Result<()> {
     fn make_package_id(moniker: &Moniker, package: &PackageInfo) -> String {
@@ -149,7 +174,7 @@ fn add_plugin_rows(
     }
 
     if packages.is_empty() {
-        match filter {
+        match source_filter {
             SourceFilter::Local => table_divider!(
                 table,
                 "No local packages found for {} ({})",

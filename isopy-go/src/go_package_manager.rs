@@ -31,7 +31,6 @@ use isopy_lib::{
     UpdateIndexOptions, Version,
 };
 use serde_json::Value;
-use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::path::Path;
 use tokio::fs::read_to_string;
@@ -76,6 +75,11 @@ impl GoPackageManager {
             ctx,
             url: url.clone(),
         }
+    }
+
+    fn sort_packages(packages: &mut [GoPackage]) {
+        packages.sort_by_cached_key(|p| p.version.clone());
+        packages.reverse();
     }
 
     async fn get_index(&self, update: bool, show_progress: bool) -> Result<Value> {
@@ -150,8 +154,8 @@ impl GoPackageManager {
             bail!("No matching packages found")
         }
 
-        packages.sort_by_cached_key(|p| p.version.clone());
-        packages.reverse();
+        Self::sort_packages(&mut packages);
+
         Ok(packages
             .into_iter()
             .next()
@@ -207,11 +211,7 @@ impl PackageManagerOps for GoPackageManager {
             }
         }
 
-        packages.sort_by(|a, b| match (b.path.is_some(), a.path.is_some()) {
-            (true, false) => Ordering::Greater,
-            (false, true) => Ordering::Less,
-            _ => b.version.cmp(&a.version),
-        });
+        Self::sort_packages(&mut packages);
 
         Ok(packages
             .into_iter()

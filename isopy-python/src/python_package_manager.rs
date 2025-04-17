@@ -34,7 +34,6 @@ use isopy_lib::{
     ListPackagesOptions, ListTagsOptions, Package, PackageInfo, PackageManagerContext,
     PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
-use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::fs::metadata;
 use std::path::{Path, PathBuf};
@@ -197,13 +196,6 @@ impl PythonPackageManager {
                 }
             }
         }
-
-        // Must sort _before_ uniquifying
-        infos.sort_by(|a, b| match (b.path.is_some(), a.path.is_some()) {
-            (true, false) => Ordering::Greater,
-            (false, true) => Ordering::Less,
-            _ => b.package.metadata.version.cmp(&a.package.metadata.version),
-        });
 
         // Ensure there is exactly one matching package for a given version and build label
         Ok(choose_best(infos))

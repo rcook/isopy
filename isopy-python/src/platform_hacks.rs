@@ -22,12 +22,19 @@
 use crate::local_package_info::LocalPackageInfo;
 use itertools::Itertools;
 
+fn sort_infos(infos: &mut [LocalPackageInfo]) {
+    infos.sort_by_cached_key(|i| i.package.metadata.version.clone());
+    infos.reverse();
+}
+
 // On some platforms, most notably Windows, we will get more than one package
 // matching the given tags: these functions will choose the "best" so that
 // there is exactly one matching package for a given version and build label
 
 #[cfg(not(target_os = "windows"))]
-pub(crate) fn choose_best(infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo> {
+pub(crate) fn choose_best(mut infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo> {
+    sort_infos(&mut infos);
+
     for (key, group) in &infos
         .iter()
         .chunk_by(|i| i.package.metadata.version.clone())
@@ -44,7 +51,9 @@ pub(crate) fn choose_best(infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo>
 // On Windows, we prefer the "shared" library over the "static" library and
 // choose the default otherwise
 #[cfg(target_os = "windows")]
-pub(crate) fn choose_best(infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo> {
+pub(crate) fn choose_best(mut infos: Vec<LocalPackageInfo>) -> Vec<LocalPackageInfo> {
+    sort_infos(&mut infos);
+
     let mut best_infos = Vec::new();
     for (key, group) in &infos
         .into_iter()
