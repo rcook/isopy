@@ -44,8 +44,8 @@ pub(crate) struct App {
     pub(crate) repo: Repo,
     pub(crate) plugin_manager: PluginManager,
     pub(crate) show_progress: bool,
+    pub config_value_path: PathBuf,
     project_config_path: PathBuf,
-    config_value_path: PathBuf,
 }
 
 impl App {
@@ -56,8 +56,8 @@ impl App {
             repo,
             plugin_manager: PluginManager::new(),
             show_progress,
-            project_config_path: cwd.join(PROJECT_CONFIG_FILE_NAME),
             config_value_path: config_dir.join("config-values.yaml"),
+            project_config_path: cwd.join(PROJECT_CONFIG_FILE_NAME),
         }
     }
 
