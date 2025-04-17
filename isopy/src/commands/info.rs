@@ -50,15 +50,6 @@ pub(crate) fn do_info(app: &App) -> StatusResult {
         app.config_value_path.display()
     );
 
-    table_title!(table, "Environment variables");
-    let mut env_keys = get_env_keys();
-    env_keys.sort_by(|a, b| a.name().cmp(b.name()));
-    for env_key in env_keys {
-        let value = read_env(env_key)?;
-        let value_str = value.as_deref().unwrap_or(NO_VALUE);
-        table_columns!(table, env_key, value_str);
-    }
-
     table_title!(table, "Configuration values");
     let config_values = app.get_config_values()?;
     let mut names = CONFIG_NAMES.into_iter().collect::<Vec<_>>();
@@ -68,6 +59,15 @@ pub(crate) fn do_info(app: &App) -> StatusResult {
             Some(value) => table_columns!(table, name, value),
             None => table_columns!(table, name, NO_VALUE),
         }
+    }
+
+    table_title!(table, "Environment variables");
+    let mut env_keys = get_env_keys();
+    env_keys.sort_by(|a, b| a.name().cmp(b.name()));
+    for env_key in env_keys {
+        let value = read_env(env_key)?;
+        let value_str = value.as_deref().unwrap_or(NO_VALUE);
+        table_columns!(table, env_key, value_str);
     }
 
     table.print();
