@@ -26,56 +26,41 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::sync::LazyLock;
 
-static NEW_STYLE_BUILD_LABEL_REGEX: LazyLock<Regex> =
+static NEW_STYLE_LABEL_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}$").expect("Invalid regex"));
 
-static OLD_STYLE_BUILD_LABEL_REGEX: LazyLock<Regex> =
+static OLD_STYLE_LABEL_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}T\\d{4}$").expect("Invalid regex"));
 
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub(crate) struct BuildLabel {
-    inner: Inner,
-}
-
-impl BuildLabel {
-    pub(crate) fn as_str(&self) -> &str {
-        self.inner.as_str()
-    }
-}
-
-impl FromStr for BuildLabel {
-    type Err = Error;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        if NEW_STYLE_BUILD_LABEL_REGEX.is_match(s) {
-            Ok(Self {
-                inner: Inner::NewStyle(String::from(s)),
-            })
-        } else if OLD_STYLE_BUILD_LABEL_REGEX.is_match(s) {
-            Ok(Self {
-                inner: Inner::OldStyle(String::from(s)),
-            })
-        } else {
-            bail!("Cannot parse {s} as group")
-        }
-    }
-}
-
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-enum Inner {
+pub(crate) enum Label {
     OldStyle(String),
     NewStyle(String),
 }
 
-impl Inner {
-    fn as_str(&self) -> &str {
+impl Label {
+    pub(crate) fn as_str(&self) -> &str {
         match self {
             Self::OldStyle(s) | Self::NewStyle(s) => s,
         }
     }
 }
 
-impl Ord for Inner {
+impl FromStr for Label {
+    type Err = Error;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        if NEW_STYLE_LABEL_REGEX.is_match(s) {
+            Ok(Self::NewStyle(String::from(s)))
+        } else if OLD_STYLE_LABEL_REGEX.is_match(s) {
+            Ok(Self::OldStyle(String::from(s)))
+        } else {
+            bail!("Cannot parse {s} as group")
+        }
+    }
+}
+
+impl Ord for Label {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (Self::OldStyle(a), Self::OldStyle(b)) | (Self::NewStyle(a), Self::NewStyle(b)) => {
@@ -87,7 +72,7 @@ impl Ord for Inner {
     }
 }
 
-impl PartialOrd for Inner {
+impl PartialOrd for Label {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

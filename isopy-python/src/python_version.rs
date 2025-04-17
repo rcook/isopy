@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::build_label::BuildLabel;
 use crate::discriminant::Discriminant;
+use crate::label::Label;
 use crate::prerelease_kind::PrereleaseKind;
 use anyhow::{bail, Error, Result};
 use isopy_lib::Triple;
@@ -36,7 +36,7 @@ use std::str::FromStr;
 pub(crate) struct PythonVersion {
     pub(crate) triple: Triple,
     pub(crate) discriminant: Discriminant,
-    pub(crate) label: Option<BuildLabel>,
+    pub(crate) label: Option<Label>,
 }
 
 fn parse_triple_discriminant_helper(s: &str) -> Result<(Triple, Discriminant)> {
@@ -206,8 +206,8 @@ impl VersionOps for PythonVersion {
 mod tests {
     use super::parse_triple_discriminant_helper;
     use super::PythonVersion;
-    use crate::build_label::BuildLabel;
     use crate::discriminant::Discriminant;
+    use crate::label::Label;
     use crate::prerelease_kind::PrereleaseKind;
     use anyhow::Result;
     use rstest::rstest;
@@ -277,7 +277,7 @@ mod tests {
         2,
         3,
         Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 2),
-        Some("20250414".parse::<BuildLabel>().expect("Must succeed")),
+        Some("20250414".parse::<Label>().expect("Must succeed")),
         "1.2.3rc2:20250414"
     )]
     fn basics(
@@ -285,7 +285,7 @@ mod tests {
         #[case] expected_minor: i32,
         #[case] expected_revision: i32,
         #[case] expected_discriminant: Discriminant,
-        #[case] expected_label: Option<BuildLabel>,
+        #[case] expected_label: Option<Label>,
         #[case] input: &str,
     ) -> Result<()> {
         let result = input.parse::<PythonVersion>()?;
