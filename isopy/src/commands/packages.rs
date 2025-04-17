@@ -165,7 +165,7 @@ fn add_plugin_rows(
                 let size = metadata(p)?.len();
                 Ok(format!(
                     "{} ({})",
-                    "Available locally".bright_white().bold(),
+                    "Locally available".bright_white().bold(),
                     humanize_size_base_2(size).cyan()
                 ))
             }
