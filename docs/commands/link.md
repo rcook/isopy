@@ -1,3 +1,3 @@
 ## `link` command
 
-_Use existing environment for current directory_
+_Uses existing environment for current directory_

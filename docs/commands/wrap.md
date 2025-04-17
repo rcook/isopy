@@ -1,3 +1,3 @@
 ## `wrap` command
 
-_Generate environment wrapper in bin directory for script_
+_Generates environment wrapper in bin directory for script_

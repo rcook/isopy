@@ -1,6 +1,6 @@
 ## `packages` command
 
-_List local and/or remote packages_
+_Lists local and/or remote packages_
 
 Lists locally cached packages or packages available for download from sources such as
 [Python Standalone Builds][python-build-standalone-releases] or

@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::args::{Args, Command, PackageFilter};
-use crate::commands::{do_config_values, do_default};
+use crate::commands::{do_list_config, do_set_config};
 use crate::constants::{CONFIG_DIR_NAME, DEFAULT_MONIKER_CONFIG_NAME};
 use crate::env::set_up_env;
 use crate::moniker::Moniker;
@@ -108,8 +108,6 @@ async fn run_command(app: App, command: Command) -> StatusResult {
     match command {
         Check { clean, .. } => do_check(&app, clean),
         Completions { shell } => do_completions(shell),
-        ConfigValues => do_config_values(&app),
-        Default { moniker } => do_default(&app, &moniker),
         Download { package_id, tags } => {
             do_download(&app, &package_id, &TagFilter::new(tags)).await
         }
@@ -122,6 +120,7 @@ async fn run_command(app: App, command: Command) -> StatusResult {
         Init { download, .. } => do_init(&app, download).await,
         Link { dir_id } => do_link(&app, &dir_id),
         List { verbose, .. } => do_list(&app, verbose),
+        ListConfig => do_list_config(&app),
         Packages {
             moniker,
             filter,
@@ -143,6 +142,7 @@ async fn run_command(app: App, command: Command) -> StatusResult {
         Remove { project_dir } => do_remove(&app, &project_dir).await,
         Run { program, args } => do_run(app, &program, &args),
         Scratch => do_scratch(&app).await,
+        SetConfig { name, value } => do_set_config(&app, &name, &value),
         Shell { verbose, .. } => do_shell(app, verbose),
         Tags { moniker } => do_tags(&app, &get_moniker(&app, &moniker)?).await,
         Update { moniker } => do_update(&app, &get_moniker(&app, &moniker)?).await,

@@ -1,3 +1,3 @@
 ## `env` command
 
-_Install package into non-project environment_
+_Installs package into non-project environment_

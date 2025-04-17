@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -20,16 +22,28 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::status::{success, StatusResult};
+use crate::constants::CONFIG_NAMES;
+use crate::status::{success, user_error, StatusResult};
 
-pub(crate) fn do_config_values(app: &App) -> StatusResult {
-    let config_values = app.get_config_values()?;
-    if config_values.is_empty() {
-        println!("There are no configuration values set.");
-    } else {
-        for (name, value) in config_values {
-            println!("{name} = {value}");
-        }
+pub(crate) fn do_set_config(app: &App, name: &str, value: &Option<String>) -> StatusResult {
+    let names = CONFIG_NAMES.into_iter().collect::<HashSet<_>>();
+    if !names.contains(name) {
+        user_error!("Invalid configuration name {name}")
     }
+
+    let old_value = app.get_config_value(name)?;
+    if let Some(s) = value {
+        app.set_config_value(name, s)?;
+        match old_value {
+            Some(value) => println!("Configuration value {name} changed from {value} to {s}",),
+            None => println!("Configuration value set to {s}"),
+        }
+    } else {
+        app.delete_config_value(name)?;
+        match old_value {
+            Some(value) => println!("Configuration value {name} cleared (previous value: {value})"),
+            None => println!("Configuration value {name} cleared"),
+        }
+    };
     success!()
 }

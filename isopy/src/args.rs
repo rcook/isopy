@@ -124,15 +124,6 @@ pub(crate) enum Command {
         shell: Option<ClapCompleteShell>,
     },
 
-    #[command(name = "config-values", about = "Show configuration values")]
-    ConfigValues,
-
-    #[command(name = "default", about = "Set default package manager")]
-    Default {
-        #[arg(help = "Package manager")]
-        moniker: Option<Moniker>,
-    },
-
     #[command(name = "download", about = "Download package into local cache")]
     Download {
         #[arg(help = "Package ID")]
@@ -218,6 +209,9 @@ pub(crate) enum Command {
         _no_verbose: bool,
     },
 
+    #[command(name = "ls-config", about = "List configuration values")]
+    ListConfig,
+
     #[command(name = "packages", about = "List local and/or remote packages")]
     Packages {
         #[arg(help = "Package manager")]
@@ -282,6 +276,15 @@ pub(crate) enum Command {
 
     #[command(name = "scratch", about = "Experimental stuff")]
     Scratch,
+
+    #[command(name = "set-config", about = "Set or clear configuration value")]
+    SetConfig {
+        #[arg(help = "Name")]
+        name: String,
+
+        #[arg(help = "Value")]
+        value: Option<String>,
+    },
 
     #[command(name = "sh", about = "Start environment shell")]
     Shell {

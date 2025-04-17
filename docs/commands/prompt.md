@@ -1,3 +1,3 @@
 ## `prompt` command
 
-_Show brief information in shell prompt_
+_Shows brief information in shell prompt_

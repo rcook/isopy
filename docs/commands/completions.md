@@ -1,3 +1,3 @@
 ## `completions` command
 
-_Generate shell completions_
+_Generates shell completions_

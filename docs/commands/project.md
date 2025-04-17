@@ -1,3 +1,3 @@
 ## `project` command
 
-_Generate or update project configuration file for current directory_
+_Generates or updates project configuration file for current directory_

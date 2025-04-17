@@ -20,31 +20,19 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::constants::DEFAULT_MONIKER_CONFIG_NAME;
-use crate::moniker::Moniker;
+use crate::constants::CONFIG_NAMES;
 use crate::status::{success, StatusResult};
 
-pub(crate) fn do_default(app: &App, moniker: &Option<Moniker>) -> StatusResult {
-    let old_value = app.get_config_value(DEFAULT_MONIKER_CONFIG_NAME)?;
+pub(crate) fn do_list_config(app: &App) -> StatusResult {
+    let config_values = app.get_config_values()?;
+    let mut names = CONFIG_NAMES.into_iter().collect::<Vec<_>>();
+    names.sort_unstable();
 
-    if let Some(m) = moniker {
-        app.set_config_value(DEFAULT_MONIKER_CONFIG_NAME, m.as_str())?;
-        match old_value {
-            Some(value) => println!(
-                "Default package manager changed from {value} to {new_value}",
-                new_value = m.as_str()
-            ),
-            None => println!(
-                "Default package manager changed to {new_value}",
-                new_value = m.as_str()
-            ),
+    for name in names {
+        match config_values.get(name) {
+            Some(value) => println!("{name}: {value}"),
+            None => println!("{name}: (not set)"),
         }
-    } else {
-        app.delete_config_value(DEFAULT_MONIKER_CONFIG_NAME)?;
-        match old_value {
-            Some(value) => println!("Default package manager cleared (previous value: {value})"),
-            None => println!("Default package manager cleared"),
-        }
-    };
+    }
     success!()
 }

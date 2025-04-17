@@ -1,3 +1,3 @@
 ## `tags` command
 
-_List package tags_
+_Lists package tags_

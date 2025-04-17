@@ -1,3 +1,3 @@
 ## `update` command
 
-_Update package indices_
+_Updates package indices_
