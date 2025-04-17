@@ -36,7 +36,7 @@ pub(crate) fn do_set_config(app: &App, name: &str, value: &Option<String>) -> St
         app.set_config_value(name, s)?;
         match old_value {
             Some(value) => println!("Configuration value {name} changed from {value} to {s}",),
-            None => println!("Configuration value set to {s}"),
+            None => println!("Configuration value {name} set to {s}"),
         }
     } else {
         app.delete_config_value(name)?;
