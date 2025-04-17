@@ -22,20 +22,14 @@
 #[derive(Default)]
 pub struct Tags {
     pub platform_tags: Vec<String>,
-    pub common_tags: Vec<String>,
     pub other_tags: Vec<String>,
 }
 
 impl Tags {
     #[must_use]
-    pub const fn new(
-        platform_tags: Vec<String>,
-        common_tags: Vec<String>,
-        other_tags: Vec<String>,
-    ) -> Self {
+    pub const fn new(platform_tags: Vec<String>, other_tags: Vec<String>) -> Self {
         Self {
             platform_tags,
-            common_tags,
             other_tags,
         }
     }

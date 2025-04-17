@@ -47,13 +47,6 @@ pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> StatusResul
             }
         }
 
-        if !tags.common_tags.is_empty() {
-            println!("  {}:", "Common tags".bright_yellow());
-            for tag in tags.common_tags {
-                println!("    {}", tag.cyan());
-            }
-        }
-
         if !tags.other_tags.is_empty() {
             println!("  {}:", "Other tags".bright_yellow());
             for tag in tags.other_tags {

@@ -227,29 +227,21 @@ impl PackageManagerOps for PythonPackageManager {
     }
 
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags> {
-        let mut common_tags = HashSet::new();
         let mut other_tags = HashSet::new();
         for package in self.read_packages(options.show_progress).await? {
-            common_tags.extend(package.metadata.tags.clone());
-            if let Some(label) = package.metadata.version.label {
-                other_tags.insert(String::from(label.as_str()));
-            }
+            other_tags.extend(package.metadata.tags.clone());
         }
 
-        common_tags.retain(|t| !self.platform_tags.contains(t));
-        let mut common_tags = common_tags.into_iter().collect::<Vec<_>>();
-        common_tags.sort();
-        let common_tags = common_tags;
+        other_tags.retain(|t| !self.platform_tags.contains(t));
+        let mut other_tags = other_tags.into_iter().collect::<Vec<_>>();
+        other_tags.sort();
+        let other_tags = other_tags;
 
         let mut platform_tags = self.platform_tags.clone().into_iter().collect::<Vec<_>>();
         platform_tags.sort();
         let platform_tags = platform_tags;
 
-        let mut other_tags = other_tags.into_iter().collect::<Vec<_>>();
-        other_tags.sort();
-        let other_tags: Vec<String> = other_tags;
-
-        Ok(Tags::new(platform_tags, common_tags, other_tags))
+        Ok(Tags::new(platform_tags, other_tags))
     }
 
     async fn list_packages(
