@@ -99,7 +99,7 @@ pub(crate) async fn run() -> StatusResult {
 async fn run_command(app: App, command: Command) -> StatusResult {
     use crate::args::Command::*;
     use crate::commands::{
-        do_check, do_completions, do_download, do_env, do_info, do_init, do_link, do_list,
+        do_check, do_completions, do_docs, do_download, do_env, do_info, do_init, do_link, do_list,
         do_packages, do_project, do_prompt, do_remove, do_run, do_scratch, do_set_config, do_shell,
         do_tags, do_update, do_wrap,
     };
@@ -107,6 +107,7 @@ async fn run_command(app: App, command: Command) -> StatusResult {
     match command {
         Check { clean, .. } => do_check(&app, clean),
         Completions { shell } => do_completions(shell),
+        Docs => do_docs(&app),
         Download { package_id, tags } => {
             do_download(&app, &package_id, &TagFilter::new(tags)).await
         }

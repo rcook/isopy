@@ -19,6 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::constants::{
+    PACKAGE_BUILD_VERSION, PACKAGE_DESCRIPTION, PACKAGE_HOME_PAGE, PACKAGE_NAME, PACKAGE_VERSION,
+};
 use crate::env::EnvKey;
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
@@ -31,12 +34,6 @@ use log::LevelFilter;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;
 use std::result::Result;
-
-const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
-const PACKAGE_DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
-const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
-const PACKAGE_HOME_PAGE: &str = env!("CARGO_PKG_HOMEPAGE");
-const PACKAGE_BUILD_VERSION: Option<&str> = option_env!("RUST_TOOL_ACTION_BUILD_VERSION");
 
 #[derive(Debug, Parser)]
 #[command(
@@ -123,6 +120,9 @@ pub(crate) enum Command {
         #[arg(help = "Shell", long = "shell", value_enum)]
         shell: Option<ClapCompleteShell>,
     },
+
+    #[command(name = "docs", about = "Show documentation in default web browser")]
+    Docs,
 
     #[command(name = "download", about = "Download package into local cache")]
     Download {

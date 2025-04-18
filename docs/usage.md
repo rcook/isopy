@@ -2,6 +2,7 @@
 
 * [`check`](commands/check.md)
 * [`completions`](commands/completions.md)
+* [`docs`](commands/docs.md)
 * [`download`](commands/download.md)
 * [`env`](commands/env.md)
 * [`info`](commands/info.md)

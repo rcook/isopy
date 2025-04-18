@@ -19,21 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-pub(crate) const PACKAGE_NAME: &str = env!("CARGO_PKG_NAME");
-pub(crate) const PACKAGE_DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
-pub(crate) const PACKAGE_VERSION: &str = env!("CARGO_PKG_VERSION");
-pub(crate) const PACKAGE_HOME_PAGE: &str = env!("CARGO_PKG_HOMEPAGE");
-pub(crate) const PACKAGE_BUILD_VERSION: Option<&str> =
-    option_env!("RUST_TOOL_ACTION_BUILD_VERSION");
+use crate::app::App;
+use crate::constants::PACKAGE_HOME_PAGE;
+use crate::status::StatusResult;
+use crate::success;
 
-pub(crate) const ENV_CONFIG_FILE_NAME: &str = "env.yaml";
-pub(crate) const PROJECT_CONFIG_FILE_NAME: &str = ".isopy.yaml";
-pub(crate) const CACHE_DIR_NAME: &str = "cache";
-pub(crate) const DOWNLOAD_CACHE_FILE_NAME: &str = "downloads.yaml";
-pub(crate) const CONFIG_DIR_NAME: &str = "isopy";
-pub(crate) const ISOPY_USER_AGENT: &str = "isopy";
-pub(crate) const DEFAULT_MONIKER_CONFIG_NAME: &str = "default_moniker";
-pub(crate) const CONFIG_NAMES: [&str; 1] = [DEFAULT_MONIKER_CONFIG_NAME];
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-pub(crate) const EXECUTABLE_MASK: u32 = 0o100;
+pub(crate) fn do_docs(_app: &App) -> StatusResult {
+    open::that(PACKAGE_HOME_PAGE)?;
+    success!()
+}
