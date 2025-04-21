@@ -76,7 +76,7 @@ impl FileNameParts {
             bail!("Url {url} cannot be sanitized")
         }
 
-        let mut url_without_path = url.clone();
+        let mut url_without_path = url.to_owned();
         url_without_path.set_path("");
         let mut prefix = sanitize(url_without_path.as_str());
         if prefix.ends_with('_') {
@@ -132,8 +132,8 @@ mod tests {
     fn from_str_safe(#[case] input: &str, #[case] expected: (&str, &str)) {
         assert_eq!(
             FileNameParts {
-                prefix: String::from(expected.0),
-                suffix: String::from(expected.1)
+                prefix: expected.0.to_owned(),
+                suffix: expected.1.to_owned()
             },
             FileNameParts::from_str_safe(input)
         );
@@ -147,8 +147,8 @@ mod tests {
         let url = input.parse()?;
         assert_eq!(
             FileNameParts {
-                prefix: String::from(expected.0),
-                suffix: String::from(expected.1)
+                prefix: expected.0.to_owned(),
+                suffix: expected.1.to_owned()
             },
             FileNameParts::from_url_safe(&url)?
         );

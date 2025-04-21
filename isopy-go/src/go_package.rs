@@ -46,23 +46,23 @@ impl GoPackage {
         checksum: Checksum,
         tags: Vec<String>,
     ) -> Self {
-        let version = version.clone();
+        let version = version.to_owned();
         let other_version = Version::new(version.clone());
         let tags = tags.into_iter().collect::<HashSet<_>>();
         Self {
-            name: String::from(name),
+            name: name.to_owned(),
             archive_type,
-            url: url.clone(),
+            url: url.to_owned(),
             version,
             other_version,
-            path: path.clone(),
+            path: path.to_owned(),
             checksum,
             tags,
         }
     }
 
     pub(crate) fn into_package_info(self) -> PackageInfo {
-        let version = PackageOps::version(&self).clone();
+        let version = PackageOps::version(&self).to_owned();
         PackageInfo::new(self.name, &self.url, version, self.path)
     }
 }

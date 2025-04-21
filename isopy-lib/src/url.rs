@@ -71,7 +71,7 @@ impl FromStr for DirUrl {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        let mut s = String::from(s.trim_end_matches('/'));
+        let mut s = s.trim_end_matches('/').to_owned();
         s.push('/');
         Ok(Self(s.parse()?))
     }
@@ -80,7 +80,7 @@ impl FromStr for DirUrl {
 impl From<Url> for DirUrl {
     fn from(value: Url) -> Self {
         let path_str = value.path().trim_end_matches('/');
-        let mut path_str = String::from(path_str);
+        let mut path_str = path_str.to_owned();
         path_str.push('/');
         let mut url = value.clone();
         url.set_path(&path_str);

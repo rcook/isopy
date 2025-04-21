@@ -86,7 +86,7 @@ impl App {
         } else {
             HashMap::new()
         };
-        _ = config_values.insert(String::from(name), String::from(value));
+        _ = config_values.insert(name.to_owned(), value.to_owned());
         let f = File::create(&self.config_value_path)?;
         serde_yaml::to_writer(f, &config_values)?;
         Ok(())
@@ -188,7 +188,7 @@ impl App {
         packages.push(EnvPackage {
             package_id: PackageId::new(moniker, package.version()),
             dir: dir_name.to_path_buf(),
-            url: package.url().clone(),
+            url: package.url().to_owned(),
         });
 
         dir_info.write_env_config(

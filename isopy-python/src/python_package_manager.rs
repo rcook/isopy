@@ -34,6 +34,7 @@ use isopy_lib::{
     ListPackagesOptions, ListTagsOptions, Package, PackageInfo, PackageManagerContext,
     PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
 };
+use std::borrow::ToOwned;
 use std::collections::HashSet;
 use std::fs::metadata;
 use std::path::{Path, PathBuf};
@@ -62,12 +63,12 @@ impl PythonPackageManager {
     pub(crate) fn new(ctx: PackageManagerContext, moniker: &str, url: &Url) -> Self {
         Self {
             ctx,
-            moniker: String::from(moniker),
-            url: url.clone(),
+            moniker: moniker.to_owned(),
+            url: url.to_owned(),
             platform_tags: PLATFORM_TAGS
                 .iter()
                 .copied()
-                .map(String::from)
+                .map(ToOwned::to_owned)
                 .collect::<HashSet<_>>(),
         }
     }
@@ -177,7 +178,7 @@ impl PythonPackageManager {
         let tags = tag_filter
             .tags
             .iter()
-            .map(String::clone)
+            .map(ToOwned::to_owned)
             .collect::<HashSet<_>>();
         let mut infos = Vec::new();
         for package in packages {
@@ -229,7 +230,7 @@ impl PackageManagerOps for PythonPackageManager {
     async fn list_tags(&self, options: &ListTagsOptions) -> Result<Tags> {
         let mut other_tags = HashSet::new();
         for package in self.read_packages(options.show_progress).await? {
-            other_tags.extend(package.metadata.tags.clone());
+            other_tags.extend(package.metadata.tags.iter().map(ToOwned::to_owned));
         }
 
         other_tags.retain(|t| !self.platform_tags.contains(t));
@@ -237,7 +238,11 @@ impl PackageManagerOps for PythonPackageManager {
         other_tags.sort();
         let other_tags = other_tags;
 
-        let mut platform_tags = self.platform_tags.clone().into_iter().collect::<Vec<_>>();
+        let mut platform_tags = self
+            .platform_tags
+            .iter()
+            .map(ToOwned::to_owned)
+            .collect::<Vec<_>>();
         platform_tags.sort();
         let platform_tags = platform_tags;
 

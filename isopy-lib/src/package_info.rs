@@ -39,7 +39,7 @@ impl PackageInfo {
     ) -> Self {
         Self {
             name: name.into(),
-            url: url.clone(),
+            url: url.to_owned(),
             version,
             path: path.map(Into::into),
         }
