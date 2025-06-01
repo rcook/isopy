@@ -14,11 +14,11 @@ version = "0.5.8"
 [dependencies]
 anyhow = { version = "1.0.98", features = ["backtrace"] }
 async-trait = "0.1.88"
-chrono = "0.4.40"
-clap = { version = "4.5.37", features = ["derive", "env"] }
-clap_complete = "4.5.47"
+chrono = "0.4.41"
+clap = { version = "4.5.39", features = ["derive", "env"] }
+clap_complete = "4.5.52"
 colored = "3.0.0"
-ctrlc = "3.4.6"
+ctrlc = "3.4.7"
 dirs = "6.0.0"
 futures-util = "0.3.31"
 isopy-go = { path = "../isopy-go" }
@@ -31,24 +31,24 @@ joatmon = "0.0.34"
 log = { version = "0.4.27", features = ["std"] }
 open = "5.3.2"
 path-absolutize = "3.1.1"
-reqwest = { version = "0.12.15", features = ["stream"] }
+reqwest = { version = "0.12.18", features = ["stream"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_yaml = "0.9.34"
 strum = "0.27.1"
 strum_macros = "0.27.1"
 tinytemplate = "1.2.1"
-tokio = { version = "1.44.2", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.45.1", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.5.4", features = ["serde"] }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
 exec = "0.3.1"
 
 [target."cfg(target_os = \"linux\")".dependencies]
-openssl-sys = { version = "0.9.107", features = ["vendored"] }
+openssl-sys = { version = "0.9.109", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
-sysinfo = "0.34.2"
+sysinfo = "0.35.1"
 
 [dev-dependencies]
 rstest = "0.25.0"
