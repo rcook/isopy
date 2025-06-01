@@ -44,7 +44,7 @@ url = { version = "2.5.4", features = ["serde"] }
 exec = "0.3.1"
 
 [target."cfg(target_os = \"linux\")".dependencies]
-openssl-sys = { version = "0.9.107", features = ["vendored"] }
+openssl-sys = { version = "0.9.109", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
