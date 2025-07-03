@@ -55,7 +55,7 @@ fn default_config_dir() -> Option<PathBuf> {
     }
 }
 
-fn get_moniker(app: &App, moniker: &Option<Moniker>) -> Result<Option<Moniker>> {
+fn get_moniker(app: &App, moniker: Option<&Moniker>) -> Result<Option<Moniker>> {
     Ok(match moniker {
         Some(m) => Some(m.clone()),
         None => {
@@ -129,7 +129,7 @@ async fn run_command(app: App, command: Command) -> StatusResult {
         } => {
             do_packages(
                 &app,
-                &get_moniker(&app, &moniker)?,
+                get_moniker(&app, moniker.as_ref())?.as_ref(),
                 PackageFilter::to_source_filter(filter),
                 &TagFilter::new(tags),
                 verbose,
@@ -141,10 +141,10 @@ async fn run_command(app: App, command: Command) -> StatusResult {
         Remove { project_dir } => do_remove(&app, &project_dir).await,
         Run { program, args } => do_run(app, &program, &args),
         Scratch => do_scratch(&app).await,
-        SetConfig { name, value } => do_set_config(&app, &name, &value),
+        SetConfig { name, value } => do_set_config(&app, &name, value.as_ref()),
         Shell { verbose, .. } => do_shell(app, verbose),
-        Tags { moniker } => do_tags(&app, &get_moniker(&app, &moniker)?).await,
-        Update { moniker } => do_update(&app, &get_moniker(&app, &moniker)?).await,
+        Tags { moniker } => do_tags(&app, get_moniker(&app, moniker.as_ref())?.as_ref()).await,
+        Update { moniker } => do_update(&app, get_moniker(&app, moniker.as_ref())?.as_ref()).await,
         Wrap {
             wrapper_file_name,
             script_path,

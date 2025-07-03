@@ -124,7 +124,7 @@ impl GoPackageManager {
                                 archive_type,
                                 &url,
                                 &version,
-                                &path,
+                                path.as_ref(),
                                 checksum,
                                 tags,
                             ));

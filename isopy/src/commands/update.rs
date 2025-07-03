@@ -26,7 +26,7 @@ use anyhow::Result;
 use isopy_lib::{UpdateIndexOptions, UpdateIndexOptionsBuilder};
 use log::info;
 
-pub(crate) async fn do_update(app: &App, moniker: &Option<Moniker>) -> StatusResult {
+pub(crate) async fn do_update(app: &App, moniker: Option<&Moniker>) -> StatusResult {
     async fn update_index(
         app: &App,
         moniker: &Moniker,

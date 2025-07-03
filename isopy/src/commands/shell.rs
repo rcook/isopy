@@ -40,7 +40,7 @@ pub(crate) fn do_shell(app: App, verbose: bool) -> StatusResult {
             "You are already in an isopy shell (metadirectory ID {}",
             isopy_env.meta_id
         );
-    };
+    }
 
     let Some(dir_info) = app.find_dir_info(None)? else {
         user_error!(

@@ -61,7 +61,7 @@ pub(crate) fn do_check(app: &App, clean: bool) -> StatusResult {
         }
 
         for (idx, manifest) in trash.unreferenced_manifests.iter().enumerate() {
-            print_metadir(&mut table, manifest, &None, Some(idx + 1));
+            print_metadir(&mut table, manifest, None, Some(idx + 1));
         }
     }
 

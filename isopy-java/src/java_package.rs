@@ -44,7 +44,7 @@ impl JavaPackage {
         archive_type: ArchiveType,
         url: &Url,
         version: &JavaVersion,
-        path: &Option<PathBuf>,
+        path: Option<&PathBuf>,
         checksum: Checksum,
         tags: Vec<String>,
     ) -> Self {
@@ -57,7 +57,7 @@ impl JavaPackage {
             url: url.clone(),
             version,
             other_version,
-            path: path.clone(),
+            path: path.cloned(),
             checksum,
             tags,
         }

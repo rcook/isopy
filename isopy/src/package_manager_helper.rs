@@ -183,7 +183,7 @@ impl PackageManagerHelper {
 
         if let Some(accept) = &options.accept {
             request = request.header(ACCEPT, accept.as_str());
-        };
+        }
 
         request = request.query(&options.query);
 
@@ -228,7 +228,7 @@ impl PackageManagerHelper {
 
         if headers.get("x-github-request-id").is_none() {
             return Ok(());
-        };
+        }
 
         let Some(h) = headers.get("x-ratelimit-reset") else {
             return Ok(());

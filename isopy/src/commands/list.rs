@@ -53,7 +53,7 @@ fn list_verbose(app: &App) -> Result<()> {
                 manifest.meta_id().to_string().bright_cyan()
             );
             let env = existing(manifest.read_env_config())?;
-            print_metadir(&mut table, manifest, &env, None);
+            print_metadir(&mut table, manifest, env.as_ref(), None);
         }
     }
 

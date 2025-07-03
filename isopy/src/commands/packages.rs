@@ -35,7 +35,7 @@ use url::{Host, Url};
 
 pub(crate) async fn do_packages(
     app: &App,
-    moniker: &Option<Moniker>,
+    moniker: Option<&Moniker>,
     source_filter: SourceFilter,
     tag_filter: &TagFilter,
     verbose: bool,

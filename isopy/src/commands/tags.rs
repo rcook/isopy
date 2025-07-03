@@ -26,7 +26,7 @@ use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{ListTagsOptions, ListTagsOptionsBuilder};
 
-pub(crate) async fn do_tags(app: &App, moniker: &Option<Moniker>) -> StatusResult {
+pub(crate) async fn do_tags(app: &App, moniker: Option<&Moniker>) -> StatusResult {
     async fn list_tags(app: &App, moniker: &Moniker, options: &ListTagsOptions) -> Result<()> {
         let tags = app
             .plugin_manager

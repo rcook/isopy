@@ -42,7 +42,7 @@ impl GoPackage {
         archive_type: ArchiveType,
         url: &Url,
         version: &GoVersion,
-        path: &Option<PathBuf>,
+        path: Option<&PathBuf>,
         checksum: Checksum,
         tags: Vec<String>,
     ) -> Self {
@@ -55,7 +55,7 @@ impl GoPackage {
             url: url.to_owned(),
             version,
             other_version,
-            path: path.to_owned(),
+            path: path.cloned(),
             checksum,
             tags,
         }

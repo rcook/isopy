@@ -25,7 +25,7 @@ use crate::status::{success, user_error, StatusResult};
 use log::info;
 use std::collections::HashSet;
 
-pub(crate) fn do_set_config(app: &App, name: &str, value: &Option<String>) -> StatusResult {
+pub(crate) fn do_set_config(app: &App, name: &str, value: Option<&String>) -> StatusResult {
     let names = CONFIG_NAMES.into_iter().collect::<HashSet<_>>();
     if !names.contains(name) {
         let mut names = names
@@ -54,6 +54,6 @@ pub(crate) fn do_set_config(app: &App, name: &str, value: &Option<String>) -> St
             }
             None => info!("Configuration value \"{name}\" cleared"),
         }
-    };
+    }
     success!()
 }

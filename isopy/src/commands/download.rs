@@ -38,7 +38,7 @@ pub(crate) async fn do_download(
         .download_package(&package_id.version, tag_filter, &options)
         .await?;
 
-    info!("Package {} is now available locally", package_id);
+    info!("Package {package_id} is now available locally");
 
     success!();
 }

@@ -49,7 +49,7 @@ pub(crate) fn print_repo(table: &mut Table, repo: &Repo) {
 pub(crate) fn print_metadir(
     table: &mut Table,
     manifest: &Manifest,
-    env: &Option<Env>,
+    env: Option<&Env>,
     idx: Option<usize>,
 ) {
     if let Some(i) = idx {
@@ -77,7 +77,7 @@ pub(crate) fn print_metadir(
     }
 }
 
-pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, env: &Option<Env>) {
+pub(crate) fn print_dir_info(app: &App, table: &mut Table, dir_info: &DirInfo, env: Option<&Env>) {
     if let Some(env) = env {
         table_columns!(table, "Project directory", env.project_dir.display());
 
@@ -120,7 +120,7 @@ pub(crate) fn print_dir_info_and_env(
 ) -> Result<()> {
     table_title!(table, "Environment information");
     let env = existing(dir_info.read_env_config())?;
-    print_dir_info(app, table, dir_info, &env);
+    print_dir_info(app, table, dir_info, env.as_ref());
     Ok(())
 }
 
