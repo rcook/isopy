@@ -116,11 +116,11 @@ impl FromStr for JavaVersion {
 }
 
 impl VersionOps for JavaVersion {
-    fn as_str(&self) -> Cow<String> {
+    fn as_str(&self) -> Cow<'_, String> {
         Cow::Owned(format!("{self}"))
     }
 
-    fn label(&self) -> Option<Cow<String>> {
+    fn label(&self) -> Option<Cow<'_, String>> {
         None
     }
 

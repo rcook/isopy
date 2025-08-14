@@ -180,14 +180,14 @@ impl FromStr for PythonVersion {
 }
 
 impl VersionOps for PythonVersion {
-    fn as_str(&self) -> Cow<String> {
+    fn as_str(&self) -> Cow<'_, String> {
         match &self.discriminant {
             Discriminant::Prerelease(d) => Cow::Owned(format!("{}{}", self.triple, d)),
             Discriminant::None => Cow::Owned(self.triple.to_string()),
         }
     }
 
-    fn label(&self) -> Option<Cow<String>> {
+    fn label(&self) -> Option<Cow<'_, String>> {
         self.label
             .as_ref()
             .map(|l| Cow::Owned(String::from(l.as_str())))

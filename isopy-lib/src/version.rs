@@ -25,8 +25,8 @@ use std::borrow::Cow;
 use std::fmt::{Debug, Formatter, Result as FmtResult};
 
 pub trait VersionOps: Debug + Send + Sync {
-    fn as_str(&self) -> Cow<String>;
-    fn label(&self) -> Option<Cow<String>>;
+    fn as_str(&self) -> Cow<'_, String>;
+    fn label(&self) -> Option<Cow<'_, String>>;
     fn box_clone(&self) -> Box<dyn VersionOps>;
     fn as_any(&self) -> &dyn Any;
 }
