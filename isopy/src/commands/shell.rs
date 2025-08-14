@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::{Command, IsopyEnv};
-use crate::status::{success, user_error, StatusResult};
+use crate::status::{StatusResult, success, user_error};
 use colored::Colorize;
 use ctrlc::set_handler;
 use log::info;

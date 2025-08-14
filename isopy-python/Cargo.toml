@@ -2,7 +2,7 @@
 authors = ["Richard Cook"]
 categories = ["development-tools"]
 description = "Isolated Python Tool - Python Support"
-edition = "2021"
+edition = "2024"
 homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"

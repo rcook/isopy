@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::status::{success, user_error, StatusResult};
+use crate::status::{StatusResult, success, user_error};
 use std::path::Path;
 
 pub(crate) async fn do_remove(app: &App, project_dir: &Path) -> StatusResult {

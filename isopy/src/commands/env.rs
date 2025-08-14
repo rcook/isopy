@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 use isopy_lib::{DownloadPackageOptionsBuilder, InstallPackageOptionsBuilder, TagFilter};
 
 pub(crate) async fn do_env(app: &App, package_id: &PackageId, download: bool) -> StatusResult {

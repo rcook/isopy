@@ -21,7 +21,7 @@
 //
 use crate::moniker::Moniker;
 use crate::plugin_manager::PluginManager;
-use anyhow::{bail, Error};
+use anyhow::{Error, bail};
 use isopy_lib::Version;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};

@@ -22,7 +22,7 @@
 use crate::discriminant::Discriminant;
 use crate::label::Label;
 use crate::prerelease_kind::PrereleaseKind;
-use anyhow::{bail, Error, Result};
+use anyhow::{Error, Result, bail};
 use isopy_lib::Triple;
 use isopy_lib::VersionOps;
 use std::any::Any;
@@ -72,21 +72,18 @@ impl PythonVersion {
         let mut tags_to_remove = Vec::new();
 
         for tag in tags.iter() {
-            if let Some((prefix, suffix)) = tag.split_once('+') {
-                if let Ok(temp_triple_discriminant) = parse_triple_discriminant_helper(prefix) {
-                    if let Ok(temp_label) = suffix.parse() {
-                        assert!(
-                            result.is_none() && triple_discriminant.is_none() && label.is_none()
-                        );
-                        tags_to_remove.push(tag.clone());
-                        result = Some(Self {
-                            triple: temp_triple_discriminant.0,
-                            discriminant: temp_triple_discriminant.1,
-                            label: Some(temp_label),
-                        });
-                        break;
-                    }
-                }
+            if let Some((prefix, suffix)) = tag.split_once('+')
+                && let Ok(temp_triple_discriminant) = parse_triple_discriminant_helper(prefix)
+                && let Ok(temp_label) = suffix.parse()
+            {
+                assert!(result.is_none() && triple_discriminant.is_none() && label.is_none());
+                tags_to_remove.push(tag.clone());
+                result = Some(Self {
+                    triple: temp_triple_discriminant.0,
+                    discriminant: temp_triple_discriminant.1,
+                    label: Some(temp_label),
+                });
+                break;
             }
 
             if let Ok(temp_triple_discriminant) = parse_triple_discriminant_helper(tag) {
@@ -204,8 +201,8 @@ impl VersionOps for PythonVersion {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_triple_discriminant_helper;
     use super::PythonVersion;
+    use super::parse_triple_discriminant_helper;
     use crate::discriminant::Discriminant;
     use crate::label::Label;
     use crate::prerelease_kind::PrereleaseKind;

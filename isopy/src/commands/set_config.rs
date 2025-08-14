@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::constants::CONFIG_NAMES;
-use crate::status::{success, user_error, StatusResult};
+use crate::status::{StatusResult, success, user_error};
 use log::info;
 use std::collections::HashSet;
 

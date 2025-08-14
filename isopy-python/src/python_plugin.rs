@@ -23,7 +23,7 @@ use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
 use crate::python_package_manager::PythonPackageManager;
 use crate::python_version::PythonVersion;
 use anyhow::Result;
-use isopy_lib::{render_absolute_path, DirUrl, EnvInfo, FileUrl, Platform, Shell};
+use isopy_lib::{DirUrl, EnvInfo, FileUrl, Platform, Shell, render_absolute_path};
 use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};

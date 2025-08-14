@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::serialization::Env;
-use crate::table::{table_columns, table_divider, table_line, table_title, Table, TableSettings};
+use crate::table::{Table, TableSettings, table_columns, table_divider, table_line, table_title};
 use anyhow::Result;
 use colored::Color;
 use joat_repo::{DirInfo, Link, Manifest, Repo};

@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::SourceFilter;
 use crate::macros::dyn_trait_struct;
 use crate::package::Package;
 use crate::package_info::PackageInfo;
 use crate::tag_filter::TagFilter;
 use crate::tags::Tags;
 use crate::version::Version;
-use crate::SourceFilter;
 use anyhow::Result;
 use async_trait::async_trait;
 use derive_builder::Builder;

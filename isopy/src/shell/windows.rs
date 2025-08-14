@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::shell::proc::{get_parent_pid, get_pid, get_process_from_pid};
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use same_file::is_same_file;
 use std::env::var;
 use std::path::PathBuf;

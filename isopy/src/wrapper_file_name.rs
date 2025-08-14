@@ -38,10 +38,10 @@ impl FromStr for WrapperFileName {
         let path = Path::new(s);
 
         let components = path.components().collect::<Vec<_>>();
-        if components.len() == 1 {
-            if let Some(Component::Normal(c)) = components.first() {
-                return Ok(Self::FileNameOnly(c.to_os_string()));
-            }
+        if components.len() == 1
+            && let Some(Component::Normal(c)) = components.first()
+        {
+            return Ok(Self::FileNameOnly(c.to_os_string()));
         }
 
         Ok(Self::Path(path.to_path_buf()))

@@ -29,4 +29,4 @@ mod windows;
 pub(crate) use command::Command;
 pub(crate) use isopy_env::IsopyEnv;
 #[cfg(target_os = "windows")]
-pub(crate) use windows::{get_windows_shell_info, WindowsShellKind};
+pub(crate) use windows::{WindowsShellKind, get_windows_shell_info};

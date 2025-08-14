@@ -24,7 +24,7 @@ use crate::args::PromptConfig;
 use crate::dir_info_ext::DirInfoExt;
 use crate::fs::existing;
 use crate::shell::IsopyEnv;
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 
 pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> StatusResult {
     let isopy_env = IsopyEnv::get_vars()?;

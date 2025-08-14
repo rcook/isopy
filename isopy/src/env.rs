@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::bool_util::str_to_bool;
-use anyhow::{bail, Result};
-use std::env::{remove_var, set_var, var, VarError};
+use anyhow::{Result, bail};
+use env::{VarError, remove_var, set_var, var};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::sync::LazyLock;
@@ -56,7 +56,7 @@ impl EnvKey {
     }
 
     pub(crate) fn set(self, s: &str) {
-        set_var(self.name(), s);
+        assert!(set_var(self.name(), s).is_some());
     }
 
     pub(crate) fn is_present(self) -> bool {
@@ -144,8 +144,8 @@ impl Action {
     fn run(&self) {
         match &self.op {
             Op::DoNothing => {}
-            Op::SetVar(value) => set_var(&self.key, value),
-            Op::RemoveVar => remove_var(&self.key),
+            Op::SetVar(value) => assert!(set_var(&self.key, value).is_some()),
+            Op::RemoveVar => assert!(remove_var(&self.key).is_some()),
         }
     }
 }

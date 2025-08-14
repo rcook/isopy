@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env::EnvKey;
-use anyhow::{bail, Error};
+use anyhow::{Error, bail};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
 use std::result::Result as StdResult;

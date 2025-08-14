@@ -27,12 +27,11 @@ pub(crate) fn existing<T>(result: Result<T>) -> Result<Option<T>> {
     match result {
         Ok(value) => Ok(Some(value)),
         Err(e) => {
-            if let Some(e0) = e.downcast_ref::<YamlError>() {
-                if let Some(e1) = e0.downcast_other_ref::<FileReadError>() {
-                    if e1.is_not_found() {
-                        return Ok(None);
-                    }
-                }
+            if let Some(e0) = e.downcast_ref::<YamlError>()
+                && let Some(e1) = e0.downcast_other_ref::<FileReadError>()
+                && e1.is_not_found()
+            {
+                return Ok(None);
             }
             Err(e)
         }

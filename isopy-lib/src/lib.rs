@@ -78,8 +78,8 @@ pub use plugin::{Plugin, PluginOps};
 pub use progress_indicator::{
     ProgressIndicator, ProgressIndicatorOptions, ProgressIndicatorOptionsBuilder,
 };
-pub use sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
-pub use shell::{env_var_substitution, join_paths, render_absolute_path, Platform, Shell};
+pub use sanitize::{SanitizeOptions, sanitize, sanitize_with_options};
+pub use shell::{Platform, Shell, env_var_substitution, join_paths, render_absolute_path};
 pub use source_filter::SourceFilter;
 pub use tag_filter::TagFilter;
 pub use tags::Tags;

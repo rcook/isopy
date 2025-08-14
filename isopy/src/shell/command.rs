@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
+use env::{join_paths, set_var, split_paths, var_os};
 use isopy_lib::EnvInfo;
-use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitStatus;
@@ -59,7 +59,7 @@ impl Command {
         isopy_env.set_vars();
 
         for (key, value) in &env_info.vars {
-            set_var(key, value);
+            assert!(set_var(key, value).is_some());
         }
 
         self.exec_impl()
@@ -83,7 +83,7 @@ impl Command {
 
     #[cfg(target_os = "windows")]
     fn exec_impl(&self) -> Result<ExitStatus> {
-        use crate::shell::{get_windows_shell_info, WindowsShellKind};
+        use crate::shell::{WindowsShellKind, get_windows_shell_info};
         use std::process::Command;
 
         let windows_shell_info = get_windows_shell_info()?;
@@ -130,7 +130,7 @@ fn prepend_paths(paths: &[PathBuf]) -> Result<()> {
         new_paths.extend(split_paths(&path));
     }
 
-    set_var("PATH", join_paths(new_paths)?);
+    assert!(set_var("PATH", join_paths(new_paths)?).is_some());
 
     Ok(())
 }

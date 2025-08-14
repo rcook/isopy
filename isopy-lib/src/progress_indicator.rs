@@ -57,7 +57,7 @@ impl ProgressIndicator {
             ),
             Extent::Bytes(len) => (
                 ProgressBar::new(*len),
-                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  [{eta_precise:.yellow} remaining]  {bar}  {decimal_bytes} of {decimal_total_bytes}  {wide_msg:.yellow}"
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  [{eta_precise:.yellow} remaining]  {bar}  {decimal_bytes} of {decimal_total_bytes}  {wide_msg:.yellow}",
             ),
         };
 

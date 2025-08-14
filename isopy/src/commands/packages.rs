@@ -22,10 +22,10 @@
 use crate::app::App;
 use crate::moniker::Moniker;
 use crate::print::{humanize_size_base_2, make_list_table};
-use crate::status::{success, StatusResult};
-use crate::table::{table_columns, table_divider, table_headings, Table};
-use anyhow::bail;
+use crate::status::{StatusResult, success};
+use crate::table::{Table, table_columns, table_divider, table_headings};
 use anyhow::Result;
+use anyhow::bail;
 use colored::{ColoredString, Colorize};
 use isopy_lib::{
     ListPackagesOptions, ListPackagesOptionsBuilder, PackageInfo, Plugin, SourceFilter, TagFilter,

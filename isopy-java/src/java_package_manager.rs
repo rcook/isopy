@@ -21,7 +21,7 @@
 //
 use crate::link_header::LinkHeader;
 use crate::serialization::versions_response::VersionsResponse;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadPackageOptions, GetPackageOptions, InstallPackageOptions, ListPackagesOptions,
@@ -30,7 +30,7 @@ use isopy_lib::{
     UpdateIndexOptions, Version,
 };
 use reqwest::Client;
-use std::fs::{read_dir, File};
+use std::fs::{File, read_dir};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 use tokio::fs::write;

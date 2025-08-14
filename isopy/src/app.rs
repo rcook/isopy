@@ -26,13 +26,13 @@ use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use isopy_lib::{
     EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
     Version,
 };
 use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::{read_yaml_file, safe_write_file, FileReadError, HasOtherError, YamlError};
+use joatmon::{FileReadError, HasOtherError, YamlError, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fs::File;

@@ -26,12 +26,12 @@ use crate::env::set_up_env;
 use crate::moniker::Moniker;
 use crate::status::StatusResult;
 use crate::terminal::reset_terminal;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use clap::Parser;
 use isopy_lib::TagFilter;
 use joat_logger::init_ui;
 use joat_repo::RepoConfig;
-use log::{set_max_level, LevelFilter};
+use log::{LevelFilter, set_max_level};
 use std::env::current_dir;
 use std::path::PathBuf;
 

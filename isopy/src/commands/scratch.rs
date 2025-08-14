@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 use log::info;
 
 #[allow(clippy::unnecessary_wraps)]

@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::fs::existing;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
-use crate::status::{success, user_error, StatusResult};
+use crate::status::{StatusResult, success, user_error};
 use log::info;
 
 pub(crate) fn do_project(app: &App, package_id: &PackageId) -> StatusResult {

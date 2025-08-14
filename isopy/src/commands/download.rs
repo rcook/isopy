@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::package_id::PackageId;
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 use isopy_lib::{DownloadPackageOptionsBuilder, TagFilter};
 use log::info;
 

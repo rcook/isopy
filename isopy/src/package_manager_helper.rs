@@ -22,7 +22,7 @@
 use crate::cache::Cache;
 use crate::constants::{DOWNLOAD_CACHE_FILE_NAME, ISOPY_USER_AGENT};
 use crate::serialization::{Directory, Download, File};
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
@@ -276,14 +276,14 @@ impl PackageManagerHelper {
             .map(|d| (d.url.clone(), d))
             .collect::<HashMap<_, _>>();
 
-        if let Some(download) = downloads.get(url) {
-            if let Some(name) = C::most_recent_name(download) {
-                let path = self.downloads_dir.join(name);
-                if C::exists(&path) {
-                    return Ok(Some(path));
-                }
-                bail!("Expected item {} is missing from cache", path.display());
+        if let Some(download) = downloads.get(url)
+            && let Some(name) = C::most_recent_name(download)
+        {
+            let path = self.downloads_dir.join(name);
+            if C::exists(&path) {
+                return Ok(Some(path));
             }
+            bail!("Expected item {} is missing from cache", path.display());
         }
 
         Ok(None)
@@ -340,10 +340,8 @@ impl PackageManagerContextOps for PackageManagerHelper {
     }
 
     fn make_asset_dir(&self, url: &Url, create_new: bool) -> Result<PathBuf> {
-        if !create_new {
-            if let Some(path) = self.check_cache::<DirectoryCacheItem>(url)? {
-                return Ok(path);
-            }
+        if !create_new && let Some(path) = self.check_cache::<DirectoryCacheItem>(url)? {
+            return Ok(path);
         }
 
         let path = self.make_download_path(url)?;
@@ -360,20 +358,20 @@ impl PackageManagerContextOps for PackageManagerHelper {
     }
 
     async fn download_asset(&self, url: &Url, options: &DownloadAssetOptions) -> Result<PathBuf> {
-        if !options.update {
-            if let Some(path) = self.check_cache::<FileCacheItem>(url)? {
-                return Ok(path);
-            }
+        if !options.update
+            && let Some(path) = self.check_cache::<FileCacheItem>(url)?
+        {
+            return Ok(path);
         }
 
         let path = self.make_download_path(url)?;
         let downloaded_at = Utc::now();
         Self::download_to_path(url, &path, options).await?;
-        if let Some(checksum) = &options.checksum {
-            if !checksum.validate_file(&path).await? {
-                remove_file(&path)?;
-                bail!("Checksum validation of {} failed", path.display());
-            }
+        if let Some(checksum) = &options.checksum
+            && !checksum.validate_file(&path).await?
+        {
+            remove_file(&path)?;
+            bail!("Checksum validation of {} failed", path.display());
         }
 
         self.add_to_cache_manifest(&FileCacheItem {

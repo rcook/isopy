@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::python_version::PythonVersion;
-use anyhow::{anyhow, bail, Error};
+use anyhow::{Error, anyhow, bail};
 use isopy_lib::ArchiveType;
 use std::collections::HashSet;
 use std::result::Result as StdResult;

@@ -55,7 +55,7 @@ pub fn sanitize(s: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::sanitize::{sanitize, sanitize_with_options, SanitizeOptions};
+    use crate::sanitize::{SanitizeOptions, sanitize, sanitize_with_options};
     use rstest::rstest;
 
     #[rstest]

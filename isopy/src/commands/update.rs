@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::moniker::Moniker;
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 use anyhow::Result;
 use isopy_lib::{UpdateIndexOptions, UpdateIndexOptionsBuilder};
 use log::info;

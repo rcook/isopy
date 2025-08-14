@@ -22,13 +22,13 @@
 use crate::api::Release;
 use crate::go_package::GoPackage;
 use crate::go_version::GoVersion;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use isopy_lib::{
-    query, ArchiveType, DirUrl, DownloadAssetOptionsBuilder, DownloadPackageOptions,
-    GetPackageOptions, InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package,
-    PackageInfo, PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags,
-    UpdateIndexOptions, Version,
+    ArchiveType, DirUrl, DownloadAssetOptionsBuilder, DownloadPackageOptions, GetPackageOptions,
+    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageInfo,
+    PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions,
+    Version, query,
 };
 use serde_json::Value;
 use std::collections::HashSet;

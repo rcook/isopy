@@ -21,7 +21,7 @@
 //
 use crate::python_package::PythonPackage;
 use crate::python_plugin::CHECKSUM_BASE_URL;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use isopy_lib::{Checksum, DownloadAssetOptionsBuilder, PackageManagerContext};
 use std::collections::HashMap;
 use std::fs::read_to_string;

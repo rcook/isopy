@@ -23,7 +23,7 @@ use crate::app::App;
 use crate::constants::CONFIG_NAMES;
 use crate::env::{get_env_keys, read_env};
 use crate::print::{make_prop_table, print_dir_info_and_env, print_repo};
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 use crate::table::{table_columns, table_title};
 
 const NO_VALUE: &str = "(not set)";

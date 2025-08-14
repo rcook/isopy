@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::print::make_prop_table;
 use crate::print::print_dir_info_and_env;
-use crate::status::{success, user_error, StatusResult};
+use crate::status::{StatusResult, success, user_error};
 use joat_repo::MetaId;
 
 pub(crate) fn do_link(app: &App, dir_id: &MetaId) -> StatusResult {

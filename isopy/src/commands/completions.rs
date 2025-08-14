@@ -20,9 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::args::Args;
-use crate::status::{success, StatusResult};
+use crate::status::{StatusResult, success};
 use clap::CommandFactory;
-use clap_complete::{generate, Shell};
+use clap_complete::{Shell, generate};
 use std::io::stdout;
 
 pub(crate) fn do_completions(shell: Option<Shell>) -> StatusResult {

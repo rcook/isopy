@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::extra::Extra;
-use anyhow::{bail, Error, Result};
+use anyhow::{Error, Result, bail};
 use isopy_lib::VersionOps;
 use std::any::Any;
 use std::borrow::Cow;

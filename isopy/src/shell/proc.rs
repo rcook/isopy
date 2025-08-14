@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{anyhow, bail, Result};
-use sysinfo::{get_current_pid, Pid, Process, ProcessesToUpdate, System};
+use anyhow::{Result, anyhow, bail};
+use sysinfo::{Pid, Process, ProcessesToUpdate, System, get_current_pid};
 
 pub(crate) fn get_pid() -> Result<Pid> {
     get_current_pid().or(Err(anyhow!("Failed to get process ID")))

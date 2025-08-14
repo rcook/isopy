@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env::EnvKey;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use joat_repo::{DirInfo, LinkId, MetaId};
 use std::env::VarError;
 

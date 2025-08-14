@@ -22,8 +22,8 @@
 use crate::extent::Extent;
 use crate::package_manager::InstallPackageOptions;
 use crate::progress_indicator::{ProgressIndicator, ProgressIndicatorOptionsBuilder};
-use anyhow::{bail, Result};
-use decompress::{decompress, ExtractOptsBuilder};
+use anyhow::{Result, bail};
+use decompress::{ExtractOptsBuilder, decompress};
 use log::info;
 use std::path::Path;
 use strum::IntoEnumIterator;

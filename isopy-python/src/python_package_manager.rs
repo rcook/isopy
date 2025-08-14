@@ -27,7 +27,7 @@ use crate::local_package_info::LocalPackageInfo;
 use crate::package_cache::{read_package_cache, write_package_cache};
 use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use async_trait::async_trait;
 use isopy_lib::{
     DownloadAssetOptionsBuilder, DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
@@ -331,7 +331,7 @@ impl PackageManagerOps for PythonPackageManager {
             bail!(
                 "Package with ID {moniker}:{version} and tags {tags:?} not downloaded: use \"isopy download <PACKAGE-ID>\" or pass \"--download\" to download missing packages",
                 moniker = self.moniker,
-                tags=tag_filter.tags
+                tags = tag_filter.tags
             );
         };
 

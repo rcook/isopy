@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::fs::existing;
-use crate::status::{success, user_error, StatusResult};
+use crate::status::{StatusResult, success, user_error};
 use isopy_lib::{
     DownloadPackageOptionsBuilder, GetPackageOptionsBuilder, InstallPackageOptionsBuilder,
     TagFilter,
@@ -80,7 +80,9 @@ pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
 
         if !unavailable_package_ids.is_empty() {
             let package_id_str = unavailable_package_ids.join(", ");
-            user_error!("The following package(s) have not been downloaded: {package_id_str}; use \"isopy download <PACKAGE-ID>\" or \"isopy init --download\" command to download missing packages");
+            user_error!(
+                "The following package(s) have not been downloaded: {package_id_str}; use \"isopy download <PACKAGE-ID>\" or \"isopy init --download\" command to download missing packages"
+            );
         }
     }
 
