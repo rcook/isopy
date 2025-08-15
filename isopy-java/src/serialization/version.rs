@@ -26,7 +26,7 @@ use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Deserialize)]
-pub(crate) struct Version {
+pub struct Version {
     #[allow(unused)]
     #[serde(rename = "major")]
     pub(crate) major: u32,

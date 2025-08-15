@@ -23,5 +23,5 @@ mod file;
 mod release;
 
 #[allow(unused)]
-pub use self::file::File;
-pub use self::release::Release;
+pub use file::*;
+pub use release::*;

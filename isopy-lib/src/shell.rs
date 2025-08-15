@@ -53,6 +53,7 @@ pub fn env_var_substitution(shell: Shell, env_var: &str) -> OsString {
     s
 }
 
+#[must_use]
 pub fn path_separator(shell: Shell) -> &'static OsStr {
     match shell {
         Shell::Bash => OsStr::new(":"),

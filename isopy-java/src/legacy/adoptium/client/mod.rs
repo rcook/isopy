@@ -22,5 +22,5 @@
 mod adoptium_client;
 mod query;
 
-pub use self::adoptium_client::{all_versions, AdoptiumClient};
-pub use self::query::Query;
+pub use adoptium_client::*;
+pub use query::*;

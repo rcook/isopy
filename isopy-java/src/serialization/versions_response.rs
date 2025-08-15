@@ -23,7 +23,7 @@ use crate::serialization::version::Version;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub(crate) struct VersionsResponse {
+pub struct VersionsResponse {
     #[serde(rename = "versions")]
     pub(crate) versions: Vec<Version>,
 }

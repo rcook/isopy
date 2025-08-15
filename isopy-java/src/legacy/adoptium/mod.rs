@@ -24,4 +24,4 @@ pub mod client;
 
 mod adoptium_index_manager;
 
-pub use self::adoptium_index_manager::AdoptiumIndexManager;
+pub use adoptium_index_manager::*;

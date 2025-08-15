@@ -26,7 +26,7 @@ mod proc;
 #[cfg(target_os = "windows")]
 mod windows;
 
-pub(crate) use command::Command;
-pub(crate) use isopy_env::IsopyEnv;
+pub(crate) use command::*;
+pub(crate) use isopy_env::*;
 #[cfg(target_os = "windows")]
-pub(crate) use windows::{WindowsShellKind, get_windows_shell_info};
+pub(crate) use windows::*;

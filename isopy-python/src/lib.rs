@@ -37,4 +37,4 @@ mod python_package_manager;
 mod python_plugin;
 mod python_version;
 
-pub use entrypoint::new_plugin;
+pub use entrypoint::*;

@@ -30,6 +30,7 @@ pub struct FileNamePartRefs<'a> {
 }
 
 impl<'a> FileNamePartRefs<'a> {
+    #[must_use]
     pub fn split(s: &'a str) -> Self {
         let Some(idx) = s.rfind('.') else {
             let (prefix, suffix) = s.split_at(s.len());

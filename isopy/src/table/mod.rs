@@ -23,7 +23,5 @@ mod internal;
 mod row;
 mod settings;
 
-pub(crate) use internal::{
-    Table, table_columns, table_divider, table_headings, table_line, table_title,
-};
-pub(crate) use settings::TableSettings;
+pub(crate) use internal::*;
+pub(crate) use settings::*;

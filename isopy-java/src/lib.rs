@@ -32,4 +32,4 @@ mod maven_version_limit;
 mod maven_version_range;
 mod serialization;
 
-pub use entrypoint::new_plugin;
+pub use entrypoint::*;

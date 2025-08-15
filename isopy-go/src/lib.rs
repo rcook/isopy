@@ -27,4 +27,4 @@ mod go_package_manager;
 mod go_plugin;
 mod go_version;
 
-pub use entrypoint::new_plugin;
+pub use entrypoint::*;

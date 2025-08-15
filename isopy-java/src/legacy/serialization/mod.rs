@@ -24,7 +24,7 @@ mod index_rec;
 mod project_config_rec;
 mod version_rec;
 
-pub use self::env_config_rec::EnvConfigRec;
-pub use self::index_rec::IndexRec;
-pub use self::project_config_rec::ProjectConfigRec;
-pub use self::version_rec::VersionRec;
+pub use env_config_rec::*;
+pub use index_rec::*;
+pub use project_config_rec::*;
+pub use version_rec::*;

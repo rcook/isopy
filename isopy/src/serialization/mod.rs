@@ -27,10 +27,10 @@ mod file;
 mod manifest;
 mod project;
 
-pub(crate) use directory::Directory;
-pub(crate) use download::Download;
-pub(crate) use env::Env;
-pub(crate) use env_package::EnvPackage;
-pub(crate) use file::File;
-pub(crate) use manifest::Manifest;
-pub(crate) use project::Project;
+pub(crate) use directory::*;
+pub(crate) use download::*;
+pub(crate) use env::*;
+pub(crate) use env_package::*;
+pub(crate) use file::*;
+pub(crate) use manifest::*;
+pub(crate) use project::*;
