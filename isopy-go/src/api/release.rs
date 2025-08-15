@@ -23,7 +23,7 @@ use crate::api::file::File;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct Release {
+pub struct Release {
     #[serde(rename = "stable")]
     pub(crate) stable: bool,
 

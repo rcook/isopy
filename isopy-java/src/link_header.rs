@@ -27,7 +27,7 @@ use std::str::FromStr;
 use url::Url;
 
 #[derive(Debug)]
-pub(crate) struct LinkHeader {
+pub struct LinkHeader {
     pub(crate) next: Option<Url>,
 
     #[allow(unused)]

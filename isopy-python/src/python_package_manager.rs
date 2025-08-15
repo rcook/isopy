@@ -173,7 +173,7 @@ impl PythonPackageManager {
         version: Option<&PythonVersion>,
         tag_filter: &TagFilter,
     ) -> Result<Vec<LocalPackageInfo>> {
-        use isopy_lib::SourceFilter::*;
+        use isopy_lib::SourceFilter::{All, Local, Remote};
 
         let tags = tag_filter
             .tags

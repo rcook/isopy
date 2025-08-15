@@ -27,7 +27,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 const MAVEN_VERSION: &AsciiSet = &CONTROLS.add(b'(').add(b')').add(b',').add(b'[').add(b']');
 
 #[allow(unused)]
-pub(crate) enum MavenVersionRange {
+pub enum MavenVersionRange {
     #[allow(unused)]
     OpenJdkVersion(String),
     #[allow(unused)]
@@ -45,7 +45,7 @@ impl MavenVersionRange {
 
 impl Display for MavenVersionRange {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        use crate::maven_version_limit::MavenVersionLimit::*;
+        use crate::maven_version_limit::MavenVersionLimit::{Closed, Open};
 
         match self {
             Self::OpenJdkVersion(s) => write!(f, "{s}"),

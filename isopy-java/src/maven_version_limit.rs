@@ -22,7 +22,7 @@
 use crate::maven_version::MavenVersion;
 
 #[allow(unused)]
-pub(crate) enum MavenVersionLimit {
+pub enum MavenVersionLimit {
     Open(Option<MavenVersion>),
     Closed(Option<MavenVersion>),
 }

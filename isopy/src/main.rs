@@ -19,25 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-//#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::future_not_send)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::new_ret_no_self)]
-#![allow(clippy::option_if_let_else)]
-#![allow(clippy::redundant_pub_crate)]
-
-use std::process::ExitCode;
-
 mod app;
 mod args;
 mod bool_util;
@@ -65,9 +46,10 @@ mod wrapper_file_name;
 async fn main() -> std::process::ExitCode {
     use crate::env::EnvKey;
     use crate::run::run;
-    use crate::status::Status::*;
+    use crate::status::Status::{Success, UserError};
     use anyhow::Error;
     use colored::Colorize;
+    use std::process::ExitCode;
 
     fn show_message(message: &str) {
         println!("{}", message.to_string().bright_green());

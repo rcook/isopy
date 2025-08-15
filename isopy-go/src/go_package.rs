@@ -24,7 +24,7 @@ use isopy_lib::{ArchiveType, Checksum, PackageInfo, PackageOps, Version};
 use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
-pub(crate) struct GoPackage {
+pub struct GoPackage {
     pub(crate) name: String,
     pub(crate) archive_type: ArchiveType,
     pub(crate) url: Url,

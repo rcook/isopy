@@ -47,7 +47,7 @@ pub(crate) struct PythonPlugin {
 }
 
 impl PythonPlugin {
-    pub(crate) fn new(moniker: &str) -> Plugin {
+    pub(crate) fn new_plugin(moniker: &str) -> Plugin {
         Plugin::new(Self {
             moniker: String::from(moniker),
         })

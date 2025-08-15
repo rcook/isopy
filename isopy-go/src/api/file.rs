@@ -22,7 +22,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct File {
+pub struct File {
     #[serde(rename = "arch")]
     pub(crate) arch: String,
 

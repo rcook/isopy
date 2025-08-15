@@ -22,7 +22,7 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[allow(unused)]
-pub(crate) struct MavenVersion {
+pub struct MavenVersion {
     major: u32,
     minor: Option<u32>,
 }

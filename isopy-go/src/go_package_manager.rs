@@ -64,7 +64,7 @@ macro_rules! downcast_version {
     };
 }
 
-pub(crate) struct GoPackageManager {
+pub struct GoPackageManager {
     ctx: PackageManagerContext,
     url: Url,
 }
@@ -190,7 +190,7 @@ impl PackageManagerOps for GoPackageManager {
         tag_filter: &TagFilter,
         options: &ListPackagesOptions,
     ) -> Result<Vec<PackageInfo>> {
-        use isopy_lib::SourceFilter::*;
+        use isopy_lib::SourceFilter::{All, Local, Remote};
 
         let mut tags = tag_filter
             .tags

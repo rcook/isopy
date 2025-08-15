@@ -29,7 +29,7 @@ use std::result::Result as StdResult;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub(crate) struct GoVersion {
+pub struct GoVersion {
     major: u32,
     minor: Option<u32>,
     build: Option<u32>,

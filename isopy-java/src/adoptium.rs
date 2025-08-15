@@ -23,7 +23,7 @@ use anyhow::Result;
 use reqwest::Client;
 use url::Url;
 
-pub(crate) struct Adoptium {
+pub struct Adoptium {
     server_url: Url,
     client: Client,
 }

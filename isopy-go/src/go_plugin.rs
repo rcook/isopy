@@ -34,10 +34,10 @@ use crate::go_version::GoVersion;
 static INDEX_URL: LazyLock<Url> =
     LazyLock::new(|| "https://go.dev/dl/".parse().expect("Invalid index URL"));
 
-pub(crate) struct GoPlugin;
+pub struct GoPlugin;
 
 impl GoPlugin {
-    pub(crate) fn new(_moniker: &str) -> Plugin {
+    pub(crate) fn new_plugin(_moniker: &str) -> Plugin {
         Plugin::new(Self)
     }
 }

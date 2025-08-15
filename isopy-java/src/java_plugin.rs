@@ -37,10 +37,10 @@ static INDEX_URL: LazyLock<Url> = LazyLock::new(|| {
         .expect("Invalid index URL")
 });
 
-pub(crate) struct JavaPlugin;
+pub struct JavaPlugin;
 
 impl JavaPlugin {
-    pub(crate) fn new(_moniker: &str) -> Plugin {
+    pub(crate) fn new_plugin(_moniker: &str) -> Plugin {
         Plugin::new(Self)
     }
 }

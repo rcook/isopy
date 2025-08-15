@@ -23,5 +23,5 @@ mod file;
 mod release;
 
 #[allow(unused)]
-pub(crate) use self::file::File;
-pub(crate) use self::release::Release;
+pub use self::file::File;
+pub use self::release::Release;

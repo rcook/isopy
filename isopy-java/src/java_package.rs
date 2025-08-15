@@ -25,7 +25,7 @@ use std::{collections::HashSet, path::PathBuf};
 use url::Url;
 
 #[allow(unused)]
-pub(crate) struct JavaPackage {
+pub struct JavaPackage {
     name: String,
     archive_type: ArchiveType,
     url: Url,

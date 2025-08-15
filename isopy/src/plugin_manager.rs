@@ -54,7 +54,7 @@ impl PluginManager {
         config_dir: &Path,
     ) -> PackageManager {
         let cache_dir = config_dir.join(CACHE_DIR_NAME).join(moniker.dir());
-        let ctx = PackageManagerHelper::new(&cache_dir);
+        let ctx = PackageManagerHelper::new_context(&cache_dir);
         let plugin = self.get_plugin(moniker);
         plugin.new_package_manager(ctx)
     }

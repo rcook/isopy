@@ -36,7 +36,7 @@ use std::path::{Path, PathBuf};
 use tokio::fs::write;
 use url::Url;
 
-pub(crate) struct JavaPackageManager {
+pub struct JavaPackageManager {
     ctx: PackageManagerContext,
     url: Url,
 }

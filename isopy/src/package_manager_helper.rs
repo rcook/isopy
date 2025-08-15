@@ -155,7 +155,7 @@ pub(crate) struct PackageManagerHelper {
 }
 
 impl PackageManagerHelper {
-    pub(crate) fn new<P: Into<PathBuf>>(base_dir: P) -> PackageManagerContext {
+    pub(crate) fn new_context<P: Into<PathBuf>>(base_dir: P) -> PackageManagerContext {
         let base_dir = base_dir.into();
         let downloads_dir = base_dir.join("downloads");
         PackageManagerContext::new(Self {

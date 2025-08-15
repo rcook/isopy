@@ -53,3 +53,12 @@ sysinfo = "0.35.2"
 
 [dev-dependencies]
 rstest = "0.25.0"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+nursery = { level = "deny", priority = -1 }
+option_if_let_else = "allow"
+pedantic = { level = "deny", priority = -1 }
+redundant_pub_crate = "allow"

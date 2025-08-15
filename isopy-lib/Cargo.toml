@@ -30,3 +30,12 @@ url = "2.5.4"
 
 [dev-dependencies]
 rstest = "0.25.0"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+derive_partial_eq_without_eq = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+nursery = { level = "deny", priority = -1 }
+option_if_let_else = "allow"
+pedantic = { level = "deny", priority = -1 }

@@ -97,7 +97,10 @@ pub(crate) async fn run() -> StatusResult {
 }
 
 async fn run_command(app: App, command: Command) -> StatusResult {
-    use crate::args::Command::*;
+    use crate::args::Command::{
+        Check, Completions, Docs, Download, Env, Info, Init, Link, List, Packages, Project, Prompt,
+        Remove, Run, Scratch, SetConfig, Shell, Tags, Update, Wrap,
+    };
     use crate::commands::{
         do_check, do_completions, do_docs, do_download, do_env, do_info, do_init, do_link, do_list,
         do_packages, do_project, do_prompt, do_remove, do_run, do_scratch, do_set_config, do_shell,

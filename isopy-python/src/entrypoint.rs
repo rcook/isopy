@@ -24,5 +24,5 @@ use isopy_lib::Plugin;
 
 #[must_use]
 pub fn new_plugin(moniker: &str) -> Plugin {
-    PythonPlugin::new(moniker)
+    PythonPlugin::new_plugin(moniker)
 }

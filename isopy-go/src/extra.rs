@@ -22,7 +22,7 @@
 use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum Extra {
+pub enum Extra {
     Stable,
     ReleaseCandidate(u32),
     Beta(u32),
