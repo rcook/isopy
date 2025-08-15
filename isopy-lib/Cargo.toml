@@ -12,8 +12,8 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.5.8"
 
 [dependencies]
-anyhow = "1.0.98"
-async-trait = "0.1.88"
+anyhow = "1.0.99"
+async-trait = "0.1.89"
 decompress = { git = "https://github.com/rcook/decompress.git", rev = "c00c3b288e430eeffe78d3ba44952cf93697b1f0" }
 derive_builder = "0.20.2"
 derive_more = { version = "2.0.1", features = ["deref"] }
@@ -21,9 +21,9 @@ hex = "0.4.3"
 indicatif = "0.17.11"
 log = "0.4.27"
 sha2 = "0.10.9"
-strum = "0.27.1"
-strum_macros = "0.27.1"
-tokio = { version = "1.46.0", features = ["full"] }
+strum = "0.27.2"
+strum_macros = "0.27.2"
+tokio = { version = "1.47.1", features = ["full"] }
 url = "2.5.4"
 
 [dev-dependencies]

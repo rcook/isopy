@@ -12,15 +12,15 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.5.8"
 
 [dependencies]
-anyhow = "1.0.98"
-async-trait = "0.1.88"
+anyhow = "1.0.99"
+async-trait = "0.1.89"
 isopy-lib = { path = "../isopy-lib" }
 log = "0.4.27"
 percent-encoding = "2.3.1"
-reqwest = { version = "0.12.22", features = ["stream"] }
+reqwest = { version = "0.12.23", features = ["stream"] }
 serde = "1.0.219"
-serde_json = "1.0.140"
-tokio = { version = "1.46.0", features = ["full"] }
+serde_json = "1.0.142"
+tokio = { version = "1.47.1", features = ["full"] }
 url = { version = "2.5.4", features = ["serde"] }
 
 [dev-dependencies]
