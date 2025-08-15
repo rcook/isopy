@@ -24,18 +24,25 @@ use std::cmp::Ordering;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) enum PrereleaseKind {
     Alpha,
+    Beta,
     ReleaseCandidate,
+}
+
+impl PrereleaseKind {
+    const fn ordering(&self) -> i32 {
+        match self {
+            Self::Alpha => 0,
+            Self::Beta => 1,
+            Self::ReleaseCandidate => 2,
+        }
+    }
 }
 
 impl Ord for PrereleaseKind {
     fn cmp(&self, other: &Self) -> Ordering {
-        match (self, other) {
-            (Self::Alpha, Self::Alpha) | (Self::ReleaseCandidate, Self::ReleaseCandidate) => {
-                Ordering::Equal
-            }
-            (Self::Alpha, Self::ReleaseCandidate) => Ordering::Less,
-            (Self::ReleaseCandidate, Self::Alpha) => Ordering::Greater,
-        }
+        let ordering = self.ordering();
+        let other_ordering = other.ordering();
+        ordering.cmp(&other_ordering)
     }
 }
 

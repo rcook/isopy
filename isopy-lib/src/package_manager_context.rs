@@ -25,6 +25,7 @@ use crate::macros::dyn_trait_struct;
 use anyhow::Result;
 use async_trait::async_trait;
 use derive_builder::Builder;
+use reqwest::Response;
 use std::path::{Path, PathBuf};
 use url::Url;
 
@@ -56,6 +57,24 @@ impl DownloadAssetOptionsBuilder {
     }
 }
 
+pub type Query = Vec<(&'static str, &'static str)>;
+
+#[derive(Builder)]
+pub struct DownloadPaginatedAssetOptions {
+    pub initial_url: Url,
+    #[builder(default)]
+    pub initial_query: Option<Query>,
+    #[builder(default)]
+    pub accept: Option<String>,
+    #[builder(default)]
+    pub check: Option<fn(&Response) -> Result<()>>,
+}
+
+pub struct DownloadPaginatedAssetResponse {
+    pub dir: PathBuf,
+    pub parts: Vec<PathBuf>,
+}
+
 #[async_trait]
 pub trait PackageManagerContextOps: Send + Sync {
     fn base_dir(&self) -> &Path;
@@ -63,5 +82,9 @@ pub trait PackageManagerContextOps: Send + Sync {
     fn check_asset_dir(&self, url: &Url) -> Result<Option<PathBuf>>;
     fn make_asset_dir(&self, url: &Url, create_new: bool) -> Result<PathBuf>;
     async fn download_asset(&self, url: &Url, options: &DownloadAssetOptions) -> Result<PathBuf>;
+    async fn download_paginated_asset(
+        &self,
+        options: &DownloadPaginatedAssetOptions,
+    ) -> Result<DownloadPaginatedAssetResponse>;
 }
 dyn_trait_struct!(PackageManagerContext, PackageManagerContextOps);

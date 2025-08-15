@@ -21,19 +21,22 @@
 //
 use crate::cache::Cache;
 use crate::constants::{DOWNLOAD_CACHE_FILE_NAME, ISOPY_USER_AGENT};
+use crate::paginated_download::get_download_paginated_asset_response_from_dir;
 use crate::serialization::{Directory, Download, File};
 use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
 use isopy_lib::{
-    DownloadAssetOptions, Extent, FileNameParts, PackageManagerContext, PackageManagerContextOps,
-    ProgressIndicator, ProgressIndicatorOptionsBuilder,
+    DownloadAssetOptions, DownloadPaginatedAssetOptions, DownloadPaginatedAssetResponse, Extent,
+    FileNameParts, PackageManagerContext, PackageManagerContextOps, ProgressIndicator,
+    ProgressIndicatorOptionsBuilder, error_for_github_rate_limit,
 };
 use log::info;
+use path_absolutize::Absolutize;
+use reqwest::Client;
+use reqwest::Url as ReqwestUrl;
 use reqwest::header::{ACCEPT, USER_AGENT};
-use reqwest::{Client, StatusCode};
-use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
 use std::fs::{create_dir_all, remove_file};
 use std::path::{Path, PathBuf};
@@ -188,7 +191,7 @@ impl PackageManagerHelper {
         request = request.query(&options.query);
 
         let response = request.send().await?;
-        Self::error_for_github_rate_limit(&response)?;
+        error_for_github_rate_limit(&response)?;
         response.error_for_status_ref()?;
 
         let progress_indicator = ProgressIndicator::new(
@@ -217,50 +220,6 @@ impl PackageManagerHelper {
         info!("Downloaded {url}");
 
         Ok(())
-    }
-
-    fn error_for_github_rate_limit(response: &Response) -> Result<()> {
-        if response.status() != StatusCode::FORBIDDEN {
-            return Ok(());
-        }
-
-        let headers = response.headers();
-
-        if headers.get("x-github-request-id").is_none() {
-            return Ok(());
-        }
-
-        let Some(h) = headers.get("x-ratelimit-reset") else {
-            return Ok(());
-        };
-
-        let Ok(s) = h.to_str() else { return Ok(()) };
-
-        let Ok(reset_timestamp) = s.parse::<i64>() else {
-            return Ok(());
-        };
-
-        let Some(reset_date_time) = DateTime::<Utc>::from_timestamp(reset_timestamp, 0) else {
-            return Ok(());
-        };
-
-        let Some(h) = headers.get("x-ratelimit-remaining") else {
-            return Ok(());
-        };
-
-        let Ok(s) = h.to_str() else { return Ok(()) };
-
-        let Ok(value) = s.parse::<i32>() else {
-            return Ok(());
-        };
-
-        if value != 0 {
-            return Ok(());
-        }
-
-        bail!(
-            "GitHub rate limit was exceeded (limit resets at {reset_date_time}): please try again later!"
-        )
     }
 
     fn load_cache(&self) -> Result<Cache> {
@@ -380,5 +339,14 @@ impl PackageManagerContextOps for PackageManagerHelper {
             downloaded_at,
         })?;
         Ok(path)
+    }
+
+    async fn download_paginated_asset(
+        &self,
+        _options: &DownloadPaginatedAssetOptions,
+    ) -> Result<DownloadPaginatedAssetResponse> {
+        let download_dir = Path::new("downloads").absolutize()?;
+        let download = get_download_paginated_asset_response_from_dir(&download_dir)?;
+        Ok(download)
     }
 }

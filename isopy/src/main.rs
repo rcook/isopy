@@ -32,6 +32,7 @@ mod fs;
 mod moniker;
 mod package_id;
 mod package_manager_helper;
+mod paginated_download;
 mod plugin_manager;
 mod print;
 mod run;

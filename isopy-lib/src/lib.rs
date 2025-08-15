@@ -19,12 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+pub mod pagination;
+
 mod accept;
 mod archive_type;
 mod checksum;
 mod env_info;
 mod extent;
 mod file_name_parts;
+mod github;
+mod link_header;
 mod macros;
 mod package;
 mod package_info;
@@ -47,6 +51,8 @@ pub use checksum::*;
 pub use env_info::*;
 pub use extent::*;
 pub use file_name_parts::*;
+pub use github::*;
+pub use link_header::*;
 pub use package::*;
 pub use package_info::*;
 pub use package_manager::*;

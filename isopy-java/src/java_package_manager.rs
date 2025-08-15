@@ -19,15 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::link_header::LinkHeader;
 use crate::serialization::versions_response::VersionsResponse;
 use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadPackageOptions, GetPackageOptions, InstallPackageOptions, ListPackagesOptions,
-    ListTagsOptions, Package, PackageInfo, PackageManagerContext, PackageManagerOps,
-    ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter, Tags,
-    UpdateIndexOptions, Version,
+    DownloadPackageOptions, GetPackageOptions, InstallPackageOptions, LinkHeader,
+    ListPackagesOptions, ListTagsOptions, Package, PackageInfo, PackageManagerContext,
+    PackageManagerOps, ProgressIndicator, ProgressIndicatorOptionsBuilder, SourceFilter, TagFilter,
+    Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
 use std::fs::{File, read_dir};

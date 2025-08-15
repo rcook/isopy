@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Richard Cook
+// Copyright (c) 2025 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -19,16 +19,4 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod adoptium;
-mod entrypoint;
-mod extra;
-mod java_package;
-mod java_package_manager;
-mod java_plugin;
-mod java_version;
-mod maven_version;
-mod maven_version_limit;
-mod maven_version_range;
-mod serialization;
-
-pub use entrypoint::*;
+pub const PAGINATION_PART_PREFIX: &str = "part-";

@@ -28,7 +28,7 @@ use url::Url;
 
 #[derive(Debug)]
 pub struct LinkHeader {
-    pub(crate) next: Option<Url>,
+    pub next: Option<Url>,
 
     #[allow(unused)]
     last: Option<Url>,
@@ -39,7 +39,7 @@ pub struct LinkHeader {
 
 impl LinkHeader {
     #[allow(unused)]
-    pub(crate) fn from_response(response: &Response) -> Result<Option<Self>> {
+    pub fn from_response(response: &Response) -> Result<Option<Self>> {
         let Some(link_header) = response.headers().get("link") else {
             return Ok(None);
         };

@@ -38,6 +38,7 @@ impl Display for PrereleaseInfo {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self.kind {
             PrereleaseKind::Alpha => write!(f, "a{}", self.number),
+            PrereleaseKind::Beta => write!(f, "b{}", self.number),
             PrereleaseKind::ReleaseCandidate => write!(f, "rc{}", self.number),
         }
     }

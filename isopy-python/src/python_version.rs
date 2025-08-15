@@ -53,9 +53,15 @@ fn parse_triple_discriminant_helper(s: &str) -> Result<(Triple, Discriminant)> {
         let discriminant = Discriminant::prerelease(prerelease_type, number);
         Ok((triple, discriminant))
     }
+
     if let Some(i) = s.find('a') {
         return prerelease_helper(PrereleaseKind::Alpha, s, i, i + 1);
     }
+
+    if let Some(i) = s.find('b') {
+        return prerelease_helper(PrereleaseKind::Beta, s, i, i + 1);
+    }
+
     if let Some(i) = s.find("rc") {
         return prerelease_helper(PrereleaseKind::ReleaseCandidate, s, i, i + 2);
     }
