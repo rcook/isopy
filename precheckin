@@ -1,0 +1,45 @@
+#!/bin/bash
+set -euo pipefail
+
+BLACK=$(tput setaf 0)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+LIME_YELLOW=$(tput setaf 190)
+POWDER_BLUE=$(tput setaf 153)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+BRIGHT=$(tput bold)
+NORMAL=$(tput sgr0)
+BLINK=$(tput blink)
+REVERSE=$(tput smso)
+UNDERLINE=$(tput smul)
+
+workspace_dir=$(cd $(dirname $0); pwd -P)
+
+run_step() {
+  cmd=$1
+
+  printf "${WHITE}${BRIGHT}Running precheckin step \"$cmd\"${NORMAL}\n"
+
+  set +e
+  $cmd
+  status=$?
+  set -e
+
+  if [ $status -eq 0 ]; then
+    printf "${GREEN}${BRIGHT}Precheckin step \"$cmd\" passed${NORMAL}\n\n"
+  else
+    printf "${RED}${BRIGHT}${BLINK}Precheckin step \"$cmd\" failed${NORMAL}\n"
+    exit 1
+  fi
+}
+
+cd $workspace_dir
+run_step 'cargo clippy'
+run_step 'cargo fmt'
+run_step 'cargo build'
+run_step 'cargo test'
+printf "${GREEN}${BRIGHT}All precheckin steps passed${NORMAL}\n\n"
