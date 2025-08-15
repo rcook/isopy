@@ -22,23 +22,25 @@
 use crate::checksum::get_checksum;
 use crate::choose_best::choose_best;
 use crate::constants::PLATFORM_TAGS;
-use crate::index::Index;
+use crate::index_item::IndexItem;
 use crate::local_package_info::LocalPackageInfo;
-use crate::package_cache::{read_package_cache, write_package_cache};
+use crate::package_cache::read_package_cache;
 use crate::python_package::PythonPackage;
 use crate::python_version::PythonVersion;
 use anyhow::{Result, bail};
 use async_trait::async_trait;
 use isopy_lib::{
-    DownloadAssetOptionsBuilder, DownloadPackageOptions, GetPackageOptions, InstallPackageOptions,
-    ListPackagesOptions, ListTagsOptions, Package, PackageInfo, PackageManagerContext,
-    PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions, Version,
+    Accept, DownloadAssetOptionsBuilder, DownloadPackageOptions,
+    DownloadPaginatedAssetOptionsBuilder, DownloadPaginatedAssetResponse, GetPackageOptions,
+    InstallPackageOptions, ListPackagesOptions, ListTagsOptions, Package, PackageInfo,
+    PackageManagerContext, PackageManagerOps, SourceFilter, TagFilter, Tags, UpdateIndexOptions,
+    Version, error_for_github_rate_limit,
 };
+use serde_json::Value;
 use std::borrow::ToOwned;
 use std::collections::HashSet;
-use std::fs::metadata;
-use std::path::{Path, PathBuf};
-use tokio::fs::read_to_string;
+use std::fs::{metadata, read_to_string};
+use std::path::Path;
 use url::Url;
 
 const PACKAGE_CACHE_FILE_NAME: &str = "packages.yaml";
@@ -113,33 +115,121 @@ impl PythonPackageManager {
         )
     }
 
-    async fn get_index_path(&self, update: bool, show_progress: bool) -> Result<PathBuf> {
-        let options = DownloadAssetOptionsBuilder::json()
-            .update(update)
+    #[allow(clippy::unused_async)]
+    async fn get_index_response(
+        &self,
+        update: bool,
+        show_progress: bool,
+    ) -> Result<DownloadPaginatedAssetResponse> {
+        /*
+        fn from_dir(dir: &Path) -> Result<DownloadPaginatedAssetResponse> {
+            let mut parts = Vec::new();
+            for entry in read_dir(dir)
+                .with_context(|| format!("directory {dir} not found", dir = dir.display()))?
+            {
+                let entry = entry?;
+                if let Some(s) = entry.file_name().to_str()
+                    && let Some(suffix) = s.strip_prefix(PAGINATION_PART_PREFIX)
+                    && let Ok(index) = suffix.parse::<usize>()
+                {
+                    parts.push((entry.path(), index));
+                }
+            }
+
+            if parts.is_empty() {
+                bail!("no paginated download found at {dir}", dir = dir.display())
+            }
+
+            parts.sort_by(|(_, index_a), (_, index_b)| index_a.cmp(index_b));
+
+            Ok(DownloadPaginatedAssetResponse {
+                dir: dir.to_path_buf(),
+                parts: parts.into_iter().map(|p| p.0).collect(),
+            })
+        }
+        */
+
+        let url = {
+            let mut url = self.url.clone();
+            {
+                let mut pairs = url.query_pairs_mut();
+                pairs.append_pair("per_page", "10");
+                pairs.append_pair("page", "1");
+            }
+            url
+        };
+
+        let options = DownloadPaginatedAssetOptionsBuilder::default()
             .show_progress(show_progress)
+            .update(update)
+            .accept(Some(Accept::ApplicationGitHubJson))
+            .check(Some(error_for_github_rate_limit))
             .build()?;
-        self.ctx.download_asset(&self.url, &options).await
+        self.ctx.download_paginated_asset(&url, &options).await
+
+        //from_dir(Path::new("downloads/transaction"))
     }
 
+    #[allow(unused)]
     async fn fetch_packages(
         &self,
-        cache_path: &Path,
+        _cache_path: &Path,
         show_progress: bool,
     ) -> Result<Vec<PythonPackage>> {
-        let index_path = self.get_index_path(false, show_progress).await?;
-        let index = read_to_string(index_path).await?.parse::<Index>()?;
-        let mut packages = Vec::new();
-        for item in index.items() {
-            packages.extend(PythonPackage::read_all(&item)?.into_iter().filter_map(|p| {
-                if p.metadata.tags.is_superset(&self.platform_tags) {
-                    Some(p)
-                } else {
-                    None
+        fn get_packages(
+            response: &DownloadPaginatedAssetResponse,
+            platform_tags: &HashSet<String>,
+        ) -> Result<Vec<PythonPackage>> {
+            fn read_values_in_order(
+                response: &DownloadPaginatedAssetResponse,
+            ) -> Result<Vec<Value>> {
+                fn from_value(value: Value) -> Option<(String, Value)> {
+                    let obj = value.as_object()?;
+                    let tag_name = obj.get("tag_name")?;
+                    let tag = tag_name.as_str()?;
+                    Some((String::from(tag), value))
                 }
-            }));
+
+                let mut values = Vec::new();
+                for p in &response.parts {
+                    let s = read_to_string(p)?;
+                    let temp = serde_json::from_str::<Vec<Value>>(&s)?;
+                    values.extend(temp.into_iter().filter_map(from_value));
+                }
+
+                values.sort_by(|a, b| b.0.cmp(&a.0));
+
+                Ok(values.into_iter().map(|(_, value)| value).collect())
+            }
+
+            fn into_packages(
+                response: &DownloadPaginatedAssetResponse,
+                platform_tags: &HashSet<String>,
+            ) -> Result<Vec<PythonPackage>> {
+                let mut packages = Vec::new();
+                for value in read_values_in_order(response)? {
+                    packages.extend(
+                        PythonPackage::read_all(&IndexItem::new(&value))?
+                            .into_iter()
+                            .filter_map(|p| {
+                                if p.metadata.tags.is_superset(platform_tags) {
+                                    Some(p)
+                                } else {
+                                    None
+                                }
+                            }),
+                    );
+                }
+
+                Ok(packages)
+            }
+
+            into_packages(response, platform_tags)
         }
 
-        write_package_cache(cache_path, &packages)?;
+        let response = self.get_index_response(false, show_progress).await?;
+        let packages = get_packages(&response, &self.platform_tags)?;
+        //write_package_cache(cache_path, &packages)?;
         Ok(packages)
     }
 
@@ -223,7 +313,7 @@ impl PythonPackageManager {
 #[async_trait]
 impl PackageManagerOps for PythonPackageManager {
     async fn update_index(&self, options: &UpdateIndexOptions) -> Result<()> {
-        self.get_index_path(true, options.show_progress).await?;
+        self.get_index_response(true, options.show_progress).await?;
         Ok(())
     }
 

@@ -25,6 +25,7 @@ mod env;
 mod env_package;
 mod file;
 mod manifest;
+mod paginated_file;
 mod project;
 
 pub(crate) use directory::*;
@@ -33,4 +34,5 @@ pub(crate) use env::*;
 pub(crate) use env_package::*;
 pub(crate) use file::*;
 pub(crate) use manifest::*;
+pub(crate) use paginated_file::*;
 pub(crate) use project::*;

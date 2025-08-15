@@ -89,8 +89,8 @@ impl GoPackageManager {
             .query(query!([("include", "all"), ("mode", "json")]))
             .build()?;
         let url: DirUrl = self.url.clone().into();
-        let path = self.ctx.download_asset(url.as_url(), &options).await?;
-        let s = read_to_string(path).await?;
+        let response = self.ctx.download_asset(url.as_url(), &options).await?;
+        let s = read_to_string(response.path).await?;
         let index = serde_json::from_str(&s)?;
         Ok(index)
     }

@@ -55,8 +55,8 @@ pub(crate) async fn get_checksum(
         .update(false)
         .show_progress(show_progress)
         .build()?;
-    let path = ctx.download_asset(&url, &options).await?;
-    let content = read_to_string(path)?;
+    let response = ctx.download_asset(&url, &options).await?;
+    let content = read_to_string(response.path)?;
     let checksum_strs = parse_checksums(&content);
 
     let package_name = package.metadata.name.as_str();

@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::directory::Directory;
 use crate::serialization::file::File;
+use crate::serialization::{PaginatedFile, directory::Directory};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -31,6 +31,13 @@ pub(crate) struct Download {
 
     #[serde(rename = "files", skip_serializing_if = "Vec::is_empty", default)]
     pub(crate) files: Vec<File>,
+
+    #[serde(
+        rename = "paginated_files",
+        skip_serializing_if = "Vec::is_empty",
+        default
+    )]
+    pub(crate) paginated_files: Vec<PaginatedFile>,
 
     #[serde(rename = "directories", skip_serializing_if = "Vec::is_empty", default)]
     pub(crate) directories: Vec<Directory>,

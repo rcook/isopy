@@ -45,6 +45,7 @@ struct Package {
     version: String,
 }
 
+#[allow(unused)]
 pub(crate) fn write_package_cache(path: &Path, packages: &[PythonPackage]) -> Result<()> {
     fn transform(package: &PythonPackage) -> Package {
         Package {

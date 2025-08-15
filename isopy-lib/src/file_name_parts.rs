@@ -77,9 +77,10 @@ impl FileNameParts {
             bail!("Url {url} cannot be sanitized")
         }
 
-        let mut url_without_path = url.to_owned();
-        url_without_path.set_path("");
-        let mut prefix = sanitize(url_without_path.as_str());
+        let mut bare_url = url.to_owned();
+        bare_url.set_path("");
+        bare_url.set_query(None);
+        let mut prefix = sanitize(bare_url.as_str());
         if prefix.ends_with('_') {
             prefix.pop();
         }
@@ -88,10 +89,17 @@ impl FileNameParts {
         assert!(file_name_parts.prefix.starts_with('_'));
         prefix.push_str(&file_name_parts.prefix);
 
-        Ok(Self {
-            prefix,
-            suffix: file_name_parts.suffix,
-        })
+        let mut suffix = file_name_parts.suffix;
+        if url.query_pairs().next().is_some() {
+            for (k, v) in url.query_pairs() {
+                suffix.push('_');
+                suffix.push_str(&sanitize(&k));
+                suffix.push('_');
+                suffix.push_str(&sanitize(&v));
+            }
+        }
+
+        Ok(Self { prefix, suffix })
     }
 
     fn can_be_sanitized(url: &Url) -> bool {
@@ -99,7 +107,6 @@ impl FileNameParts {
             && url.username().is_empty()
             && url.password().is_none()
             && url.port().is_none()
-            && url.query().is_none()
             && url.fragment().is_none()
     }
 }

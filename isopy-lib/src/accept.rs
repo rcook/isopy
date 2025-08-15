@@ -22,6 +22,7 @@
 #[derive(Clone, Copy, Debug)]
 pub enum Accept {
     ApplicationJson,
+    ApplicationGitHubJson,
 }
 
 impl Accept {
@@ -29,6 +30,7 @@ impl Accept {
     pub const fn as_str(&self) -> &str {
         match self {
             Self::ApplicationJson => "application/json",
+            Self::ApplicationGitHubJson => "application/vnd.github+json",
         }
     }
 }

@@ -21,19 +21,24 @@
 //
 use crate::cache::Cache;
 use crate::constants::{DOWNLOAD_CACHE_FILE_NAME, ISOPY_USER_AGENT};
-use crate::serialization::{Directory, Download, File};
+use crate::paginated_download::{
+    get_download_paginated_asset_response, get_download_paginated_asset_response_from_dir,
+};
+use crate::serialization::{Directory, Download, File, PaginatedFile};
 use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use futures_util::StreamExt;
 use isopy_lib::{
-    DownloadAssetOptions, Extent, FileNameParts, PackageManagerContext, PackageManagerContextOps,
-    ProgressIndicator, ProgressIndicatorOptionsBuilder,
+    DownloadAssetOptions, DownloadAssetResponse, DownloadPaginatedAssetOptions,
+    DownloadPaginatedAssetResponse, Extent, FileNameParts, PackageManagerContext,
+    PackageManagerContextOps, ProgressIndicator, ProgressIndicatorOptionsBuilder,
+    error_for_github_rate_limit,
 };
 use log::info;
+use reqwest::Client;
+use reqwest::Url as ReqwestUrl;
 use reqwest::header::{ACCEPT, USER_AGENT};
-use reqwest::{Client, StatusCode};
-use reqwest::{Response, Url as ReqwestUrl};
 use std::collections::HashMap;
 use std::fs::{create_dir_all, remove_file};
 use std::path::{Path, PathBuf};
@@ -61,9 +66,9 @@ impl FileCacheItem {
             file_name: self
                 .path
                 .file_name()
-                .expect("Must have file name")
+                .expect("must have file name")
                 .to_str()
-                .expect("Must be valid string")
+                .expect("must be valid string")
                 .to_string(),
             downloaded_at: self.downloaded_at,
         }
@@ -90,6 +95,7 @@ impl CacheItem for FileCacheItem {
         Download {
             url: self.url.clone(),
             files: vec![self.make_file()],
+            paginated_files: vec![],
             directories: vec![],
         }
     }
@@ -111,9 +117,9 @@ impl DirectoryCacheItem {
             dir_name: self
                 .path
                 .file_name()
-                .expect("Must have directory name")
+                .expect("must have directory name")
                 .to_str()
-                .expect("Must be valid string")
+                .expect("must be valid string")
                 .to_string(),
             created_at: self.created_at,
         }
@@ -140,12 +146,64 @@ impl CacheItem for DirectoryCacheItem {
         Download {
             url: self.url.clone(),
             files: vec![],
+            paginated_files: vec![],
             directories: vec![self.make_directory()],
         }
     }
 
     fn add_to_downloads(&self, download: &mut Download) {
         download.directories.push(self.make_directory());
+    }
+}
+
+struct PaginatedFileCacheItem {
+    url: Url,
+    path: PathBuf,
+    downloaded_at: DateTime<Utc>,
+}
+
+impl PaginatedFileCacheItem {
+    fn make_paginated_file(&self) -> PaginatedFile {
+        PaginatedFile {
+            dir_name: self
+                .path
+                .file_name()
+                .expect("must have directory name")
+                .to_str()
+                .expect("must be valid string")
+                .to_string(),
+            downloaded_at: self.downloaded_at,
+        }
+    }
+}
+
+impl CacheItem for PaginatedFileCacheItem {
+    fn exists(path: &Path) -> bool {
+        path.is_dir()
+    }
+
+    fn most_recent_name(download: &Download) -> Option<&str> {
+        let mut paginated_files = download.paginated_files.iter().collect::<Vec<_>>();
+        paginated_files.sort_by_cached_key(|f| f.downloaded_at);
+        paginated_files.reverse();
+        paginated_files.first().map(|f| f.dir_name.as_str())
+    }
+
+    fn url(&self) -> &Url {
+        &self.url
+    }
+
+    fn make_download(&self) -> Download {
+        Download {
+            url: self.url.clone(),
+            files: vec![],
+            paginated_files: vec![self.make_paginated_file()],
+            directories: vec![],
+        }
+    }
+
+    fn add_to_downloads(&self, download: &mut Download) {
+        download.paginated_files.push(self.make_paginated_file());
     }
 }
 
@@ -188,7 +246,7 @@ impl PackageManagerHelper {
         request = request.query(&options.query);
 
         let response = request.send().await?;
-        Self::error_for_github_rate_limit(&response)?;
+        error_for_github_rate_limit(&response)?;
         response.error_for_status_ref()?;
 
         let progress_indicator = ProgressIndicator::new(
@@ -219,50 +277,6 @@ impl PackageManagerHelper {
         Ok(())
     }
 
-    fn error_for_github_rate_limit(response: &Response) -> Result<()> {
-        if response.status() != StatusCode::FORBIDDEN {
-            return Ok(());
-        }
-
-        let headers = response.headers();
-
-        if headers.get("x-github-request-id").is_none() {
-            return Ok(());
-        }
-
-        let Some(h) = headers.get("x-ratelimit-reset") else {
-            return Ok(());
-        };
-
-        let Ok(s) = h.to_str() else { return Ok(()) };
-
-        let Ok(reset_timestamp) = s.parse::<i64>() else {
-            return Ok(());
-        };
-
-        let Some(reset_date_time) = DateTime::<Utc>::from_timestamp(reset_timestamp, 0) else {
-            return Ok(());
-        };
-
-        let Some(h) = headers.get("x-ratelimit-remaining") else {
-            return Ok(());
-        };
-
-        let Ok(s) = h.to_str() else { return Ok(()) };
-
-        let Ok(value) = s.parse::<i32>() else {
-            return Ok(());
-        };
-
-        if value != 0 {
-            return Ok(());
-        }
-
-        bail!(
-            "GitHub rate limit was exceeded (limit resets at {reset_date_time}): please try again later!"
-        )
-    }
-
     fn load_cache(&self) -> Result<Cache> {
         Cache::load(self.base_dir.join(DOWNLOAD_CACHE_FILE_NAME))
     }
@@ -283,7 +297,10 @@ impl PackageManagerHelper {
             if C::exists(&path) {
                 return Ok(Some(path));
             }
-            bail!("Expected item {} is missing from cache", path.display());
+            bail!(
+                "expected item {path} is missing from cache",
+                path = path.display()
+            );
         }
 
         Ok(None)
@@ -293,11 +310,16 @@ impl PackageManagerHelper {
         let file_name_parts = FileNameParts::from_url_safe(url)?;
         for i in 0.. {
             let file_name = if i == 0 {
-                format!("{}{}", file_name_parts.prefix, file_name_parts.suffix)
+                format!(
+                    "{prefix}{parts}",
+                    prefix = file_name_parts.prefix,
+                    parts = file_name_parts.suffix,
+                )
             } else {
                 format!(
-                    "{}-{i:05}{}",
-                    file_name_parts.prefix, file_name_parts.suffix
+                    "{prefix}{parts}-{i:05}",
+                    prefix = file_name_parts.prefix,
+                    parts = file_name_parts.suffix,
                 )
             };
             let p = self.downloads_dir.join(file_name);
@@ -340,8 +362,8 @@ impl PackageManagerContextOps for PackageManagerHelper {
     }
 
     fn make_asset_dir(&self, url: &Url, create_new: bool) -> Result<PathBuf> {
-        if !create_new && let Some(path) = self.check_cache::<DirectoryCacheItem>(url)? {
-            return Ok(path);
+        if !create_new && let Some(dir) = self.check_cache::<DirectoryCacheItem>(url)? {
+            return Ok(dir);
         }
 
         let path = self.make_download_path(url)?;
@@ -357,11 +379,15 @@ impl PackageManagerContextOps for PackageManagerHelper {
         Ok(path)
     }
 
-    async fn download_asset(&self, url: &Url, options: &DownloadAssetOptions) -> Result<PathBuf> {
+    async fn download_asset(
+        &self,
+        url: &Url,
+        options: &DownloadAssetOptions,
+    ) -> Result<DownloadAssetResponse> {
         if !options.update
             && let Some(path) = self.check_cache::<FileCacheItem>(url)?
         {
-            return Ok(path);
+            return Ok(DownloadAssetResponse { path });
         }
 
         let path = self.make_download_path(url)?;
@@ -371,7 +397,10 @@ impl PackageManagerContextOps for PackageManagerHelper {
             && !checksum.validate_file(&path).await?
         {
             remove_file(&path)?;
-            bail!("Checksum validation of {} failed", path.display());
+            bail!(
+                "checksum validation of {path} failed",
+                path = path.display()
+            );
         }
 
         self.add_to_cache_manifest(&FileCacheItem {
@@ -379,6 +408,31 @@ impl PackageManagerContextOps for PackageManagerHelper {
             path: path.clone(),
             downloaded_at,
         })?;
-        Ok(path)
+        Ok(DownloadAssetResponse { path })
+    }
+
+    async fn download_paginated_asset(
+        &self,
+        url: &Url,
+        options: &DownloadPaginatedAssetOptions,
+    ) -> Result<DownloadPaginatedAssetResponse> {
+        if !options.update
+            && let Some(dir) = self.check_cache::<PaginatedFileCacheItem>(url)?
+        {
+            return get_download_paginated_asset_response_from_dir(&dir);
+        }
+
+        let path = self.make_download_path(url)?;
+        create_dir_all(&path)?;
+
+        let response = get_download_paginated_asset_response(url, options, &path).await?;
+        let downloaded_at = Utc::now();
+        self.add_to_cache_manifest(&PaginatedFileCacheItem {
+            url: url.clone(),
+            path,
+            downloaded_at,
+        })?;
+
+        Ok(response)
     }
 }
