@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use env::{join_paths, set_var, split_paths, var_os};
 use isopy_lib::EnvInfo;
+use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitStatus;
@@ -59,7 +59,7 @@ impl Command {
         isopy_env.set_vars();
 
         for (key, value) in &env_info.vars {
-            assert!(set_var(key, value).is_some());
+            unsafe { set_var(key, value) };
         }
 
         self.exec_impl()
@@ -130,7 +130,8 @@ fn prepend_paths(paths: &[PathBuf]) -> Result<()> {
         new_paths.extend(split_paths(&path));
     }
 
-    assert!(set_var("PATH", join_paths(new_paths)?).is_some());
+    let p = join_paths(new_paths)?;
+    unsafe { set_var("PATH", p) };
 
     Ok(())
 }
