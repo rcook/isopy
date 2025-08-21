@@ -22,6 +22,7 @@
 use crate::bool_util::str_to_bool;
 use anyhow::{Result, bail};
 use std::env::{VarError, remove_var, set_var, var};
+use std::ffi::OsStr;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::sync::LazyLock;
@@ -56,7 +57,7 @@ impl EnvKey {
     }
 
     pub(crate) fn set(self, s: &str) {
-        unsafe { set_var(self.name(), s) };
+        unsafe_set_var(self.name(), s);
     }
 
     pub(crate) fn is_present(self) -> bool {
@@ -144,8 +145,8 @@ impl Action {
     fn run(&self) {
         match &self.op {
             Op::DoNothing => {}
-            Op::SetVar(value) => unsafe { set_var(&self.key, value) },
-            Op::RemoveVar => unsafe { remove_var(&self.key) },
+            Op::SetVar(value) => unsafe_set_var(&self.key, value),
+            Op::RemoveVar => unsafe_remove_var(&self.key),
         }
     }
 }
@@ -171,5 +172,17 @@ pub(crate) fn read_env(key: EnvKey) -> Result<Option<String>> {
         Ok(s) => Ok(Some(s)),
         Err(VarError::NotPresent) => Ok(None),
         Err(e) => bail!(e),
+    }
+}
+
+fn unsafe_remove_var<K: AsRef<OsStr>>(key: K) {
+    unsafe {
+        remove_var(key);
+    }
+}
+
+fn unsafe_set_var<K: AsRef<OsStr>, V: AsRef<OsStr>>(key: K, value: V) {
+    unsafe {
+        set_var(key, value);
     }
 }
