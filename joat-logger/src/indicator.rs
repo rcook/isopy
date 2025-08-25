@@ -32,16 +32,13 @@ pub struct Indicator {
 
 impl Indicator {
     pub(crate) fn new(len: Option<OpProgress>) -> Result<Self> {
-        let (progress_bar, template) = match len {
-            Some(n) => (
+        let (progress_bar, template) = len.map_or_else(|| (
+                ProgressBar::new_spinner(),
+                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}"
+            ),|n| (
                 ProgressBar::new(n),
                 "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
-            ),
-            None => (
-                ProgressBar::new_spinner(),
-                "[{elapsed_precise:.green}]  {spinner:.cyan/blue}           {wide_msg:.yellow}",
-            ),
-        };
+            ));
 
         progress_bar.set_style(
             ProgressStyle::with_template(template)

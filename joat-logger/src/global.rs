@@ -34,6 +34,7 @@ pub fn init_ui(enable_logger: bool) -> Result<()> {
         "global UI object has already been initialized"
     );
     *writer = Some(Ui::new(enable_logger)?);
+    drop(writer);
     Ok(())
 }
 

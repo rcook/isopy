@@ -40,6 +40,7 @@ impl State {
         *writer = None;
         let indicator = Arc::new(Indicator::new(len)?);
         *writer = Some(Arc::clone(&indicator));
+        drop(writer);
         Ok(indicator)
     }
 
