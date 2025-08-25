@@ -16,12 +16,12 @@ anyhow = "1.0.99"
 async-trait = "0.1.89"
 isopy-lib = { path = "../isopy-lib" }
 log = "0.4.27"
-percent-encoding = "2.3.1"
+percent-encoding = "2.3.2"
 reqwest = { version = "0.12.23", features = ["stream"] }
 serde = "1.0.219"
-serde_json = "1.0.142"
+serde_json = "1.0.143"
 tokio = { version = "1.47.1", features = ["full"] }
-url = { version = "2.5.4", features = ["serde"] }
+url = { version = "2.5.7", features = ["serde"] }
 
 [dev-dependencies]
 rstest = "0.25.0"
