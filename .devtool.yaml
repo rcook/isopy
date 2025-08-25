@@ -4,4 +4,7 @@ cargo_toml_paths:
   - isopy-go/Cargo.toml
   - isopy-java/Cargo.toml
   - isopy-lib/Cargo.toml
+  - isopy-logging/Cargo.toml
   - isopy-python/Cargo.toml
+  - isopy-repo/Cargo.toml
+  - isopy-util/Cargo.toml
