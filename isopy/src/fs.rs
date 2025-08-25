@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Result;
-use joatmon::{FileReadError, HasOtherError, YamlError};
+use isopy_util::{FileReadError, HasOtherError, YamlError};
 use std::path::Path;
 
 pub(crate) fn existing<T>(result: Result<T>) -> Result<Option<T>> {

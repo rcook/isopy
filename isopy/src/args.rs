@@ -29,7 +29,7 @@ use crate::wrapper_file_name::WrapperFileName;
 use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell as ClapCompleteShell;
 use isopy_lib::{Platform as IsopyLibPlatform, Shell as IsopyLibShell, SourceFilter};
-use joat_repo::MetaId;
+use isopy_repo::MetaId;
 use log::LevelFilter;
 use path_absolutize::Absolutize;
 use std::path::PathBuf;

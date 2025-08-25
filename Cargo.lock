@@ -1369,10 +1369,10 @@ dependencies = [
  "isopy-go",
  "isopy-java",
  "isopy-lib",
+ "isopy-logging",
  "isopy-python",
- "joat-logger",
- "joat-repo",
- "joatmon",
+ "isopy-repo",
+ "isopy-util",
  "log",
  "open",
  "openssl-sys",
@@ -1444,6 +1444,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "isopy-logging"
+version = "0.5.9"
+dependencies = [
+ "indicatif",
+ "log",
+ "uuid",
+]
+
+[[package]]
 name = "isopy-python"
 version = "0.5.9"
 dependencies = [
@@ -1461,31 +1470,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itoa"
-version = "1.0.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
-
-[[package]]
-name = "joat-logger"
-version = "0.5.9"
-dependencies = [
- "indicatif",
- "log",
- "uuid",
-]
-
-[[package]]
-name = "joat-repo"
+name = "isopy-repo"
 version = "0.5.9"
 dependencies = [
  "anyhow",
@@ -1495,7 +1480,7 @@ dependencies = [
  "colored 2.2.0",
  "fslock",
  "home",
- "joatmon",
+ "isopy-util",
  "log",
  "md5",
  "path-absolutize",
@@ -1508,7 +1493,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "joatmon"
+name = "isopy-util"
 version = "0.5.9"
 dependencies = [
  "anyhow",
@@ -1523,6 +1508,21 @@ dependencies = [
  "toml",
  "toml_edit",
 ]
+
+[[package]]
+name = "itertools"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itoa"
+version = "1.0.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "jobserver"

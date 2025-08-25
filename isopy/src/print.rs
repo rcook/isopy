@@ -26,7 +26,7 @@ use crate::serialization::Env;
 use crate::table::{Table, TableSettings, table_columns, table_divider, table_line, table_title};
 use anyhow::Result;
 use colored::Color;
-use joat_repo::{DirInfo, Link, Manifest, Repo};
+use isopy_repo::{DirInfo, Link, Manifest, Repo};
 
 pub(crate) fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {

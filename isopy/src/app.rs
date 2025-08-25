@@ -31,8 +31,8 @@ use isopy_lib::{
     EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
     Version,
 };
-use joat_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
-use joatmon::{FileReadError, HasOtherError, YamlError, read_yaml_file, safe_write_file};
+use isopy_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
+use isopy_util::{FileReadError, HasOtherError, YamlError, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fs::File;
@@ -204,7 +204,7 @@ impl App {
 
     pub(crate) fn find_link(&self, link_id: &LinkId) -> RepoResult<Option<Link>> {
         // THIS IS A TEMPORARY HACK!
-        // joat-repo-rs needs a method to get a DirInfo given a link ID or something
+        // isopy-repo needs a method to get a DirInfo given a link ID or something
         for link in self.repo.list_links()? {
             if link.link_id() == link_id {
                 return Ok(Some(link));

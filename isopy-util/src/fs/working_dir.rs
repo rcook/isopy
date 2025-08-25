@@ -78,7 +78,7 @@ mod tests {
     #[test]
     #[serial]
     fn test_drop() -> Result<()> {
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let original_dir = current_dir()?;
         assert_ne!(normalize_dir(temp_dir.path()), normalize_dir(&original_dir));
         let working_dir = WorkingDirectory::change(temp_dir.path())?;
@@ -94,7 +94,7 @@ mod tests {
     #[test]
     #[serial]
     fn test_close_then_drop() -> Result<()> {
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let original_dir = current_dir()?;
         assert_ne!(normalize_dir(temp_dir.path()), normalize_dir(&original_dir));
         let mut working_dir = WorkingDirectory::change(temp_dir.path())?;

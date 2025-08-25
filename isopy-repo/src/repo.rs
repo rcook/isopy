@@ -31,7 +31,7 @@ use crate::shared_path::SharedPath;
 use crate::trash::Trash;
 use chrono::Utc;
 use fslock::LockFile;
-use joatmon::{FileReadError, HasOtherError, read_text_file, read_yaml_file, safe_write_file};
+use isopy_util::{FileReadError, HasOtherError, read_text_file, read_yaml_file, safe_write_file};
 use path_absolutize::Absolutize;
 use std::fs::{read_dir, remove_dir_all, remove_file};
 use std::path::{Path, PathBuf};

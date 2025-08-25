@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use anyhow::Error as AnyhowError;
-use joatmon::HasOtherError;
+use isopy_util::HasOtherError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};

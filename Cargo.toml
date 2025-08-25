@@ -10,9 +10,9 @@ members = [
   "isopy-go",
   "isopy-java",
   "isopy-lib",
+  "isopy-logging",
   "isopy-python",
-  "joat-logger",
-  "joat-repo",
-  "joatmon",
+  "isopy-repo",
+  "isopy-util",
 ]
 resolver = "2"

@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn test_read_toml_file_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let path = temp_dir.path().join("file.toml");
         write(&path, "message = \"hello-world\"")?;
 
@@ -187,7 +187,7 @@ mod tests {
     #[test]
     fn test_read_toml_file_invalid_fails() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let path = temp_dir.path().join("file.toml");
         write(&path, "xxx{\"message\": \"hello-world\"}")?;
 
@@ -209,19 +209,19 @@ mod tests {
     #[test]
     fn test_read_toml_file_edit_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let path = temp_dir.path().join("file.toml");
         let cargo_toml = r#"[package]
-name = "joatmon"
+name = "isopy-util"
 version = "0.0.0"
 edition = "2021"
 
 [lib]
-name = "joatmon"
+name = "isopy-util"
 path = "src/lib/mod.rs"
 
 [[bin]]
-name = "joatmon"
+name = "isopy-util"
 path = "src/bin/main.rs"
 
 [dependencies]
@@ -249,7 +249,7 @@ toml_edit = "0.19.8"
     #[test]
     fn test_read_toml_file_edit_invalid_fails() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let path = temp_dir.path().join("file.toml");
         write(&path, "xxx{\"message\": \"hello-world\"}")?;
 

@@ -24,10 +24,10 @@ futures-util = "0.3.31"
 isopy-go = { path = "../isopy-go" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
+isopy-logging = { path = "../isopy-logging" }
 isopy-python = { path = "../isopy-python" }
-joat-logger = { path = "../joat-logger" }
-joat-repo = { path = "../joat-repo" }
-joatmon = { path = "../joatmon" }
+isopy-repo = { path = "../isopy-repo" }
+isopy-util = { path = "../isopy-util" }
 log = { version = "0.4.27", features = ["std"] }
 open = "5.3.2"
 path-absolutize = "3.1.1"

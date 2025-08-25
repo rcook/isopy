@@ -22,7 +22,7 @@
 use crate::error::RepoError;
 use crate::repo::Repo;
 use crate::result::RepoResult;
-use joatmon::{read_yaml_file, safe_write_file};
+use isopy_util::{read_yaml_file, safe_write_file};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -67,7 +67,7 @@ mod tests {
 
     #[test]
     fn default() -> Result<()> {
-        let base_dir = TempDir::new("joat-repo-test")?;
+        let base_dir = TempDir::new("isopy-repo-test")?;
         let c = RepoConfig::default(base_dir.path(), None);
         assert_eq!(base_dir.path().join(".lock"), c.lock_path);
         assert_eq!(base_dir.path().join("config.yaml"), c.config_path);
@@ -79,7 +79,7 @@ mod tests {
 
     #[test]
     fn prefix() -> Result<()> {
-        let base_dir = TempDir::new("joat-repo-test")?;
+        let base_dir = TempDir::new("isopy-repo-test")?;
         let c = RepoConfig::default(base_dir.path(), Some("foo"));
         assert_eq!(base_dir.path().join(".foo-lock"), c.lock_path);
         assert_eq!(base_dir.path().join("foo-config.yaml"), c.config_path);

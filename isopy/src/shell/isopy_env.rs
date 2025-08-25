@@ -21,7 +21,7 @@
 //
 use crate::env::EnvKey;
 use anyhow::{Result, bail};
-use joat_repo::{DirInfo, LinkId, MetaId};
+use isopy_repo::{DirInfo, LinkId, MetaId};
 use std::env::VarError;
 
 #[derive(Clone, Debug)]

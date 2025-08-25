@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn no_conflict() -> Result<()> {
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let path = temp_dir.path().join("file.ext");
         write(&path, "CONTENT")?;
 
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn conflict() -> Result<()> {
-        let temp_dir = TempDir::new("joatmon-test")?;
+        let temp_dir = TempDir::new("isopy-util-test")?;
         let path1 = temp_dir.path().join("file.ext");
 
         // Deliberately conflicting file name
