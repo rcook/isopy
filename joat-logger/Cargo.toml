@@ -1,15 +1,15 @@
 [package]
 authors = ["Richard Cook"]
 categories = ["development-tools"]
-description = "Logger and progress indicator"
-edition = "2021"
-homepage = "https://github.com/rcook/joat-logger-rs/"
+description = "Isolated Python Tool - Logger and Progress Indicator"
+edition = "2024"
+homepage = "https://rcook.github.io/isopy"
 keywords = ["logging"]
 license = "MIT"
 name = "joat-logger"
-readme = "README.md"
-repository = "https://github.com/rcook/joat-logger-rs.git"
-version = "0.0.5"
+readme = "../README.md"
+repository = "https://github.com/rcook/isopy.git"
+version = "0.5.9"
 
 [dependencies]
 indicatif = "0.17.8"

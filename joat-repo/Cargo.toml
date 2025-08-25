@@ -1,15 +1,15 @@
 [package]
 authors = ["Richard Cook"]
 categories = ["filesystem"]
-description = "Metadirectory repositories"
-edition = "2021"
-homepage = "https://github.com/rcook/joat-repo-rs"
+description = "Isolated Python Tool - Metadirectory Repositories"
+edition = "2024"
+homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
 name = "joat-repo"
-readme = "README.md"
-repository = "https://github.com/rcook/joat-repo-rs.git"
-version = "0.0.12"
+readme = "../README.md"
+repository = "https://github.com/rcook/isopy.git"
+version = "0.5.9"
 
 [features]
 example-bin = ["clap", "color-backtrace", "colored", "home", "log"]

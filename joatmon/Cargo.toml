@@ -1,15 +1,15 @@
 [package]
 authors = ["Richard Cook"]
 categories = ["encoding", "filesystem"]
-description = "Jack of All Trades Master of None"
-edition = "2021"
-homepage = "https://github.com/rcook/joatmon-rs"
+description = "Isolated Python Tool - Utility Functions"
+edition = "2024"
+homepage = "https://rcook.github.io/isopy"
 keywords = ["general"]
 license = "MIT"
 name = "joatmon"
-readme = "README.md"
-repository = "https://github.com/rcook/joatmon-rs.git"
-version = "0.0.34"
+readme = "../README.md"
+repository = "https://github.com/rcook/isopy.git"
+version = "0.5.9"
 
 [dependencies]
 anyhow = "1.0.81"

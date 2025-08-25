@@ -1477,7 +1477,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 
 [[package]]
 name = "joat-logger"
-version = "0.0.5"
+version = "0.5.9"
 dependencies = [
  "indicatif",
  "lazy_static",
@@ -1487,7 +1487,7 @@ dependencies = [
 
 [[package]]
 name = "joat-repo"
-version = "0.0.12"
+version = "0.5.9"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1510,7 +1510,7 @@ dependencies = [
 
 [[package]]
 name = "joatmon"
-version = "0.0.34"
+version = "0.5.9"
 dependencies = [
  "anyhow",
  "chrono",
