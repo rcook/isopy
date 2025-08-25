@@ -23,7 +23,7 @@ use crate::error::HasOtherError;
 use anyhow::Error as AnyhowError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
-use std::fs::{read, read_to_string, File};
+use std::fs::{File, read, read_to_string};
 use std::io::Error as IOError;
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -152,7 +152,7 @@ pub fn read_bytes(path: &Path) -> StdResult<Vec<u8>, FileReadError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{open_file, read_bytes, read_text_file, FileReadErrorKind};
+    use super::{FileReadErrorKind, open_file, read_bytes, read_text_file};
     use anyhow::Result;
     use std::fs::write;
     use std::io::Read;

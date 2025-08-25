@@ -163,11 +163,11 @@ pub fn read_toml_file_edit(path: &Path) -> StdResult<DocumentMut, TomlError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{read_toml_file, read_toml_file_edit, TomlErrorKind};
+    use super::{TomlErrorKind, read_toml_file, read_toml_file_edit};
     use anyhow::Result;
     use std::fs::write;
     use tempdir::TempDir;
-    use toml::{toml, Value};
+    use toml::{Value, toml};
 
     #[test]
     fn test_read_toml_file_succeeds() -> Result<()> {

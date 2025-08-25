@@ -34,16 +34,16 @@
 mod cli;
 
 use crate::cli::{
-    do_find, do_info, do_init, do_link, do_list, do_purge, do_read, do_remove, do_show, do_trash,
-    do_write, Args, Logger, Status, Subcommand,
+    Args, Logger, Status, Subcommand, do_find, do_info, do_init, do_link, do_list, do_purge,
+    do_read, do_remove, do_show, do_trash, do_write,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use clap::Parser;
 use joat_repo::{Repo, RepoConfig};
 use log::error;
-use log::{set_logger, set_max_level, LevelFilter};
+use log::{LevelFilter, set_logger, set_max_level};
 use path_absolutize::Absolutize;
-use std::env::{current_dir, set_var, var, VarError};
+use std::env::{VarError, current_dir, set_var, var};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 

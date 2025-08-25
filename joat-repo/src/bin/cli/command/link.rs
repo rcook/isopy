@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use super::super::util::print_data_dir;
-use super::super::{prompt, Status};
+use super::super::{Status, prompt};
 use anyhow::Result;
 use joat_repo::{MetaId, Repo};
 use log::error;

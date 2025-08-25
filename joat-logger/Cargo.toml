@@ -16,3 +16,10 @@ indicatif = "0.17.8"
 lazy_static = "1.4.0"
 log = { version = "0.4.21", features = ["std"] }
 uuid = { version = "1.8.0", features = ["v4"] }
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+nursery = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }

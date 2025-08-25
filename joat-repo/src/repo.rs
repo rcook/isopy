@@ -31,7 +31,7 @@ use crate::shared_path::SharedPath;
 use crate::trash::Trash;
 use chrono::Utc;
 use fslock::LockFile;
-use joatmon::{read_text_file, read_yaml_file, safe_write_file, FileReadError, HasOtherError};
+use joatmon::{FileReadError, HasOtherError, read_text_file, read_yaml_file, safe_write_file};
 use path_absolutize::Absolutize;
 use std::fs::{read_dir, remove_dir_all, remove_file};
 use std::path::{Path, PathBuf};
@@ -95,10 +95,10 @@ impl Repo {
         if self.config.links_dir.is_dir() {
             for entry_opt in read_dir(&self.config.links_dir).map_err(RepoError::other)? {
                 let entry = entry_opt.map_err(RepoError::other)?;
-                if entry.path().is_file() {
-                    if let Some(link) = self.read_link_from_link_path(&entry.path())? {
-                        links.push(link);
-                    }
+                if entry.path().is_file()
+                    && let Some(link) = self.read_link_from_link_path(&entry.path())?
+                {
+                    links.push(link);
                 }
             }
         }
@@ -215,7 +215,7 @@ impl Repo {
             Ok(link_record) => Ok(Some(Link::new(link_path.to_path_buf(), link_record))),
             Err(e)
                 if e.downcast_other_ref::<FileReadError>()
-                    .map_or(false, FileReadError::is_not_found) =>
+                    .is_some_and(FileReadError::is_not_found) =>
             {
                 Ok(None)
             }

@@ -24,12 +24,12 @@ use crate::op::OpProgress;
 use crate::result::Result;
 use std::sync::{Arc, RwLock};
 
-pub(crate) struct State {
+pub struct State {
     indicator: RwLock<Option<Arc<Indicator>>>,
 }
 
 impl State {
-    pub(crate) fn new() -> Self {
+    pub(crate) const fn new() -> Self {
         Self {
             indicator: RwLock::new(None),
         }
@@ -45,18 +45,18 @@ impl State {
 
     pub(crate) fn release_indicator(&self, indicator: &Arc<Indicator>) {
         let mut writer = self.indicator.write().expect("lock is poisoned");
-        if let Some(i) = &*writer {
-            if indicator.id() == i.id() {
-                *writer = None
-            }
+        if let Some(i) = &*writer
+            && indicator.id() == i.id()
+        {
+            *writer = None;
         }
     }
 
     pub(crate) fn print(&self, s: &str) {
         if let Some(i) = &*self.indicator.read().expect("lock is poisoned") {
-            i.print(s)
+            i.print(s);
         } else {
-            println!("{}", s)
+            println!("{s}");
         }
     }
 }

@@ -37,11 +37,11 @@ mod fs;
 
 pub use self::error::HasOtherError;
 pub use self::formats::{
-    read_json_file, read_toml_file, read_toml_file_edit, read_yaml_file, JsonError, JsonErrorKind,
-    TomlError, TomlErrorKind, YamlError, YamlErrorKind,
+    JsonError, JsonErrorKind, TomlError, TomlErrorKind, YamlError, YamlErrorKind, read_json_file,
+    read_toml_file, read_toml_file_edit, read_yaml_file,
 };
 pub use self::fs::{
+    FileReadError, FileReadErrorKind, FileWriteError, FileWriteErrorKind, WorkingDirectory,
     file_name_safe_timestamp, find_sentinel_dir, find_sentinel_file, label_file_name, open_file,
-    read_bytes, read_text_file, safe_back_up, safe_create_file, safe_write_file, FileReadError,
-    FileReadErrorKind, FileWriteError, FileWriteErrorKind, WorkingDirectory,
+    read_bytes, read_text_file, safe_back_up, safe_create_file, safe_write_file,
 };

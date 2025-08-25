@@ -21,7 +21,7 @@
 //
 use super::paths::{file_name_safe_timestamp, label_file_name};
 use chrono::{DateTime, Utc};
-use std::fs::{copy, OpenOptions};
+use std::fs::{OpenOptions, copy};
 use std::io::{ErrorKind as IOErrorKind, Result as IOResult};
 use std::path::{Path, PathBuf};
 

@@ -23,12 +23,12 @@ use crate::state::State;
 use log::{Log, Metadata, Record};
 use std::sync::Arc;
 
-pub(crate) struct Logger {
+pub struct Logger {
     state: Arc<State>,
 }
 
 impl Logger {
-    pub(crate) fn new(state: Arc<State>) -> Self {
+    pub(crate) const fn new(state: Arc<State>) -> Self {
         Self { state }
     }
 }
@@ -42,6 +42,6 @@ impl Log for Logger {
 
     fn log(&self, record: &Record) {
         self.state
-            .print(&format!("{} - {}", record.level(), record.args()))
+            .print(&format!("{} - {}", record.level(), record.args()));
     }
 }

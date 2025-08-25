@@ -23,7 +23,7 @@ use anyhow::Result;
 use colored::Colorize;
 use joat_repo::{DirInfo, Link, Manifest};
 use std::fmt::Display;
-use std::io::{stdin, stdout, Write};
+use std::io::{Write, stdin, stdout};
 
 pub fn prompt(message: &str) -> Result<String> {
     print!("{message}: ");

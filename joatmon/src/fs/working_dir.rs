@@ -41,7 +41,7 @@ impl WorkingDirectory {
         if let Some(ref d) = self.saved_dir {
             set_current_dir(d)?;
             self.saved_dir = None;
-        };
+        }
         Ok(())
     }
 }

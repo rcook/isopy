@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::super::util::{print_link, print_manifest};
 use super::super::Status;
+use super::super::util::{print_link, print_manifest};
 use anyhow::Result;
 use joat_repo::{Repo, Trash};
 use log::info;

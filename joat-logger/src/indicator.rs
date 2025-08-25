@@ -25,7 +25,7 @@ use crate::result::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use uuid::Uuid;
 
-pub(crate) struct Indicator {
+pub struct Indicator {
     id: Uuid,
     progress_bar: ProgressBar,
 }
@@ -54,19 +54,19 @@ impl Indicator {
         })
     }
 
-    pub(crate) fn id(&self) -> &Uuid {
+    pub(crate) const fn id(&self) -> &Uuid {
         &self.id
     }
 
     pub(crate) fn set_progress(&self, value: OpProgress) {
-        self.progress_bar.set_position(value)
+        self.progress_bar.set_position(value);
     }
 
     pub(crate) fn set_message(&self, s: &str) {
-        self.progress_bar.set_message(String::from(s))
+        self.progress_bar.set_message(String::from(s));
     }
 
     pub(crate) fn print(&self, s: &str) {
-        self.progress_bar.println(s)
+        self.progress_bar.println(s);
     }
 }

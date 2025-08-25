@@ -34,6 +34,7 @@ pub struct ManifestRecord {
 #[derive(Clone, Debug)]
 pub struct Manifest {
     data_dir: PathBuf,
+    #[allow(clippy::struct_field_names)]
     manifest_path: PathBuf,
     record: ManifestRecord,
 }

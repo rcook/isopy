@@ -25,3 +25,10 @@ toml_edit = "0.22.9"
 serial_test = "3.0.0"
 rstest = "0.18.2"
 tempdir = "0.3.7"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+nursery = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }

@@ -33,26 +33,26 @@ pub struct Op {
 impl Op {
     #[allow(unused)]
     pub fn set_progress(&self, value: OpProgress) {
-        self.indicator.set_progress(value)
+        self.indicator.set_progress(value);
     }
 
     #[allow(unused)]
     pub fn set_message(&self, s: &str) {
-        self.indicator.set_message(s)
+        self.indicator.set_message(s);
     }
 
     #[allow(unused)]
     pub fn print(&self, s: &str) {
-        self.indicator.print(s)
+        self.indicator.print(s);
     }
 
-    pub(crate) fn new(state: Arc<State>, indicator: Arc<Indicator>) -> Self {
+    pub(crate) const fn new(state: Arc<State>, indicator: Arc<Indicator>) -> Self {
         Self { state, indicator }
     }
 }
 
 impl Drop for Op {
     fn drop(&mut self) {
-        self.state.release_indicator(&self.indicator)
+        self.state.release_indicator(&self.indicator);
     }
 }

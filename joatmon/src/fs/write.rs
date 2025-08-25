@@ -23,7 +23,7 @@ use crate::error::HasOtherError;
 use anyhow::Error as AnyhowError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
-use std::fs::{create_dir_all, write, File, OpenOptions};
+use std::fs::{File, OpenOptions, create_dir_all, write};
 use std::io::{Error as IOError, Write};
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -153,7 +153,7 @@ fn ensure_dir(file_path: &Path) -> StdResult<(), FileWriteError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{safe_create_file, safe_write_file, FileWriteErrorKind};
+    use super::{FileWriteErrorKind, safe_create_file, safe_write_file};
     use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;

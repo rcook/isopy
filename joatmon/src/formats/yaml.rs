@@ -121,9 +121,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{read_yaml_file, YamlErrorKind};
-    use crate::error::HasOtherError;
+    use super::{YamlErrorKind, read_yaml_file};
     use crate::FileReadError;
+    use crate::error::HasOtherError;
     use anyhow::Result;
     use serde_yaml::Value;
     use std::fs::write;
@@ -187,10 +187,11 @@ mod tests {
         assert!(e.is_other());
         let message = format!("{e}");
         assert!(message.contains(path.to_str().expect("must be valid string")));
-        assert!(e
-            .downcast_other_ref::<FileReadError>()
-            .expect("must be Some")
-            .is_not_found());
+        assert!(
+            e.downcast_other_ref::<FileReadError>()
+                .expect("must be Some")
+                .is_not_found()
+        );
 
         Ok(())
     }

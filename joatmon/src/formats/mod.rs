@@ -23,6 +23,6 @@ mod json;
 mod toml;
 mod yaml;
 
-pub use self::json::{read_json_file, JsonError, JsonErrorKind};
-pub use self::toml::{read_toml_file, read_toml_file_edit, TomlError, TomlErrorKind};
-pub use self::yaml::{read_yaml_file, YamlError, YamlErrorKind};
+pub use self::json::{JsonError, JsonErrorKind, read_json_file};
+pub use self::toml::{TomlError, TomlErrorKind, read_toml_file, read_toml_file_edit};
+pub use self::yaml::{YamlError, YamlErrorKind, read_yaml_file};

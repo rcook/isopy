@@ -55,6 +55,6 @@ impl Ui {
 
     #[allow(unused)]
     pub fn print(&self, msg: &str) {
-        self.state.print(msg)
+        self.state.print(msg);
     }
 }

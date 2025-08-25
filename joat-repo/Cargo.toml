@@ -41,3 +41,10 @@ uuid = { version = "1.8.0", features = ["v4", "serde"] }
 [dev-dependencies]
 rstest = "0.18.2"
 tempdir = "0.3.7"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+nursery = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
