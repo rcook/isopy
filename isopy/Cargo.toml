@@ -25,9 +25,9 @@ isopy-go = { path = "../isopy-go" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
-joat-logger = "0.0.5"
-joat-repo = "0.0.12"
-joatmon = "0.0.34"
+joat-logger = { path = "../joat-logger" }
+joat-repo = { path = "../joat-repo" }
+joatmon = { path = "../joatmon" }
 log = { version = "0.4.27", features = ["std"] }
 open = "5.3.2"
 path-absolutize = "3.1.1"

@@ -11,5 +11,8 @@ members = [
   "isopy-java",
   "isopy-lib",
   "isopy-python",
+  "joat-logger",
+  "joat-repo",
+  "joatmon",
 ]
 resolver = "2"

@@ -1,0 +1,18 @@
+[package]
+authors = ["Richard Cook"]
+categories = ["development-tools"]
+description = "Logger and progress indicator"
+edition = "2021"
+homepage = "https://github.com/rcook/joat-logger-rs/"
+keywords = ["logging"]
+license = "MIT"
+name = "joat-logger"
+readme = "README.md"
+repository = "https://github.com/rcook/joat-logger-rs.git"
+version = "0.0.5"
+
+[dependencies]
+indicatif = "0.17.8"
+lazy_static = "1.4.0"
+log = { version = "0.4.21", features = ["std"] }
+uuid = { version = "1.8.0", features = ["v4"] }
