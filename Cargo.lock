@@ -1480,7 +1480,6 @@ name = "joat-logger"
 version = "0.5.9"
 dependencies = [
  "indicatif",
- "lazy_static",
  "log",
  "uuid",
 ]

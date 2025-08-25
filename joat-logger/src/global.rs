@@ -22,12 +22,9 @@
 use crate::op::{Op, OpProgress};
 use crate::result::Result;
 use crate::ui::Ui;
-use lazy_static::lazy_static;
-use std::sync::RwLock;
+use std::sync::{LazyLock, RwLock};
 
-lazy_static! {
-    static ref GLOBAL: RwLock<Option<Ui>> = RwLock::new(None);
-}
+static GLOBAL: LazyLock<RwLock<Option<Ui>>> = LazyLock::new(|| RwLock::new(None));
 
 #[allow(unused)]
 pub fn init_ui(enable_logger: bool) -> Result<()> {
