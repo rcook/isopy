@@ -22,7 +22,7 @@
 use crate::app::App;
 use crate::args::PromptConfig;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::existing;
+use crate::fs::util::existing;
 use crate::shell::IsopyEnv;
 use crate::status::{StatusResult, success};
 

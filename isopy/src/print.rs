@@ -21,7 +21,7 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::existing;
+use crate::fs::util::existing;
 use crate::repo::{DirInfo, Link, Manifest, Repo};
 use crate::serialization::Env;
 use crate::table::{Table, TableSettings, table_columns, table_divider, table_line, table_title};

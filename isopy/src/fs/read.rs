@@ -49,7 +49,7 @@ impl FileReadError {
         match self.0 {
             FileReadErrorImpl::IsADirectory(_) => FileReadErrorKind::IsADirectory,
             FileReadErrorImpl::NotFound(_) => FileReadErrorKind::NotFound,
-            _ => FileReadErrorKind::Other,
+            FileReadErrorImpl::Other(_) => FileReadErrorKind::Other,
         }
     }
 
@@ -79,7 +79,7 @@ impl FileReadError {
     }
 
     fn convert(e: IOError, path: &Path) -> Self {
-        use std::io::ErrorKind::{self, *};
+        use std::io::ErrorKind::{self, NotFound};
 
         #[cfg(target_os = "windows")]
         fn is_is_a_directory(kind: ErrorKind, path: &Path) -> bool {
@@ -152,7 +152,7 @@ pub fn read_bytes(path: &Path) -> StdResult<Vec<u8>, FileReadError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{FileReadErrorKind, open_file, read_bytes, read_text_file};
+    use crate::fs::{FileReadErrorKind, open_file, read_bytes, read_text_file};
     use anyhow::Result;
     use std::fs::write;
     use std::io::Read;

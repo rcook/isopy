@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::error::HasOtherError;
 use crate::repo::SharedPath;
 use anyhow::Error as AnyhowError;
-use isopy_util::HasOtherError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};

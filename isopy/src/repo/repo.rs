@@ -19,6 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::error::HasOtherError;
+use crate::formats::read_yaml_file;
+use crate::fs::{FileReadError, read_text_file, safe_write_file};
 use crate::repo::config::RepoConfig;
 use crate::repo::dir_info::DirInfo;
 use crate::repo::error::RepoError;
@@ -31,7 +34,6 @@ use crate::repo::shared_path::SharedPath;
 use crate::repo::trash::Trash;
 use chrono::Utc;
 use fslock::LockFile;
-use isopy_util::{FileReadError, HasOtherError, read_text_file, read_yaml_file, safe_write_file};
 use path_absolutize::Absolutize;
 use std::fs::{read_dir, remove_dir_all, remove_file};
 use std::path::{Path, PathBuf};

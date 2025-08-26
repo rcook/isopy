@@ -25,6 +25,7 @@ use std::fmt::{Debug, Display};
 /// present, via downcasting
 pub trait HasOtherError {
     /// Returns `true` if error wraps an inner error; `false` otherwise
+    #[allow(unused)]
     fn is_other(&self) -> bool;
 
     /// Attempt to downcast to type `E` if error wraps an inner error;

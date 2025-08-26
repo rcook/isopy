@@ -49,7 +49,7 @@ impl TomlError {
     pub const fn kind(&self) -> TomlErrorKind {
         match self.0 {
             TomlErrorImpl::Syntax { .. } => TomlErrorKind::Syntax,
-            _ => TomlErrorKind::Other,
+            TomlErrorImpl::Other(_) => TomlErrorKind::Other,
         }
     }
 
@@ -163,7 +163,7 @@ pub fn read_toml_file_edit(path: &Path) -> StdResult<DocumentMut, TomlError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{TomlErrorKind, read_toml_file, read_toml_file_edit};
+    use crate::formats::toml::{TomlErrorKind, read_toml_file, read_toml_file_edit};
     use anyhow::Result;
     use std::fs::write;
     use tempdir::TempDir;

@@ -11,6 +11,5 @@ members = [
   "isopy-java",
   "isopy-lib",
   "isopy-python",
-  "isopy-util",
 ]
 resolver = "2"

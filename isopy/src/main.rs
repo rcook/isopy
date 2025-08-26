@@ -28,6 +28,8 @@ mod constants;
 mod date_time_format;
 mod dir_info_ext;
 mod env;
+mod error;
+mod formats;
 mod fs;
 mod moniker;
 mod package_id;

@@ -21,13 +21,13 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::{ensure_file_executable_mode, is_executable_file};
+use crate::fs::safe_write_file;
+use crate::fs::util::{ensure_file_executable_mode, is_executable_file};
 use crate::repo::DirInfo;
 use crate::status::{StatusResult, success, user_error};
 use crate::wrapper_file_name::WrapperFileName;
 use anyhow::{Result, anyhow, bail};
 use isopy_lib::{Platform, Shell, env_var_substitution, join_paths, render_absolute_path};
-use isopy_util::safe_write_file;
 use log::info;
 use path_absolutize::Absolutize;
 use serde::Serialize;

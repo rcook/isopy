@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::existing;
+use crate::fs::util::existing;
 use crate::status::{StatusResult, success, user_error};
 use isopy_lib::{
     DownloadPackageOptionsBuilder, GetPackageOptionsBuilder, InstallPackageOptionsBuilder,

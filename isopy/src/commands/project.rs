@@ -20,7 +20,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::existing;
+use crate::fs::util::existing;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
 use crate::status::{StatusResult, success, user_error};

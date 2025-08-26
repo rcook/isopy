@@ -27,20 +27,21 @@ isopy-go = { path = "../isopy-go" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
-isopy-util = { path = "../isopy-util" }
 log = { version = "0.4.27", features = ["std"] }
 md5 = "0.7.0"
 open = "5.3.2"
 path-absolutize = "3.1.1"
 reqwest = { version = "0.12.23", features = ["stream"] }
 serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.143"
 serde_yaml = "0.9.34"
 strum = "0.27.2"
 strum_macros = "0.27.2"
-tempdir = "0.3.7"
 thiserror = "1.0.69"
 tinytemplate = "1.2.1"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
+toml = "0.9.5"
+toml_edit = "0.23.4"
 url = { version = "2.5.7", features = ["serde"] }
 uuid = { version = "1.18.0", features = ["v4", "serde"] }
 
@@ -56,6 +57,8 @@ sysinfo = "0.35.2"
 
 [dev-dependencies]
 rstest = "0.25.0"
+serial_test = "3.2.0"
+tempdir = "0.3.7"
 
 [lints.clippy]
 all = { level = "deny", priority = -1 }

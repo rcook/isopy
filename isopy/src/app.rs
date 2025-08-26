@@ -21,6 +21,9 @@
 //
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
+use crate::error::HasOtherError;
+use crate::formats::{YamlError, read_yaml_file};
+use crate::fs::{FileReadError, safe_write_file};
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
@@ -32,7 +35,6 @@ use isopy_lib::{
     EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
     Version,
 };
-use isopy_util::{FileReadError, HasOtherError, YamlError, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::fs::File;

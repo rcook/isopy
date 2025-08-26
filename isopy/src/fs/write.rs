@@ -47,7 +47,7 @@ impl FileWriteError {
     pub const fn kind(&self) -> FileWriteErrorKind {
         match self.0 {
             FileWriteErrorImpl::AlreadyExists(_) => FileWriteErrorKind::AlreadyExists,
-            _ => FileWriteErrorKind::Other,
+            FileWriteErrorImpl::Other(_) => FileWriteErrorKind::Other,
         }
     }
 
@@ -71,7 +71,8 @@ impl FileWriteError {
     }
 
     fn convert(e: IOError, path: &Path) -> Self {
-        use std::io::ErrorKind::*;
+        use std::io::ErrorKind::AlreadyExists;
+
         match e.kind() {
             AlreadyExists => Self(FileWriteErrorImpl::AlreadyExists(path.to_path_buf())),
             _ => Self::other(e),
@@ -153,7 +154,7 @@ fn ensure_dir(file_path: &Path) -> StdResult<(), FileWriteError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{FileWriteErrorKind, safe_create_file, safe_write_file};
+    use crate::fs::{FileWriteErrorKind, safe_create_file, safe_write_file};
     use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;

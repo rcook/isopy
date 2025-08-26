@@ -25,6 +25,7 @@ use std::fs::{OpenOptions, copy};
 use std::io::{ErrorKind as IOErrorKind, Result as IOResult};
 use std::path::{Path, PathBuf};
 
+#[allow(unused)]
 pub fn safe_back_up(path: &Path) -> IOResult<PathBuf> {
     safe_back_up_inner(path, None)
 }

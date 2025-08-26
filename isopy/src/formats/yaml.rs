@@ -23,7 +23,7 @@ use crate::error::HasOtherError;
 use crate::fs::read_text_file;
 use anyhow::Error as AnyhowError;
 use serde::de::DeserializeOwned;
-use serde_json::Error as SerdeJsonError;
+use serde_yaml::{Error as SerdeYamlError, Location};
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};
@@ -33,83 +33,54 @@ use thiserror::Error;
 #[allow(unused)]
 #[derive(Debug, PartialEq)]
 #[non_exhaustive]
-pub enum JsonErrorKind {
-    Data,
-    Eof,
-    Io,
+pub enum YamlErrorKind {
     Syntax,
     Other,
 }
 
 #[derive(Debug, Error)]
 #[error(transparent)]
-pub struct JsonError(#[from] JsonErrorImpl);
+pub struct YamlError(#[from] YamlErrorImpl);
 
-impl JsonError {
+impl YamlError {
     #[allow(unused)]
     #[must_use]
-    pub const fn kind(&self) -> JsonErrorKind {
+    pub const fn kind(&self) -> YamlErrorKind {
         match self.0 {
-            JsonErrorImpl::Data { .. } => JsonErrorKind::Data,
-            JsonErrorImpl::Eof { .. } => JsonErrorKind::Eof,
-            JsonErrorImpl::Io { .. } => JsonErrorKind::Io,
-            JsonErrorImpl::Syntax { .. } => JsonErrorKind::Syntax,
-            _ => JsonErrorKind::Other,
+            YamlErrorImpl::Syntax { .. } => YamlErrorKind::Syntax,
+            YamlErrorImpl::Other(_) => YamlErrorKind::Other,
         }
     }
 
     #[allow(unused)]
     #[must_use]
-    pub fn is_data(&self) -> bool {
-        self.kind() == JsonErrorKind::Data
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub fn is_eof(&self) -> bool {
-        self.kind() == JsonErrorKind::Eof
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub fn is_io(&self) -> bool {
-        self.kind() == JsonErrorKind::Io
-    }
-
-    #[allow(unused)]
-    #[must_use]
     pub fn is_syntax(&self) -> bool {
-        self.kind() == JsonErrorKind::Syntax
+        self.kind() == YamlErrorKind::Syntax
     }
 
     #[allow(unused)]
     #[must_use]
     pub fn is_other(&self) -> bool {
-        self.kind() == JsonErrorKind::Other
+        self.kind() == YamlErrorKind::Other
     }
 
     fn other<E>(e: E) -> Self
     where
         E: StdError + Send + Sync + 'static,
     {
-        Self(JsonErrorImpl::Other(AnyhowError::new(e)))
+        Self(YamlErrorImpl::Other(AnyhowError::new(e)))
     }
 
-    fn convert(e: &SerdeJsonError, path: &Path) -> Self {
-        use serde_json::error::Category::*;
-
-        let message = e.to_string();
-        let path = path.to_path_buf();
-        Self(match e.classify() {
-            Data => JsonErrorImpl::Data { message, path },
-            Eof => JsonErrorImpl::Eof { message, path },
-            Io => JsonErrorImpl::Io { message, path },
-            Syntax => JsonErrorImpl::Syntax { message, path },
+    fn convert(e: &SerdeYamlError, path: &Path) -> Self {
+        Self(YamlErrorImpl::Syntax {
+            message: e.to_string(),
+            location: e.location(),
+            path: path.to_path_buf(),
         })
     }
 }
 
-impl HasOtherError for JsonError {
+impl HasOtherError for YamlError {
     fn is_other(&self) -> bool {
         self.is_other()
     }
@@ -118,7 +89,7 @@ impl HasOtherError for JsonError {
     where
         E: Display + Debug + Send + Sync + 'static,
     {
-        if let JsonErrorImpl::Other(ref inner) = self.0 {
+        if let YamlErrorImpl::Other(ref inner) = self.0 {
             inner.downcast_ref::<E>()
         } else {
             None
@@ -127,74 +98,101 @@ impl HasOtherError for JsonError {
 }
 
 #[derive(Debug, Error)]
-enum JsonErrorImpl {
+enum YamlErrorImpl {
     #[error("{message} in {path}")]
-    Data { message: String, path: PathBuf },
-    #[error("{message} in {path}")]
-    Eof { message: String, path: PathBuf },
-    #[error("{message} in {path}")]
-    Io { message: String, path: PathBuf },
-    #[error("{message} in {path}")]
-    Syntax { message: String, path: PathBuf },
+    Syntax {
+        message: String,
+        location: Option<Location>,
+        path: PathBuf,
+    },
     #[error(transparent)]
     Other(AnyhowError),
 }
 
 #[allow(unused)]
-pub fn read_json_file<T>(path: &Path) -> StdResult<T, JsonError>
+pub fn read_yaml_file<T>(path: &Path) -> StdResult<T, YamlError>
 where
     T: DeserializeOwned,
 {
-    let s = read_text_file(path).map_err(JsonError::other)?;
-    let value = serde_json::from_str::<T>(&s).map_err(|e| JsonError::convert(&e, path))?;
+    let s = read_text_file(path).map_err(YamlError::other)?;
+    let value = serde_yaml::from_str::<T>(&s).map_err(|e| YamlError::convert(&e, path))?;
     Ok(value)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{JsonErrorKind, read_json_file};
+    use crate::error::HasOtherError;
+    use crate::formats::{YamlErrorKind, read_yaml_file};
+    use crate::fs::FileReadError;
     use anyhow::Result;
-    use serde_json::{Value, json};
+    use serde_yaml::Value;
     use std::fs::write;
     use tempdir::TempDir;
 
     #[test]
-    fn test_read_json_file_succeeds() -> Result<()> {
+    fn test_read_yaml_file_succeeds() -> Result<()> {
         // Arrange
         let temp_dir = TempDir::new("isopy-util-test")?;
-        let path = temp_dir.path().join("file.json");
+        let path = temp_dir.path().join("file.yaml");
         write(&path, "{\"message\": \"hello-world\"}")?;
 
         // Act
-        let value = read_json_file::<Value>(&path)?;
+        let value = read_yaml_file::<Value>(&path)?;
 
         // Assert
-        assert_eq!(json!({"message": "hello-world"}), value);
+        assert_eq!(
+            serde_yaml::from_str::<Value>("message: hello-world").expect("must succeed"),
+            value
+        );
         Ok(())
     }
 
     #[test]
-    fn test_read_json_file_invalid_fails() -> Result<()> {
+    fn test_read_yaml_file_invalid_fails() -> Result<()> {
         // Arrange
         let temp_dir = TempDir::new("isopy-util-test")?;
-        let path = temp_dir.path().join("file.json");
+        let path = temp_dir.path().join("file.yaml");
         write(&path, "xxx{\"message\": \"hello-world\"}")?;
 
         // Act
-        let e = match read_json_file::<Value>(&path) {
-            Ok(_) => panic!("read_json_file must fail"),
+        let e = match read_yaml_file::<Value>(&path) {
+            Ok(_) => panic!("read_yaml_file must fail"),
             Err(e) => e,
         };
 
         // Assert
-        assert_eq!(JsonErrorKind::Syntax, e.kind());
-        assert!(!e.is_data());
-        assert!(!e.is_eof());
-        assert!(!e.is_io());
+        assert_eq!(YamlErrorKind::Syntax, e.kind());
         assert!(e.is_syntax());
         assert!(!e.is_other());
         let message = format!("{e}");
         assert!(message.contains(path.to_str().expect("must be valid string")));
+        Ok(())
+    }
+
+    #[test]
+    fn test_read_yaml_file_nonexistent_fails() -> Result<()> {
+        // Arrange
+        let temp_dir = TempDir::new("isopy-util-test")?;
+        let path = temp_dir.path().join("file.yaml");
+
+        // Act
+        let e = match read_yaml_file::<Value>(&path) {
+            Ok(_) => panic!("read_yaml_file must fail"),
+            Err(e) => e,
+        };
+
+        // Assert
+        assert_eq!(YamlErrorKind::Other, e.kind());
+        assert!(!e.is_syntax());
+        assert!(e.is_other());
+        let message = format!("{e}");
+        assert!(message.contains(path.to_str().expect("must be valid string")));
+        assert!(
+            e.downcast_other_ref::<FileReadError>()
+                .expect("must be Some")
+                .is_not_found()
+        );
+
         Ok(())
     }
 }
