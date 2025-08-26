@@ -19,12 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::ui::error::Error;
 use crate::ui::logger::Logger;
 use crate::ui::op::Op;
 use crate::ui::op::OpProgress;
-use crate::ui::result::Result;
 use crate::ui::state::State;
+use anyhow::Result;
 use log::set_boxed_logger;
 use std::sync::Arc;
 
@@ -38,8 +37,7 @@ impl Ui {
         let state = Arc::new(State::new());
 
         if enable_logger {
-            set_boxed_logger(Box::new(Logger::new(Arc::clone(&state))))
-                .map_err(|_| Error::CouldNotSetLogger)?;
+            set_boxed_logger(Box::new(Logger::new(Arc::clone(&state))))?;
         }
 
         Ok(Self { state })

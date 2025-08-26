@@ -19,9 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::ui::error::Error;
 use crate::ui::op::OpProgress;
-use crate::ui::result::Result;
+use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use uuid::Uuid;
 
@@ -40,10 +39,7 @@ impl Indicator {
                 "[{elapsed_precise:.green}]  {spinner:.cyan/blue}  {pos:>7}  {wide_msg:.yellow}",
             ));
 
-        progress_bar.set_style(
-            ProgressStyle::with_template(template)
-                .map_err(|_| Error::CouldNotConfigureProgressBar)?,
-        );
+        progress_bar.set_style(ProgressStyle::with_template(template)?);
 
         Ok(Self {
             id: Uuid::new_v4(),

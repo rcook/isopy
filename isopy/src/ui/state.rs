@@ -21,7 +21,7 @@
 //
 use crate::ui::indicator::Indicator;
 use crate::ui::op::OpProgress;
-use crate::ui::result::Result;
+use anyhow::Result;
 use std::sync::{Arc, RwLock};
 
 pub struct State {

@@ -21,7 +21,7 @@
 //
 use crate::ui::Ui;
 use crate::ui::op::{Op, OpProgress};
-use crate::ui::result::Result;
+use anyhow::Result;
 use std::sync::{LazyLock, RwLock};
 
 static GLOBAL: LazyLock<RwLock<Option<Ui>>> = LazyLock::new(|| RwLock::new(None));
