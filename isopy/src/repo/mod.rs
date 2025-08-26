@@ -27,7 +27,6 @@ mod manifest;
 mod meta_id;
 #[allow(clippy::module_inception)]
 mod repo;
-mod shared_path;
 mod trash;
 
 pub use config::*;

@@ -27,14 +27,11 @@ use crate::repo::link::{Link, LinkRecord};
 use crate::repo::link_id::LinkId;
 use crate::repo::manifest::{Manifest, ManifestRecord};
 use crate::repo::meta_id::MetaId;
-use crate::repo::shared_path::SharedPath;
 use crate::repo::trash::Trash;
 use anyhow::{Result, bail};
 use chrono::Utc;
 use fslock::LockFile;
-use path_absolutize::Absolutize;
-use std::fs::{read_dir, read_to_string, remove_dir_all, remove_file};
-use std::io::ErrorKind;
+use std::fs::{read_dir, remove_dir_all, remove_file};
 use std::path::{Path, PathBuf};
 
 const MANIFEST_FILE_NAME: &str = "manifest.yaml";
@@ -256,23 +253,6 @@ impl Repo {
         Ok(())
     }
 
-    #[allow(unused)]
-    pub fn read_shared_file(&self, path: &SharedPath) -> Result<Option<String>> {
-        let p = self.resolve_shared_path(path)?;
-        Ok(match read_to_string(&p) {
-            Ok(s) => Some(s),
-            Err(e) if e.kind() != ErrorKind::NotFound => None,
-            Err(e) => bail!(e),
-        })
-    }
-
-    #[allow(unused)]
-    pub fn write_shared_file(&self, path: &SharedPath, value: &str) -> Result<()> {
-        let p = self.resolve_shared_path(path)?;
-        safe_write_file(&p, value, true)?;
-        Ok(())
-    }
-
     fn make_link_id(project_dir: &Path) -> Result<LinkId> {
         LinkId::try_from(project_dir)
     }
@@ -283,15 +263,5 @@ impl Repo {
 
     fn make_data_dir(&self, meta_id: &MetaId) -> PathBuf {
         self.config.container_dir.join(format!("{meta_id}"))
-    }
-
-    fn resolve_shared_path(&self, path: &SharedPath) -> Result<PathBuf> {
-        let p = Path::new(path.as_str())
-            .absolutize_from(&self.config.shared_dir)?
-            .into_owned();
-        if !p.starts_with(&self.config.shared_dir) {
-            bail!("invalid shared path {path}")
-        }
-        Ok(p)
     }
 }
