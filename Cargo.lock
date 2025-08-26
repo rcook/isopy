@@ -1336,15 +1336,16 @@ dependencies = [
  "ctrlc",
  "dirs",
  "exec",
+ "fslock",
  "futures-util",
  "indicatif",
  "isopy-go",
  "isopy-java",
  "isopy-lib",
  "isopy-python",
- "isopy-repo",
  "isopy-util",
  "log",
+ "md5",
  "open",
  "openssl-sys",
  "path-absolutize",
@@ -1356,6 +1357,8 @@ dependencies = [
  "strum",
  "strum_macros",
  "sysinfo",
+ "tempdir",
+ "thiserror 1.0.69",
  "tinytemplate",
  "tokio",
  "url",
@@ -1430,24 +1433,6 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "url",
-]
-
-[[package]]
-name = "isopy-repo"
-version = "0.5.9"
-dependencies = [
- "anyhow",
- "chrono",
- "fslock",
- "isopy-util",
- "md5",
- "path-absolutize",
- "rstest 0.18.2",
- "serde",
- "serde_yaml",
- "tempdir",
- "thiserror 1.0.69",
- "uuid",
 ]
 
 [[package]]

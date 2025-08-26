@@ -19,6 +19,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::RepoError;
+mod config;
+mod dir_info;
+mod error;
+mod link;
+mod link_id;
+mod manifest;
+mod meta_id;
+#[allow(clippy::module_inception)]
+mod repo;
+mod result;
+mod shared_path;
+mod trash;
 
-pub type RepoResult<T> = std::result::Result<T, RepoError>;
+pub use config::*;
+pub use dir_info::*;
+pub use error::*;
+pub use link::*;
+pub use link_id::*;
+pub use manifest::*;
+pub use meta_id::*;
+pub use repo::*;
+pub use result::*;
+pub use shared_path::*;
+pub use trash::*;

@@ -20,8 +20,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::env::EnvKey;
+use crate::repo::{DirInfo, LinkId, MetaId};
 use anyhow::{Result, bail};
-use isopy_repo::{DirInfo, LinkId, MetaId};
 use std::env::VarError;
 
 #[derive(Clone, Debug)]

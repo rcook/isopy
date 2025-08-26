@@ -14,21 +14,22 @@ version = "0.5.9"
 [dependencies]
 anyhow = { version = "1.0.99", features = ["backtrace"] }
 async-trait = "0.1.89"
-chrono = "0.4.41"
+chrono = { version = "0.4.41", features = ["serde"] }
 clap = { version = "4.5.46", features = ["derive", "env"] }
 clap_complete = "4.5.57"
 colored = "3.0.0"
 ctrlc = "3.4.7"
 dirs = "6.0.0"
+fslock = "0.2.1"
 futures-util = "0.3.31"
 indicatif = "0.17.11"
 isopy-go = { path = "../isopy-go" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
-isopy-repo = { path = "../isopy-repo" }
 isopy-util = { path = "../isopy-util" }
 log = { version = "0.4.27", features = ["std"] }
+md5 = "0.7.0"
 open = "5.3.2"
 path-absolutize = "3.1.1"
 reqwest = { version = "0.12.23", features = ["stream"] }
@@ -36,10 +37,12 @@ serde = { version = "1.0.219", features = ["derive"] }
 serde_yaml = "0.9.34"
 strum = "0.27.2"
 strum_macros = "0.27.2"
+tempdir = "0.3.7"
+thiserror = "1.0.69"
 tinytemplate = "1.2.1"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
 url = { version = "2.5.7", features = ["serde"] }
-uuid = { version = "1.18.0", features = ["v4"] }
+uuid = { version = "1.18.0", features = ["v4", "serde"] }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
 exec = "0.3.1"

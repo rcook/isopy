@@ -19,38 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-#![warn(clippy::all)]
-#![warn(clippy::cargo)]
-//#![warn(clippy::expect_used)]
-#![warn(clippy::nursery)]
-//#![warn(clippy::panic_in_result_fn)]
-#![warn(clippy::pedantic)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::enum_glob_use)]
-#![allow(clippy::match_wildcard_for_single_variants)]
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::module_name_repetitions)]
-#![allow(clippy::option_if_let_else)]
-mod config;
-mod dir_info;
-mod error;
-mod link;
-mod link_id;
-mod manifest;
-mod meta_id;
-mod repo;
-mod result;
-mod shared_path;
-mod trash;
+use crate::repo::error::RepoError;
 
-pub use self::config::RepoConfig;
-pub use self::dir_info::DirInfo;
-pub use self::error::{RepoError, RepoErrorKind};
-pub use self::link::Link;
-pub use self::link_id::LinkId;
-pub use self::manifest::Manifest;
-pub use self::meta_id::MetaId;
-pub use self::repo::Repo;
-pub use self::result::RepoResult;
-pub use self::shared_path::SharedPath;
-pub use self::trash::Trash;
+pub type RepoResult<T> = std::result::Result<T, RepoError>;

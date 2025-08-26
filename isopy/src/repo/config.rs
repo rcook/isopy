@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::RepoError;
 use crate::repo::Repo;
-use crate::result::RepoResult;
+use crate::repo::error::RepoError;
+use crate::repo::result::RepoResult;
 use isopy_util::{read_yaml_file, safe_write_file};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -61,7 +61,7 @@ impl RepoConfig {
 
 #[cfg(test)]
 mod tests {
-    use crate::RepoConfig;
+    use crate::repo::RepoConfig;
     use anyhow::Result;
     use tempdir::TempDir;
 

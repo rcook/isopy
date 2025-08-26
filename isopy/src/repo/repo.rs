@@ -19,16 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::config::RepoConfig;
-use crate::dir_info::DirInfo;
-use crate::error::RepoError;
-use crate::link::{Link, LinkRecord};
-use crate::link_id::LinkId;
-use crate::manifest::{Manifest, ManifestRecord};
-use crate::meta_id::MetaId;
-use crate::result::RepoResult;
-use crate::shared_path::SharedPath;
-use crate::trash::Trash;
+use crate::repo::config::RepoConfig;
+use crate::repo::dir_info::DirInfo;
+use crate::repo::error::RepoError;
+use crate::repo::link::{Link, LinkRecord};
+use crate::repo::link_id::LinkId;
+use crate::repo::manifest::{Manifest, ManifestRecord};
+use crate::repo::meta_id::MetaId;
+use crate::repo::result::RepoResult;
+use crate::repo::shared_path::SharedPath;
+use crate::repo::trash::Trash;
 use chrono::Utc;
 use fslock::LockFile;
 use isopy_util::{FileReadError, HasOtherError, read_text_file, read_yaml_file, safe_write_file};
@@ -198,18 +198,21 @@ impl Repo {
         self.read_manifest_from_datadir(&manifest_path)
     }
 
+    #[allow(clippy::unused_self)]
     pub fn read_manifest_from_datadir(&self, data_dir: &Path) -> RepoResult<Manifest> {
         let manifest_path = data_dir.join(MANIFEST_FILE_NAME);
         let record = read_yaml_file(&manifest_path).map_err(RepoError::other)?;
         Ok(Manifest::new(data_dir.to_path_buf(), manifest_path, record))
     }
 
+    #[allow(unused)]
     pub fn read_link(&self, project_dir: &Path) -> RepoResult<Option<Link>> {
         let link_id = Self::make_link_id(project_dir)?;
         let link_path = self.make_link_path(&link_id);
         self.read_link_from_link_path(&link_path)
     }
 
+    #[allow(clippy::unused_self)]
     pub fn read_link_from_link_path(&self, link_path: &Path) -> RepoResult<Option<Link>> {
         match read_yaml_file(link_path) {
             Ok(link_record) => Ok(Some(Link::new(link_path.to_path_buf(), link_record))),
@@ -247,6 +250,7 @@ impl Repo {
         }))
     }
 
+    #[allow(unused)]
     pub fn purge(&self) -> RepoResult<()> {
         if self.config.shared_dir.is_dir() {
             remove_dir_all(&self.config.shared_dir)
@@ -271,6 +275,7 @@ impl Repo {
         Ok(())
     }
 
+    #[allow(unused)]
     pub fn read_shared_file(&self, path: &SharedPath) -> RepoResult<Option<String>> {
         let p = self.resolve_shared_path(path)?;
         Ok(match read_text_file(&p) {
@@ -280,6 +285,7 @@ impl Repo {
         })
     }
 
+    #[allow(unused)]
     pub fn write_shared_file(&self, path: &SharedPath, value: &str) -> RepoResult<()> {
         let p = self.resolve_shared_path(path)?;
         safe_write_file(&p, value, true).map_err(RepoError::other)?;

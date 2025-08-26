@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::print::{make_prop_table, print_link, print_metadir};
+use crate::repo::Trash;
 use crate::status::{StatusResult, success};
 use crate::table::table_divider;
-use isopy_repo::Trash;
 
 pub(crate) fn do_check(app: &App, clean: bool) -> StatusResult {
     let mut trash = Trash::compute(&app.repo)?;

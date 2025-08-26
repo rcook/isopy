@@ -19,14 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::repo::SharedPath;
 use anyhow::Error as AnyhowError;
 use isopy_util::HasOtherError;
 use std::error::Error as StdError;
 use std::fmt::{Debug, Display};
 use std::path::{Path, PathBuf};
 use thiserror::Error;
-
-use crate::SharedPath;
 
 #[allow(unused)]
 #[derive(Debug, PartialEq)]
@@ -55,6 +54,7 @@ enum RepoErrorImpl {
     #[error("Could not lock lock file {0}")]
     CouldNotLock(PathBuf),
     #[error("Invalid shared path {0}")]
+    #[allow(unused)]
     InvalidSharedPath(SharedPath),
     #[error("Could not compute MD5 hash for path {0}")]
     CouldNotComputeHash(PathBuf),
@@ -88,7 +88,7 @@ impl RepoError {
             RepoErrorImpl::InvalidLinkFile(_, _, _) => RepoErrorKind::InvalidLinkFile,
             RepoErrorImpl::InvalidMetaId(_) => RepoErrorKind::InvalidMetaId,
             RepoErrorImpl::InvalidLinkId(_) => RepoErrorKind::InvalidLinkId,
-            _ => RepoErrorKind::Other,
+            RepoErrorImpl::Other(_) => RepoErrorKind::Other,
         }
     }
 
@@ -160,6 +160,7 @@ impl RepoError {
         Self(RepoErrorImpl::CouldNotLock(path.to_path_buf()))
     }
 
+    #[allow(unused)]
     pub(crate) fn invalid_shared_path(shared_path: &SharedPath) -> Self {
         Self(RepoErrorImpl::InvalidSharedPath(shared_path.clone()))
     }

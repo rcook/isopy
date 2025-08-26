@@ -35,6 +35,7 @@ mod package_manager_helper;
 mod paginated_download;
 mod plugin_manager;
 mod print;
+mod repo;
 mod run;
 mod serialization;
 mod shell;

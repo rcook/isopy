@@ -22,8 +22,8 @@
 use crate::app::App;
 use crate::print::make_prop_table;
 use crate::print::print_dir_info_and_env;
+use crate::repo::MetaId;
 use crate::status::{StatusResult, success, user_error};
-use isopy_repo::MetaId;
 
 pub(crate) fn do_link(app: &App, dir_id: &MetaId) -> StatusResult {
     let Some(dir_info) = app.repo.link(dir_id, &app.cwd)? else {

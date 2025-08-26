@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::RepoError;
+use crate::repo::error::RepoError;
 use md5::compute;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -84,7 +84,7 @@ impl<'de> Deserialize<'de> for LinkId {
 
 #[cfg(test)]
 mod tests {
-    use crate::LinkId;
+    use crate::repo::LinkId;
     use anyhow::Result;
     use rstest::rstest;
     use std::path::{Path, PathBuf};

@@ -26,6 +26,7 @@ pub struct SharedPath(String);
 
 impl SharedPath {
     #[must_use]
+    #[allow(unused)]
     pub fn new(s: &str) -> Self {
         Self(String::from(s))
     }

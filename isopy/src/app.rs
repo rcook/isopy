@@ -24,6 +24,7 @@ use crate::dir_info_ext::DirInfoExt;
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
+use crate::repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{Result, bail};
@@ -31,7 +32,6 @@ use isopy_lib::{
     EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
     Version,
 };
-use isopy_repo::{DirInfo, Link, LinkId, Repo, RepoResult};
 use isopy_util::{FileReadError, HasOtherError, YamlError, read_yaml_file, safe_write_file};
 use std::collections::HashMap;
 use std::ffi::OsString;

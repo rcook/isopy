@@ -21,10 +21,10 @@
 //
 use crate::app::App;
 use crate::constants::ENV_CONFIG_FILE_NAME;
+use crate::repo::{DirInfo, Manifest};
 use crate::serialization::Env;
 use anyhow::Result;
 use isopy_lib::{EnvInfo, Platform, Shell};
-use isopy_repo::{DirInfo, Manifest};
 use isopy_util::{read_yaml_file, safe_write_file};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};

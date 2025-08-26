@@ -19,61 +19,62 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::meta_id::MetaId;
+use crate::repo::link::Link;
+use crate::repo::link_id::LinkId;
+use crate::repo::manifest::Manifest;
+use crate::repo::meta_id::MetaId;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ManifestRecord {
-    pub(crate) created_at: DateTime<Utc>,
-    pub(crate) original_project_dir: PathBuf,
-    pub(crate) meta_id: MetaId,
+#[derive(Debug)]
+pub struct DirInfo {
+    pub(crate) manifest: Manifest,
+    pub(crate) link: Link,
 }
 
-#[derive(Clone, Debug)]
-pub struct Manifest {
-    data_dir: PathBuf,
-    #[allow(clippy::struct_field_names)]
-    manifest_path: PathBuf,
-    record: ManifestRecord,
-}
-
-impl Manifest {
-    pub(crate) const fn new(
-        data_dir: PathBuf,
-        manifest_path: PathBuf,
-        record: ManifestRecord,
-    ) -> Self {
-        Self {
-            data_dir,
-            manifest_path,
-            record,
-        }
-    }
-
+impl DirInfo {
     #[must_use]
     pub fn data_dir(&self) -> &Path {
-        &self.data_dir
+        self.manifest.data_dir()
     }
 
     #[must_use]
     pub fn manifest_path(&self) -> &Path {
-        &self.manifest_path
+        self.manifest.manifest_path()
     }
 
     #[must_use]
     pub const fn created_at(&self) -> &DateTime<Utc> {
-        &self.record.created_at
+        self.manifest.created_at()
     }
 
     #[must_use]
     pub fn original_project_dir(&self) -> &Path {
-        &self.record.original_project_dir
+        self.manifest.original_project_dir()
     }
 
     #[must_use]
     pub const fn meta_id(&self) -> &MetaId {
-        &self.record.meta_id
+        self.manifest.meta_id()
+    }
+
+    #[must_use]
+    pub fn link_path(&self) -> &Path {
+        self.link.link_path()
+    }
+
+    #[must_use]
+    pub const fn link_created_at(&self) -> &DateTime<Utc> {
+        self.link.created_at()
+    }
+
+    #[must_use]
+    pub const fn link_id(&self) -> &LinkId {
+        self.link.link_id()
+    }
+
+    #[must_use]
+    pub fn project_dir(&self) -> &Path {
+        self.link.project_dir()
     }
 }
