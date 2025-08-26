@@ -21,13 +21,13 @@
 //
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::safe_write_file;
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
 use crate::repo::{DirInfo, Link, LinkId, Repo};
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
+use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
 use anyhow::{Result, bail};
 use isopy_lib::{

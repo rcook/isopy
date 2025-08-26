@@ -19,7 +19,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::fs::safe_write_file;
 use crate::repo::config::RepoConfig;
 use crate::repo::dir_info::DirInfo;
 use crate::repo::link::{Link, LinkRecord};
@@ -27,6 +26,7 @@ use crate::repo::link_id::LinkId;
 use crate::repo::manifest::{Manifest, ManifestRecord};
 use crate::repo::meta_id::MetaId;
 use crate::repo::trash::Trash;
+use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
 use anyhow::{Result, bail};
 use chrono::Utc;

@@ -68,7 +68,7 @@ fn ensure_dir(file_path: &Path) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::fs::{safe_create_file, safe_write_file};
+    use crate::write::{safe_create_file, safe_write_file};
     use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;

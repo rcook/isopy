@@ -21,9 +21,9 @@
 //
 use crate::app::App;
 use crate::constants::ENV_CONFIG_FILE_NAME;
-use crate::fs::safe_write_file;
 use crate::repo::{DirInfo, Manifest};
 use crate::serialization::Env;
+use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
 use anyhow::Result;
 use isopy_lib::{EnvInfo, Platform, Shell};

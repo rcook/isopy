@@ -28,7 +28,7 @@ mod constants;
 mod date_time_format;
 mod dir_info_ext;
 mod env;
-mod fs;
+mod executable;
 mod moniker;
 mod package_id;
 mod package_manager_helper;
@@ -44,6 +44,7 @@ mod table;
 mod terminal;
 mod ui;
 mod wrapper_file_name;
+mod write;
 mod yaml;
 
 #[tokio::main]
