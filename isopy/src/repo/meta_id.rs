@@ -1,3 +1,4 @@
+use anyhow::Error;
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,7 +20,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::repo::RepoError;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
@@ -37,12 +37,11 @@ impl MetaId {
 }
 
 impl FromStr for MetaId {
-    type Err = RepoError;
+    type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        s.parse::<Uuid>()
-            .map_err(|_e| RepoError::invalid_meta_id(s))
-            .map(Self)
+        let uuid = s.parse::<Uuid>()?;
+        Ok(Self(uuid))
     }
 }
 

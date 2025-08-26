@@ -21,18 +21,12 @@
 //
 use crate::app::App;
 use crate::args::PromptConfig;
-use crate::dir_info_ext::DirInfoExt;
-use crate::fs::util::existing;
 use crate::shell::IsopyEnv;
 use crate::status::{StatusResult, success};
 
 pub(crate) fn do_prompt(app: &App, prompt_config: &PromptConfig) -> StatusResult {
     let isopy_env = IsopyEnv::get_vars()?;
-    let env = if let Some(d) = app.find_dir_info(isopy_env.as_ref())? {
-        existing(d.read_env_config())?
-    } else {
-        None
-    };
+    let env = app.find_dir_info(isopy_env.as_ref())?;
 
     let has_project_config_file = app.has_project_config_file();
 

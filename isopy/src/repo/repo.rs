@@ -19,23 +19,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::HasOtherError;
 use crate::formats::read_yaml_file;
-use crate::fs::{FileReadError, read_text_file, safe_write_file};
+use crate::fs::safe_write_file;
 use crate::repo::config::RepoConfig;
 use crate::repo::dir_info::DirInfo;
-use crate::repo::error::RepoError;
 use crate::repo::link::{Link, LinkRecord};
 use crate::repo::link_id::LinkId;
 use crate::repo::manifest::{Manifest, ManifestRecord};
 use crate::repo::meta_id::MetaId;
-use crate::repo::result::RepoResult;
 use crate::repo::shared_path::SharedPath;
 use crate::repo::trash::Trash;
+use anyhow::{Result, bail};
 use chrono::Utc;
 use fslock::LockFile;
 use path_absolutize::Absolutize;
-use std::fs::{read_dir, remove_dir_all, remove_file};
+use std::fs::{read_dir, read_to_string, remove_dir_all, remove_file};
+use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 
 const MANIFEST_FILE_NAME: &str = "manifest.yaml";
@@ -47,23 +46,17 @@ pub struct Repo {
 }
 
 impl Repo {
-    pub fn new(config: RepoConfig) -> RepoResult<Option<Self>> {
-        safe_write_file(&config.lock_path, vec![], true).map_err(RepoError::other)?;
-        let mut lock_file = LockFile::open(&config.lock_path)
-            .map_err(|_e| RepoError::could_not_open_lock_file(&config.lock_path))?;
-        Ok(
-            if lock_file
-                .try_lock_with_pid()
-                .map_err(|_e| RepoError::could_not_lock(&config.lock_path))?
-            {
-                Some(Self {
-                    config,
-                    _lock_file: lock_file,
-                })
-            } else {
-                None
-            },
-        )
+    pub fn new(config: RepoConfig) -> Result<Option<Self>> {
+        safe_write_file(&config.lock_path, vec![], true)?;
+        let mut lock_file = LockFile::open(&config.lock_path)?;
+        Ok(if lock_file.try_lock_with_pid()? {
+            Some(Self {
+                config,
+                _lock_file: lock_file,
+            })
+        } else {
+            None
+        })
     }
 
     #[must_use]
@@ -91,12 +84,12 @@ impl Repo {
         &self.config.shared_dir
     }
 
-    pub fn list_links(&self) -> RepoResult<Vec<Link>> {
+    pub fn list_links(&self) -> Result<Vec<Link>> {
         let mut links = Vec::new();
 
         if self.config.links_dir.is_dir() {
-            for entry_opt in read_dir(&self.config.links_dir).map_err(RepoError::other)? {
-                let entry = entry_opt.map_err(RepoError::other)?;
+            for entry in read_dir(&self.config.links_dir)? {
+                let entry = entry?;
                 if entry.path().is_file()
                     && let Some(link) = self.read_link_from_link_path(&entry.path())?
                 {
@@ -108,12 +101,12 @@ impl Repo {
         Ok(links)
     }
 
-    pub fn list_manifests(&self) -> RepoResult<Vec<Manifest>> {
+    pub fn list_manifests(&self) -> Result<Vec<Manifest>> {
         let mut manifests = Vec::new();
 
         if self.config.container_dir.is_dir() {
-            for entry_opt in read_dir(&self.config.container_dir).map_err(RepoError::other)? {
-                let entry = entry_opt.map_err(RepoError::other)?;
+            for entry in read_dir(&self.config.container_dir)? {
+                let entry = entry?;
                 if entry.path().is_dir() {
                     manifests.push(self.read_manifest_from_datadir(&entry.path())?);
                 }
@@ -123,7 +116,7 @@ impl Repo {
         Ok(manifests)
     }
 
-    pub fn init(&self, project_dir: &Path) -> RepoResult<Option<DirInfo>> {
+    pub fn init(&self, project_dir: &Path) -> Result<Option<DirInfo>> {
         let link_id = Self::make_link_id(project_dir)?;
         let link_path = self.make_link_path(&link_id);
         if link_path.is_file() {
@@ -139,8 +132,8 @@ impl Repo {
             original_project_dir: project_dir.to_path_buf(),
             meta_id: meta_id.clone(),
         };
-        let yaml_str = serde_yaml::to_string(&manifest_record).map_err(RepoError::other)?;
-        safe_write_file(&manifest_path, yaml_str, false).map_err(RepoError::other)?;
+        let yaml_str = serde_yaml::to_string(&manifest_record)?;
+        safe_write_file(&manifest_path, yaml_str, false)?;
 
         let link_record = LinkRecord {
             created_at: Utc::now(),
@@ -148,8 +141,8 @@ impl Repo {
             project_dir: project_dir.to_path_buf(),
             meta_id,
         };
-        let yaml_str = serde_yaml::to_string(&link_record).map_err(RepoError::other)?;
-        safe_write_file(&link_path, yaml_str, false).map_err(RepoError::other)?;
+        let yaml_str = serde_yaml::to_string(&link_record)?;
+        safe_write_file(&link_path, yaml_str, false)?;
 
         Ok(Some(DirInfo {
             manifest: Manifest::new(data_dir, manifest_path, manifest_record),
@@ -157,10 +150,9 @@ impl Repo {
         }))
     }
 
-    pub fn remove(&self, project_dir: &Path) -> RepoResult<bool> {
+    pub fn remove(&self, project_dir: &Path) -> Result<bool> {
         Ok(if let Some(dir_info) = self.get(project_dir)? {
-            remove_file(dir_info.link_path())
-                .map_err(|_e| RepoError::could_not_delete_file(&self.config.config_path))?;
+            remove_file(dir_info.link_path())?;
             Trash::compute(self)?.empty()?;
             true
         } else {
@@ -168,26 +160,26 @@ impl Repo {
         })
     }
 
-    pub fn get(&self, project_dir: &Path) -> RepoResult<Option<DirInfo>> {
+    pub fn get(&self, project_dir: &Path) -> Result<Option<DirInfo>> {
         let link_id = Self::make_link_id(project_dir)?;
         let link_path = self.make_link_path(&link_id);
         if !link_path.is_file() {
             return Ok(None);
         }
 
-        let link_record = read_yaml_file::<LinkRecord>(&link_path).map_err(RepoError::other)?;
+        let link_record = read_yaml_file::<LinkRecord>(&link_path)?;
         if link_record.project_dir != *project_dir {
-            return Err(RepoError::invalid_link_file(
-                &link_path,
-                &link_record.project_dir,
-                project_dir,
-            ));
+            bail!(
+                "project directory {project_dir} specified in link file {link_path} does not match expected directory {expected_project_dir}",
+                link_path = link_path.display(),
+                project_dir = link_record.project_dir.display(),
+                expected_project_dir = project_dir.display(),
+            );
         }
 
         let data_dir = self.make_data_dir(&link_record.meta_id);
         let manifest_path = data_dir.join(MANIFEST_FILE_NAME);
-        let manifest_record =
-            read_yaml_file::<ManifestRecord>(&manifest_path).map_err(RepoError::other)?;
+        let manifest_record = read_yaml_file::<ManifestRecord>(&manifest_path)?;
 
         Ok(Some(DirInfo {
             manifest: Manifest::new(data_dir, manifest_path, manifest_record),
@@ -195,40 +187,32 @@ impl Repo {
         }))
     }
 
-    pub fn read_manifest(&self, meta_id: &MetaId) -> RepoResult<Manifest> {
+    pub fn read_manifest(&self, meta_id: &MetaId) -> Result<Manifest> {
         let manifest_path = self.make_data_dir(meta_id);
         self.read_manifest_from_datadir(&manifest_path)
     }
 
     #[allow(clippy::unused_self)]
-    pub fn read_manifest_from_datadir(&self, data_dir: &Path) -> RepoResult<Manifest> {
+    pub fn read_manifest_from_datadir(&self, data_dir: &Path) -> Result<Manifest> {
         let manifest_path = data_dir.join(MANIFEST_FILE_NAME);
-        let record = read_yaml_file(&manifest_path).map_err(RepoError::other)?;
+        let record = read_yaml_file(&manifest_path)?;
         Ok(Manifest::new(data_dir.to_path_buf(), manifest_path, record))
     }
 
     #[allow(unused)]
-    pub fn read_link(&self, project_dir: &Path) -> RepoResult<Option<Link>> {
+    pub fn read_link(&self, project_dir: &Path) -> Result<Option<Link>> {
         let link_id = Self::make_link_id(project_dir)?;
         let link_path = self.make_link_path(&link_id);
         self.read_link_from_link_path(&link_path)
     }
 
     #[allow(clippy::unused_self)]
-    pub fn read_link_from_link_path(&self, link_path: &Path) -> RepoResult<Option<Link>> {
-        match read_yaml_file(link_path) {
-            Ok(link_record) => Ok(Some(Link::new(link_path.to_path_buf(), link_record))),
-            Err(e)
-                if e.downcast_other_ref::<FileReadError>()
-                    .is_some_and(FileReadError::is_not_found) =>
-            {
-                Ok(None)
-            }
-            Err(e) => Err(RepoError::other(e)),
-        }
+    pub fn read_link_from_link_path(&self, link_path: &Path) -> Result<Option<Link>> {
+        let link_record = read_yaml_file(link_path)?;
+        Ok(Some(Link::new(link_path.to_path_buf(), link_record)))
     }
 
-    pub fn link(&self, meta_id: &MetaId, project_dir: &Path) -> RepoResult<Option<DirInfo>> {
+    pub fn link(&self, meta_id: &MetaId, project_dir: &Path) -> Result<Option<DirInfo>> {
         let manifest = self.read_manifest(meta_id)?;
 
         let link_id = Self::make_link_id(project_dir)?;
@@ -243,8 +227,8 @@ impl Repo {
             project_dir: project_dir.to_path_buf(),
             meta_id: meta_id.clone(),
         };
-        let yaml_str = serde_yaml::to_string(&link_record).map_err(RepoError::other)?;
-        safe_write_file(&link_path, yaml_str, false).map_err(RepoError::other)?;
+        let yaml_str = serde_yaml::to_string(&link_record)?;
+        safe_write_file(&link_path, yaml_str, false)?;
 
         Ok(Some(DirInfo {
             manifest,
@@ -253,48 +237,43 @@ impl Repo {
     }
 
     #[allow(unused)]
-    pub fn purge(&self) -> RepoResult<()> {
+    pub fn purge(&self) -> Result<()> {
         if self.config.shared_dir.is_dir() {
-            remove_dir_all(&self.config.shared_dir)
-                .map_err(|_e| RepoError::could_not_delete_directory(&self.config.shared_dir))?;
+            remove_dir_all(&self.config.shared_dir)?;
         }
         if self.config.container_dir.is_dir() {
-            remove_dir_all(&self.config.container_dir)
-                .map_err(|_e| RepoError::could_not_delete_directory(&self.config.container_dir))?;
+            remove_dir_all(&self.config.container_dir)?;
         }
         if self.config.links_dir.is_dir() {
-            remove_dir_all(&self.config.links_dir)
-                .map_err(|_e| RepoError::could_not_delete_directory(&self.config.links_dir))?;
+            remove_dir_all(&self.config.links_dir)?;
         }
         if self.config.config_path.is_file() {
-            remove_file(&self.config.config_path)
-                .map_err(|_e| RepoError::could_not_delete_file(&self.config.config_path))?;
+            remove_file(&self.config.config_path)?;
         }
         if self.config.lock_path.is_file() {
-            remove_file(&self.config.lock_path)
-                .map_err(|_e| RepoError::could_not_delete_file(&self.config.lock_path))?;
+            remove_file(&self.config.lock_path)?;
         }
         Ok(())
     }
 
     #[allow(unused)]
-    pub fn read_shared_file(&self, path: &SharedPath) -> RepoResult<Option<String>> {
+    pub fn read_shared_file(&self, path: &SharedPath) -> Result<Option<String>> {
         let p = self.resolve_shared_path(path)?;
-        Ok(match read_text_file(&p) {
+        Ok(match read_to_string(&p) {
             Ok(s) => Some(s),
-            Err(e) if e.is_not_found() => None,
-            Err(e) => return Err(RepoError::other(e)),
+            Err(e) if e.kind() != ErrorKind::NotFound => None,
+            Err(e) => bail!(e),
         })
     }
 
     #[allow(unused)]
-    pub fn write_shared_file(&self, path: &SharedPath, value: &str) -> RepoResult<()> {
+    pub fn write_shared_file(&self, path: &SharedPath, value: &str) -> Result<()> {
         let p = self.resolve_shared_path(path)?;
-        safe_write_file(&p, value, true).map_err(RepoError::other)?;
+        safe_write_file(&p, value, true)?;
         Ok(())
     }
 
-    fn make_link_id(project_dir: &Path) -> RepoResult<LinkId> {
+    fn make_link_id(project_dir: &Path) -> Result<LinkId> {
         LinkId::try_from(project_dir)
     }
 
@@ -306,13 +285,12 @@ impl Repo {
         self.config.container_dir.join(format!("{meta_id}"))
     }
 
-    fn resolve_shared_path(&self, path: &SharedPath) -> RepoResult<PathBuf> {
+    fn resolve_shared_path(&self, path: &SharedPath) -> Result<PathBuf> {
         let p = Path::new(path.as_str())
-            .absolutize_from(&self.config.shared_dir)
-            .map_err(RepoError::other)?
+            .absolutize_from(&self.config.shared_dir)?
             .into_owned();
         if !p.starts_with(&self.config.shared_dir) {
-            return Err(RepoError::invalid_shared_path(path));
+            bail!("invalid shared path {path}")
         }
         Ok(p)
     }

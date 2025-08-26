@@ -96,7 +96,7 @@ fn make_env_config_path(data_dir: &Path) -> PathBuf {
 }
 
 fn read_env_config(data_dir: &Path) -> Result<Env> {
-    Ok(read_yaml_file(&make_env_config_path(data_dir))?)
+    read_yaml_file(&make_env_config_path(data_dir))
 }
 
 fn write_env_config(data_dir: &Path, env: &Env, overwrite: bool) -> Result<()> {

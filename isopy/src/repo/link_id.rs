@@ -1,3 +1,4 @@
+use anyhow::{Error, bail};
 // Copyright (c) 2023 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -19,7 +20,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::repo::error::RepoError;
 use md5::compute;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -31,28 +31,32 @@ use std::str::FromStr;
 pub struct LinkId(String);
 
 impl FromStr for LinkId {
-    type Err = RepoError;
+    type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         if !s.is_empty() && s.chars().all(|c| c.is_ascii_hexdigit()) {
             Ok(Self(s.to_lowercase()))
         } else {
-            Err(RepoError::invalid_link_id(s))
+            bail!("invalid link ID {s}")
         }
     }
 }
 
 impl TryFrom<&Path> for LinkId {
-    type Error = RepoError;
+    type Error = Error;
 
     fn try_from(value: &Path) -> StdResult<Self, Self::Error> {
         if !value.is_absolute() {
-            return Err(RepoError::could_not_compute_hash(value));
+            bail!(
+                "could not hash relative path {path}",
+                path = value.display()
+            )
         }
 
-        let s = value
-            .to_str()
-            .ok_or_else(|| RepoError::could_not_compute_hash(value))?;
+        let Some(s) = value.to_str() else {
+            bail!("could not hash {path}", path = value.display())
+        };
+
         let digest = compute(s);
         format!("{digest:x}").parse::<Self>()
     }

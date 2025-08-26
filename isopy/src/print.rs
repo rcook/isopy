@@ -21,7 +21,6 @@
 //
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
-use crate::fs::util::existing;
 use crate::repo::{DirInfo, Link, Manifest, Repo};
 use crate::serialization::Env;
 use crate::table::{Table, TableSettings, table_columns, table_divider, table_line, table_title};
@@ -119,7 +118,7 @@ pub(crate) fn print_dir_info_and_env(
     dir_info: &DirInfo,
 ) -> Result<()> {
     table_title!(table, "Environment information");
-    let env = existing(dir_info.read_env_config())?;
+    let env = Some(dir_info.read_env_config()?);
     print_dir_info(app, table, dir_info, env.as_ref());
     Ok(())
 }

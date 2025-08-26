@@ -20,14 +20,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::util::existing;
 use crate::status::{StatusResult, success, user_error};
 use isopy_lib::{
     DownloadPackageOptionsBuilder, GetPackageOptionsBuilder, InstallPackageOptionsBuilder,
     TagFilter,
 };
 
-pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
+pub async fn do_init(app: &App, download: bool) -> StatusResult {
     if app.repo.get(&app.cwd)?.is_some() {
         user_error!(
             "Project in directory {} already has an environment",
@@ -35,12 +34,7 @@ pub(crate) async fn do_init(app: &App, download: bool) -> StatusResult {
         );
     }
 
-    let Some(project) = existing(app.read_project_config())? else {
-        user_error!(
-            "No project configuration file in directory {}: create one with \"isopy project <PACKAGE-ID>\"",
-            app.cwd.display()
-        );
-    };
+    let project = app.read_project_config()?;
 
     if download {
         let download_package_options = DownloadPackageOptionsBuilder::default()

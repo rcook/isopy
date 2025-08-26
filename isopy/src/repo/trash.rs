@@ -20,10 +20,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::repo::Repo;
-use crate::repo::error::RepoError;
 use crate::repo::link::Link;
 use crate::repo::manifest::Manifest;
-use crate::repo::result::RepoResult;
+use anyhow::Result;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::fs::{remove_dir_all, remove_file};
@@ -45,7 +44,7 @@ struct LinkStatus {
 }
 
 impl Trash {
-    pub fn compute(repo: &Repo) -> RepoResult<Self> {
+    pub fn compute(repo: &Repo) -> Result<Self> {
         let mut manifest_map = repo
             .list_manifests()?
             .into_iter()
@@ -107,15 +106,13 @@ impl Trash {
         self.invalid_links.len() + self.unreferenced_manifests.len() == 0
     }
 
-    pub fn empty(&mut self) -> RepoResult<()> {
+    pub fn empty(&mut self) -> Result<()> {
         for l in self.invalid_links.drain(..) {
-            remove_file(l.link_path())
-                .map_err(|_e| RepoError::could_not_delete_file(l.link_path()))?;
+            remove_file(l.link_path())?;
         }
 
         for m in self.unreferenced_manifests.drain(..) {
-            remove_dir_all(m.data_dir())
-                .map_err(|_e| RepoError::could_not_delete_directory(m.data_dir()))?;
+            remove_dir_all(m.data_dir())?;
         }
 
         Ok(())

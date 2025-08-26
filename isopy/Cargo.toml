@@ -37,7 +37,6 @@ serde_json = "1.0.143"
 serde_yaml = "0.9.34"
 strum = "0.27.2"
 strum_macros = "0.27.2"
-thiserror = "1.0.69"
 tinytemplate = "1.2.1"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
 toml = "0.9.5"

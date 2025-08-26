@@ -19,94 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::HasOtherError;
-use anyhow::Error as AnyhowError;
-use std::error::Error as StdError;
-use std::fmt::{Debug, Display};
+use anyhow::{Context, Result};
 use std::fs::{File, OpenOptions, create_dir_all, write};
-use std::io::{Error as IOError, Write};
+use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::result::Result as StdResult;
-use thiserror::Error;
 
-#[allow(unused)]
-#[derive(Debug, PartialEq)]
-#[non_exhaustive]
-pub enum FileWriteErrorKind {
-    AlreadyExists,
-    Other,
-}
-
-#[derive(Debug, Error)]
-#[error(transparent)]
-pub struct FileWriteError(#[from] FileWriteErrorImpl);
-
-impl FileWriteError {
-    #[allow(unused)]
-    #[must_use]
-    pub const fn kind(&self) -> FileWriteErrorKind {
-        match self.0 {
-            FileWriteErrorImpl::AlreadyExists(_) => FileWriteErrorKind::AlreadyExists,
-            FileWriteErrorImpl::Other(_) => FileWriteErrorKind::Other,
-        }
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub fn is_already_exists(&self) -> bool {
-        self.kind() == FileWriteErrorKind::AlreadyExists
-    }
-
-    #[allow(unused)]
-    #[must_use]
-    pub fn is_other(&self) -> bool {
-        self.kind() == FileWriteErrorKind::Other
-    }
-
-    fn other<E>(e: E) -> Self
-    where
-        E: StdError + Send + Sync + 'static,
-    {
-        Self(FileWriteErrorImpl::Other(AnyhowError::new(e)))
-    }
-
-    fn convert(e: IOError, path: &Path) -> Self {
-        use std::io::ErrorKind::AlreadyExists;
-
-        match e.kind() {
-            AlreadyExists => Self(FileWriteErrorImpl::AlreadyExists(path.to_path_buf())),
-            _ => Self::other(e),
-        }
-    }
-}
-
-impl HasOtherError for FileWriteError {
-    fn is_other(&self) -> bool {
-        self.is_other()
-    }
-
-    fn downcast_other_ref<E>(&self) -> Option<&E>
-    where
-        E: Display + Debug + Send + Sync + 'static,
-    {
-        if let FileWriteErrorImpl::Other(ref inner) = self.0 {
-            inner.downcast_ref::<E>()
-        } else {
-            None
-        }
-    }
-}
-
-#[derive(Debug, Error)]
-enum FileWriteErrorImpl {
-    #[error("File {0} already exists")]
-    AlreadyExists(PathBuf),
-    #[error(transparent)]
-    Other(AnyhowError),
-}
-
-#[allow(unused)]
-pub fn safe_create_file(path: &Path, overwrite: bool) -> StdResult<File, FileWriteError> {
+pub fn safe_create_file(path: &Path, overwrite: bool) -> Result<File> {
     ensure_dir(path)?;
 
     let mut options = OpenOptions::new();
@@ -119,42 +37,38 @@ pub fn safe_create_file(path: &Path, overwrite: bool) -> StdResult<File, FileWri
 
     options
         .open(path)
-        .map_err(|e| FileWriteError::convert(e, path))
+        .with_context(|| format!("could not create file {path}", path = path.display()))
 }
 
-#[allow(unused)]
-pub fn safe_write_file<C>(
-    path: &Path,
-    contents: C,
-    overwrite: bool,
-) -> StdResult<(), FileWriteError>
+pub fn safe_write_file<C>(path: &Path, contents: C, overwrite: bool) -> Result<()>
 where
     C: AsRef<[u8]>,
 {
     ensure_dir(path)?;
 
     if overwrite {
-        write(path, contents).map_err(|e| FileWriteError::convert(e, path))?;
+        write(path, contents)
+            .with_context(|| format!("cannot overwrite {path}", path = path.display()))?;
     } else {
         let mut file = safe_create_file(path, overwrite)?;
         file.write_all(contents.as_ref())
-            .map_err(|e| FileWriteError::convert(e, path))?;
+            .with_context(|| format!("cannot write to file {path}", path = path.display()))?;
     }
 
     Ok(())
 }
 
-fn ensure_dir(file_path: &Path) -> StdResult<(), FileWriteError> {
+fn ensure_dir(file_path: &Path) -> Result<()> {
     let mut dir = PathBuf::new();
     dir.push(file_path);
     dir.pop();
-    create_dir_all(&dir).map_err(FileWriteError::other)?;
+    create_dir_all(&dir)?;
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::fs::{FileWriteErrorKind, safe_create_file, safe_write_file};
+    use crate::fs::{safe_create_file, safe_write_file};
     use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;
@@ -204,9 +118,6 @@ mod tests {
         };
 
         // Assert
-        assert_eq!(FileWriteErrorKind::AlreadyExists, e.kind());
-        assert!(e.is_already_exists());
-        assert!(!e.is_other());
         let message = format!("{e}");
         assert!(message.contains(path.to_str().expect("must be valid string")));
         assert_eq!("hello-world", read_to_string(&path)?);
@@ -271,9 +182,6 @@ mod tests {
         };
 
         // Assert
-        assert_eq!(FileWriteErrorKind::AlreadyExists, e.kind());
-        assert!(e.is_already_exists());
-        assert!(!e.is_other());
         let message = format!("{e}");
         assert!(message.contains(path.to_str().expect("must be valid string")));
         assert_eq!("hello-world", read_to_string(&path)?);

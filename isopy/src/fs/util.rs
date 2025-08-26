@@ -19,28 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::HasOtherError;
-use crate::formats::YamlError;
-use crate::fs::FileReadError;
 use anyhow::Result;
 use std::path::Path;
 
-pub(crate) fn existing<T>(result: Result<T>) -> Result<Option<T>> {
-    match result {
-        Ok(value) => Ok(Some(value)),
-        Err(e) => {
-            if let Some(e0) = e.downcast_ref::<YamlError>()
-                && let Some(e1) = e0.downcast_other_ref::<FileReadError>()
-                && e1.is_not_found()
-            {
-                return Ok(None);
-            }
-            Err(e)
-        }
-    }
-}
-
-pub(crate) fn is_executable_file(path: &Path) -> Result<bool> {
+pub fn is_executable_file(path: &Path) -> Result<bool> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<bool> {
         use crate::constants::EXECUTABLE_MASK;
@@ -61,7 +43,7 @@ pub(crate) fn is_executable_file(path: &Path) -> Result<bool> {
     Ok(path.is_file() && inner(path)?)
 }
 
-pub(crate) fn ensure_file_executable_mode(path: &Path) -> Result<()> {
+pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<()> {
         use crate::constants::EXECUTABLE_MASK;

@@ -21,13 +21,12 @@
 //
 use crate::constants::PROJECT_CONFIG_FILE_NAME;
 use crate::dir_info_ext::DirInfoExt;
-use crate::error::HasOtherError;
-use crate::formats::{YamlError, read_yaml_file};
-use crate::fs::{FileReadError, safe_write_file};
+use crate::formats::read_yaml_file;
+use crate::fs::safe_write_file;
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
-use crate::repo::{DirInfo, Link, LinkId, Repo, RepoResult};
+use crate::repo::{DirInfo, Link, LinkId, Repo};
 use crate::serialization::{Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use anyhow::{Result, bail};
@@ -111,7 +110,7 @@ impl App {
     }
 
     pub(crate) fn read_project_config(&self) -> Result<Project> {
-        Ok(read_yaml_file(&self.project_config_path)?)
+        read_yaml_file(&self.project_config_path)
     }
 
     pub(crate) fn write_project_config(&self, project: &Project, overwrite: bool) -> Result<()> {
@@ -204,7 +203,7 @@ impl App {
         Ok(())
     }
 
-    pub(crate) fn find_link(&self, link_id: &LinkId) -> RepoResult<Option<Link>> {
+    pub(crate) fn find_link(&self, link_id: &LinkId) -> Result<Option<Link>> {
         // THIS IS A TEMPORARY HACK!
         // isopy-repo needs a method to get a DirInfo given a link ID or something
         for link in self.repo.list_links()? {
@@ -217,11 +216,11 @@ impl App {
     }
 
     pub(crate) fn get_dir_info(&self, project_dir: &Path) -> Result<Option<DirInfo>> {
-        Ok(self.repo.get(project_dir)?)
+        self.repo.get(project_dir)
     }
 
     pub(crate) fn remove_project_env(&self, project_dir: &Path) -> Result<bool> {
-        Ok(self.repo.remove(project_dir)?)
+        self.repo.remove(project_dir)
     }
 
     pub(crate) fn find_dir_info(&self, isopy_env: Option<&IsopyEnv>) -> Result<Option<DirInfo>> {
@@ -241,28 +240,7 @@ impl App {
             return Ok(None);
         };
 
-        // Well, this is painful...
-        let dir_info = match self.repo.get(link.project_dir()) {
-            Ok(dir_info) => dir_info,
-            Err(e) if e.is_other() => {
-                let Some(e0) = e.downcast_other_ref::<YamlError>() else {
-                    bail!(e);
-                };
-
-                let Some(e1) = e0.downcast_other_ref::<FileReadError>() else {
-                    bail!(e);
-                };
-
-                if !e1.is_not_found() {
-                    bail!(e);
-                }
-
-                None
-            }
-            Err(e) => bail!(e),
-        };
-
-        Ok(dir_info)
+        self.repo.get(link.project_dir())
     }
 
     pub(crate) fn make_env_info(&self, data_dir: &Path, package: &EnvPackage) -> EnvInfo {

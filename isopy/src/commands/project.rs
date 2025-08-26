@@ -20,15 +20,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 use crate::app::App;
-use crate::fs::util::existing;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
 use crate::status::{StatusResult, success, user_error};
 use log::info;
 
-pub(crate) fn do_project(app: &App, package_id: &PackageId) -> StatusResult {
-    let mut package_ids =
-        existing(app.read_project_config())?.map_or_else(Vec::new, |p| p.package_ids);
+pub fn do_project(app: &App, package_id: &PackageId) -> StatusResult {
+    let project = app.read_project_config()?;
+    let mut package_ids = project.package_ids;
 
     if package_ids.iter().any(|p| p.moniker == package_id.moniker) {
         user_error!(

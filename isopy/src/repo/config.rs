@@ -22,8 +22,7 @@
 use crate::formats::read_yaml_file;
 use crate::fs::safe_write_file;
 use crate::repo::Repo;
-use crate::repo::error::RepoError;
-use crate::repo::result::RepoResult;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -49,12 +48,12 @@ impl RepoConfig {
         }
     }
 
-    pub fn repo(self) -> RepoResult<Option<Repo>> {
+    pub fn repo(self) -> Result<Option<Repo>> {
         Repo::new(if self.config_path.is_file() {
-            read_yaml_file::<Self>(&self.config_path).map_err(RepoError::other)?
+            read_yaml_file::<Self>(&self.config_path)?
         } else {
-            let yaml_str = serde_yaml::to_string(&self).map_err(RepoError::other)?;
-            safe_write_file(&self.config_path, yaml_str, false).map_err(RepoError::other)?;
+            let yaml_str = serde_yaml::to_string(&self)?;
+            safe_write_file(&self.config_path, yaml_str, false)?;
             self
         })
     }
