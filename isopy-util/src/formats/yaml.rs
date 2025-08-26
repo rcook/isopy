@@ -121,9 +121,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{YamlErrorKind, read_yaml_file};
     use crate::FileReadError;
     use crate::error::HasOtherError;
+    use crate::{YamlErrorKind, read_yaml_file};
     use anyhow::Result;
     use serde_yaml::Value;
     use std::fs::write;

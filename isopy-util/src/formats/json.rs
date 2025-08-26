@@ -152,7 +152,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{JsonErrorKind, read_json_file};
+    use crate::{JsonErrorKind, read_json_file};
     use anyhow::Result;
     use serde_json::{Value, json};
     use std::fs::write;

@@ -207,11 +207,10 @@ impl VersionOps for PythonVersion {
 
 #[cfg(test)]
 mod tests {
-    use super::PythonVersion;
-    use super::parse_triple_discriminant_helper;
     use crate::discriminant::Discriminant;
     use crate::label::Label;
     use crate::prerelease_kind::PrereleaseKind;
+    use crate::python_version::{PythonVersion, parse_triple_discriminant_helper};
     use anyhow::Result;
     use rstest::rstest;
 

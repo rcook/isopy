@@ -19,7 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::paths::{file_name_safe_timestamp, label_file_name};
+use crate::fs::paths::{file_name_safe_timestamp, label_file_name};
 use chrono::{DateTime, Utc};
 use std::fs::{OpenOptions, copy};
 use std::io::{ErrorKind as IOErrorKind, Result as IOResult};
@@ -60,7 +60,7 @@ fn safe_back_up_inner(path: &Path, now: Option<DateTime<Utc>>) -> IOResult<PathB
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::fs::backup::safe_back_up_inner;
     use anyhow::Result;
     use chrono::{TimeZone, Utc};
     use std::fs::{read_dir, read_to_string, write};

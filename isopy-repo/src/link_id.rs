@@ -84,7 +84,7 @@ impl<'de> Deserialize<'de> for LinkId {
 
 #[cfg(test)]
 mod tests {
-    use super::LinkId;
+    use crate::LinkId;
     use anyhow::Result;
     use rstest::rstest;
     use std::path::{Path, PathBuf};

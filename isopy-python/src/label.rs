@@ -80,7 +80,8 @@ impl PartialOrd for Label {
 
 #[cfg(test)]
 mod tests {
-    use super::Label;
+    use crate::label::Label;
+
     #[test]
     fn basics() {
         let label1 = Label::NewStyle(String::from("label"));

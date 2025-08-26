@@ -47,7 +47,7 @@ impl Display for Discriminant {
 
 #[cfg(test)]
 mod tests {
-    use super::Discriminant;
+    use crate::discriminant::Discriminant;
     use crate::prerelease_kind::PrereleaseKind;
 
     #[test]

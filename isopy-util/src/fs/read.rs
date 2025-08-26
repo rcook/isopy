@@ -152,7 +152,7 @@ pub fn read_bytes(path: &Path) -> StdResult<Vec<u8>, FileReadError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{FileReadErrorKind, open_file, read_bytes, read_text_file};
+    use crate::{FileReadErrorKind, open_file, read_bytes, read_text_file};
     use anyhow::Result;
     use std::fs::write;
     use std::io::Read;

@@ -19,8 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use super::row::Row;
-use super::settings::TableSettings;
+use crate::table::row::Row;
+use crate::table::settings::TableSettings;
 use colored::{Color, Colorize};
 
 macro_rules! table_title {

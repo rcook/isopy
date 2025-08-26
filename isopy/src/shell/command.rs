@@ -19,14 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use crate::shell::IsopyEnv;
 use anyhow::Result;
 use isopy_lib::EnvInfo;
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitStatus;
-
-use super::IsopyEnv;
 
 pub(crate) struct Command {
     program: Option<OsString>,

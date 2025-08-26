@@ -79,7 +79,7 @@ pub fn find_sentinel_file(
 
 #[cfg(test)]
 mod tests {
-    use super::{find_sentinel_dir, find_sentinel_file};
+    use crate::{find_sentinel_dir, find_sentinel_file};
     use anyhow::Result;
     use std::fs::create_dir_all;
     use std::fs::write;

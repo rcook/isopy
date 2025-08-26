@@ -163,7 +163,7 @@ pub fn read_toml_file_edit(path: &Path) -> StdResult<DocumentMut, TomlError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{TomlErrorKind, read_toml_file, read_toml_file_edit};
+    use crate::{TomlErrorKind, read_toml_file, read_toml_file_edit};
     use anyhow::Result;
     use std::fs::write;
     use tempdir::TempDir;

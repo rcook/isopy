@@ -54,7 +54,7 @@ impl PartialOrd for PrereleaseKind {
 
 #[cfg(test)]
 mod tests {
-    use super::PrereleaseKind;
+    use crate::prerelease_kind::PrereleaseKind;
 
     #[test]
     fn order() {

@@ -52,7 +52,7 @@ pub fn file_name_safe_timestamp(dt: &DateTime<Utc>) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{file_name_safe_timestamp, label_file_name};
+    use crate::{file_name_safe_timestamp, label_file_name};
     use chrono::{TimeZone, Utc};
     use rstest::rstest;
     use std::path::PathBuf;

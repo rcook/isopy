@@ -73,7 +73,7 @@ impl<'de> Deserialize<'de> for MetaId {
 
 #[cfg(test)]
 mod tests {
-    use super::MetaId;
+    use crate::MetaId;
     use anyhow::Result;
     use rstest::rstest;
     use uuid::Uuid;

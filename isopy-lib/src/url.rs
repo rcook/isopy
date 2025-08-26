@@ -96,7 +96,7 @@ impl From<DirUrl> for Url {
 
 #[cfg(test)]
 mod tests {
-    use super::FileUrl;
+    use crate::FileUrl;
     use crate::url::DirUrl;
     use anyhow::Result;
     use rstest::rstest;

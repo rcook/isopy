@@ -46,7 +46,7 @@ impl Display for PrereleaseInfo {
 
 #[cfg(test)]
 mod tests {
-    use super::PrereleaseInfo;
+    use crate::prerelease_info::PrereleaseInfo;
     use crate::prerelease_kind::PrereleaseKind;
 
     #[test]

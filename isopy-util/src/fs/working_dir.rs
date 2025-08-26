@@ -55,7 +55,7 @@ impl Drop for WorkingDirectory {
 
 #[cfg(test)]
 mod tests {
-    use super::WorkingDirectory;
+    use crate::WorkingDirectory;
     use anyhow::Result;
     use serial_test::serial;
     use std::env::current_dir;

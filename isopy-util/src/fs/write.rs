@@ -153,7 +153,7 @@ fn ensure_dir(file_path: &Path) -> StdResult<(), FileWriteError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{FileWriteErrorKind, safe_create_file, safe_write_file};
+    use crate::{FileWriteErrorKind, safe_create_file, safe_write_file};
     use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;
