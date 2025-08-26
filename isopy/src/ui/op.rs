@@ -19,7 +19,40 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::Error;
-use std::result::Result as StdResult;
+use crate::ui::indicator::Indicator;
+use crate::ui::state::State;
+use std::sync::Arc;
 
-pub type Result<T> = StdResult<T, Error>;
+pub type OpProgress = u64;
+
+pub struct Op {
+    state: Arc<State>,
+    indicator: Arc<Indicator>,
+}
+
+impl Op {
+    #[allow(unused)]
+    pub fn set_progress(&self, value: OpProgress) {
+        self.indicator.set_progress(value);
+    }
+
+    #[allow(unused)]
+    pub fn set_message(&self, s: &str) {
+        self.indicator.set_message(s);
+    }
+
+    #[allow(unused)]
+    pub fn print(&self, s: &str) {
+        self.indicator.print(s);
+    }
+
+    pub(crate) const fn new(state: Arc<State>, indicator: Arc<Indicator>) -> Self {
+        Self { state, indicator }
+    }
+}
+
+impl Drop for Op {
+    fn drop(&mut self) {
+        self.state.release_indicator(&self.indicator);
+    }
+}

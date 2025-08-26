@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::Error;
-use crate::op::OpProgress;
-use crate::result::Result;
+use crate::ui::error::Error;
+use crate::ui::op::OpProgress;
+use crate::ui::result::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use uuid::Uuid;
 

@@ -1337,10 +1337,10 @@ dependencies = [
  "dirs",
  "exec",
  "futures-util",
+ "indicatif",
  "isopy-go",
  "isopy-java",
  "isopy-lib",
- "isopy-logging",
  "isopy-python",
  "isopy-repo",
  "isopy-util",
@@ -1359,6 +1359,7 @@ dependencies = [
  "tinytemplate",
  "tokio",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -1412,15 +1413,6 @@ dependencies = [
  "strum_macros",
  "tokio",
  "url",
-]
-
-[[package]]
-name = "isopy-logging"
-version = "0.5.9"
-dependencies = [
- "indicatif",
- "log",
- "uuid",
 ]
 
 [[package]]

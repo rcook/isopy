@@ -19,29 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::state::State;
-use log::{Log, Metadata, Record};
-use std::sync::Arc;
+mod error;
+mod global;
+mod indicator;
+mod logger;
+mod op;
+mod result;
+mod state;
+#[allow(clippy::module_inception)]
+mod ui;
 
-pub struct Logger {
-    state: Arc<State>,
-}
-
-impl Logger {
-    pub(crate) const fn new(state: Arc<State>) -> Self {
-        Self { state }
-    }
-}
-
-impl Log for Logger {
-    fn enabled(&self, _metadata: &Metadata) -> bool {
-        true
-    }
-
-    fn flush(&self) {}
-
-    fn log(&self, record: &Record) {
-        self.state
-            .print(&format!("{} - {}", record.level(), record.args()));
-    }
-}
+pub use global::*;
+pub use ui::*;

@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::op::{Op, OpProgress};
-use crate::result::Result;
 use crate::ui::Ui;
+use crate::ui::op::{Op, OpProgress};
+use crate::ui::result::Result;
 use std::sync::{LazyLock, RwLock};
 
 static GLOBAL: LazyLock<RwLock<Option<Ui>>> = LazyLock::new(|| RwLock::new(None));

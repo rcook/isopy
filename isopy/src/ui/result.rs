@@ -19,42 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::error::Error;
-use crate::logger::Logger;
-use crate::op::Op;
-use crate::op::OpProgress;
-use crate::result::Result;
-use crate::state::State;
-use log::set_boxed_logger;
-use std::sync::Arc;
+use crate::ui::error::Error;
+use std::result::Result as StdResult;
 
-pub struct Ui {
-    state: Arc<State>,
-}
-
-impl Ui {
-    #[allow(unused)]
-    pub fn new(enable_logger: bool) -> Result<Self> {
-        let state = Arc::new(State::new());
-
-        if enable_logger {
-            set_boxed_logger(Box::new(Logger::new(Arc::clone(&state))))
-                .map_err(|_| Error::CouldNotSetLogger)?;
-        }
-
-        Ok(Self { state })
-    }
-
-    #[allow(unused)]
-    pub fn begin_operation(&self, len: Option<OpProgress>) -> Result<Op> {
-        Ok(Op::new(
-            Arc::clone(&self.state),
-            self.state.make_indicator(len)?,
-        ))
-    }
-
-    #[allow(unused)]
-    pub fn print(&self, msg: &str) {
-        self.state.print(msg);
-    }
-}
+pub type Result<T> = StdResult<T, Error>;

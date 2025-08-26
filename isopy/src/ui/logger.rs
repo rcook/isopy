@@ -19,45 +19,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::indicator::Indicator;
-use crate::op::OpProgress;
-use crate::result::Result;
-use std::sync::{Arc, RwLock};
+use crate::ui::state::State;
+use log::{Log, Metadata, Record};
+use std::sync::Arc;
 
-pub struct State {
-    indicator: RwLock<Option<Arc<Indicator>>>,
+pub struct Logger {
+    state: Arc<State>,
 }
 
-impl State {
-    pub(crate) const fn new() -> Self {
-        Self {
-            indicator: RwLock::new(None),
-        }
+impl Logger {
+    pub(crate) const fn new(state: Arc<State>) -> Self {
+        Self { state }
+    }
+}
+
+impl Log for Logger {
+    fn enabled(&self, _metadata: &Metadata) -> bool {
+        true
     }
 
-    pub(crate) fn make_indicator(&self, len: Option<OpProgress>) -> Result<Arc<Indicator>> {
-        let mut writer = self.indicator.write().expect("lock is poisoned");
-        *writer = None;
-        let indicator = Arc::new(Indicator::new(len)?);
-        *writer = Some(Arc::clone(&indicator));
-        drop(writer);
-        Ok(indicator)
-    }
+    fn flush(&self) {}
 
-    pub(crate) fn release_indicator(&self, indicator: &Arc<Indicator>) {
-        let mut writer = self.indicator.write().expect("lock is poisoned");
-        if let Some(i) = &*writer
-            && indicator.id() == i.id()
-        {
-            *writer = None;
-        }
-    }
-
-    pub(crate) fn print(&self, s: &str) {
-        if let Some(i) = &*self.indicator.read().expect("lock is poisoned") {
-            i.print(s);
-        } else {
-            println!("{s}");
-        }
+    fn log(&self, record: &Record) {
+        self.state
+            .print(&format!("{} - {}", record.level(), record.args()));
     }
 }

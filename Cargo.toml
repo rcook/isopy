@@ -10,7 +10,6 @@ members = [
   "isopy-go",
   "isopy-java",
   "isopy-lib",
-  "isopy-logging",
   "isopy-python",
   "isopy-repo",
   "isopy-util",

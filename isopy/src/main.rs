@@ -41,6 +41,7 @@ mod shell;
 mod status;
 mod table;
 mod terminal;
+mod ui;
 mod wrapper_file_name;
 
 #[tokio::main]

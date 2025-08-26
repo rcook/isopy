@@ -19,40 +19,45 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::indicator::Indicator;
-use crate::state::State;
-use std::sync::Arc;
+use crate::ui::indicator::Indicator;
+use crate::ui::op::OpProgress;
+use crate::ui::result::Result;
+use std::sync::{Arc, RwLock};
 
-pub type OpProgress = u64;
-
-pub struct Op {
-    state: Arc<State>,
-    indicator: Arc<Indicator>,
+pub struct State {
+    indicator: RwLock<Option<Arc<Indicator>>>,
 }
 
-impl Op {
-    #[allow(unused)]
-    pub fn set_progress(&self, value: OpProgress) {
-        self.indicator.set_progress(value);
+impl State {
+    pub(crate) const fn new() -> Self {
+        Self {
+            indicator: RwLock::new(None),
+        }
     }
 
-    #[allow(unused)]
-    pub fn set_message(&self, s: &str) {
-        self.indicator.set_message(s);
+    pub(crate) fn make_indicator(&self, len: Option<OpProgress>) -> Result<Arc<Indicator>> {
+        let mut writer = self.indicator.write().expect("lock is poisoned");
+        *writer = None;
+        let indicator = Arc::new(Indicator::new(len)?);
+        *writer = Some(Arc::clone(&indicator));
+        drop(writer);
+        Ok(indicator)
     }
 
-    #[allow(unused)]
-    pub fn print(&self, s: &str) {
-        self.indicator.print(s);
+    pub(crate) fn release_indicator(&self, indicator: &Arc<Indicator>) {
+        let mut writer = self.indicator.write().expect("lock is poisoned");
+        if let Some(i) = &*writer
+            && indicator.id() == i.id()
+        {
+            *writer = None;
+        }
     }
 
-    pub(crate) const fn new(state: Arc<State>, indicator: Arc<Indicator>) -> Self {
-        Self { state, indicator }
-    }
-}
-
-impl Drop for Op {
-    fn drop(&mut self) {
-        self.state.release_indicator(&self.indicator);
+    pub(crate) fn print(&self, s: &str) {
+        if let Some(i) = &*self.indicator.read().expect("lock is poisoned") {
+            i.print(s);
+        } else {
+            println!("{s}");
+        }
     }
 }
