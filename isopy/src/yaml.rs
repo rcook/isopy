@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Richard Cook
+// Copyright (c) 2025 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -19,8 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod json;
-mod toml;
-mod yaml;
+use anyhow::{Context, Result};
+use serde::de::DeserializeOwned;
+use std::fs::read_to_string;
+use std::path::Path;
 
-pub use yaml::*;
+pub fn read_yaml_file<T>(path: &Path) -> Result<T>
+where
+    T: DeserializeOwned,
+{
+    let s = read_to_string(path)
+        .with_context(|| format!("failed to read from {path}", path = path.display()))?;
+    let value = serde_yaml::from_str::<T>(&s)?;
+    Ok(value)
+}

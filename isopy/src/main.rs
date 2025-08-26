@@ -28,7 +28,6 @@ mod constants;
 mod date_time_format;
 mod dir_info_ext;
 mod env;
-mod formats;
 mod fs;
 mod moniker;
 mod package_id;
@@ -45,6 +44,7 @@ mod table;
 mod terminal;
 mod ui;
 mod wrapper_file_name;
+mod yaml;
 
 #[tokio::main]
 async fn main() -> std::process::ExitCode {

@@ -24,7 +24,6 @@ pub mod util;
 mod backup;
 mod find;
 mod paths;
-mod read;
 mod working_dir;
 mod write;
 
