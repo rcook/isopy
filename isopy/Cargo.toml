@@ -55,6 +55,7 @@ same-file = "1.0.6"
 sysinfo = "0.35.2"
 
 [dev-dependencies]
+remove_dir_all = "1.0.0"
 rstest = "0.25.0"
 serial_test = "3.2.0"
 tempdir = "0.3.7"
