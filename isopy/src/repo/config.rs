@@ -63,11 +63,11 @@ impl RepoConfig {
 mod tests {
     use crate::repo::RepoConfig;
     use anyhow::Result;
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     #[test]
     fn default() -> Result<()> {
-        let base_dir = TempDir::new("isopy-repo-test")?;
+        let base_dir = TempDir::with_prefix("isopy-repo-test")?;
         let c = RepoConfig::default(base_dir.path(), None);
         assert_eq!(base_dir.path().join(".lock"), c.lock_path);
         assert_eq!(base_dir.path().join("config.yaml"), c.config_path);
@@ -79,7 +79,7 @@ mod tests {
 
     #[test]
     fn prefix() -> Result<()> {
-        let base_dir = TempDir::new("isopy-repo-test")?;
+        let base_dir = TempDir::with_prefix("isopy-repo-test")?;
         let c = RepoConfig::default(base_dir.path(), Some("foo"));
         assert_eq!(base_dir.path().join(".foo-lock"), c.lock_path);
         assert_eq!(base_dir.path().join("foo-config.yaml"), c.config_path);

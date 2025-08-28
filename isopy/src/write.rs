@@ -72,12 +72,12 @@ mod tests {
     use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     #[test]
     fn test_safe_create_file_no_overwrite_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
 
         // Act
@@ -92,7 +92,7 @@ mod tests {
     #[test]
     fn test_safe_create_file_overwrite_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
 
         // Act
@@ -107,7 +107,7 @@ mod tests {
     #[test]
     fn test_safe_create_file_exists_no_overwrite_fails() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
         write(&path, "hello-world")?;
 
@@ -127,7 +127,7 @@ mod tests {
     #[test]
     fn test_safe_create_file_exists_overwrite_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
         write(&path, "hello-world")?;
 
@@ -143,7 +143,7 @@ mod tests {
     #[test]
     fn test_safe_write_file_no_overwrite_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
 
         // Act
@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn test_safe_write_file_overwrite_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
 
         // Act
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn test_safe_write_file_exists_no_overwrite_fails() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
         write(&path, "hello-world")?;
 
@@ -191,7 +191,7 @@ mod tests {
     #[test]
     fn test_safe_write_file_exists_overwrite_succeeds() -> Result<()> {
         // Arrange
-        let temp_dir = TempDir::new("isopy-util-test")?;
+        let temp_dir = TempDir::with_prefix("isopy-util-test")?;
         let path = temp_dir.path().join("file.txt");
         write(&path, "hello-world")?;
 

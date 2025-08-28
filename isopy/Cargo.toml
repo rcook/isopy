@@ -33,14 +33,11 @@ open = "5.3.2"
 path-absolutize = "3.1.1"
 reqwest = { version = "0.12.23", features = ["stream"] }
 serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.143"
 serde_yaml = "0.9.34"
 strum = "0.27.2"
 strum_macros = "0.27.2"
 tinytemplate = "1.2.1"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
-toml = "0.9.5"
-toml_edit = "0.23.4"
 url = { version = "2.5.7", features = ["serde"] }
 uuid = { version = "1.18.0", features = ["v4", "serde"] }
 
@@ -55,10 +52,9 @@ same-file = "1.0.6"
 sysinfo = "0.35.2"
 
 [dev-dependencies]
-remove_dir_all = "1.0.0"
 rstest = "0.25.0"
 serial_test = "3.2.0"
-tempdir = "0.3.7"
+tempfile = "3.21.0"
 
 [lints.clippy]
 all = { level = "deny", priority = -1 }
