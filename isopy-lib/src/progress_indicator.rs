@@ -40,7 +40,6 @@ pub struct ProgressIndicatorOptions {
 pub struct ProgressIndicator(Option<Arc<ProgressBar>>);
 
 impl ProgressIndicator {
-    #[allow(unused)]
     pub fn new(options: &ProgressIndicatorOptions) -> Result<Self> {
         if !options.enabled {
             return Ok(Self(None));

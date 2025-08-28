@@ -170,7 +170,6 @@ impl PythonPackageManager {
         //from_dir(Path::new("downloads/transaction"))
     }
 
-    #[allow(unused)]
     async fn fetch_packages(
         &self,
         _cache_path: &Path,

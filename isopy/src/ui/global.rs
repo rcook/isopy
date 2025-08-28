@@ -26,7 +26,6 @@ use std::sync::{LazyLock, RwLock};
 
 static GLOBAL: LazyLock<RwLock<Option<Ui>>> = LazyLock::new(|| RwLock::new(None));
 
-#[allow(unused)]
 pub fn init_ui(enable_logger: bool) -> Result<()> {
     let mut writer = GLOBAL.write().expect("lock is poisoned");
     assert!(

@@ -19,6 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+#![allow(unused)]
+
 use crate::ui::indicator::Indicator;
 use crate::ui::state::State;
 use std::sync::Arc;
@@ -31,17 +33,14 @@ pub struct Op {
 }
 
 impl Op {
-    #[allow(unused)]
     pub fn set_progress(&self, value: OpProgress) {
         self.indicator.set_progress(value);
     }
 
-    #[allow(unused)]
     pub fn set_message(&self, s: &str) {
         self.indicator.set_message(s);
     }
 
-    #[allow(unused)]
     pub fn print(&self, s: &str) {
         self.indicator.print(s);
     }

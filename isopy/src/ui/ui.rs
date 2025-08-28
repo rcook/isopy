@@ -32,7 +32,6 @@ pub struct Ui {
 }
 
 impl Ui {
-    #[allow(unused)]
     pub fn new(enable_logger: bool) -> Result<Self> {
         let state = Arc::new(State::new());
 
@@ -43,7 +42,6 @@ impl Ui {
         Ok(Self { state })
     }
 
-    #[allow(unused)]
     pub fn begin_operation(&self, len: Option<OpProgress>) -> Result<Op> {
         Ok(Op::new(
             Arc::clone(&self.state),
