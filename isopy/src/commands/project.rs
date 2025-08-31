@@ -23,11 +23,23 @@ use crate::app::App;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
 use crate::status::{StatusResult, success, user_error};
+use anyhow::{Error, bail};
 use log::info;
+use std::io::{Error as IoError, ErrorKind};
+
+fn is_io_error_kind(e: &Error, error_kind: ErrorKind) -> bool {
+    match e.root_cause().downcast_ref::<IoError>() {
+        Some(e) => e.kind() == error_kind,
+        None => false,
+    }
+}
 
 pub fn do_project(app: &App, package_id: &PackageId) -> StatusResult {
-    let project = app.read_project_config()?;
-    let mut package_ids = project.package_ids;
+    let mut package_ids = match app.read_project_config() {
+        Ok(project) => project.package_ids,
+        Err(e) if is_io_error_kind(&e, ErrorKind::NotFound) => Vec::new(),
+        Err(e) => bail!(e),
+    };
 
     if package_ids.iter().any(|p| p.moniker == package_id.moniker) {
         user_error!(
