@@ -49,12 +49,13 @@ mod yaml;
 
 #[tokio::main]
 async fn main() -> std::process::ExitCode {
-    use crate::env::EnvKey;
     use crate::run::run;
     use crate::status::Status::{Success, UserError};
-    use anyhow::Error;
     use colored::Colorize;
+    use std::env::{VarError, var};
+    use std::fmt::Debug;
     use std::process::ExitCode;
+    use std::result::Result as StdResult;
 
     fn show_message(message: &str) {
         println!("{}", message.to_string().bright_green());
@@ -64,28 +65,24 @@ async fn main() -> std::process::ExitCode {
         eprintln!("{}", message.to_string().bright_yellow());
     }
 
-    fn show_error(error: &Error) {
-        eprintln!("{}", error.to_string().bright_red());
-        if EnvKey::BacktraceEnabled.is_true() {
-            eprintln!("stack backtrace:\n{}", error.backtrace());
+    fn show_error<T, E: Debug + ToString>(result: StdResult<T, E>) {
+        assert!(result.is_err());
+        if let Err(e) = result.as_ref() {
+            eprintln!("{}", e.to_string().bright_red());
         } else {
-            #[cfg(debug_assertions)]
-            eprintln!(
-                "{}",
-                format!(
-                    "note: run with `{name}={value}` environment variable to display a backtrace",
-                    name = EnvKey::BacktraceEnabled,
-                    value = crate::env::BOOL_TRUE_VALUE
-                )
-                .bright_white()
-                .bold()
-            );
+            unreachable!()
+        }
+        match var("RUST_BACKTRACE") {
+            Ok(_) => _ = result.unwrap(),
+            Err(VarError::NotPresent) => {}
+            Err(e) => panic!("{e}"),
         }
     }
 
     const USER_ERROR: u8 = 2;
 
-    match run().await {
+    let result = run().await;
+    match result {
         Ok(Success(Some(message))) => {
             show_message(&message);
             ExitCode::SUCCESS
@@ -95,8 +92,8 @@ async fn main() -> std::process::ExitCode {
             show_user_error(&message);
             ExitCode::from(USER_ERROR)
         }
-        Err(e) => {
-            show_error(&e);
+        Err(_) => {
+            show_error(result);
             ExitCode::FAILURE
         }
     }
