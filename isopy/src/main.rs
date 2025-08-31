@@ -48,14 +48,18 @@ mod write;
 mod yaml;
 
 #[tokio::main]
-async fn main() -> std::process::ExitCode {
+async fn main() -> anyhow::Result<()> {
     use crate::run::run;
     use crate::status::Status::{Success, UserError};
+    use anyhow::Error;
+    use anyhow::bail;
     use colored::Colorize;
     use std::env::{VarError, var};
-    use std::fmt::Debug;
-    use std::process::ExitCode;
-    use std::result::Result as StdResult;
+    use std::process::exit;
+
+    const SUCCESS: i32 = 0;
+    const FAILURE: i32 = 1;
+    const USER_ERROR: i32 = 2;
 
     fn show_message(message: &str) {
         println!("{}", message.to_string().bright_green());
@@ -65,36 +69,29 @@ async fn main() -> std::process::ExitCode {
         eprintln!("{}", message.to_string().bright_yellow());
     }
 
-    fn show_error<T, E: Debug + ToString>(result: StdResult<T, E>) {
-        assert!(result.is_err());
-        if let Err(e) = result.as_ref() {
-            eprintln!("{}", e.to_string().bright_red());
-        } else {
-            unreachable!()
-        }
-        match var("RUST_BACKTRACE") {
-            Ok(_) => _ = result.unwrap(),
-            Err(VarError::NotPresent) => {}
-            Err(e) => panic!("{e}"),
-        }
+    fn show_error(error: &Error) {
+        eprintln!("{}", error.to_string().bright_red());
     }
-
-    const USER_ERROR: u8 = 2;
 
     let result = run().await;
-    match result {
+    match result.as_ref() {
         Ok(Success(Some(message))) => {
-            show_message(&message);
-            ExitCode::SUCCESS
+            show_message(message);
+            exit(SUCCESS);
         }
-        Ok(Success(None)) => ExitCode::SUCCESS,
+        Ok(Success(None)) => exit(SUCCESS),
         Ok(UserError(message)) => {
-            show_user_error(&message);
-            ExitCode::from(USER_ERROR)
+            show_user_error(message);
+            exit(USER_ERROR);
         }
-        Err(_) => {
-            show_error(result);
-            ExitCode::FAILURE
+        Err(e) => {
+            show_error(e);
+            match var("RUST_BACKTRACE") {
+                Ok(_) => _ = result?,
+                Err(VarError::NotPresent) => exit(FAILURE),
+                Err(e) => bail!(e),
+            }
         }
     }
+    Ok(())
 }
