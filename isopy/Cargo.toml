@@ -12,49 +12,49 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.5.11"
 
 [dependencies]
-anyhow = { version = "1.0.99", features = ["backtrace"] }
+anyhow = { version = "1.0.101", features = ["backtrace"] }
 async-trait = "0.1.89"
-chrono = { version = "0.4.41", features = ["serde"] }
-clap = { version = "4.5.46", features = ["derive", "env"] }
-clap_complete = "4.5.57"
-colored = "3.0.0"
-ctrlc = "3.4.7"
+chrono = { version = "0.4.43", features = ["serde"] }
+clap = { version = "4.5.59", features = ["derive", "env"] }
+clap_complete = "4.5.66"
+colored = "3.1.1"
+ctrlc = "3.5.2"
 dirs = "6.0.0"
 fslock = "0.2.1"
-futures-util = "0.3.31"
-indicatif = "0.18.0"
+futures-util = "0.3.32"
+indicatif = "0.18.4"
 isopy-go = { path = "../isopy-go" }
 isopy-java = { path = "../isopy-java" }
 isopy-lib = { path = "../isopy-lib" }
 isopy-python = { path = "../isopy-python" }
-log = { version = "0.4.27", features = ["std"] }
+log = { version = "0.4.29", features = ["std"] }
 md5 = "0.8.0"
-open = "5.3.2"
+open = "5.3.3"
 path-absolutize = "3.1.1"
-reqwest = { version = "0.12.23", features = ["stream"] }
-serde = { version = "1.0.219", features = ["derive"] }
+reqwest = { version = "0.12.28", features = ["stream"] }
+serde = { version = "1.0.228", features = ["derive"] }
 serde_yaml = "0.9.34"
 strum = "0.27.2"
 strum_macros = "0.27.2"
 tinytemplate = "1.2.1"
-tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
-url = { version = "2.5.7", features = ["serde"] }
-uuid = { version = "1.18.0", features = ["v4", "serde"] }
+tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread"] }
+url = { version = "2.5.8", features = ["serde"] }
+uuid = { version = "1.21.0", features = ["v4", "serde"] }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"macos\"))".dependencies]
 exec = "0.3.1"
 
 [target."cfg(target_os = \"linux\")".dependencies]
-openssl-sys = { version = "0.9.109", features = ["vendored"] }
+openssl-sys = { version = "0.9.111", features = ["vendored"] }
 
 [target."cfg(target_os = \"windows\")".dependencies]
 same-file = "1.0.6"
-sysinfo = "0.37.0"
+sysinfo = "0.37.2"
 
 [dev-dependencies]
 rstest = "0.26.1"
-serial_test = "3.2.0"
-tempfile = "3.21.0"
+serial_test = "3.3.1"
+tempfile = "3.25.0"
 
 [lints.clippy]
 all = { level = "deny", priority = -1 }
