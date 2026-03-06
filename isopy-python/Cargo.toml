@@ -12,7 +12,7 @@ repository = "https://github.com/rcook/isopy.git"
 version = "0.5.11"
 
 [dependencies]
-anyhow = "1.0.101"
+anyhow = "1.0.102"
 async-trait = "0.1.89"
 isopy-lib = { path = "../isopy-lib" }
 itertools = "0.14.0"
