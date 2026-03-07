@@ -35,6 +35,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Echo GITHUB_REF
+        shell: bash
+        run: echo "GITHUB_REF=${GITHUB_REF}"
+
       - name: Echo the release version from the tag
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/}"
