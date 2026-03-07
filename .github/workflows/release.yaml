@@ -2,8 +2,8 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - new-workflow
+    tags:
+      - this-is-an-awesome-tag
 
 permissions:
   contents: write
