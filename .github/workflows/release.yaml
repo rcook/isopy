@@ -1,8 +1,8 @@
 name: Release
 
 env:
-  tool_name: isopy
-  build_type: release
+  REF_PREFIX: refs/tags
+  BINARY: isopy
 
 permissions:
   contents: write
@@ -16,40 +16,67 @@ jobs:
   release:
     strategy:
       matrix:
-        target:
-          - aarch64-apple-darwin
-          #- x86_64-apple-darwin
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-musl
         include:
           - target: aarch64-apple-darwin
             target_ext: ""
             archive_type: .tar.gz
+            build: macos
             build_os: macos-latest
+
           #- target: x86_64-apple-darwin
           #  target_ext: ""
           #  archive_type: .tar.gz
-          #  build_os: macos-13
+          #  build: macos
+          #  build_os: macos-latest
+
           - target: x86_64-pc-windows-msvc
             target_ext: .exe
             archive_type: .zip
+            build: windows
             build_os: windows-latest
+
           - target: x86_64-unknown-linux-musl
             target_ext: ""
             archive_type: .tar.gz
+            build: linux
             build_os: ubuntu-latest
+    name: Release
     runs-on: ${{ matrix.build_os }}
     steps:
-      - name: Build, test and release Rust tool
-        uses: rcook/rust-tool-action@v0.0.35
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Add version to environment
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#$REF_PREFIX/}" >> $GITHUB_ENV
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          tool_name: ${{ env.tool_name }}
-          target: ${{ matrix.target }}
-          target_ext: ${{ matrix.target_ext }}
-          archive_type: ${{ matrix.archive_type }}
-          build_type: ${{ env.build_type }}
-          code_sign: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUST_TOOL_ACTION_CODE_SIGN_CRT: ${{ secrets.RCOOK_CRT }}
-          RUST_TOOL_ACTION_CODE_SIGN_CRTPASS: ${{ secrets.RCOOK_CRTPASS }}
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --verbose --release --target ${{ matrix.target }}
+
+      - name: Build archive
+        shell: bash
+        run: |
+          base_name="${{ env.BINARY }}-${{ env.VERSION }}-${{ matrix.target }}"
+          archive_name="$base_name${{ matrix.archive_type }}"
+          mv "target/${{ matrix.target }}/release/${{ env.BINARY }}${{ matrix.target_ext }}" "$base_name"
+          if [ "${{ matrix.archive_type }}" = ".zip" ]; then
+            7z a "$archive_name" "$base_name"
+          else
+            tar -czf "$archive_name" "$base_name"
+          fi
+          echo "ASSET=$archive_name" >> $GITHUB_ENV
+
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ env.ASSET }}
