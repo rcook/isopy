@@ -54,7 +54,7 @@ sysinfo = "0.38.3"
 [dev-dependencies]
 rstest = "0.26.1"
 serial_test = "3.4.0"
-tempfile = "3.26.0"
+tempfile = "3.27.0"
 
 [lints.clippy]
 all = { level = "deny", priority = -1 }
