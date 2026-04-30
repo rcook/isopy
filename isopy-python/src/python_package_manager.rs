@@ -45,14 +45,6 @@ use url::Url;
 
 const PACKAGE_CACHE_FILE_NAME: &str = "packages.yaml";
 
-macro_rules! downcast_version {
-    ($version : expr) => {
-        $version
-            .as_any()
-            .downcast_ref::<$crate::python_version::PythonVersion>()
-            .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
-    };
-}
 
 pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
@@ -362,7 +354,7 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         options: &GetPackageOptions,
     ) -> Result<Option<PackageInfo>> {
-        let version = downcast_version!(version);
+        let version = isopy_lib::downcast_version!(version, PythonVersion);
         let package = self
             .read_package(version, tag_filter, options.show_progress)
             .await?;
@@ -375,7 +367,7 @@ impl PackageManagerOps for PythonPackageManager {
         tag_filter: &TagFilter,
         options: &DownloadPackageOptions,
     ) -> Result<()> {
-        let version = downcast_version!(version);
+        let version = isopy_lib::downcast_version!(version, PythonVersion);
         let Some(info) = self
             .read_package(version, tag_filter, options.show_progress)
             .await?
@@ -404,7 +396,7 @@ impl PackageManagerOps for PythonPackageManager {
         dir: &Path,
         options: &InstallPackageOptions,
     ) -> Result<Package> {
-        let version = downcast_version!(version);
+        let version = isopy_lib::downcast_version!(version, PythonVersion);
         let Some(info) = self
             .read_package(version, tag_filter, options.show_progress)
             .await?

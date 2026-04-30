@@ -54,15 +54,6 @@ const PLATFORM_TAGS: [&str; 2] = ["arm64", "windows"];
 #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
 const PLATFORM_TAGS: [&str; 2] = ["amd64", "windows"];
 
-#[allow(unused)]
-macro_rules! downcast_version {
-    ($version : expr) => {
-        $version
-            .as_any()
-            .downcast_ref::<$crate::go_version::GoVersion>()
-            .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
-    };
-}
 
 pub struct GoPackageManager {
     ctx: PackageManagerContext,
@@ -225,7 +216,7 @@ impl PackageManagerOps for GoPackageManager {
         tags: &TagFilter,
         options: &GetPackageOptions,
     ) -> Result<Option<PackageInfo>> {
-        let version = downcast_version!(version);
+        let version = isopy_lib::downcast_version!(version, GoVersion);
         let package = self
             .get_package_inner(false, options.show_progress, version, tags)
             .await?;
@@ -238,7 +229,7 @@ impl PackageManagerOps for GoPackageManager {
         tags: &TagFilter,
         options: &DownloadPackageOptions,
     ) -> Result<()> {
-        let version = downcast_version!(version);
+        let version = isopy_lib::downcast_version!(version, GoVersion);
         let package = self
             .get_package_inner(false, options.show_progress, version, tags)
             .await?;
@@ -258,7 +249,7 @@ impl PackageManagerOps for GoPackageManager {
         dir: &Path,
         options: &InstallPackageOptions,
     ) -> Result<Package> {
-        let version = downcast_version!(version);
+        let version = isopy_lib::downcast_version!(version, GoVersion);
         let Ok(package) = self
             .get_package_inner(false, options.show_progress, version, tag_filter)
             .await

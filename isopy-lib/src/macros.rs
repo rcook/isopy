@@ -33,3 +33,13 @@ macro_rules! dyn_trait_struct {
     };
 }
 pub(crate) use dyn_trait_struct;
+
+#[macro_export]
+macro_rules! downcast_version {
+    ($version:expr, $type:ty) => {
+        $version
+            .as_any()
+            .downcast_ref::<$type>()
+            .ok_or_else(|| ::anyhow::anyhow!("Invalid version type"))?
+    };
+}
