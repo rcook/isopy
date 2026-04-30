@@ -21,7 +21,6 @@
 //
 mod adoptium;
 mod entrypoint;
-mod extra;
 mod java_package;
 mod java_package_manager;
 mod java_plugin;

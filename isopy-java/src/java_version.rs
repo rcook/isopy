@@ -19,9 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::extra::Extra;
-use anyhow::{Error, Result, bail};
-use isopy_lib::VersionOps;
+use anyhow::{Error, bail};
+use isopy_lib::{Extra, VersionOps, parse_last_part};
 use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -47,62 +46,30 @@ impl FromStr for JavaVersion {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        fn parse_last_part(raw: &str, s: &str) -> Result<(u32, Extra)> {
-            let mut iter = s.chars();
-            let mut prefix = String::new();
-            let mut rest = String::new();
-
-            for c in iter.by_ref() {
-                if !c.is_ascii_digit() {
-                    rest.push(c);
-                    break;
-                }
-                prefix.push(c);
-            }
-
-            for c in iter {
-                rest.push(c);
-            }
-
-            let value = prefix.parse()?;
-
-            Ok(if rest.is_empty() {
-                (value, Extra::Stable)
-            } else if let Some(rest) = rest.strip_prefix("rc") {
-                let value1 = rest.parse()?;
-                (value, Extra::ReleaseCandidate(value1))
-            } else if let Some(rest) = rest.strip_prefix("beta") {
-                let value1 = rest.parse()?;
-                (value, Extra::Beta(value1))
-            } else {
-                bail!("Invalid Go version {raw}")
-            })
-        }
-
         let raw = String::from(s);
 
-        let Some(rest) = s.strip_prefix("go") else {
-            bail!("Invalid Go version {raw}")
+        let Some(rest) = s.strip_prefix("jdk-") else {
+            bail!("Invalid Java version {raw}")
         };
 
         let parts = rest.split('.').collect::<Vec<_>>();
         let (major, minor, build, extra) = match parts.len() {
             1 => {
-                let (major, extra) = parse_last_part(&raw, parts[0])?;
+                let (major, extra) = parse_last_part("Java", &raw, parts[0])?;
                 (major, None, None, extra)
             }
             2 => {
                 let major = parts[0].parse()?;
-                let (minor, extra) = parse_last_part(&raw, parts[1])?;
+                let (minor, extra) = parse_last_part("Java", &raw, parts[1])?;
                 (major, Some(minor), None, extra)
             }
             3 => {
                 let major = parts[0].parse()?;
                 let minor = parts[1].parse()?;
-                let (build, extra) = parse_last_part(&raw, parts[2])?;
+                let (build, extra) = parse_last_part("Java", &raw, parts[2])?;
                 (major, Some(minor), Some(build), extra)
             }
-            _ => bail!("Invalid Go version {raw}"),
+            _ => bail!("Invalid Java version {raw}"),
         };
 
         Ok(Self {

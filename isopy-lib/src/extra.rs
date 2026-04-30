@@ -19,6 +19,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::{Result, bail};
 use std::cmp::Ordering;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -52,4 +53,36 @@ impl Ord for Extra {
             },
         }
     }
+}
+
+pub fn parse_last_part(label: &str, raw: &str, s: &str) -> Result<(u32, Extra)> {
+    let mut iter = s.chars();
+    let mut prefix = String::new();
+    let mut rest = String::new();
+
+    for c in iter.by_ref() {
+        if !c.is_ascii_digit() {
+            rest.push(c);
+            break;
+        }
+        prefix.push(c);
+    }
+
+    for c in iter {
+        rest.push(c);
+    }
+
+    let value = prefix.parse()?;
+
+    Ok(if rest.is_empty() {
+        (value, Extra::Stable)
+    } else if let Some(rest) = rest.strip_prefix("rc") {
+        let value1 = rest.parse()?;
+        (value, Extra::ReleaseCandidate(value1))
+    } else if let Some(rest) = rest.strip_prefix("beta") {
+        let value1 = rest.parse()?;
+        (value, Extra::Beta(value1))
+    } else {
+        bail!("Invalid {label} version {raw}")
+    })
 }
