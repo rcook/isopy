@@ -55,7 +55,7 @@ pub fn get_download_paginated_asset_response_from_dir(
         bail!("no paginated download found at {dir}", dir = dir.display())
     }
 
-    parts.sort_by(|(_, index_a), (_, index_b)| index_a.cmp(index_b));
+    parts.sort_by_key(|(_, index)| *index);
 
     Ok(DownloadPaginatedAssetResponse {
         dir: dir.to_path_buf(),
