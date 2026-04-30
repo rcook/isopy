@@ -54,7 +54,6 @@ const PLATFORM_TAGS: [&str; 2] = ["arm64", "windows"];
 #[cfg(all(target_os = "windows", target_arch = "x86_64"))]
 const PLATFORM_TAGS: [&str; 2] = ["amd64", "windows"];
 
-
 pub struct GoPackageManager {
     ctx: PackageManagerContext,
     url: Url,

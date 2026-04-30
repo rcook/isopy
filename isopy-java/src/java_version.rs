@@ -150,7 +150,16 @@ mod tests {
         ];
         versions.sort();
         let strs: Vec<_> = versions.iter().map(ToString::to_string).collect();
-        assert_eq!(strs, ["jdk-21beta1", "jdk-21rc1", "jdk-21", "jdk-21.0.0", "jdk-21.0.1"]);
+        assert_eq!(
+            strs,
+            [
+                "jdk-21beta1",
+                "jdk-21rc1",
+                "jdk-21",
+                "jdk-21.0.0",
+                "jdk-21.0.1"
+            ]
+        );
     }
 
     #[test]

@@ -150,6 +150,9 @@ mod tests {
         ];
         versions.sort();
         let strs: Vec<_> = versions.iter().map(ToString::to_string).collect();
-        assert_eq!(strs, ["go1.21.0", "go1.21.5", "go1.22beta1", "go1.22rc1", "go1.22"]);
+        assert_eq!(
+            strs,
+            ["go1.21.0", "go1.21.5", "go1.22beta1", "go1.22rc1", "go1.22"]
+        );
     }
 }

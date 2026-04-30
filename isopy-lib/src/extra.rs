@@ -98,9 +98,17 @@ mod tests {
     #[case(Extra::Beta(2), Extra::Beta(1), Ordering::Greater)]
     #[case(Extra::Beta(1), Extra::ReleaseCandidate(1), Ordering::Less)]
     #[case(Extra::Beta(1), Extra::Stable, Ordering::Less)]
-    #[case(Extra::ReleaseCandidate(1), Extra::ReleaseCandidate(1), Ordering::Equal)]
+    #[case(
+        Extra::ReleaseCandidate(1),
+        Extra::ReleaseCandidate(1),
+        Ordering::Equal
+    )]
     #[case(Extra::ReleaseCandidate(1), Extra::ReleaseCandidate(2), Ordering::Less)]
-    #[case(Extra::ReleaseCandidate(2), Extra::ReleaseCandidate(1), Ordering::Greater)]
+    #[case(
+        Extra::ReleaseCandidate(2),
+        Extra::ReleaseCandidate(1),
+        Ordering::Greater
+    )]
     #[case(Extra::ReleaseCandidate(1), Extra::Beta(1), Ordering::Greater)]
     #[case(Extra::ReleaseCandidate(1), Extra::Stable, Ordering::Less)]
     #[case(Extra::Stable, Extra::Stable, Ordering::Equal)]

@@ -45,7 +45,6 @@ use url::Url;
 
 const PACKAGE_CACHE_FILE_NAME: &str = "packages.yaml";
 
-
 pub(crate) struct PythonPackageManager {
     ctx: PackageManagerContext,
     moniker: String,
