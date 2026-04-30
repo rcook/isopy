@@ -86,3 +86,63 @@ pub fn parse_last_part(label: &str, raw: &str, s: &str) -> Result<(u32, Extra)> 
         bail!("Invalid {label} version {raw}")
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Extra::Beta(1), Extra::Beta(1), Ordering::Equal)]
+    #[case(Extra::Beta(1), Extra::Beta(2), Ordering::Less)]
+    #[case(Extra::Beta(2), Extra::Beta(1), Ordering::Greater)]
+    #[case(Extra::Beta(1), Extra::ReleaseCandidate(1), Ordering::Less)]
+    #[case(Extra::Beta(1), Extra::Stable, Ordering::Less)]
+    #[case(Extra::ReleaseCandidate(1), Extra::ReleaseCandidate(1), Ordering::Equal)]
+    #[case(Extra::ReleaseCandidate(1), Extra::ReleaseCandidate(2), Ordering::Less)]
+    #[case(Extra::ReleaseCandidate(2), Extra::ReleaseCandidate(1), Ordering::Greater)]
+    #[case(Extra::ReleaseCandidate(1), Extra::Beta(1), Ordering::Greater)]
+    #[case(Extra::ReleaseCandidate(1), Extra::Stable, Ordering::Less)]
+    #[case(Extra::Stable, Extra::Stable, Ordering::Equal)]
+    #[case(Extra::Stable, Extra::ReleaseCandidate(1), Ordering::Greater)]
+    #[case(Extra::Stable, Extra::Beta(1), Ordering::Greater)]
+    fn extra_ordering(#[case] a: Extra, #[case] b: Extra, #[case] expected: Ordering) {
+        assert_eq!(expected, a.cmp(&b));
+        assert_eq!(Some(expected), a.partial_cmp(&b));
+    }
+
+    #[rstest]
+    #[case("5", 5, Extra::Stable)]
+    #[case("0", 0, Extra::Stable)]
+    #[case("123", 123, Extra::Stable)]
+    #[case("5rc1", 5, Extra::ReleaseCandidate(1))]
+    #[case("5rc0", 5, Extra::ReleaseCandidate(0))]
+    #[case("5beta1", 5, Extra::Beta(1))]
+    #[case("5beta0", 5, Extra::Beta(0))]
+    fn parse_last_part_valid(
+        #[case] input: &str,
+        #[case] expected_value: u32,
+        #[case] expected_extra: Extra,
+    ) -> Result<()> {
+        let (value, extra) = parse_last_part("Test", "raw", input)?;
+        assert_eq!(expected_value, value);
+        assert_eq!(expected_extra, extra);
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case("abc")]
+    #[case("5alpha1")]
+    #[case("5dev1")]
+    fn parse_last_part_invalid(#[case] input: &str) {
+        assert!(parse_last_part("Test", "raw", input).is_err());
+    }
+
+    #[test]
+    fn parse_last_part_error_includes_label() {
+        let err = parse_last_part("Go", "go1.21xyz", "21xyz").unwrap_err();
+        assert!(err.to_string().contains("Go"));
+        assert!(err.to_string().contains("go1.21xyz"));
+    }
+}

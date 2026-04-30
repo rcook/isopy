@@ -99,3 +99,62 @@ impl VersionOps for JavaVersion {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("jdk-21", 21, None, None, Extra::Stable)]
+    #[case("jdk-21.0", 21, Some(0), None, Extra::Stable)]
+    #[case("jdk-21.0.1", 21, Some(0), Some(1), Extra::Stable)]
+    #[case("jdk-17.0.12", 17, Some(0), Some(12), Extra::Stable)]
+    #[case("jdk-21rc1", 21, None, None, Extra::ReleaseCandidate(1))]
+    #[case("jdk-21.0rc1", 21, Some(0), None, Extra::ReleaseCandidate(1))]
+    #[case("jdk-21beta1", 21, None, None, Extra::Beta(1))]
+    fn parse_valid(
+        #[case] input: &str,
+        #[case] major: u32,
+        #[case] minor: Option<u32>,
+        #[case] build: Option<u32>,
+        #[case] extra: Extra,
+    ) -> anyhow::Result<()> {
+        let v: JavaVersion = input.parse()?;
+        assert_eq!(v.major, major);
+        assert_eq!(v.minor, minor);
+        assert_eq!(v.build, build);
+        assert_eq!(v.extra, extra);
+        assert_eq!(v.to_string(), input);
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case("21.0.1")]
+    #[case("go1.21.0")]
+    #[case("jdk-")]
+    #[case("jdk-1.2.3.4")]
+    fn parse_invalid(#[case] input: &str) {
+        assert!(input.parse::<JavaVersion>().is_err());
+    }
+
+    #[test]
+    fn ordering() {
+        let mut versions: Vec<JavaVersion> = vec![
+            "jdk-21.0.1".parse().unwrap(),
+            "jdk-21.0.0".parse().unwrap(),
+            "jdk-21rc1".parse().unwrap(),
+            "jdk-21beta1".parse().unwrap(),
+            "jdk-21".parse().unwrap(),
+        ];
+        versions.sort();
+        let strs: Vec<_> = versions.iter().map(ToString::to_string).collect();
+        assert_eq!(strs, ["jdk-21beta1", "jdk-21rc1", "jdk-21", "jdk-21.0.0", "jdk-21.0.1"]);
+    }
+
+    #[test]
+    fn rejects_go_prefix() {
+        assert!("go1.21.0".parse::<JavaVersion>().is_err());
+    }
+}

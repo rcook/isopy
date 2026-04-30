@@ -99,3 +99,57 @@ impl VersionOps for GoVersion {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("go1", 1, None, None, Extra::Stable)]
+    #[case("go1.21", 1, Some(21), None, Extra::Stable)]
+    #[case("go1.21.0", 1, Some(21), Some(0), Extra::Stable)]
+    #[case("go1.21.5", 1, Some(21), Some(5), Extra::Stable)]
+    #[case("go1.22rc1", 1, Some(22), None, Extra::ReleaseCandidate(1))]
+    #[case("go1.22.0rc1", 1, Some(22), Some(0), Extra::ReleaseCandidate(1))]
+    #[case("go1.21beta1", 1, Some(21), None, Extra::Beta(1))]
+    fn parse_valid(
+        #[case] input: &str,
+        #[case] major: u32,
+        #[case] minor: Option<u32>,
+        #[case] build: Option<u32>,
+        #[case] extra: Extra,
+    ) -> anyhow::Result<()> {
+        let v: GoVersion = input.parse()?;
+        assert_eq!(v.major, major);
+        assert_eq!(v.minor, minor);
+        assert_eq!(v.build, build);
+        assert_eq!(v.extra, extra);
+        assert_eq!(v.to_string(), input);
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case("1.21.0")]
+    #[case("rust1.21.0")]
+    #[case("go")]
+    #[case("go1.2.3.4")]
+    fn parse_invalid(#[case] input: &str) {
+        assert!(input.parse::<GoVersion>().is_err());
+    }
+
+    #[test]
+    fn ordering() {
+        let mut versions: Vec<GoVersion> = vec![
+            "go1.21.5".parse().unwrap(),
+            "go1.21.0".parse().unwrap(),
+            "go1.22rc1".parse().unwrap(),
+            "go1.22beta1".parse().unwrap(),
+            "go1.22".parse().unwrap(),
+        ];
+        versions.sort();
+        let strs: Vec<_> = versions.iter().map(ToString::to_string).collect();
+        assert_eq!(strs, ["go1.21.0", "go1.21.5", "go1.22beta1", "go1.22rc1", "go1.22"]);
+    }
+}
