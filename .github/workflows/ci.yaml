@@ -8,26 +8,41 @@ on:
     branches:
       - main
   schedule:
-    - cron: 0 5 * * *
+    - cron: "0 5 * * *"
 
 jobs:
-  ci:
+  check:
     strategy:
+      fail-fast: false
       matrix:
-        target:
-          #- x86_64-apple-darwin
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-gnu
         include:
-          #- target: x86_64-apple-darwin
-          #  host_os: macos-13
-          - target: x86_64-pc-windows-msvc
-            host_os: windows-latest
           - target: x86_64-unknown-linux-gnu
-            host_os: ubuntu-latest
-    runs-on: ${{ matrix.host_os }}
+            os: ubuntu-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Build and test Rust package
-        uses: rcook/rust-package-action@v0.0.5
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Lint
+        run: cargo clippy --target ${{ matrix.target }} -- -D warnings
+
+      - name: Build
+        run: cargo build --target ${{ matrix.target }}
+
+      - name: Test
+        run: cargo test --target ${{ matrix.target }}
