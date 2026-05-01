@@ -1,9 +1,3 @@
-[profile.release]
-codegen-units = 1
-lto = true
-opt-level = "z"
-strip = true
-
 [workspace]
 members = [
   "isopy",
@@ -13,3 +7,46 @@ members = [
   "isopy-python",
 ]
 resolver = "2"
+
+[workspace.package]
+authors = ["Richard Cook"]
+categories = ["development-tools"]
+edition = "2024"
+homepage = "https://rcook.github.io/isopy"
+keywords = ["general"]
+license = "MIT"
+repository = "https://github.com/rcook/isopy.git"
+version = "0.5.17"
+
+[workspace.dependencies]
+anyhow = "1.0.102"
+async-trait = "0.1.89"
+chrono = "0.4.44"
+indicatif = "0.18.4"
+log = "0.4.29"
+reqwest = { version = "0.13.2", features = ["query", "stream"] }
+rstest = "0.26.1"
+serde = "1.0.228"
+serde_json = "1.0.149"
+serde_yaml = "0.9.34"
+strum = "0.28.0"
+strum_macros = "0.28.0"
+tokio = "1.52.1"
+url = "2.5.8"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+derive_partial_eq_without_eq = "allow"
+future_not_send = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+nursery = { level = "deny", priority = -1 }
+option_if_let_else = "allow"
+pedantic = { level = "deny", priority = -1 }
+redundant_pub_crate = "allow"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "z"
+strip = true

@@ -1,33 +1,29 @@
 [package]
-authors = ["Richard Cook"]
-categories = ["development-tools"]
+authors.workspace = true
+categories.workspace = true
 description = "Isolated Python Tool - Java Support"
-edition = "2024"
-homepage = "https://rcook.github.io/isopy"
-keywords = ["general"]
-license = "MIT"
+edition.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+license.workspace = true
 name = "isopy-java"
 readme = "../README.md"
-repository = "https://github.com/rcook/isopy.git"
-version = "0.5.17"
+repository.workspace = true
+version.workspace = true
 
 [dependencies]
-anyhow = "1.0.102"
-async-trait = "0.1.89"
+anyhow.workspace = true
+async-trait.workspace = true
 isopy-lib = { path = "../isopy-lib" }
 percent-encoding = "2.3.2"
-reqwest = { version = "0.13.2", features = ["query", "stream"] }
-serde = "1.0.228"
-serde_json = "1.0.149"
-tokio = { version = "1.52.1", features = ["full"] }
-url = { version = "2.5.8", features = ["serde"] }
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["full"] }
+url = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
-rstest = "0.26.1"
+rstest.workspace = true
 
-[lints.clippy]
-all = { level = "deny", priority = -1 }
-missing_errors_doc = "allow"
-missing_panics_doc = "allow"
-nursery = { level = "deny", priority = -1 }
-pedantic = { level = "deny", priority = -1 }
+[lints]
+workspace = true
