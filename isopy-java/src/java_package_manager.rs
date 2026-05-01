@@ -29,9 +29,8 @@ use isopy_lib::{
     Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
-use std::fs::read_dir;
 use std::path::{Path, PathBuf};
-use tokio::fs::{read, write};
+use tokio::fs::{read, read_dir, write};
 use url::Url;
 
 pub struct JavaPackageManager {
@@ -47,16 +46,15 @@ impl JavaPackageManager {
         }
     }
 
-    fn get_page_paths(dir: &Path) -> Result<Vec<PathBuf>> {
+    async fn get_page_paths(dir: &Path) -> Result<Vec<PathBuf>> {
         let mut pages = Vec::new();
-        for e in read_dir(dir)? {
-            let e = e?;
-            if let Some(suffix) = e
-                .file_name()
+        let mut entries = read_dir(dir).await?;
+        while let Some(e) = entries.next_entry().await? {
+            let file_name = e.file_name();
+            let name = file_name
                 .to_str()
-                .ok_or_else(|| anyhow!("Invalid file in path {}", e.path().display()))?
-                .strip_prefix("page-")
-            {
+                .ok_or_else(|| anyhow!("Invalid file in path {}", e.path().display()))?;
+            if let Some(suffix) = name.strip_prefix("page-") {
                 let index = suffix.parse::<i32>()?;
                 pages.push((e.path(), index));
             }
@@ -122,7 +120,7 @@ impl PackageManagerOps for JavaPackageManager {
     ) -> Result<Vec<PackageInfo>> {
         let dir = self.get_index(options.show_progress, false).await?;
         let mut packages = Vec::new();
-        for path in Self::get_page_paths(&dir)? {
+        for path in Self::get_page_paths(&dir).await? {
             let bytes = read(&path).await?;
             let response = serde_json::from_slice::<VersionsResponse>(&bytes)?;
             packages.extend(response.versions.into_iter().map(|v| {
