@@ -19,13 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::Result;
+use colored::Color;
+
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::repo::{DirInfo, Link, Manifest, Repo};
 use crate::serialization::Env;
 use crate::table::{Table, TableSettings, table_columns, table_divider, table_line, table_title};
-use anyhow::Result;
-use colored::Color;
 
 pub(crate) fn print_link(table: &mut Table, link: &Link, idx: Option<usize>) {
     if let Some(i) = idx {
@@ -176,8 +177,9 @@ pub(crate) fn humanize_size_base_2(bytes: u64) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::print::humanize_size_base_2;
     use rstest::rstest;
+
+    use crate::print::humanize_size_base_2;
 
     #[rstest]
     #[case("100 B", 100u64)]

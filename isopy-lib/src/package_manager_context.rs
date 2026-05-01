@@ -19,15 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::accept::Accept;
-use crate::checksum::Checksum;
-use crate::macros::dyn_trait_struct;
+use std::path::{Path, PathBuf};
+
 use anyhow::Result;
 use async_trait::async_trait;
 use derive_builder::Builder;
 use reqwest::Response;
-use std::path::{Path, PathBuf};
 use url::Url;
+
+use crate::accept::Accept;
+use crate::checksum::Checksum;
+use crate::macros::dyn_trait_struct;
 
 #[derive(Builder, Default)]
 #[builder(default)]

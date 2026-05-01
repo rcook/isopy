@@ -19,14 +19,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::moniker::Moniker;
-use crate::plugin_manager::PluginManager;
-use anyhow::{Error, bail};
-use isopy_lib::Version;
-use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, bail};
+use isopy_lib::Version;
+use serde::{Deserialize, Serialize};
+
+use crate::moniker::Moniker;
+use crate::plugin_manager::PluginManager;
 
 #[derive(Clone, Debug)]
 pub(crate) struct PackageId {

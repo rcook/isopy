@@ -19,9 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::ui::state::State;
-use log::{Log, Metadata, Record};
 use std::sync::Arc;
+
+use log::{Log, Metadata, Record};
+
+use crate::ui::state::State;
 
 pub struct Logger {
     state: Arc<State>,

@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Result, bail};
 use std::cmp::Ordering;
+
+use anyhow::{Result, bail};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Extra {
@@ -89,8 +90,9 @@ pub fn parse_last_part(label: &str, raw: &str, s: &str) -> Result<(u32, Extra)> 
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use rstest::rstest;
+
+    use super::*;
 
     #[rstest]
     #[case(Extra::Beta(1), Extra::Beta(1), Ordering::Equal)]

@@ -19,14 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::checksum::get_checksum;
-use crate::choose_best::choose_best;
-use crate::constants::PLATFORM_TAGS;
-use crate::index_item::IndexItem;
-use crate::local_package_info::LocalPackageInfo;
-use crate::package_cache::read_package_cache;
-use crate::python_package::PythonPackage;
-use crate::python_version::PythonVersion;
+use std::borrow::ToOwned;
+use std::collections::HashSet;
+use std::fs::{metadata, read_to_string};
+use std::path::Path;
+
 use anyhow::{Result, bail};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -37,11 +34,16 @@ use isopy_lib::{
     Version, error_for_github_rate_limit,
 };
 use serde_json::Value;
-use std::borrow::ToOwned;
-use std::collections::HashSet;
-use std::fs::{metadata, read_to_string};
-use std::path::Path;
 use url::Url;
+
+use crate::checksum::get_checksum;
+use crate::choose_best::choose_best;
+use crate::constants::PLATFORM_TAGS;
+use crate::index_item::IndexItem;
+use crate::local_package_info::LocalPackageInfo;
+use crate::package_cache::read_package_cache;
+use crate::python_package::PythonPackage;
+use crate::python_version::PythonVersion;
 
 const PACKAGE_CACHE_FILE_NAME: &str = "packages.yaml";
 
@@ -68,8 +70,9 @@ impl PythonPackageManager {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn on_after_install(dir: &Path) -> Result<()> {
-        use log::trace;
         use std::os::unix::fs::symlink;
+
+        use log::trace;
 
         let bin_dir = dir.join("bin");
         let link = bin_dir.join("python");
@@ -84,8 +87,9 @@ impl PythonPackageManager {
 
     #[cfg(target_os = "windows")]
     fn on_after_install(dir: &Path) -> Result<()> {
-        use log::trace;
         use std::fs::write;
+
+        use log::trace;
 
         let cmd_path = dir.join("python3.cmd");
         if !cmd_path.exists() {

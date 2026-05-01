@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::sanitize::{SanitizeOptions, sanitize, sanitize_with_options};
 use anyhow::{Result, bail};
 use url::Url;
+
+use crate::sanitize::{SanitizeOptions, sanitize, sanitize_with_options};
 
 #[derive(Debug, PartialEq)]
 pub struct FileNamePartRefs<'a> {
@@ -113,9 +114,10 @@ impl FileNameParts {
 
 #[cfg(test)]
 mod tests {
-    use crate::file_name_parts::{FileNamePartRefs, FileNameParts};
     use anyhow::Result;
     use rstest::rstest;
+
+    use crate::file_name_parts::{FileNamePartRefs, FileNameParts};
 
     #[rstest]
     #[case("temp", ("temp", ""))]

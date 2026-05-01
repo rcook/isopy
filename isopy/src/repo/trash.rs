@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::repo::Repo;
-use crate::repo::link::Link;
-use crate::repo::manifest::Manifest;
-use anyhow::Result;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::fs::{remove_dir_all, remove_file};
+
+use anyhow::Result;
+
+use crate::repo::Repo;
+use crate::repo::link::Link;
+use crate::repo::manifest::Manifest;
 
 #[derive(Debug)]
 pub struct Trash {

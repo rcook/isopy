@@ -19,13 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::ffi::OsString;
+use std::path::Path;
+use std::sync::LazyLock;
+
 use anyhow::Result;
 use isopy_lib::{
     EnvInfo, PackageManager, PackageManagerContext, Platform, Plugin, PluginOps, Shell, Version,
 };
-use std::ffi::OsString;
-use std::path::Path;
-use std::sync::LazyLock;
 use url::Url;
 
 use crate::go_package_manager::GoPackageManager;

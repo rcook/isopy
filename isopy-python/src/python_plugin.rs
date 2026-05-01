@@ -19,16 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
-use crate::python_package_manager::PythonPackageManager;
-use crate::python_version::PythonVersion;
-use anyhow::Result;
-use isopy_lib::{DirUrl, EnvInfo, FileUrl, Platform, Shell, render_absolute_path};
-use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
+
+use anyhow::Result;
+use isopy_lib::{DirUrl, EnvInfo, FileUrl, Platform, Shell, render_absolute_path};
+use isopy_lib::{PackageManager, PackageManagerContext, Plugin, PluginOps, Version};
 use url::Url;
+
+use crate::constants::{PYTHON_BIN_FILE_NAME, PYTHON_SCRIPT_EXT};
+use crate::python_package_manager::PythonPackageManager;
+use crate::python_version::PythonVersion;
 
 static INDEX_URL: LazyLock<FileUrl> = LazyLock::new(|| {
     "https://api.github.com/repos/astral-sh/python-build-standalone/releases"

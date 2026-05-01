@@ -19,12 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Error, Result};
-use hex::decode;
-use sha2::{Digest, Sha256};
 use std::path::Path;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, Result};
+use hex::decode;
+use sha2::{Digest, Sha256};
 use tokio::fs::read;
 
 #[derive(Clone, Debug)]

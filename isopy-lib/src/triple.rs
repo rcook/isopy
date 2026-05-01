@@ -19,10 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Error, bail};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, bail};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Triple {
@@ -56,9 +57,10 @@ impl FromStr for Triple {
 
 #[cfg(test)]
 mod tests {
-    use crate::triple::Triple;
     use anyhow::Result;
     use rstest::rstest;
+
+    use crate::triple::Triple;
 
     #[rstest]
     #[case("1.2.3", Triple { major: 1, minor: 2, revision: 3 })]

@@ -19,6 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::env::current_dir;
+use std::path::PathBuf;
+
+use anyhow::{Result, bail};
+use clap::Parser;
+use isopy_lib::TagFilter;
+use log::{LevelFilter, set_max_level};
+
 use crate::app::App;
 use crate::args::{Args, Command, PackageFilter};
 use crate::constants::{CONFIG_DIR_NAME, DEFAULT_MONIKER_CONFIG_NAME};
@@ -28,12 +36,6 @@ use crate::repo::RepoConfig;
 use crate::status::StatusResult;
 use crate::terminal::reset_terminal;
 use crate::ui::init_ui;
-use anyhow::{Result, bail};
-use clap::Parser;
-use isopy_lib::TagFilter;
-use log::{LevelFilter, set_max_level};
-use std::env::current_dir;
-use std::path::PathBuf;
 
 fn set_up() -> Result<()> {
     reset_terminal();

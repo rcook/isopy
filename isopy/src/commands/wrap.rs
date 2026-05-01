@@ -19,6 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::ffi::OsString;
+use std::fmt::Write;
+use std::path::{Path, PathBuf};
+
+use anyhow::{Result, anyhow, bail};
+use isopy_lib::{Platform, Shell, env_var_substitution, join_paths, render_absolute_path};
+use log::info;
+use path_absolutize::Absolutize;
+use serde::Serialize;
+use tinytemplate::{TinyTemplate, format_unescaped};
+
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::executable::{ensure_file_executable_mode, is_executable_file};
@@ -26,15 +37,6 @@ use crate::repo::DirInfo;
 use crate::status::{StatusResult, success, user_error};
 use crate::wrapper_file_name::WrapperFileName;
 use crate::write::safe_write_file;
-use anyhow::{Result, anyhow, bail};
-use isopy_lib::{Platform, Shell, env_var_substitution, join_paths, render_absolute_path};
-use log::info;
-use path_absolutize::Absolutize;
-use serde::Serialize;
-use std::ffi::OsString;
-use std::fmt::Write;
-use std::path::{Path, PathBuf};
-use tinytemplate::{TinyTemplate, format_unescaped};
 
 const BASH_WRAPPER_TEMPLATE: &str = r#"#!/bin/bash
 set -euo pipefail

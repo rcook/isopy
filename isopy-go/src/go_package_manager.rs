@@ -19,9 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::api::Release;
-use crate::go_package::GoPackage;
-use crate::go_version::GoVersion;
+use std::collections::HashSet;
+use std::path::Path;
+
 use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -31,10 +31,12 @@ use isopy_lib::{
     Version, query,
 };
 use serde_json::Value;
-use std::collections::HashSet;
-use std::path::Path;
 use tokio::fs::read_to_string;
 use url::Url;
+
+use crate::api::Release;
+use crate::go_package::GoPackage;
+use crate::go_version::GoVersion;
 
 #[cfg(all(target_os = "linux", target_arch = "aarch64"))]
 const PLATFORM_TAGS: [&str; 2] = ["arm64", "linux"];

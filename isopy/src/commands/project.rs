@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::io::{Error as IoError, ErrorKind};
+
+use anyhow::{Error, bail};
+use log::info;
+
 use crate::app::App;
 use crate::package_id::PackageId;
 use crate::serialization::Project;
 use crate::status::{StatusResult, success, user_error};
-use anyhow::{Error, bail};
-use log::info;
-use std::io::{Error as IoError, ErrorKind};
 
 fn is_io_error_kind(e: &Error, error_kind: ErrorKind) -> bool {
     match e.root_cause().downcast_ref::<IoError>() {

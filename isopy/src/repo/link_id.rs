@@ -19,13 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Error, bail};
-use md5::compute;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, bail};
+use md5::compute;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct LinkId(String);
@@ -88,10 +89,12 @@ impl<'de> Deserialize<'de> for LinkId {
 
 #[cfg(test)]
 mod tests {
-    use crate::repo::LinkId;
+    use std::path::{Path, PathBuf};
+
     use anyhow::Result;
     use rstest::rstest;
-    use std::path::{Path, PathBuf};
+
+    use crate::repo::LinkId;
 
     #[test]
     fn from_path_basics() {

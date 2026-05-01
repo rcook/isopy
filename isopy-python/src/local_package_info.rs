@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_package::PythonPackage;
 use std::path::PathBuf;
+
+use crate::python_package::PythonPackage;
 
 pub(crate) struct LocalPackageInfo {
     pub(crate) package: PythonPackage,

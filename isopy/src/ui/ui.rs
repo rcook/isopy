@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::sync::Arc;
+
+use anyhow::Result;
+use log::set_boxed_logger;
+
 use crate::ui::logger::Logger;
 use crate::ui::op::Op;
 use crate::ui::op::OpProgress;
 use crate::ui::state::State;
-use anyhow::Result;
-use log::set_boxed_logger;
-use std::sync::Arc;
 
 pub struct Ui {
     state: Arc<State>,

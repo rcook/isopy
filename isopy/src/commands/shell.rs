@@ -19,13 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use colored::Colorize;
+use ctrlc::set_handler;
+use log::info;
+
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::{Command, IsopyEnv};
 use crate::status::{StatusResult, success, user_error};
-use colored::Colorize;
-use ctrlc::set_handler;
-use log::info;
 
 pub(crate) fn do_shell(app: App, verbose: bool) -> StatusResult {
     if let Some(isopy_env) = IsopyEnv::get_vars()? {

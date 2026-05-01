@@ -19,12 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::path::{Path, PathBuf};
+
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+
 use crate::repo::Repo;
 use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
-use anyhow::Result;
-use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RepoConfig {
@@ -61,9 +63,10 @@ impl RepoConfig {
 
 #[cfg(test)]
 mod tests {
-    use crate::repo::RepoConfig;
     use anyhow::Result;
     use tempfile::TempDir;
+
+    use crate::repo::RepoConfig;
 
     #[test]
     fn default() -> Result<()> {

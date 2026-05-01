@@ -19,12 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::moniker::Moniker;
-use crate::status::{StatusResult, success};
 use anyhow::Result;
 use colored::Colorize;
 use isopy_lib::{ListTagsOptions, ListTagsOptionsBuilder};
+
+use crate::app::App;
+use crate::moniker::Moniker;
+use crate::status::{StatusResult, success};
 
 pub(crate) async fn do_tags(app: &App, moniker: Option<&Moniker>) -> StatusResult {
     async fn list_tags(app: &App, moniker: &Moniker, options: &ListTagsOptions) -> Result<()> {

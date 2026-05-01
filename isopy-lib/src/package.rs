@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use url::Url;
+
 use crate::macros::dyn_trait_struct;
 use crate::version::Version;
-use url::Url;
 
 pub trait PackageOps {
     fn version(&self) -> &Version;

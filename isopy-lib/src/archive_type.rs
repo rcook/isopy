@@ -19,20 +19,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::extent::Extent;
-use crate::package_manager::InstallPackageOptions;
-use crate::progress_indicator::{ProgressIndicator, ProgressIndicatorOptionsBuilder};
-use anyhow::{Result, bail};
-use flate2::read::GzDecoder;
-use log::info;
 use std::fs::{File, create_dir_all};
 use std::io::{Read, copy};
 use std::path::{Component, Path, PathBuf};
+
+use anyhow::{Result, bail};
+use flate2::read::GzDecoder;
+use log::info;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use tar::Archive;
 use zip::ZipArchive;
 use zstd::stream::read::Decoder as ZstdDecoder;
+
+use crate::extent::Extent;
+use crate::package_manager::InstallPackageOptions;
+use crate::progress_indicator::{ProgressIndicator, ProgressIndicatorOptionsBuilder};
 
 #[derive(Clone, Copy, Debug, EnumIter)]
 pub enum ArchiveType {
@@ -202,8 +204,9 @@ fn reject_traversal(root: &Path, candidate: &Path) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::path::PathBuf;
+
+    use super::*;
 
     #[test]
     fn strip_one_component_drops_first_segment() {

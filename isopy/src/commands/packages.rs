@@ -19,19 +19,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::moniker::Moniker;
-use crate::print::{humanize_size_base_2, make_list_table};
-use crate::status::{StatusResult, success};
-use crate::table::{Table, table_columns, table_divider, table_headings};
+use std::fs::metadata;
+
 use anyhow::Result;
 use anyhow::bail;
 use colored::{ColoredString, Colorize};
 use isopy_lib::{
     ListPackagesOptions, ListPackagesOptionsBuilder, PackageInfo, Plugin, SourceFilter, TagFilter,
 };
-use std::fs::metadata;
 use url::{Host, Url};
+
+use crate::app::App;
+use crate::moniker::Moniker;
+use crate::print::{humanize_size_base_2, make_list_table};
+use crate::status::{StatusResult, success};
+use crate::table::{Table, table_columns, table_divider, table_headings};
 
 pub(crate) async fn do_packages(
     app: &App,

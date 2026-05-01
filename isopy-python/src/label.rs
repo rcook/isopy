@@ -19,12 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Error, bail};
-use regex::Regex;
 use std::cmp::Ordering;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 use std::sync::LazyLock;
+
+use anyhow::{Error, bail};
+use regex::Regex;
 
 static NEW_STYLE_LABEL_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new("^\\d{8}$").expect("Invalid regex"));
@@ -80,8 +81,9 @@ impl PartialOrd for Label {
 
 #[cfg(test)]
 mod tests {
-    use crate::label::Label;
     use rstest::rstest;
+
+    use crate::label::Label;
 
     #[test]
     fn basics() {

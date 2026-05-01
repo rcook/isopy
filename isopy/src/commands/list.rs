@@ -19,14 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use anyhow::Result;
+use colored::Colorize;
+use log::info;
+
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::print::{make_prop_table, print_link, print_metadir};
 use crate::status::{StatusResult, success};
 use crate::table::{table_divider, table_title};
-use anyhow::Result;
-use colored::Colorize;
-use log::info;
 
 pub fn do_list(app: &App, verbose: bool) -> StatusResult {
     if verbose {

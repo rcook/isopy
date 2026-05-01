@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::index_item::IndexItem;
-use crate::metadata::Metadata;
 use anyhow::Result;
 use isopy_lib::{PackageOps, Version};
 use url::Url;
+
+use crate::index_item::IndexItem;
+use crate::metadata::Metadata;
 
 #[derive(Clone, Debug)]
 pub(crate) struct PythonPackage {

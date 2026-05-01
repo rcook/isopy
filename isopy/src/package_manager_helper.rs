@@ -19,14 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::cache_item::{
-    DirectoryCacheItem, FileCacheItem, PaginatedFileCacheItem, add_to_cache_manifest, check_cache,
-    make_download_path,
-};
-use crate::download::download_to_path;
-use crate::paginated_download::{
-    get_download_paginated_asset_response, get_download_paginated_asset_response_from_dir,
-};
+use std::fs::{create_dir_all, remove_file};
+use std::path::{Path, PathBuf};
+
 use anyhow::{Result, bail};
 use async_trait::async_trait;
 use chrono::Utc;
@@ -35,9 +30,16 @@ use isopy_lib::{
     DownloadPaginatedAssetResponse, PackageManagerContext, PackageManagerContextOps,
 };
 use log::warn;
-use std::fs::{create_dir_all, remove_file};
-use std::path::{Path, PathBuf};
 use url::Url;
+
+use crate::cache_item::{
+    DirectoryCacheItem, FileCacheItem, PaginatedFileCacheItem, add_to_cache_manifest, check_cache,
+    make_download_path,
+};
+use crate::download::download_to_path;
+use crate::paginated_download::{
+    get_download_paginated_asset_response, get_download_paginated_asset_response_from_dir,
+};
 
 pub(crate) struct PackageManagerHelper {
     base_dir: PathBuf,
@@ -179,9 +181,11 @@ async fn cached_is_valid(path: &Path, checksum: Option<&Checksum>) -> Result<boo
 
 #[cfg(test)]
 mod tests {
-    use super::cached_is_valid;
     use std::fs::write;
+
     use tempfile::TempDir;
+
+    use super::cached_is_valid;
 
     const HELLO_SHA256: &str = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824";
 

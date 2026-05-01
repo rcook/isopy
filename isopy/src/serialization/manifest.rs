@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::download::Download;
 use serde::{Deserialize, Serialize};
+
+use crate::serialization::download::Download;
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub(crate) struct Manifest {

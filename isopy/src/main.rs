@@ -51,13 +51,15 @@ mod yaml;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    use crate::run::run;
-    use crate::status::Status::{Success, UserError};
+    use std::env::{VarError, var};
+    use std::process::exit;
+
     use anyhow::Error;
     use anyhow::bail;
     use colored::Colorize;
-    use std::env::{VarError, var};
-    use std::process::exit;
+
+    use crate::run::run;
+    use crate::status::Status::{Success, UserError};
 
     const SUCCESS: i32 = 0;
     const FAILURE: i32 = 1;

@@ -19,10 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::env::VarError;
+
+use anyhow::{Result, bail};
+
 use crate::env::EnvKey;
 use crate::repo::{DirInfo, LinkId, MetaId};
-use anyhow::{Result, bail};
-use std::env::VarError;
 
 #[derive(Clone, Debug)]
 pub(crate) struct IsopyEnv {

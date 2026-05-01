@@ -19,7 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ISOPY_USER_AGENT;
+use std::fs::create_dir_all;
+use std::path::Path;
+
 use anyhow::{Result, anyhow};
 use futures_util::StreamExt;
 use isopy_lib::{
@@ -27,14 +29,13 @@ use isopy_lib::{
     error_for_github_rate_limit,
 };
 use log::info;
-use reqwest::Client;
-use reqwest::Url as ReqwestUrl;
 use reqwest::header::{ACCEPT, USER_AGENT};
-use std::fs::create_dir_all;
-use std::path::Path;
+use reqwest::{Client, Url as ReqwestUrl};
 use tokio::fs::File as FSFile;
 use tokio::io::AsyncWriteExt;
 use url::Url;
+
+use crate::constants::ISOPY_USER_AGENT;
 
 pub(crate) async fn download_to_path(
     url: &Url,

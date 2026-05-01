@@ -19,12 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::app::App;
-use crate::status::{StatusResult, success, user_error};
 use isopy_lib::{
     DownloadPackageOptionsBuilder, GetPackageOptionsBuilder, InstallPackageOptionsBuilder,
     TagFilter,
 };
+
+use crate::app::App;
+use crate::status::{StatusResult, success, user_error};
 
 pub async fn do_init(app: &App, download: bool) -> StatusResult {
     if app.repo.get(&app.cwd)?.is_some() {

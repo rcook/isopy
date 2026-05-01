@@ -19,15 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::cache::Cache;
-use crate::constants::DOWNLOAD_CACHE_FILE_NAME;
-use crate::serialization::{Directory, Download, File, PaginatedFile};
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+
 use anyhow::{Result, bail};
 use chrono::{DateTime, Utc};
 use isopy_lib::FileNameParts;
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
 use url::Url;
+
+use crate::cache::Cache;
+use crate::constants::DOWNLOAD_CACHE_FILE_NAME;
+use crate::serialization::{Directory, Download, File, PaginatedFile};
 
 pub(crate) trait CacheItem {
     fn exists(path: &Path) -> bool;

@@ -19,10 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Context, Result};
 use std::fs::{File, OpenOptions, create_dir_all, write};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+
+use anyhow::{Context, Result};
 
 pub fn safe_create_file(path: &Path, overwrite: bool) -> Result<File> {
     ensure_dir(path)?;
@@ -68,11 +69,13 @@ fn ensure_dir(file_path: &Path) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::write::{safe_create_file, safe_write_file};
-    use anyhow::Result;
     use std::fs::{read_to_string, write};
     use std::io::Write;
+
+    use anyhow::Result;
     use tempfile::TempDir;
+
+    use crate::write::{safe_create_file, safe_write_file};
 
     #[test]
     fn test_safe_create_file_no_overwrite_succeeds() -> Result<()> {

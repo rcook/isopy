@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::shell::IsopyEnv;
-use anyhow::Result;
-use isopy_lib::EnvInfo;
 use std::env::{join_paths, set_var, split_paths, var_os};
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::process::ExitStatus;
+
+use anyhow::Result;
+use isopy_lib::EnvInfo;
+
+use crate::shell::IsopyEnv;
 
 pub(crate) struct Command {
     program: Option<OsString>,
@@ -66,9 +68,10 @@ impl Command {
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn exec_impl(&self) -> Result<ExitStatus> {
+        use std::iter::once;
+
         use anyhow::{anyhow, bail};
         use exec::execvp;
-        use std::iter::once;
 
         let p = if let Some(program) = &self.program {
             program.clone()
@@ -82,8 +85,9 @@ impl Command {
 
     #[cfg(target_os = "windows")]
     fn exec_impl(&self) -> Result<ExitStatus> {
-        use crate::shell::{WindowsShellKind, get_windows_shell_info};
         use std::process::Command;
+
+        use crate::shell::{WindowsShellKind, get_windows_shell_info};
 
         let windows_shell_info = get_windows_shell_info()?;
         let mut command = match &self.program {

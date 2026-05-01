@@ -19,6 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::path::PathBuf;
+use std::result::Result;
+
+use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
+use clap_complete::Shell as ClapCompleteShell;
+use isopy_lib::{Platform as IsopyLibPlatform, Shell as IsopyLibShell, SourceFilter};
+use log::LevelFilter;
+use path_absolutize::Absolutize;
+
 use crate::constants::{
     PACKAGE_BUILD_VERSION, PACKAGE_DESCRIPTION, PACKAGE_HOME_PAGE, PACKAGE_NAME, PACKAGE_VERSION,
 };
@@ -27,13 +36,6 @@ use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::repo::MetaId;
 use crate::wrapper_file_name::WrapperFileName;
-use clap::{ArgAction, Args as ClapArgs, Parser, Subcommand, ValueEnum};
-use clap_complete::Shell as ClapCompleteShell;
-use isopy_lib::{Platform as IsopyLibPlatform, Shell as IsopyLibShell, SourceFilter};
-use log::LevelFilter;
-use path_absolutize::Absolutize;
-use std::path::PathBuf;
-use std::result::Result;
 
 #[derive(Debug, Parser)]
 #[command(

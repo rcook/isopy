@@ -19,7 +19,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::versions_response::VersionsResponse;
+use std::path::{Path, PathBuf};
+
 use anyhow::{Result, anyhow, bail};
 use async_trait::async_trait;
 use isopy_lib::{
@@ -29,9 +30,10 @@ use isopy_lib::{
     Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
-use std::path::{Path, PathBuf};
 use tokio::fs::{read, read_dir, write};
 use url::Url;
+
+use crate::serialization::versions_response::VersionsResponse;
 
 pub struct JavaPackageManager {
     ctx: PackageManagerContext,

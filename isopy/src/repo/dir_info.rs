@@ -19,12 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::path::Path;
+
+use chrono::{DateTime, Utc};
+
 use crate::repo::link::Link;
 use crate::repo::link_id::LinkId;
 use crate::repo::manifest::Manifest;
 use crate::repo::meta_id::MetaId;
-use chrono::{DateTime, Utc};
-use std::path::Path;
 
 #[derive(Debug)]
 pub struct DirInfo {

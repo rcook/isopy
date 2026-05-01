@@ -55,8 +55,9 @@ pub fn sanitize(s: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::sanitize::{SanitizeOptions, sanitize, sanitize_with_options};
     use rstest::rstest;
+
+    use crate::sanitize::{SanitizeOptions, sanitize, sanitize_with_options};
 
     #[rstest]
     #[case("www.foo.com", "www.foo.com")]

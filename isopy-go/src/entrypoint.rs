@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::go_plugin::GoPlugin;
 use isopy_lib::Plugin;
+
+use crate::go_plugin::GoPlugin;
 
 #[must_use]
 pub fn new_plugin(moniker: &str) -> Plugin {

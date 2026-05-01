@@ -19,10 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::file::File;
-use crate::serialization::{PaginatedFile, directory::Directory};
 use serde::{Deserialize, Serialize};
 use url::Url;
+
+use crate::serialization::file::File;
+use crate::serialization::{PaginatedFile, directory::Directory};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct Download {

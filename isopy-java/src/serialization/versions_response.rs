@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::serialization::version::Version;
 use serde::Deserialize;
+
+use crate::serialization::version::Version;
 
 #[derive(Deserialize)]
 pub struct VersionsResponse {

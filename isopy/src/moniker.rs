@@ -19,15 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::env::EnvKey;
-use anyhow::{Error, bail};
-use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, bail};
+use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+
+use crate::env::EnvKey;
 
 const GO: &str = "go";
 const JAVA: &str = "java";

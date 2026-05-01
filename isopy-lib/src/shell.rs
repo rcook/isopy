@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
+
+use anyhow::Result;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Platform {
@@ -98,8 +99,9 @@ pub fn render_absolute_path(shell: Shell, path: &Path) -> Result<OsString> {
 
 #[cfg(target_os = "windows")]
 fn render_absolute_path_windows_bash(path: &Path) -> Result<OsString> {
-    use anyhow::bail;
     use std::path::{Component, Prefix};
+
+    use anyhow::bail;
 
     let mut iter = path.components();
 

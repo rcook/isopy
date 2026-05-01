@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Error, Result, anyhow};
-use reqwest::Response;
 use std::collections::HashMap;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, Result, anyhow};
+use reqwest::Response;
 use url::Url;
 
 #[derive(Debug)]
@@ -90,9 +91,10 @@ impl FromStr for LinkHeader {
 
 #[cfg(test)]
 mod tests {
-    use crate::link_header::LinkHeader;
     use anyhow::Result;
     use reqwest::Url;
+
+    use crate::link_header::LinkHeader;
 
     #[test]
     fn basics() -> Result<()> {

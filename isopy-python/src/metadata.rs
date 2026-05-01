@@ -19,12 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_version::PythonVersion;
-use anyhow::{Error, anyhow, bail};
-use isopy_lib::ArchiveType;
 use std::collections::HashSet;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, anyhow, bail};
+use isopy_lib::ArchiveType;
+
+use crate::python_version::PythonVersion;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Metadata {
@@ -64,9 +66,10 @@ impl FromStr for Metadata {
 
 #[cfg(test)]
 mod tests {
-    use crate::metadata::Metadata;
     use isopy_lib::ArchiveType;
     use rstest::rstest;
+
+    use crate::metadata::Metadata;
 
     #[rstest]
     #[case(

@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::metadata::Metadata;
-use crate::python_package::PythonPackage;
-use anyhow::Result;
-use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::path::Path;
+
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use url::Url;
+
+use crate::metadata::Metadata;
+use crate::python_package::PythonPackage;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Container {

@@ -19,18 +19,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::discriminant::Discriminant;
-use crate::label::Label;
-use crate::prerelease_kind::PrereleaseKind;
-use anyhow::{Error, Result, bail};
-use isopy_lib::Triple;
-use isopy_lib::VersionOps;
 use std::any::Any;
 use std::borrow::Cow;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, Result, bail};
+use isopy_lib::Triple;
+use isopy_lib::VersionOps;
+
+use crate::discriminant::Discriminant;
+use crate::label::Label;
+use crate::prerelease_kind::PrereleaseKind;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PythonVersion {
@@ -207,12 +209,13 @@ impl VersionOps for PythonVersion {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Result;
+    use rstest::rstest;
+
     use crate::discriminant::Discriminant;
     use crate::label::Label;
     use crate::prerelease_kind::PrereleaseKind;
     use crate::python_version::{PythonVersion, parse_triple_discriminant_helper};
-    use anyhow::Result;
-    use rstest::rstest;
 
     #[rstest]
     #[case(

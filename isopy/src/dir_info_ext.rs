@@ -19,16 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::ffi::OsString;
+use std::path::{Path, PathBuf};
+
+use anyhow::Result;
+use isopy_lib::{EnvInfo, Platform, Shell};
+
 use crate::app::App;
 use crate::constants::ENV_CONFIG_FILE_NAME;
 use crate::repo::{DirInfo, Manifest};
 use crate::serialization::Env;
 use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
-use anyhow::Result;
-use isopy_lib::{EnvInfo, Platform, Shell};
-use std::ffi::OsString;
-use std::path::{Path, PathBuf};
 
 pub(crate) trait DirInfoExt {
     fn read_env_config(&self) -> Result<Env>;

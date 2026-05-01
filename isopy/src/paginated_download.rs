@@ -19,7 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::ISOPY_USER_AGENT;
+use std::fs::read_dir;
+use std::path::Path;
+
 use anyhow::bail;
 use anyhow::{Context, Result};
 use futures_util::StreamExt;
@@ -29,11 +31,11 @@ use log::info;
 use reqwest::Client;
 use reqwest::Url as ReqwestUrl;
 use reqwest::header::{ACCEPT, USER_AGENT};
-use std::fs::read_dir;
-use std::path::Path;
 use tokio::fs::{File as TokioFsFile, create_dir_all as tokio_fs_create_dir_all};
 use tokio::io::AsyncWriteExt;
 use url::Url;
+
+use crate::constants::ISOPY_USER_AGENT;
 
 pub fn get_download_paginated_asset_response_from_dir(
     dir: &Path,

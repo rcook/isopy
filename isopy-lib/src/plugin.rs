@@ -19,16 +19,18 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::ffi::OsString;
+use std::path::Path;
+
+use anyhow::Result;
+use url::Url;
+
 use crate::env_info::EnvInfo;
 use crate::macros::dyn_trait_struct;
 use crate::package_manager::PackageManager;
 use crate::package_manager_context::PackageManagerContext;
 use crate::shell::{Platform, Shell};
 use crate::version::Version;
-use anyhow::Result;
-use std::ffi::OsString;
-use std::path::Path;
-use url::Url;
 
 pub trait PluginOps: Send + Sync {
     fn url(&self) -> &Url;

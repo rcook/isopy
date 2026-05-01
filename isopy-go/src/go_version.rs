@@ -19,13 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::{Error, bail};
-use isopy_lib::{Extra, VersionOps, parse_last_part};
 use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::{Error, bail};
+use isopy_lib::{Extra, VersionOps, parse_last_part};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct GoVersion {
@@ -102,8 +103,9 @@ impl VersionOps for GoVersion {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use rstest::rstest;
+
+    use super::*;
 
     #[rstest]
     #[case("go1", 1, None, None, Extra::Stable)]

@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use isopy_lib::VersionOps;
-use serde::Deserialize;
 use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use isopy_lib::VersionOps;
+use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Version {

@@ -19,10 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::repo::meta_id::MetaId;
+use std::path::{Path, PathBuf};
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+
+use crate::repo::meta_id::MetaId;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ManifestRecord {

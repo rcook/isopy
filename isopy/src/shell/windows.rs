@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::shell::proc::{get_parent_pid, get_pid, get_process_from_pid};
-use anyhow::{Result, bail};
-use same_file::is_same_file;
 use std::env::var;
 use std::path::PathBuf;
 use std::sync::LazyLock;
+
+use anyhow::{Result, bail};
+use same_file::is_same_file;
 use sysinfo::System;
+
+use crate::shell::proc::{get_parent_pid, get_pid, get_process_from_pid};
 
 static POWERSHELL_PATH: LazyLock<PathBuf> = LazyLock::new(|| {
     PathBuf::from(var("WINDIR").expect("WINDIR must be defined"))

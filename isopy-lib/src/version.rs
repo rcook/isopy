@@ -19,10 +19,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::macros::dyn_trait_struct;
 use std::any::Any;
 use std::borrow::Cow;
 use std::fmt::{Debug, Formatter, Result as FmtResult};
+
+use crate::macros::dyn_trait_struct;
 
 pub trait VersionOps: Debug + Send + Sync {
     fn as_str(&self) -> Cow<'_, String>;

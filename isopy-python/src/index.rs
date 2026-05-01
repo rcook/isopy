@@ -21,12 +21,14 @@
 //
 #![allow(unused)]
 
-use crate::index_item::IndexItem;
-use anyhow::Error;
-use serde_json::Value;
 use std::iter::from_fn;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::Error;
+use serde_json::Value;
+
+use crate::index_item::IndexItem;
 
 pub(crate) struct Index {
     value: Value,

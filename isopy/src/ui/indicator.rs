@@ -21,10 +21,11 @@
 //
 #![allow(unused)]
 
-use crate::ui::op::OpProgress;
 use anyhow::Result;
 use indicatif::{ProgressBar, ProgressStyle};
 use uuid::Uuid;
+
+use crate::ui::op::OpProgress;
 
 pub struct Indicator {
     id: Uuid,

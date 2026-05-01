@@ -36,8 +36,9 @@ pub(crate) fn str_to_bool(s: &str) -> Option<bool> {
 
 #[cfg(test)]
 mod tests {
-    use crate::bool_util::str_to_bool;
     use rstest::rstest;
+
+    use crate::bool_util::str_to_bool;
 
     #[rstest]
     #[case(None, "junk")]

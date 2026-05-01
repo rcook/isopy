@@ -19,11 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::args::Args;
-use crate::status::{StatusResult, success};
+use std::io::stdout;
+
 use clap::CommandFactory;
 use clap_complete::{Shell, generate};
-use std::io::stdout;
+
+use crate::args::Args;
+use crate::status::{StatusResult, success};
 
 pub(crate) fn do_completions(shell: Option<Shell>) -> StatusResult {
     let shell = shell.unwrap_or(Shell::Bash);

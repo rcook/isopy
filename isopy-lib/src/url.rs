@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Error;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::Error;
 use url::Url;
 
 #[derive(Clone, Debug)]
@@ -96,11 +97,12 @@ impl From<DirUrl> for Url {
 
 #[cfg(test)]
 mod tests {
-    use crate::FileUrl;
-    use crate::url::DirUrl;
     use anyhow::Result;
     use rstest::rstest;
     use url::Url;
+
+    use crate::FileUrl;
+    use crate::url::DirUrl;
 
     #[rstest]
     #[case("https://aaa/", "https://aaa")]

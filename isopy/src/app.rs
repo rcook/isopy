@@ -19,6 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::collections::HashMap;
+use std::ffi::OsString;
+use std::fs::File;
+use std::path::{Path, PathBuf};
+
+use anyhow::{Result, bail};
+use isopy_lib::{
+    EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
+    Version,
+};
+
 use crate::constants::{DEFAULT_MONIKER_CONFIG_NAME, PROJECT_CONFIG_FILE_NAME};
 use crate::dir_info_ext::DirInfoExt;
 use crate::moniker::Moniker;
@@ -29,15 +40,6 @@ use crate::serialization::{Config, Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
-use anyhow::{Result, bail};
-use isopy_lib::{
-    EnvInfo, GetPackageOptions, InstallPackageOptions, PackageInfo, Platform, Shell, TagFilter,
-    Version,
-};
-use std::collections::HashMap;
-use std::ffi::OsString;
-use std::fs::File;
-use std::path::{Path, PathBuf};
 
 pub(crate) struct App {
     pub(crate) config_dir: PathBuf,

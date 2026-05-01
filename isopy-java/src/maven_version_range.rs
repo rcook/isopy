@@ -19,10 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use percent_encoding::{AsciiSet, CONTROLS, utf8_percent_encode};
+
 use crate::maven_version::MavenVersion;
 use crate::maven_version_limit::MavenVersionLimit;
-use percent_encoding::{AsciiSet, CONTROLS, utf8_percent_encode};
-use std::fmt::{Display, Formatter, Result as FmtResult};
 
 const MAVEN_VERSION: &AsciiSet = &CONTROLS.add(b'(').add(b')').add(b',').add(b'[').add(b']');
 
@@ -87,12 +89,13 @@ impl Display for MavenVersionRange {
 
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
+
     use crate::maven_version::MavenVersion;
     use crate::maven_version_limit::MavenVersionLimit::{Closed, Open};
     use crate::maven_version_range::MavenVersionRange::{
         self, OpenJdkVersion, Version, VersionRange,
     };
-    use rstest::rstest;
 
     #[rstest]
     #[case(

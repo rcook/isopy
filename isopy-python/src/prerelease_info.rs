@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::prerelease_kind::PrereleaseKind;
 use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use crate::prerelease_kind::PrereleaseKind;
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) struct PrereleaseInfo {

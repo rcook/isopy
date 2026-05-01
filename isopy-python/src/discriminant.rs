@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
 use crate::prerelease_info::PrereleaseInfo;
 use crate::prerelease_kind::PrereleaseKind;
-use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) enum Discriminant {
@@ -47,9 +48,10 @@ impl Display for Discriminant {
 
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
+
     use crate::discriminant::Discriminant;
     use crate::prerelease_kind::PrereleaseKind;
-    use rstest::rstest;
 
     #[rstest]
     #[case(Discriminant::None, "")]

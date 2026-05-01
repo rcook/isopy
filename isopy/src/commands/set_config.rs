@@ -19,11 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::collections::HashSet;
+
+use log::info;
+
 use crate::app::App;
 use crate::constants::CONFIG_NAMES;
 use crate::status::{StatusResult, success, user_error};
-use log::info;
-use std::collections::HashSet;
 
 pub(crate) fn do_set_config(app: &App, name: &str, value: Option<&String>) -> StatusResult {
     let names = CONFIG_NAMES.into_iter().collect::<HashSet<_>>();

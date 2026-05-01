@@ -21,9 +21,10 @@
 //
 #![allow(unused)]
 
+use std::sync::Arc;
+
 use crate::ui::indicator::Indicator;
 use crate::ui::state::State;
-use std::sync::Arc;
 
 pub type OpProgress = u64;
 

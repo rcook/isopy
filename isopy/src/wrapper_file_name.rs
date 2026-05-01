@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Error;
 use std::ffi::OsString;
 use std::path::{Component, Path, PathBuf};
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::Error;
 
 #[derive(Clone, Debug)]
 pub(crate) enum WrapperFileName {

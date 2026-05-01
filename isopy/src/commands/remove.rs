@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::path::Path;
+
 use crate::app::App;
 use crate::status::{StatusResult, success, user_error};
-use std::path::Path;
 
 pub(crate) async fn do_remove(app: &App, project_dir: &Path) -> StatusResult {
     if app.get_dir_info(project_dir)?.is_none() {

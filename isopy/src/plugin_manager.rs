@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::path::Path;
+use std::sync::OnceLock;
+
+use isopy_lib::{PackageManager, Plugin};
+use log::warn;
+
 use crate::constants::CACHE_DIR_NAME;
 use crate::moniker::Moniker;
 use crate::package_manager_helper::PackageManagerHelper;
-use isopy_lib::{PackageManager, Plugin};
-use log::warn;
-use std::path::Path;
-use std::sync::OnceLock;
 
 pub(crate) struct PluginManager {
     go: Plugin,

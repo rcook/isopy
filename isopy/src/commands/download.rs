@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use isopy_lib::{DownloadPackageOptionsBuilder, TagFilter};
+use log::info;
+
 use crate::app::App;
 use crate::package_id::PackageId;
 use crate::status::{StatusResult, success};
-use isopy_lib::{DownloadPackageOptionsBuilder, TagFilter};
-use log::info;
 
 pub(crate) async fn do_download(
     app: &App,

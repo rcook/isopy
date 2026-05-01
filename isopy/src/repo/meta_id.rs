@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Error;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use anyhow::Error;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use uuid::Uuid;
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -71,10 +72,11 @@ impl<'de> Deserialize<'de> for MetaId {
 
 #[cfg(test)]
 mod tests {
-    use crate::repo::MetaId;
     use anyhow::Result;
     use rstest::rstest;
     use uuid::Uuid;
+
+    use crate::repo::MetaId;
 
     #[rstest]
     #[case(

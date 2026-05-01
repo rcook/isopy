@@ -19,8 +19,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::local_package_info::LocalPackageInfo;
 use itertools::Itertools;
+
+use crate::local_package_info::LocalPackageInfo;
 
 fn sort_infos(infos: &mut [LocalPackageInfo]) {
     infos.sort_by_cached_key(|i| i.package.metadata.version.clone());

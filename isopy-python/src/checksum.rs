@@ -19,12 +19,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::python_package::PythonPackage;
-use crate::python_plugin::CHECKSUM_BASE_URL;
+use std::collections::HashMap;
+
 use anyhow::{Result, anyhow, bail};
 use isopy_lib::{Checksum, DownloadAssetOptionsBuilder, PackageManagerContext};
-use std::collections::HashMap;
 use tokio::fs::read_to_string;
+
+use crate::python_package::PythonPackage;
+use crate::python_plugin::CHECKSUM_BASE_URL;
 
 pub(crate) async fn get_checksum(
     ctx: &PackageManagerContext,

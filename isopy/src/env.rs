@@ -19,13 +19,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::bool_util::str_to_bool;
-use anyhow::{Result, bail};
 use std::env::{VarError, remove_var, set_var, var};
 use std::ffi::OsStr;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 use std::sync::LazyLock;
+
+use anyhow::{Result, bail};
+
+use crate::bool_util::str_to_bool;
 
 pub const BOOL_TRUE_VALUE: &str = "true";
 pub const BOOL_FALSE_VALUE: &str = "false";

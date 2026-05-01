@@ -19,11 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::ffi::OsString;
+
 use crate::app::App;
 use crate::dir_info_ext::DirInfoExt;
 use crate::shell::{Command, IsopyEnv};
 use crate::status::{StatusResult, success, user_error};
-use std::ffi::OsString;
 
 pub(crate) fn do_run(app: App, program: &str, args: &[String]) -> StatusResult {
     let mut command = Command::new(OsString::from(program));

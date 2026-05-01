@@ -19,10 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::java_version::JavaVersion;
-use isopy_lib::{ArchiveType, Checksum, PackageOps, Version};
 use std::{collections::HashSet, path::PathBuf};
+
+use isopy_lib::{ArchiveType, Checksum, PackageOps, Version};
 use url::Url;
+
+use crate::java_version::JavaVersion;
 
 #[allow(unused)]
 pub struct JavaPackage {

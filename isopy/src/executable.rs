@@ -19,15 +19,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use anyhow::Result;
 use std::path::Path;
+
+use anyhow::Result;
 
 pub fn is_executable_file(path: &Path) -> Result<bool> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<bool> {
-        use crate::constants::EXECUTABLE_MASK;
         use std::fs::metadata;
         use std::os::unix::fs::PermissionsExt;
+
+        use crate::constants::EXECUTABLE_MASK;
 
         let permissions = metadata(path)?.permissions();
         Ok((permissions.mode() & EXECUTABLE_MASK) != 0)
@@ -46,9 +48,10 @@ pub fn is_executable_file(path: &Path) -> Result<bool> {
 pub fn ensure_file_executable_mode(path: &Path) -> Result<()> {
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn inner(path: &Path) -> Result<()> {
-        use crate::constants::EXECUTABLE_MASK;
         use std::fs::{metadata, set_permissions};
         use std::os::unix::fs::PermissionsExt;
+
+        use crate::constants::EXECUTABLE_MASK;
 
         let mut permissions = metadata(path)?.permissions();
         permissions.set_mode(permissions.mode() | EXECUTABLE_MASK);

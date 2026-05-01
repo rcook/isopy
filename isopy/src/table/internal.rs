@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use colored::{Color, Colorize};
+
 use crate::table::row::Row;
 use crate::table::settings::TableSettings;
-use colored::{Color, Colorize};
 
 macro_rules! table_title {
     ($table: expr, $($arg: tt)*) => {{
@@ -173,9 +174,10 @@ impl Table {
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::{Display, Formatter, Result as FmtResult};
+
     use crate::table::internal::Table;
     use crate::table::settings::TableSettings;
-    use std::fmt::{Display, Formatter, Result as FmtResult};
 
     #[test]
     fn table_columns_macro() {

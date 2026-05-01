@@ -19,9 +19,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use log::info;
+
 use crate::app::App;
 use crate::status::{StatusResult, success};
-use log::info;
 
 #[allow(clippy::unnecessary_wraps)]
 #[allow(clippy::unused_async)]

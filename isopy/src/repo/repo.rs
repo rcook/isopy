@@ -19,6 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+use std::fs::{read_dir, remove_dir_all, remove_file};
+use std::path::{Path, PathBuf};
+
+use anyhow::{Result, bail};
+use chrono::Utc;
+use fslock::LockFile;
+
 use crate::repo::config::RepoConfig;
 use crate::repo::dir_info::DirInfo;
 use crate::repo::link::{Link, LinkRecord};
@@ -28,11 +35,6 @@ use crate::repo::meta_id::MetaId;
 use crate::repo::trash::Trash;
 use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
-use anyhow::{Result, bail};
-use chrono::Utc;
-use fslock::LockFile;
-use std::fs::{read_dir, remove_dir_all, remove_file};
-use std::path::{Path, PathBuf};
 
 const MANIFEST_FILE_NAME: &str = "manifest.yaml";
 
