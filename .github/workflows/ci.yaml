@@ -49,3 +49,30 @@ jobs:
 
       - name: Test
         run: cargo test --target ${{ matrix.target }}
+
+  # Build each workspace member in isolation so we catch feature-unification
+  # leaks (e.g. a crate relying on features activated only because another
+  # workspace member enables them). The workspace build above will happily
+  # compile such crates; building them alone will not.
+  build-per-crate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: [isopy, isopy-go, isopy-java, isopy-lib, isopy-python]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: per-crate-${{ matrix.crate }}
+
+      - name: Build
+        run: cargo build -p ${{ matrix.crate }}
+
+      - name: Lint
+        run: cargo clippy -p ${{ matrix.crate }} --all-targets -- -D warnings
