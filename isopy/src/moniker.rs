@@ -21,6 +21,7 @@
 //
 use crate::env::EnvKey;
 use anyhow::{Error, bail};
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::path::Path;
 use std::result::Result as StdResult;
@@ -32,8 +33,8 @@ const GO: &str = "go";
 const JAVA: &str = "java";
 const PYTHON: &str = "python";
 
-#[derive(Clone, Debug, EnumIter, PartialEq)]
-
+#[derive(Clone, Debug, Deserialize, EnumIter, PartialEq, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub(crate) enum Moniker {
     Go,
     Java,

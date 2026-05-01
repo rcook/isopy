@@ -51,11 +51,10 @@ pub(crate) fn do_info(app: &App) -> StatusResult {
     );
 
     table_title!(table, "Configuration values");
-    let config_values = app.get_config_values()?;
     let mut names = CONFIG_NAMES.into_iter().collect::<Vec<_>>();
     names.sort_unstable();
     for name in names {
-        match config_values.get(name) {
+        match app.get_config_value(name)? {
             Some(value) => table_columns!(table, name, value),
             None => table_columns!(table, name, NO_VALUE),
         }

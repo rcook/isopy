@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Richard Cook
+// Copyright (c) 2026 Richard Cook
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -19,22 +19,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-mod config;
-mod directory;
-mod download;
-mod env;
-mod env_package;
-mod file;
-mod manifest;
-mod paginated_file;
-mod project;
+use crate::moniker::Moniker;
+use serde::{Deserialize, Serialize};
 
-pub(crate) use config::*;
-pub(crate) use directory::*;
-pub(crate) use download::*;
-pub(crate) use env::*;
-pub(crate) use env_package::*;
-pub(crate) use file::*;
-pub(crate) use manifest::*;
-pub(crate) use paginated_file::*;
-pub(crate) use project::*;
+#[derive(Debug, Default, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Config {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(crate) default_moniker: Option<Moniker>,
+}

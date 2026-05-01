@@ -19,13 +19,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-use crate::constants::PROJECT_CONFIG_FILE_NAME;
+use crate::constants::{DEFAULT_MONIKER_CONFIG_NAME, PROJECT_CONFIG_FILE_NAME};
 use crate::dir_info_ext::DirInfoExt;
 use crate::moniker::Moniker;
 use crate::package_id::PackageId;
 use crate::plugin_manager::PluginManager;
 use crate::repo::{DirInfo, Link, LinkId, Repo};
-use crate::serialization::{Env, EnvPackage, Project};
+use crate::serialization::{Config, Env, EnvPackage, Project};
 use crate::shell::IsopyEnv;
 use crate::write::safe_write_file;
 use crate::yaml::read_yaml_file;
@@ -62,46 +62,46 @@ impl App {
         }
     }
 
-    pub(crate) fn get_config_values(&self) -> Result<HashMap<String, String>> {
+    pub(crate) fn get_config(&self) -> Result<Config> {
         if self.config_value_path.is_file() {
-            Ok(read_yaml_file::<HashMap<String, String>>(
-                &self.config_value_path,
-            )?)
+            Ok(read_yaml_file::<Config>(&self.config_value_path)?)
         } else {
-            Ok(HashMap::new())
+            Ok(Config::default())
         }
     }
 
     pub(crate) fn get_config_value(&self, name: &str) -> Result<Option<String>> {
-        if !self.config_value_path.is_file() {
-            return Ok(None);
-        }
-
-        let config_values = read_yaml_file::<HashMap<String, String>>(&self.config_value_path)?;
-        Ok(config_values.get(name).cloned())
+        let config = self.get_config()?;
+        Ok(match name {
+            DEFAULT_MONIKER_CONFIG_NAME => config.default_moniker.map(|m| m.as_str().to_owned()),
+            _ => bail!("Unknown configuration value {name}"),
+        })
     }
 
     pub(crate) fn set_config_value(&self, name: &str, value: &str) -> Result<()> {
-        let mut config_values = if self.config_value_path.is_file() {
-            read_yaml_file::<HashMap<String, String>>(&self.config_value_path)?
-        } else {
-            HashMap::new()
-        };
-        _ = config_values.insert(name.to_owned(), value.to_owned());
+        let mut config = self.get_config()?;
+        match name {
+            DEFAULT_MONIKER_CONFIG_NAME => {
+                config.default_moniker = Some(value.parse()?);
+            }
+            _ => bail!("Unknown configuration value {name}"),
+        }
         let f = File::create(&self.config_value_path)?;
-        serde_yaml::to_writer(f, &config_values)?;
+        serde_yaml::to_writer(f, &config)?;
         Ok(())
     }
 
     pub(crate) fn delete_config_value(&self, name: &str) -> Result<()> {
-        if self.config_value_path.is_file() {
-            let mut config_values =
-                read_yaml_file::<HashMap<String, String>>(&self.config_value_path)?;
-            if config_values.remove(name).is_some() {
-                let f = File::create(&self.config_value_path)?;
-                serde_yaml::to_writer(f, &config_values)?;
-            }
+        if !self.config_value_path.is_file() {
+            return Ok(());
         }
+        let mut config = self.get_config()?;
+        match name {
+            DEFAULT_MONIKER_CONFIG_NAME => config.default_moniker = None,
+            _ => bail!("Unknown configuration value {name}"),
+        }
+        let f = File::create(&self.config_value_path)?;
+        serde_yaml::to_writer(f, &config)?;
         Ok(())
     }
 
