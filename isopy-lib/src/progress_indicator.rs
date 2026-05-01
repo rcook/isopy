@@ -90,4 +90,13 @@ impl ProgressIndicator {
     }
 }
 
-unsafe impl Send for ProgressIndicator {}
+#[cfg(test)]
+mod tests {
+    use super::ProgressIndicator;
+    const fn assert_send<T: Send>() {}
+    const fn assert_sync<T: Sync>() {}
+    const _: () = {
+        assert_send::<ProgressIndicator>();
+        assert_sync::<ProgressIndicator>();
+    };
+}
