@@ -34,6 +34,7 @@ pub const BOOL_FALSE_VALUE: &str = "false";
 pub enum EnvKey {
     ConfigDir,
     LogLevel,
+    GoEnabled,
     JavaEnabled,
     IsopyEnv,
 }
@@ -43,6 +44,7 @@ impl EnvKey {
         match self {
             Self::ConfigDir => "ISOPY_CONFIG_DIR",
             Self::LogLevel => "ISOPY_LOG_LEVEL",
+            Self::GoEnabled => "ISOPY_GO",
             Self::JavaEnabled => "ISOPY_JAVA",
             Self::IsopyEnv => "ISOPY_ENV",
         }
@@ -77,6 +79,7 @@ static CLI_ENVS: LazyLock<Vec<(EnvKey, EnvType)>> = LazyLock::new(|| {
     vec![
         (EnvKey::ConfigDir, EnvType::Ignore),
         (EnvKey::LogLevel, EnvType::Ignore),
+        (EnvKey::GoEnabled, EnvType::Bool),
         (EnvKey::JavaEnabled, EnvType::Bool),
         (EnvKey::IsopyEnv, EnvType::Ignore),
     ]

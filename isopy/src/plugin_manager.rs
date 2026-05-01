@@ -23,12 +23,16 @@ use crate::constants::CACHE_DIR_NAME;
 use crate::moniker::Moniker;
 use crate::package_manager_helper::PackageManagerHelper;
 use isopy_lib::{PackageManager, Plugin};
+use log::warn;
 use std::path::Path;
+use std::sync::OnceLock;
 
 pub(crate) struct PluginManager {
     go: Plugin,
     java: Plugin,
     python: Plugin,
+    go_warned: OnceLock<()>,
+    java_warned: OnceLock<()>,
 }
 
 impl PluginManager {
@@ -37,10 +41,13 @@ impl PluginManager {
             go: isopy_go::new_plugin(Moniker::Go.as_str()),
             java: isopy_java::new_plugin(Moniker::Java.as_str()),
             python: isopy_python::new_plugin(Moniker::Python.as_str()),
+            go_warned: OnceLock::new(),
+            java_warned: OnceLock::new(),
         }
     }
 
-    pub(crate) const fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
+    pub(crate) fn get_plugin(&self, moniker: &Moniker) -> &Plugin {
+        self.warn_if_experimental(moniker);
         match moniker {
             Moniker::Go => &self.go,
             Moniker::Java => &self.java,
@@ -57,5 +64,19 @@ impl PluginManager {
         let ctx = PackageManagerHelper::new_context(&cache_dir);
         let plugin = self.get_plugin(moniker);
         plugin.new_package_manager(ctx)
+    }
+
+    fn warn_if_experimental(&self, moniker: &Moniker) {
+        let cell = match moniker {
+            Moniker::Go => &self.go_warned,
+            Moniker::Java => &self.java_warned,
+            Moniker::Python => return,
+        };
+        cell.get_or_init(|| {
+            warn!(
+                "{} plugin is experimental and may panic on unimplemented operations",
+                moniker.as_str()
+            );
+        });
     }
 }

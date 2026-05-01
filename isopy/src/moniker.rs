@@ -53,12 +53,21 @@ impl Moniker {
         Path::new(self.as_str())
     }
 
+    /// Env var that enables this moniker, or `None` if it's always enabled.
+    pub(crate) const fn enable_env_var(&self) -> Option<EnvKey> {
+        match self {
+            Self::Go => Some(EnvKey::GoEnabled),
+            Self::Java => Some(EnvKey::JavaEnabled),
+            Self::Python => None,
+        }
+    }
+
+    pub(crate) fn is_enabled(&self) -> bool {
+        self.enable_env_var().is_none_or(EnvKey::is_true)
+    }
+
     pub(crate) fn iter_enabled() -> impl Iterator<Item = Self> {
-        let java_enabled = EnvKey::JavaEnabled.is_true();
-        Self::iter().filter(move |member| match member {
-            Self::Java => java_enabled,
-            _ => true,
-        })
+        Self::iter().filter(Self::is_enabled)
     }
 }
 
@@ -72,9 +81,18 @@ impl FromStr for Moniker {
     type Err = Error;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        for member in Self::iter_enabled() {
+        for member in Self::iter() {
             if member.as_str().eq_ignore_ascii_case(s) {
-                return Ok(member);
+                return if member.is_enabled() {
+                    Ok(member)
+                } else {
+                    let name = member.as_str();
+                    let env_key = member
+                        .enable_env_var()
+                        .expect("disabled moniker must have an enable env var");
+                    let env = env_key.name();
+                    bail!("{name} plugin is not enabled; set {env}=true to enable (experimental)")
+                };
             }
         }
         bail!("Invalid package manager moniker {s}")
