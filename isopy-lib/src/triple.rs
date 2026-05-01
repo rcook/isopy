@@ -42,18 +42,14 @@ impl FromStr for Triple {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let parts = s.splitn(3, '.').collect::<Vec<_>>();
-        if parts.len() != 3 {
+        let [major, minor, revision] = parts.as_slice() else {
             bail!("Invalid package version {s}")
-        }
-
-        let major = parts.first().expect("Expected major").parse()?;
-        let minor = parts.get(1).expect("Expected minor").parse()?;
-        let revision = parts.get(2).expect("Expected revision").parse()?;
+        };
 
         Ok(Self {
-            major,
-            minor,
-            revision,
+            major: major.parse()?,
+            minor: minor.parse()?,
+            revision: revision.parse()?,
         })
     }
 }
