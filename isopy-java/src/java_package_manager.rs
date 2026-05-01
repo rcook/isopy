@@ -29,10 +29,9 @@ use isopy_lib::{
     Tags, UpdateIndexOptions, Version,
 };
 use reqwest::Client;
-use std::fs::{File, read_dir};
-use std::io::BufReader;
+use std::fs::read_dir;
 use std::path::{Path, PathBuf};
-use tokio::fs::write;
+use tokio::fs::{read, write};
 use url::Url;
 
 pub struct JavaPackageManager {
@@ -124,9 +123,8 @@ impl PackageManagerOps for JavaPackageManager {
         let dir = self.get_index(options.show_progress, false).await?;
         let mut packages = Vec::new();
         for path in Self::get_page_paths(&dir)? {
-            let f = File::open(path)?;
-            let reader = BufReader::new(f);
-            let response = serde_json::from_reader::<_, VersionsResponse>(reader)?;
+            let bytes = read(&path).await?;
+            let response = serde_json::from_slice::<VersionsResponse>(&bytes)?;
             packages.extend(response.versions.into_iter().map(|v| {
                 PackageInfo::new(
                     v.semver.clone(),
