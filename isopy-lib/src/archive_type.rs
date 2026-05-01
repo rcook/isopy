@@ -23,11 +23,16 @@ use crate::extent::Extent;
 use crate::package_manager::InstallPackageOptions;
 use crate::progress_indicator::{ProgressIndicator, ProgressIndicatorOptionsBuilder};
 use anyhow::{Result, bail};
-use decompress::{ExtractOptsBuilder, decompress};
+use flate2::read::GzDecoder;
 use log::info;
-use std::path::Path;
+use std::fs::{File, create_dir_all};
+use std::io::{Read, copy};
+use std::path::{Component, Path, PathBuf};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use tar::Archive;
+use zip::ZipArchive;
+use zstd::stream::read::Decoder as ZstdDecoder;
 
 #[derive(Clone, Copy, Debug, EnumIter)]
 pub enum ArchiveType {
@@ -74,21 +79,158 @@ impl ArchiveType {
                 .build()?,
         )?;
 
-        {
-            let progress_indicator = progress_indicator.clone();
-            let options = ExtractOptsBuilder::default()
-                .strip(1)
-                .filter(move |args| {
-                    progress_indicator.set_message(format!("Unpacking {}", args.rel_path()));
-                    true
-                })
-                .build()?;
-            decompress(archive_path, dir, &options)?;
+        match self {
+            Self::TarGz => {
+                let file = File::open(archive_path)?;
+                unpack_tar(GzDecoder::new(file), dir, &progress_indicator)?;
+            }
+            Self::TarZst => {
+                let file = File::open(archive_path)?;
+                unpack_tar(ZstdDecoder::new(file)?, dir, &progress_indicator)?;
+            }
+            Self::Zip => unpack_zip(archive_path, dir, &progress_indicator)?,
         }
 
         progress_indicator.finish_and_clear();
 
         info!("Unpacked package to {}", dir.display());
         Ok(())
+    }
+}
+
+fn unpack_tar<R: Read>(reader: R, dir: &Path, progress: &ProgressIndicator) -> Result<()> {
+    let mut archive = Archive::new(reader);
+    archive.set_preserve_permissions(true);
+    archive.set_preserve_mtime(true);
+    archive.set_overwrite(true);
+
+    for entry in archive.entries()? {
+        let mut entry = entry?;
+        let path = entry.path()?.into_owned();
+        let Some(stripped) = strip_one_component(&path) else {
+            continue;
+        };
+
+        let out_path = dir.join(&stripped);
+        reject_traversal(dir, &out_path)?;
+
+        progress.set_message(format!("Unpacking {}", stripped.display()));
+        if let Some(parent) = out_path.parent() {
+            create_dir_all(parent)?;
+        }
+        entry.unpack(&out_path)?;
+    }
+
+    Ok(())
+}
+
+fn unpack_zip(archive_path: &Path, dir: &Path, progress: &ProgressIndicator) -> Result<()> {
+    let file = File::open(archive_path)?;
+    let mut archive = ZipArchive::new(file)?;
+
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        let Some(enclosed) = entry.enclosed_name() else {
+            continue;
+        };
+        let Some(stripped) = strip_one_component(enclosed) else {
+            continue;
+        };
+
+        let out_path = dir.join(&stripped);
+        reject_traversal(dir, &out_path)?;
+
+        progress.set_message(format!("Unpacking {}", stripped.display()));
+
+        if entry.is_dir() {
+            create_dir_all(&out_path)?;
+        } else {
+            if let Some(parent) = out_path.parent() {
+                create_dir_all(parent)?;
+            }
+            let mut out = File::create(&out_path)?;
+            copy(&mut entry, &mut out)?;
+
+            #[cfg(unix)]
+            if let Some(mode) = entry.unix_mode() {
+                use std::fs::{Permissions, set_permissions};
+                use std::os::unix::fs::PermissionsExt;
+                set_permissions(&out_path, Permissions::from_mode(mode))?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn strip_one_component(path: &Path) -> Option<PathBuf> {
+    let mut components = path.components();
+    components.next()?;
+    let rest: PathBuf = components.collect();
+    if rest.as_os_str().is_empty() {
+        None
+    } else {
+        Some(rest)
+    }
+}
+
+fn reject_traversal(root: &Path, candidate: &Path) -> Result<()> {
+    for component in candidate.components() {
+        if matches!(component, Component::ParentDir) {
+            bail!(
+                "Refusing to extract path containing '..': {}",
+                candidate.display()
+            );
+        }
+    }
+    if !candidate.starts_with(root) {
+        bail!(
+            "Refusing to extract path outside target directory: {}",
+            candidate.display()
+        );
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn strip_one_component_drops_first_segment() {
+        assert_eq!(
+            Some(PathBuf::from("bin/python")),
+            strip_one_component(Path::new("cpython-3.14/bin/python"))
+        );
+    }
+
+    #[test]
+    fn strip_one_component_returns_none_for_top_level() {
+        assert_eq!(None, strip_one_component(Path::new("cpython-3.14")));
+    }
+
+    #[test]
+    fn strip_one_component_returns_none_for_empty() {
+        assert_eq!(None, strip_one_component(Path::new("")));
+    }
+
+    #[test]
+    fn reject_traversal_allows_nested_paths() {
+        let root = Path::new("/tmp/root");
+        assert!(reject_traversal(root, &root.join("a/b/c")).is_ok());
+    }
+
+    #[test]
+    fn reject_traversal_blocks_parent_dir_component() {
+        let root = Path::new("/tmp/root");
+        let candidate = root.join("..").join("escape");
+        assert!(reject_traversal(root, &candidate).is_err());
+    }
+
+    #[test]
+    fn reject_traversal_blocks_path_outside_root() {
+        let root = Path::new("/tmp/root");
+        assert!(reject_traversal(root, Path::new("/tmp/other/file")).is_err());
     }
 }

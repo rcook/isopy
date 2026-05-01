@@ -15,9 +15,9 @@ version.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
-decompress = { git = "https://github.com/rcook/decompress.git", rev = "c00c3b288e430eeffe78d3ba44952cf93697b1f0" }
 derive_builder = "0.20.2"
 derive_more = { version = "2.1.1", features = ["deref"] }
+flate2 = "1.1.9"
 hex = "0.4.3"
 indicatif.workspace = true
 log.workspace = true
@@ -25,11 +25,16 @@ reqwest.workspace = true
 sha2 = "0.11.0"
 strum.workspace = true
 strum_macros.workspace = true
+tar = "0.4.45"
 tokio = { workspace = true, features = ["fs"] }
 url.workspace = true
+zip = { version = "0.6.6", default-features = false, features = ["deflate"] }
+zstd = "0.13"
 
 [dev-dependencies]
 rstest.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 [lints]
 workspace = true
