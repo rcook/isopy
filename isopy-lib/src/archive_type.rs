@@ -61,7 +61,6 @@ impl ArchiveType {
         }
     }
 
-    #[allow(clippy::unused_async)]
     pub async fn unpack(
         &self,
         archive_path: &Path,
@@ -79,21 +78,30 @@ impl ArchiveType {
                 .build()?,
         )?;
 
-        match self {
-            Self::TarGz => {
-                let file = File::open(archive_path)?;
-                unpack_tar(GzDecoder::new(file), dir, &progress_indicator)?;
+        // Decompression is CPU-bound and uses synchronous file I/O; run it on
+        // a blocking thread so we don't stall other tasks on this runtime.
+        let archive_type = *self;
+        let archive_path = archive_path.to_path_buf();
+        let dir = dir.to_path_buf();
+        let progress = progress_indicator.clone();
+        tokio::task::spawn_blocking(move || -> Result<()> {
+            match archive_type {
+                Self::TarGz => {
+                    let file = File::open(&archive_path)?;
+                    unpack_tar(GzDecoder::new(file), &dir, &progress)?;
+                }
+                Self::TarZst => {
+                    let file = File::open(&archive_path)?;
+                    unpack_tar(ZstdDecoder::new(file)?, &dir, &progress)?;
+                }
+                Self::Zip => unpack_zip(&archive_path, &dir, &progress)?,
             }
-            Self::TarZst => {
-                let file = File::open(archive_path)?;
-                unpack_tar(ZstdDecoder::new(file)?, dir, &progress_indicator)?;
-            }
-            Self::Zip => unpack_zip(archive_path, dir, &progress_indicator)?,
-        }
+            info!("Unpacked package to {}", dir.display());
+            Ok(())
+        })
+        .await??;
 
         progress_indicator.finish_and_clear();
-
-        info!("Unpacked package to {}", dir.display());
         Ok(())
     }
 }

@@ -218,7 +218,11 @@ impl PythonPackageManager {
         }
 
         let response = self.get_index_response(false, show_progress).await?;
-        let packages = get_packages(&response, &self.platform_tags)?;
+        // Reading and parsing many large JSON pages is CPU- and I/O-bound;
+        // push it off the tokio runtime thread so other tasks can progress.
+        let platform_tags = self.platform_tags.clone();
+        let packages =
+            tokio::task::spawn_blocking(move || get_packages(&response, &platform_tags)).await??;
         //write_package_cache(cache_path, &packages)?;
         Ok(packages)
     }

@@ -24,7 +24,7 @@ use crate::python_plugin::CHECKSUM_BASE_URL;
 use anyhow::{Result, anyhow, bail};
 use isopy_lib::{Checksum, DownloadAssetOptionsBuilder, PackageManagerContext};
 use std::collections::HashMap;
-use std::fs::read_to_string;
+use tokio::fs::read_to_string;
 
 pub(crate) async fn get_checksum(
     ctx: &PackageManagerContext,
@@ -56,7 +56,7 @@ pub(crate) async fn get_checksum(
         .show_progress(show_progress)
         .build()?;
     let response = ctx.download_asset(&url, &options).await?;
-    let content = read_to_string(response.path)?;
+    let content = read_to_string(response.path).await?;
     let checksum_strs = parse_checksums(&content);
 
     let package_name = package.metadata.name.as_str();
