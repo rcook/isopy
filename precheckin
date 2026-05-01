@@ -38,7 +38,7 @@ run_step() {
 }
 
 cd $workspace_dir
-run_step 'cargo clippy'
+run_step 'cargo clippy --workspace --all-targets -- -D warnings'
 run_step 'cargo fmt'
 run_step 'cargo build'
 run_step 'cargo test'

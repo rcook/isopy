@@ -112,9 +112,8 @@ mod tests {
         write(&path, "hello-world")?;
 
         // Act
-        let e = match safe_create_file(&path, false) {
-            Ok(_) => panic!("safe_create_file must fail"),
-            Err(e) => e,
+        let Err(e) = safe_create_file(&path, false) else {
+            panic!("safe_create_file must fail")
         };
 
         // Assert
@@ -176,9 +175,8 @@ mod tests {
         write(&path, "hello-world")?;
 
         // Act
-        let e = match safe_write_file(&path, "something-else", false) {
-            Ok(_) => panic!("safe_write_file must fail"),
-            Err(e) => e,
+        let Err(e) = safe_write_file(&path, "something-else", false) else {
+            panic!("safe_write_file must fail")
         };
 
         // Assert

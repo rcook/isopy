@@ -42,7 +42,7 @@ jobs:
         run: cargo fmt --all --check
 
       - name: Lint
-        run: cargo clippy --target ${{ matrix.target }} -- -D warnings
+        run: cargo clippy --workspace --all-targets --target ${{ matrix.target }} -- -D warnings
 
       - name: Build
         run: cargo build --target ${{ matrix.target }}

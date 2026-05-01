@@ -29,8 +29,10 @@ use url::Url;
 #[derive(Debug)]
 pub struct LinkHeader {
     pub next: Option<Url>,
-    _last: Option<Url>,
-    _links: HashMap<String, String>,
+    #[allow(dead_code)]
+    last: Option<Url>,
+    #[allow(dead_code)]
+    links: HashMap<String, String>,
 }
 
 impl LinkHeader {
@@ -82,11 +84,7 @@ impl FromStr for LinkHeader {
         let links = Self::parse_link_header(s);
         let next = Self::get_link_url(&links, "next")?;
         let last = Self::get_link_url(&links, "last")?;
-        Ok(Self {
-            next,
-            _last: last,
-            _links: links,
-        })
+        Ok(Self { next, last, links })
     }
 }
 
@@ -100,8 +98,8 @@ mod tests {
     fn basics() -> Result<()> {
         let result = "<https://api.adoptium.net/v3/info/release_versions?heap_size=normal&image_type=jdk&project=jdk&release_type=ga&sort_method=DEFAULT&sort_order=DESC&vendor=eclipse&page=1&page_size=10>; rel=\"next\"".parse::<LinkHeader>()?;
         assert_eq!(Some("https://api.adoptium.net/v3/info/release_versions?heap_size=normal&image_type=jdk&project=jdk&release_type=ga&sort_method=DEFAULT&sort_order=DESC&vendor=eclipse&page=1&page_size=10".parse::<Url>()?), result.next);
-        assert!(result._last.is_none());
-        assert_eq!(1, result._links.len());
+        assert!(result.last.is_none());
+        assert_eq!(1, result.links.len());
         Ok(())
     }
 }
