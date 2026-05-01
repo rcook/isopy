@@ -61,3 +61,69 @@ impl FromStr for Metadata {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::metadata::Metadata;
+    use isopy_lib::ArchiveType;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(
+        "cpython-3.10.17+20250409-aarch64-apple-darwin-install_only.tar.gz",
+        3,
+        10,
+        17,
+        "20250409"
+    )]
+    #[case(
+        "cpython-3.14.0rc2+20250414-x86_64-unknown-linux-gnu-install_only.tar.gz",
+        3,
+        14,
+        0,
+        "20250414"
+    )]
+    fn parse_valid(
+        #[case] input: &str,
+        #[case] major: i32,
+        #[case] minor: i32,
+        #[case] revision: i32,
+        #[case] label: &str,
+    ) -> anyhow::Result<()> {
+        let m: Metadata = input.parse()?;
+        assert_eq!(input, m.name);
+        assert!(matches!(m.archive_type, ArchiveType::TarGz));
+        assert_eq!(major, m.version.triple.major);
+        assert_eq!(minor, m.version.triple.minor);
+        assert_eq!(revision, m.version.triple.revision);
+        assert_eq!(
+            label,
+            m.version
+                .label
+                .as_ref()
+                .expect("label must be present")
+                .as_str()
+        );
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("cpython-3.10.17+20250409-aarch64-apple-darwin-install_only_stripped.tar.gz")]
+    #[case("cpython-3.10.17+20250409-aarch64-apple-darwin-debug-full.tar.zst")]
+    fn detects_archive_type(#[case] input: &str) -> anyhow::Result<()> {
+        let m: Metadata = input.parse()?;
+        assert!(matches!(
+            m.archive_type,
+            ArchiveType::TarGz | ArchiveType::TarZst
+        ));
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("cpython-3.10.17+20250409-aarch64-apple-darwin-install_only.unknown")]
+    #[case("pypy-3.10.17+20250409-aarch64-apple-darwin-install_only.tar.gz")]
+    #[case("not-a-valid-archive")]
+    fn parse_invalid(#[case] input: &str) {
+        assert!(input.parse::<Metadata>().is_err());
+    }
+}

@@ -49,6 +49,16 @@ impl Display for Discriminant {
 mod tests {
     use crate::discriminant::Discriminant;
     use crate::prerelease_kind::PrereleaseKind;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(Discriminant::None, "")]
+    #[case(Discriminant::prerelease(PrereleaseKind::Alpha, 10), "a10")]
+    #[case(Discriminant::prerelease(PrereleaseKind::Beta, 3), "b3")]
+    #[case(Discriminant::prerelease(PrereleaseKind::ReleaseCandidate, 1), "rc1")]
+    fn display(#[case] discriminant: Discriminant, #[case] expected: &str) {
+        assert_eq!(expected, discriminant.to_string());
+    }
 
     #[test]
     fn order() {

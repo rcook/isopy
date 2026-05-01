@@ -81,6 +81,7 @@ impl PartialOrd for Label {
 #[cfg(test)]
 mod tests {
     use crate::label::Label;
+    use rstest::rstest;
 
     #[test]
     fn basics() {
@@ -92,5 +93,34 @@ mod tests {
         assert_ne!(label2, label3);
         assert!(label1 > label3);
         assert!(label3 < label2);
+    }
+
+    #[rstest]
+    #[case("20250414", Label::NewStyle(String::from("20250414")))]
+    #[case("20220227", Label::NewStyle(String::from("20220227")))]
+    #[case("20250414T1530", Label::OldStyle(String::from("20250414T1530")))]
+    #[case("20240101T0000", Label::OldStyle(String::from("20240101T0000")))]
+    fn parse_valid(#[case] input: &str, #[case] expected: Label) -> anyhow::Result<()> {
+        assert_eq!(expected, input.parse::<Label>()?);
+        Ok(())
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case("2025-04-14")]
+    #[case("2025041")]
+    #[case("202504140")]
+    #[case("20250414T15")]
+    #[case("20250414t1530")]
+    #[case("label")]
+    fn parse_invalid(#[case] input: &str) {
+        assert!(input.parse::<Label>().is_err());
+    }
+
+    #[test]
+    fn new_style_sorts_after_old_style_even_with_earlier_date() {
+        let old: Label = "20991231T2359".parse().unwrap();
+        let new: Label = "20000101".parse().unwrap();
+        assert!(new > old);
     }
 }

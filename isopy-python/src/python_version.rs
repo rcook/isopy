@@ -265,6 +265,64 @@ mod tests {
     }
 
     #[rstest]
+    #[case("")]
+    #[case("3.14")]
+    #[case("3.14.0x10")]
+    #[case("3.14.0alpha1")]
+    #[case("not-a-version")]
+    fn from_str_invalid(#[case] input: &str) {
+        assert!(input.parse::<PythonVersion>().is_err());
+    }
+
+    #[rstest]
+    #[case("1.2.3")]
+    #[case("3.14.0rc5")]
+    #[case("3.14.0a10")]
+    #[case("3.14.0b2")]
+    #[case("1.2.3:20250414")]
+    #[case("3.14.0rc2:20250414")]
+    #[case("3.14.0a10:20250414T1530")]
+    fn display_round_trip(#[case] input: &str) -> Result<()> {
+        let parsed: PythonVersion = input.parse()?;
+        assert_eq!(input, parsed.to_string());
+        Ok(())
+    }
+
+    #[test]
+    fn matches_ignores_missing_label_on_other() -> Result<()> {
+        let lhs: PythonVersion = "1.2.3:20250414".parse()?;
+        let rhs: PythonVersion = "1.2.3".parse()?;
+        assert!(lhs.matches(&rhs));
+        Ok(())
+    }
+
+    #[test]
+    fn matches_requires_equal_label_when_other_has_one() -> Result<()> {
+        let lhs: PythonVersion = "1.2.3:20250414".parse()?;
+        let rhs_same: PythonVersion = "1.2.3:20250414".parse()?;
+        let rhs_diff: PythonVersion = "1.2.3:20250415".parse()?;
+        assert!(lhs.matches(&rhs_same));
+        assert!(!lhs.matches(&rhs_diff));
+        Ok(())
+    }
+
+    #[test]
+    fn matches_rejects_different_triple() -> Result<()> {
+        let lhs: PythonVersion = "1.2.3".parse()?;
+        let rhs: PythonVersion = "1.2.4".parse()?;
+        assert!(!lhs.matches(&rhs));
+        Ok(())
+    }
+
+    #[test]
+    fn matches_rejects_different_discriminant() -> Result<()> {
+        let lhs: PythonVersion = "1.2.3rc1".parse()?;
+        let rhs: PythonVersion = "1.2.3rc2".parse()?;
+        assert!(!lhs.matches(&rhs));
+        Ok(())
+    }
+
+    #[rstest]
     #[case(1, 2, 3, Discriminant::None, None, "1.2.3")]
     #[case(
         1,
