@@ -35,9 +35,11 @@ jobs:
         with:
           key: release-${{ matrix.target }}
 
-      - name: Install musl tools
+      - name: Install musl cross toolchain
         if: matrix.target == 'x86_64-unknown-linux-musl'
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
+        uses: taiki-e/setup-cross-toolchain-action@v1
+        with:
+          target: ${{ matrix.target }}
 
       - name: Build
         run: cargo build --verbose --release --target ${{ matrix.target }}
