@@ -31,9 +31,10 @@ use anyhow::{Result, bail};
 use async_trait::async_trait;
 use chrono::Utc;
 use isopy_lib::{
-    DownloadAssetOptions, DownloadAssetResponse, DownloadPaginatedAssetOptions,
+    Checksum, DownloadAssetOptions, DownloadAssetResponse, DownloadPaginatedAssetOptions,
     DownloadPaginatedAssetResponse, PackageManagerContext, PackageManagerContextOps,
 };
+use log::warn;
 use std::fs::{create_dir_all, remove_file};
 use std::path::{Path, PathBuf};
 use url::Url;
@@ -100,6 +101,7 @@ impl PackageManagerContextOps for PackageManagerHelper {
         if !options.update
             && let Some(path) =
                 check_cache::<FileCacheItem>(&self.base_dir, &self.downloads_dir, url)?
+            && cached_is_valid(&path, options.checksum.as_ref()).await?
         {
             return Ok(DownloadAssetResponse { path });
         }
@@ -155,5 +157,66 @@ impl PackageManagerContextOps for PackageManagerHelper {
         )?;
 
         Ok(response)
+    }
+}
+
+/// Returns true if the cached file is usable. If a checksum is supplied and
+/// validation fails, the stale file is removed so the caller can re-download.
+async fn cached_is_valid(path: &Path, checksum: Option<&Checksum>) -> Result<bool> {
+    let Some(checksum) = checksum else {
+        return Ok(true);
+    };
+    if checksum.validate_file(path).await? {
+        return Ok(true);
+    }
+    warn!(
+        "Cached file {} failed checksum validation; re-downloading",
+        path.display()
+    );
+    remove_file(path)?;
+    Ok(false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::cached_is_valid;
+    use std::fs::write;
+    use tempfile::TempDir;
+
+    const HELLO_SHA256: &str = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824";
+
+    #[tokio::test]
+    async fn valid_cached_file_passes() -> anyhow::Result<()> {
+        let tmp = TempDir::with_prefix("cached-valid-")?;
+        let path = tmp.path().join("payload");
+        write(&path, b"hello")?;
+        let checksum = HELLO_SHA256.parse()?;
+        assert!(cached_is_valid(&path, Some(&checksum)).await?);
+        assert!(path.exists(), "file must be preserved on valid checksum");
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn corrupt_cached_file_is_removed() -> anyhow::Result<()> {
+        let tmp = TempDir::with_prefix("cached-corrupt-")?;
+        let path = tmp.path().join("payload");
+        write(&path, b"not-hello")?;
+        let checksum = HELLO_SHA256.parse()?;
+        assert!(!cached_is_valid(&path, Some(&checksum)).await?);
+        assert!(
+            !path.exists(),
+            "file must be removed when checksum fails so the caller re-downloads"
+        );
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn no_checksum_trusts_cache() -> anyhow::Result<()> {
+        let tmp = TempDir::with_prefix("cached-nosum-")?;
+        let path = tmp.path().join("payload");
+        write(&path, b"whatever")?;
+        assert!(cached_is_valid(&path, None).await?);
+        assert!(path.exists());
+        Ok(())
     }
 }
