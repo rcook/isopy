@@ -4,6 +4,8 @@
 [![Release](https://github.com/rcook/isopy/actions/workflows/release.yaml/badge.svg)][release-workflow]
 [![Latest release](https://img.shields.io/github/v/tag/rcook/isopy)][latest-release]
 
+[**Use pydl instead!**][pydl]
+
 [GitHub Pages documentation][github-pages] including [usage][usage]
 
 Isolated Python environment tool to download and manage Python builds
@@ -51,6 +53,7 @@ This tool is similar in philosophy to the following projects:
 [ci-workflow]: https://github.com/rcook/isopy/actions/workflows/ci.yaml
 [github-pages]: https://rcook.github.io/isopy/
 [latest-release]: https://github.com/rcook/isopy/releases
+[pydl]: https://github.com/rcook/pydl
 [pyenv]: https://github.com/pyenv/pyenv
 [pyenv-win]: https://github.com/pyenv-win/pyenv-win
 [python-build-standalone-releases]: https://github.com/astral-sh/python-build-standalone/releases
