@@ -4,7 +4,7 @@
 [![Release](https://github.com/rcook/isopy/actions/workflows/release.yaml/badge.svg)][release-workflow]
 [![Latest release](https://img.shields.io/github/v/tag/rcook/isopy)][latest-release]
 
-[**Use pydl instead!**][pydl]
+**This project is now archived: use [pydl][pydl] or [uv][uv] instead!**
 
 [GitHub Pages documentation][github-pages] including [usage][usage]
 
@@ -64,3 +64,4 @@ This tool is similar in philosophy to the following projects:
 [rust]: https://www.rust-lang.org/
 [rustup]: https://rustup.rs/
 [usage]: https://rcook.github.io/isopy/usage
+[uv]: https://docs.astral.sh/uv/
