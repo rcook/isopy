@@ -62,8 +62,7 @@ impl LinkHeader {
         s.split(',')
             .filter_map(|part| {
                 part.split_once(';').and_then(|(u, r)| {
-                    parse_url_part(u.trim())
-                        .and_then(|u0| parse_rel_part(r.trim()).map(|r0| (r0, u0)))
+                    parse_rel_part(r.trim()).zip(parse_url_part(u.trim()))
                 })
             })
             .collect::<HashMap<_, _>>()
